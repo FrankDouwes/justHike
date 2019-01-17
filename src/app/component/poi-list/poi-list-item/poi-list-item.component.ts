@@ -23,7 +23,7 @@ export class PoiListItemComponent implements OnInit {
     if(this.data) {
 
       // generate poiTypes (icons)
-      let _poiStrArr: Array<string> = this.data['type'].split(", ");
+      let _poiStrArr: Array<string> = this.data['type'].split(', ');
 
       _poiStrArr.forEach(function(poi, index) {
 
