@@ -1,0 +1,38 @@
+<div id="wrap">
+
+  <cdk-virtual-scroll-viewport
+    #scrollViewport
+
+    orientation="horizontal"
+    itemSize="{{itemWidth}}"
+    class="virtual-list"
+    templateCacheSize="14"
+
+    (window:resize)="onResize($event)"
+    (scrolledIndexChange)="onScroll(scrollViewport, $event)">
+
+    <!-- the virtual list item -->
+    <display-list-item
+      class="list-item"
+
+      *cdkVirtualFor="let li of trailData.miles; let last = last; trackBy: trackElementBy"
+      [resize]="resize"
+      [data]="li"
+      [isLast]="last"
+      [current]="(li.isCurrent) ? userLocation : false"
+      [visibleOHLC]="visibleOHLC"
+      [guides]="guides"
+
+      (click)="onClick(li)">
+
+    </display-list-item>
+
+    <!-- runs under marker layer (in list item) -->
+    <guides id="guides" [visibleOHLC]="visibleOHLC" [guides]="guides"></guides>
+
+  </cdk-virtual-scroll-viewport>
+
+</div>
+
+<!-- runs above marker layer (in list item) -->
+<axis id="axis" [visibleOHLC]="visibleOHLC" [guides]="guides"></axis>

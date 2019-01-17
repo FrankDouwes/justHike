@@ -1,0 +1,79 @@
+\:host
+
+button:before
+
+button
+  position: relative
+  background-image: unset
+
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&0.78+0,0.55+100 */
+  background: -moz-linear-gradient(-45deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.55) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(-45deg, rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.55) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.55) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c7ffffff', endColorstr='#8cffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+  border-radius: 50%
+  font-size: 14px
+  min-width: 56px
+  min-height: 56px
+  width: 7vw
+  height: 7vw
+  margin: 10px 10px 0 0
+  padding: 0
+  outline: none
+  border: 2px solid white
+  overflow: hidden
+  -webkit-box-shadow: 0px 5px 10px -5px rgba(0,0,0,0.35)
+  -moz-box-shadow: 0px 5px 10px -5px rgba(0,0,0,0.35)
+  box-shadow: 0px 5px 10px -5px rgba(0,0,0,0.35)
+  backdrop-filter: blur(6px)
+  color: #555
+
+  transition: all 200ms ease
+  transition-property: width, height, border-radius
+
+  fa-icon
+    filter: drop-shadow(-1px -2px 1px rgba(0,0,0,0.1)) drop-shadow(2px 3px 2px white);
+
+  #mini-map
+    position: absolute
+    top: 0
+    left: 0
+    width: 15vw
+    height: 15vw
+    transition-property: opacity
+    opacity: 0
+    visibility: hidden
+    transition: all 200ms ease
+    transition-property: opacity
+
+  fa-icon
+    height: 28px
+    margin: auto
+    position: absolute
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
+
+  #error
+    color: red
+
+.active
+  width: 15vw
+  height: 15vw
+  border-radius: 5%
+
+  #mini-map
+    opacity: 1
+    visibility: visible
+
+.visible
+  opacity: 1
+  visibility: visible
+.invisible
+  opacity: 0
+  visibility: hidden
+
+button:focus
+  outline: 0

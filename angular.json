@@ -27,9 +27,18 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.sass"
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modules/leaflet/dist/leaflet.css",
+              "./node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css",
+              "src/styles.sass",
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/svg.js/dist/svg.js",
+              "./node_modules/svg.filter.js/dist/svg.filter.js",
+              "./node_modules/geolib/dist/geolib.js",
+              "./node_modules/geolib/dist/geolib.elevation.js",
+              "./node_modules/seedrandom/seedrandom.js",
+            ]
           },
           "configurations": {
             "production": {
@@ -83,9 +92,18 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles.sass"
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "./node_modules/leaflet/dist/leaflet.css",
+              "./node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css",
+              "src/styles.sass",
             ],
-            "scripts": [],
+            "scripts": [
+              "./node_modules/svg.js/dist/svg.js",
+              "./node_modules/svg.filter.js/dist/svg.filter.js",
+              "./node_modules/geolib/dist/geolib.js",
+              "./node_modules/geolib/dist/geolib.elevation.js",
+              "./node_modules/seedrandom/seedrandom.js"
+            ],
             "assets": [
               "src/favicon.ico",
               "src/assets"

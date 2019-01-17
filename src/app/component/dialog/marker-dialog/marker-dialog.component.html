@@ -1,0 +1,17 @@
+<div id="center-icon" >
+  <display-button class="button" label="" [poiTypes]="this.poiTypes" routerLink=""></display-button>
+</div>
+
+<!-- left -->
+<div id="left-panel">
+  <h1 mat-dialog-title>{{data.label}}</h1>
+  <p [innerHTML]="data.description"></p>
+  <p>{{this.poiMi}}</p>
+  <p>{{this.offTrail}}</p>
+  <poi-list class="poi-list"></poi-list>
+</div>
+
+<!-- right -->
+<div id="right-panel" [ngStyle]="{'background-color': this.poiTypes[0].color}">
+  test right
+</div>

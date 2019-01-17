@@ -1,0 +1,80 @@
+  <div id="center-icon" >
+    <display-button class="button" label="" icon="{{data.icon}}" routerLink=""></display-button>
+  </div>
+
+  <!-- left -->
+  <div id="left-panel">
+
+    <div id="setings-meta">
+      <h1 mat-dialog-title>Settings</h1>
+      <div mat-dialog-content>
+        <p>Welcome to the settings dialog, select a topic below (needs a real text)</p>
+      </div>
+    </div>
+
+    <mat-action-list id="settings-menu">
+      <button mat-list-item (click)="save()"> <h2>Select/Purchase Trail Data</h2><span><fa-icon icon="angle-right" size="lg"></fa-icon></span></button>
+      <button mat-list-item (click)="undo()"> <h2>Elevation Profile</h2><span><fa-icon icon="angle-right" size="lg"></fa-icon></span></button>
+      <button mat-list-item (click)="undo()"> <h2>Mile Overview</h2><span><fa-icon icon="angle-right" size="lg"></fa-icon></span></button>
+      <button mat-list-item (click)="undo()"> <h2>Units / Measurements / Markers</h2><span><fa-icon icon="angle-right" size="lg"></fa-icon></span></button>
+      <button mat-list-item (click)="undo()"> <h2>Cosmetics</h2><span><fa-icon icon="angle-right" size="lg" color="#00F"></fa-icon></span></button>
+      <button mat-list-item (click)="undo()"> <h2>About / Bug report</h2><span><fa-icon icon="angle-right" size="lg"></fa-icon></span></button>
+    </mat-action-list>
+  </div>
+
+  <!-- right -->
+  <div id="right-panel">
+
+    <!--<mat-card id="purchase-trails">-->
+
+      <!--<mat-card-header>-->
+        <!--<mat-card-title>Purchase Trail Expansions:</mat-card-title>-->
+      <!--</mat-card-header>-->
+
+      <!--<mat-card-content>-->
+        <!--<section class="example-section">-->
+          <!--<div>Pacific Crest Trail</div>-->
+          <!--<div>Continental Divide Trail</div>-->
+          <!--<div>Appalachian Trail</div>-->
+          <!--<div></div>-->
+          <!--<div></div>-->
+        <!--</section>-->
+      <!--</mat-card-content>-->
+
+    <!--</mat-card>-->
+
+    <mat-card>
+
+      <mat-card-content>
+        <section class="example-section">
+          <mat-form-field>
+            <mat-select placeholder="Trail">
+              <mat-option value="demo">Demo Trail</mat-option>
+              <mat-option *ngFor="let trail of trails" [value]="trail.id">
+                {{trail.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </section>
+
+        <section>
+          <div>
+            <fa-icon icon="arrow-alt-circle-down" size="lg"></fa-icon>
+            <p>Map image tiles</p>
+          </div>
+          <div>
+            <fa-icon icon="arrow-alt-circle-down" size="lg"></fa-icon>
+            <p>Elevation lines</p>
+          </div>
+          <div>
+            <fa-icon icon="arrow-alt-circle-down" size="lg"></fa-icon>
+            <p>Snow level data</p>
+          </div>
+        </section>
+
+
+      </mat-card-content>
+
+    </mat-card>
+
+  </div>

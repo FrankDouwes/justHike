@@ -1,0 +1,44 @@
+\:host
+
+  #content
+    border-bottom: 1px solid #EEE
+    width: 100%
+
+  #content.right
+      display: inline-grid
+      grid-template-columns: 85% 15%
+      grid-template-areas: 'main icon'
+
+  #content.left
+      display: inline-grid
+      grid-template-columns: 15% 85%
+      grid-template-areas: 'icon main'
+
+  .main
+    grid-area: main
+    padding-right: 0.2em
+
+    h2
+      -webkit-margin-before: 0.63em
+      margin-before: 0.63em
+      text-align: left
+      white-space: nowrap
+      text-overflow: ellipsis
+      overflow: hidden
+      font-size: 3.4vh
+      font-weight: 300
+      margin-bottom: 0.2em
+
+    small
+      display: block
+      color: grey
+      white-space: nowrap
+      -webkit-margin-after: 1em
+      margin-after: 1em
+      font-size: 2vh
+
+  .icon
+    grid-area: icon
+    display: flex
+    align-items: center
+    justify-content: center

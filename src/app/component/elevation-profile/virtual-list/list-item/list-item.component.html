@@ -1,0 +1,20 @@
+<div class="map" id="map_{{data.id}}" #map></div>
+<div class="markers" id="markers_{{data.id}}" #markers></div>
+<div class="meta">
+  <div class="elevation-container">
+    <div class="elevation-change">
+
+      <div class="gain"><fa-icon [icon]="['fas', 'long-arrow-alt-up']" transform="rotate-45"></fa-icon> {{data.elevationGain}} ft.</div>
+      <div class="loss"><fa-icon [icon]="['fas', 'long-arrow-alt-down']" transform="rotate--45"></fa-icon> {{data.elevationLoss}} ft.</div>
+    </div>
+  </div>
+
+  <div class="icons">
+    <span *ngIf="data.hasCamp && !showCampSites"><fa-icon [icon]="['fas', 'campground']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
+    <span *ngIf="data.hasEscape"><fa-icon [icon]="['fas', 'road']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
+    <span *ngIf="data.pois && data.pois.length > 0"><fa-icon [icon]="['fas', 'map-marker-alt']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
+  </div>
+
+  <div class="label" *ngIf="!isLast">{{data.id}}</div>
+
+</div>

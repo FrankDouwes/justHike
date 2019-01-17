@@ -1,0 +1,22 @@
+<!--<poi-list id="poi-list"></poi-list>-->
+
+<div id="layout">
+  <div id="main">
+    <leaflet-map
+
+      name="detail-map"
+
+      allowPanning="true"
+      showPois="true"
+      showMapTiles="true"
+      showElevationTiles="true"
+
+      [milesData]="this.visibleMiles"
+      [activeMileId]="this.routedMile"
+    >
+    </leaflet-map>
+  </div>
+  <div id="list">
+    <poi-list [milesData]="this.visibleMiles"></poi-list>
+  </div>
+</div>

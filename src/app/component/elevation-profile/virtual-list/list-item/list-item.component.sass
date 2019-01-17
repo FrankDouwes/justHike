@@ -1,0 +1,77 @@
+\:host
+  position: relative
+  display: inline-block
+  width: 22.22vw
+  height: 90vh
+  border-right: 1px dashed #BBB
+  align-items: center
+  overflow: visible
+  //z-index: 20
+
+  .map, .markers
+    display: block
+    margin-top: 10vh
+    width: 22.22vw
+    height: 60vh
+    font-size: 1.33em
+
+  .markers
+    overflow: visible
+    padding-top: 0
+    top: 0
+    position: absolute
+    z-index: 200
+
+.meta
+  position: absolute
+  bottom: 0
+  width: 22.22vw
+  height: 20vh
+
+  .elevation-container
+    padding-top: 2.5vh;
+    display: flex
+    width: 100%
+    justify-content: center;
+
+    .elevation-change
+      text-align: left
+      font-size: 14px
+      color: #333
+
+  .label
+    display: block
+
+    position: absolute
+    box-sizing: border-box
+    float: right
+
+    width: 44px
+    padding: 2px 3px 2px 3px
+
+    bottom: 2vh
+    right: -22px
+    z-index: 0
+
+    background-color: rgba(243,243,243,0.75);
+    border: 1px solid #777
+    border-radius: 3px
+
+    font-size: 12px
+    text-align: center
+
+.icons
+  display: block
+  text-align: center
+  padding-top: 5px
+
+  span
+    display: inline-block
+    padding: 6px 0
+    margin: 2px
+    width: 30px
+    text-align: center
+    border: 1px solid #97a895
+    border-radius: 50%
+    font-size: 16px
+    color: #666

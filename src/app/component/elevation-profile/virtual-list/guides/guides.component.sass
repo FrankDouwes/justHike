@@ -1,0 +1,32 @@
+\:host
+  display: block
+  position: fixed
+  top: 10vh
+  left: 0
+  height: 60vh
+  width: 100%
+  margin: 0
+  padding: 0
+  overflow-y: visible
+  pointer-events: none
+  z-index: 100
+
+  .guide
+    position: absolute
+    white-space: nowrap
+    left: 0
+    margin: 0
+    padding: 0
+    box-sizing: border-box
+    border-top: 1px solid
+    width: 100%
+    transition: margin-top 0.1s linear
+
+    .max
+      top: -19px
+
+  .guide:first-child
+    border-top: 2px dashed
+
+  .guide:last-child
+    border-top: 2px dashed
