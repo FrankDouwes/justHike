@@ -43,6 +43,7 @@ export class PoiListComponent implements OnInit {
         detail: poi
       });
 
-    this.container.elementRef.nativeElement.dispatchEvent(_event);
+    console.log(this.container);
+    this.container['elementRef'].nativeElement.dispatchEvent(_event);
   }
 }

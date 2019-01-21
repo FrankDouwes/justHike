@@ -3,6 +3,10 @@ import {Snowpoint} from '../type/snowpoint';
 // needs optimising (using static data files)
 export function parseSnow(snow: Array<any>): Array<any> {
 
+  if (!snow || snow.length === 0) {
+    return [];
+  }
+
   const _snowPivots: Array<any> = [];
 
   for (let i = 1; i < snow.length; i++) {
@@ -23,7 +27,7 @@ export function parseSnow(snow: Array<any>): Array<any> {
     }
   }
 
-  const _snowMiles: Array<Snowpoint> = [];
+  const _snowMiles: Array<Array<Snowpoint>> = [];
 
   // calculate snowlevel elevation line
   for (let s = 0; s < _snowPivots.length; s += 2) {
@@ -53,7 +57,7 @@ export function parseSnow(snow: Array<any>): Array<any> {
     let _miles = _nextFullMileDist;
 
     // set start / end points for miles in distance
-    while (_miles.toFixed(2) < _distance - _nextFullMileDist - 1) {
+    while (Number(_miles.toFixed(2)) < _distance - _nextFullMileDist - 1) {
 
       _miles ++;
 

@@ -23,6 +23,8 @@ export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: A
   const _optimisedWaypoints: Array<Waypoint> = simplify(waypoints, tolerance);
   trail.waypoints = _optimisedWaypoints;
 
+  console.log('optimised waypoints');
+
   // 2. calculate trail properties
   let flatPoints: Array<object> = [];
 
@@ -35,6 +37,8 @@ export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: A
   trail.scale = (trail.length / trail.calcLength);
   trail.elevationRange = calculateOHLC(trail.waypoints, {start: 0, end: waypoints.length - 1});
 
+  console.log('calculated trail properties');
+
   // 3. split waypoints into miles
   trail.miles = createMiles(_optimisedWaypoints, pois, snow, trail.scale);
 
@@ -44,6 +48,8 @@ export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: A
     }
   )
 
+  console.log('created miles');
+
   _tree = [flatMileCoordinates];
   createMileTree(flatMileCoordinates, _tree);
 
@@ -51,6 +57,8 @@ export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: A
 
   // 4b. link pois to trail waypoints
   linkPoisToMiles(pois, trail.miles);
+
+  console.log('linked pois to miles');
 
   return trail;
 }
@@ -165,6 +173,8 @@ function createMiles (waypoints: Array<object>, pois: Array<Poi>, snow: Array<ob
       for (const wp of _mileWaypoints) {
         wp.distance -= Settings.MILE;
       }
+
+      console.log(_miles.length);
 
     }
 

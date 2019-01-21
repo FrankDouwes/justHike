@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AngularFittextModule } from 'angular-fittext';
+import {NgForageModule, NgForageConfig, Driver} from 'ngforage';
 
 // font awesome
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -55,7 +56,6 @@ import { FaSamplerComponent } from './component/fa-sampler/fa-sampler.component'
 import { FaIconComponent } from './component/fa-sampler/fa-icon/fa-icon.component';
 import { IconComponent } from './display/icon/icon.component';
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -84,6 +84,7 @@ import { IconComponent } from './display/icon/icon.component';
   imports: [
     BrowserModule,
     HttpClientModule,
+    NgForageModule.forRoot(),
     ScrollingModule,
     BrowserAnimationsModule,
     MatProgressSpinnerModule,
@@ -103,7 +104,19 @@ import { IconComponent } from './display/icon/icon.component';
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor() {
+  constructor(ngfConfig: NgForageConfig) {
+
+    // local forage
+    ngfConfig.configure({
+      name: 'JustHike',
+      driver: [
+        Driver.INDEXED_DB,
+        Driver.WEB_SQL,
+        Driver.LOCAL_STORAGE
+      ]
+    });
+
+    // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen,
       faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar,

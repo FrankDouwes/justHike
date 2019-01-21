@@ -28,7 +28,7 @@ export class Settings {
       id: 0,
       name: 'Pacific Crest Trail - CA section 1',
       abbr: 'PCT',
-      length: 109.5,      //estimated length
+      length: 109.5,      //estimated length (according to halfmile pct data
       dataPath: 'PCT/'
     }, {
       id: 1,

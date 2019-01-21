@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, OnChanges, SimpleChanges} from '@angular/core';
-import {PoiType} from '../../../type/poi';
+import {Poi, PoiType} from '../../../type/poi';
 import {distanceInMilesFeet, getPoiTypeByType} from '../../../_util/poi';
 
 @Component({
@@ -9,7 +9,7 @@ import {distanceInMilesFeet, getPoiTypeByType} from '../../../_util/poi';
 })
 export class PoiListItemComponent implements OnInit {
 
-  @Input() data:object;
+  @Input() data: Poi;
   public poiTypes: Array<PoiType> = [];
   public poiMi;
   public offTrail;

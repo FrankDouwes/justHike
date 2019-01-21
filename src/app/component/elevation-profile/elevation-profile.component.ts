@@ -25,10 +25,6 @@ export class ElevationProfileComponent implements OnInit {
       .subscribe(result => {
         this.trailData = result.trailData;
       });
-    // const _id = Number(this._route.snapshot.paramMap.get('id'));
-    // if(_id && _id !== -1) {
-    //   this.onScrollTo(_id);
-    // }
   }
 
   onScroll(response: object) {

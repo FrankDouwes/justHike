@@ -21,13 +21,13 @@ export function distanceInMilesFeet(distanceMeters:number, force: string = ""): 
   if (distanceMeters / Settings.MILE >= 0.1 && force !== 'ft' || force === 'mi') {
     // show in miles
 
-    _distance = (distanceMeters / Settings.MILE).toFixed(2);
+    _distance = Number((distanceMeters / Settings.MILE).toFixed(2));
     _unit = 'mi.'
 
   } else {
     // show in feet
 
-    _distance = (distanceMeters / Settings.FOOT).toFixed(0);
+    _distance = Number((distanceMeters / Settings.FOOT).toFixed(0));
     _unit = 'ft.';
   }
 

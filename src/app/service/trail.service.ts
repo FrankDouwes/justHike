@@ -21,6 +21,12 @@ export class TrailService {
   // this will eventually be replaced with a fetch of already parsed/optimised JSON data XXX */
   getTrailData(path: string): Observable<object> {
 
+    // if cached
+
+    // else load parsed
+
+    // else download raw
+
     const _trail = this._http.get(this._baseUrl + path + 'trail.gpx', {responseType: 'text'});
     const _poi = this._http.get(this._baseUrl + path + 'poi.gpx', {responseType: 'text'});
     const _snow = this._http.get(this._baseUrl + path + 'snow.json', {responseType: 'json'});
