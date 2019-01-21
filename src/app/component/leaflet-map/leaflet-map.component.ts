@@ -2,13 +2,14 @@ import {Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges} from 
 import {Mile} from '../../type/mile';
 import {ActivatedRoute} from '@angular/router';
 import * as L from 'leaflet';
-import "leaflet.awesome-markers/dist/leaflet.awesome-markers";
-import "leaflet-polylinedecorator/dist/leaflet.polylineDecorator";
+import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
 
-import {Poi} from '../../type/poi';
+import {Poi, PoiType} from '../../type/poi';
 import {Waypoint} from '../../type/waypoint';
 import {Settings} from '../../settings';
 import {elevationLines, mapTiles} from '../../_util/tiles';
+import {getPoiTypeByType} from '../../_util/poi';
+import {createFaLeafletMarker} from '../../_util/markers';
 
 @Component({
   selector: 'leaflet-map',
@@ -105,7 +106,7 @@ export class LeafletMapComponent implements OnInit {
     let _centerpoint: object;
     let _bounds: Array<object> = [];
 
-    L.AwesomeMarkers.Icon.prototype.options.prefix = 'fa';
+    // L.AwesomeMarkers.Icon.prototype.options.prefix = 'fa';
 
     for (let mile of this.milesData) {
 
@@ -199,11 +200,15 @@ export class LeafletMapComponent implements OnInit {
 
   createmarker(poi: Poi) {
 
-    var _marker = L.divIcon({
-      html: 'test',
-      className: 'marker'});
+    let _poiType: PoiType = getPoiTypeByType(poi.type);
 
-    let _poi = L.marker([poi.waypoint.latitude, poi.waypoint.longitude], {icon: _marker});
+    if (!_poiType) {
+      _poiType = getPoiTypeByType('multiple');
+    }
+
+    let _poi = L.marker([poi.waypoint.latitude, poi.waypoint.longitude], {icon: createFaLeafletMarker(_poiType.icon, _poiType.iconType, _poiType.color), poi:poi});
+
+    _poi.on('click', this.onMarkerClick.bind({data:poi, self:this}));
 
     return _poi;
   }
@@ -226,6 +231,21 @@ export class LeafletMapComponent implements OnInit {
 
   toBoolean(value: any) {
     return (String(value) === "true") ? true : false;
+  }
+
+  // linked directly to svg marker
+  onMarkerClick (event: MouseEvent) {
+
+    const _event: CustomEvent = new CustomEvent(
+      'markerClick',
+      {
+        bubbles: true,
+        cancelable: true,
+        detail: this.data
+      });
+
+    // get DOM element on changed scope
+    this['self']._map._container.dispatchEvent(_event);
   }
 
 }

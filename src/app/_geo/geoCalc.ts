@@ -173,9 +173,6 @@ function createMiles (waypoints: Array<object>, pois: Array<Poi>, snow: Array<ob
       for (const wp of _mileWaypoints) {
         wp.distance -= Settings.MILE;
       }
-
-      console.log(_miles.length);
-
     }
 
     // set the previous point for next distance calc.

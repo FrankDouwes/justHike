@@ -19,8 +19,6 @@ export class IconComponent implements OnInit {
 
   ngOnInit() {
 
-    console.log(this.data);
-
     const _self = this;
 
     this.data.forEach(function(poiType, index) {

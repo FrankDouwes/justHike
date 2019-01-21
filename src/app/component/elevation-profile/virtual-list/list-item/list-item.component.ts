@@ -423,9 +423,4 @@ export class ListItemComponent implements OnInit {
     // changed scope
     this['self'].map.nativeElement.dispatchEvent(_event);
   }
-
-  // dispatch marker event
-  dispatchMarkerEvent() {
-
-  }
 }

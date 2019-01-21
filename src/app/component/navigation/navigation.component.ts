@@ -12,6 +12,7 @@ export class NavigationComponent implements OnInit {
   @Output() navEvent: EventEmitter<string> = new EventEmitter<string>();
 
   public visibleClass = 'hide';
+  public oppositeClass = 'show';
   private _backIndex: object;
 
   constructor(
@@ -27,8 +28,10 @@ export class NavigationComponent implements OnInit {
 
         if (event['url'].includes('detail') || event['url'].includes('settings')) {
           this.visibleClass = 'show';
+          this.oppositeClass = 'hide';
         } else {
           this.visibleClass = 'hide';
+          this.oppositeClass = 'show';
         }
       }
     });
@@ -43,6 +46,7 @@ export class NavigationComponent implements OnInit {
 
   onBackClick() {
     this.visibleClass = 'hide';
+    this.oppositeClass = 'show';
     // this._location.back();
     this._router.navigate(['elevation-profile/'], {queryParams: {id: this._backIndex}});
     this.navEvent.emit('elevation-profile');
