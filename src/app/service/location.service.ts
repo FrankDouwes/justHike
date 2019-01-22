@@ -69,11 +69,11 @@ export class LocationService {
   private parseLocation(location): void {
 
     // FIXED POSITION XXX
-    const _tempLocation = {
-      coords: {latitude: 33.257092, longitude: -116.615705, altitude: 3436.2532808398946, accuracy: 53, altitudeAccuracy: 1},
-      timestamp: 1546899591215
-    };
-    location = _tempLocation;
+    // const _tempLocation = {
+    //   coords: {latitude: 33.257092, longitude: -116.615705, altitude: 3436.2532808398946, accuracy: 53, altitudeAccuracy: 1},
+    //   timestamp: 1546899591215
+    // };
+    // location = _tempLocation;
 
     // only execute if location changed (optimisation)
     if (!this._previousLocation ||

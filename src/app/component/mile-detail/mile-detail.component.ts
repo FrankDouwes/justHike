@@ -10,7 +10,9 @@ import {Mile} from '../../type/mile';
 
 export class MileDetailComponent implements OnInit {
 
-  public visibleMiles: Array<Mile>;
+  public visibleMilesList: Array<Mile>;
+  public visibleMilesLeaflet: Array<Mile>;
+
   public routedMile: number;
 
   constructor(
@@ -24,16 +26,21 @@ export class MileDetailComponent implements OnInit {
 
     this._route.data
       .subscribe(result => {
-
         const _milesBehind = 2;
         const _milesAhead = 1;
+        const _mapLineSegmentPadding = 0;     // extra line segments to show, at start/end, since leaflet works with zoom levels.
 
-        const _startIndex: number = (this.routedMile >= _milesBehind) ? this.routedMile - _milesBehind : 0;
-        const _endIndex: number = (this.routedMile <= result.trailData.miles.length) ? this.routedMile + _milesAhead : result.trailData.miles.length;
-
-        this.visibleMiles = result.trailData.miles.slice(_startIndex, _endIndex);
-        console.log(this.visibleMiles);
+        this.visibleMilesList = this.getMilesSegmentData(result, _milesBehind, _milesAhead);
+        this.visibleMilesLeaflet =  this.getMilesSegmentData(result, (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
       });
+  }
+
+  getMilesSegmentData(data: any, milesBehind: number, milesAhead: number) {
+
+    const _startIndex: number = (this.routedMile >= milesBehind) ? this.routedMile - milesBehind : 0;
+    const _endIndex: number = (this.routedMile + milesAhead <= data.trailData.miles.length) ? this.routedMile + milesAhead : data.trailData.miles.length;
+
+    return data.trailData.miles.slice(_startIndex, _endIndex);
   }
 }
 

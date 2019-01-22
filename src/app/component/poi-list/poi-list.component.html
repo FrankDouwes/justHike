@@ -5,7 +5,7 @@
   orientation="vertical"
   itemSize="20%"
   templateCacheSize="8">
-
-  <poi-list-item class="list-item" *cdkVirtualFor="let poi of this.poisArray" [data]="poi" (click)="onClick(poi)"></poi-list-item>
+  <poi-user></poi-user>
+  <poi-list-item class="list-item" *cdkVirtualFor="let poi of this.poisArray" [data]="poi" (click)="onListItemClick(poi)"></poi-list-item>
 
 </cdk-virtual-scroll-viewport>

@@ -29,14 +29,14 @@
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "./node_modules/leaflet/dist/leaflet.css",
-              "src/styles.sass",
+              "src/styles.sass"
             ],
             "scripts": [
               "./node_modules/svg.js/dist/svg.js",
               "./node_modules/svg.filter.js/dist/svg.filter.js",
               "./node_modules/geolib/dist/geolib.js",
               "./node_modules/geolib/dist/geolib.elevation.js",
-              "./node_modules/seedrandom/seedrandom.js",
+              "./node_modules/seedrandom/seedrandom.js"
             ]
           },
           "configurations": {

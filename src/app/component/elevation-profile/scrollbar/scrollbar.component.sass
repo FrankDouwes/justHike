@@ -6,7 +6,7 @@
   left: 0
   width: 100vw
   height: 10vh
-  padding-top: 10px
+  //padding-top: 10px
   border-top: 1px solid #999
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#b2b2b2+0,dddddd+5 */
   background: #b2b2b2; /* Old browsers */
@@ -15,14 +15,15 @@
   background: linear-gradient(to bottom, #b2b2b2 0%,#dddddd 5%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b2b2b2', endColorstr='#dddddd',GradientType=0 ); /* IE6-9 */
   display: inline-grid
-  grid-template-columns: 5% 90% 5%
+  grid-template-columns: 0 100% 0
   grid-template-areas: 'leftbutton main rightbutton'
+  overflow: hidden
 
 #main
   grid-area: main
+  height: 10vh
 
   #scroll-map
-    height: 10vh
     filter: drop-shadow(0 0 10px rgba(255,255,255,0.25));
     height: 100%
 
@@ -38,7 +39,7 @@
     -webkit-transition: padding-left 0.25s /* Safari */
     transition: padding-left 0.25s
     overflow-x: visible
-    background-color: red
+    //background-color: red
 
     .viewport
       position: absolute

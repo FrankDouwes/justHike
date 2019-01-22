@@ -66,8 +66,10 @@ export class ListItemComponent implements OnInit {
 
   ngAfterViewInit() {
 
-    this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
+    // this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
+    this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
     this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
+
 
     this._svgCanvas = SVG('map_' + this.data.id)
       .size(this._svgWidth, this._svgHeight)
@@ -94,7 +96,8 @@ export class ListItemComponent implements OnInit {
 
     if (changes.resize) {
 
-      this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
+      // this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
+      this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
       this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
 
       // update svg size

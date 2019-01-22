@@ -2,9 +2,9 @@ import { Waypoint } from './waypoint';
 
 export class Poi {
   id:                 number;             // id (mile number, starts at 1 not 0)
-  trail:              string;             // abbr. of trail mile belongs to
+  trail?:              string;            // abbr. of trail mile belongs to      (optional as user has a poi, but no trail)
   waypoint:           Waypoint;           // coordinates (+ elevation)
-  type:               string;             // type (PoiType.type
+  type:               string;             // type (PoiType.type)
   label:              string;             // name
 
   anchorPoint?:        Waypoint;          // calculated nearest trail location (between 2 waypoints in a mile)

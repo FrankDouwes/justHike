@@ -22,7 +22,6 @@ export class ScrollbarComponent implements OnInit {
   @Output() scrollToEvent: EventEmitter<number> = new EventEmitter<number>();
 
   private _verticalPadding = 10;
-  // private _container: ElementRef;
 
   // SVG MAP
   private _svgCanvas;
@@ -33,17 +32,14 @@ export class ScrollbarComponent implements OnInit {
   public viewportSize = 0;
   public viewportOffset = 0;
 
-  constructor(_element: ElementRef) {
-    // this._container = _element;
-  }
+  constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
   ngAfterViewInit() {
 
-    this._svgWidth =  Math.ceil(this.main.nativeElement.clientWidth);
-    this._svgHeight =  Math.ceil(this.main.nativeElement.clientHeight);
+    this._svgWidth =  this.main.nativeElement.clientWidth;
+    this._svgHeight =  this.main.nativeElement.clientHeight;
 
     this._svgCanvas = SVG('scroll-map')
       .size(this._svgWidth, this._svgHeight)
@@ -59,10 +55,12 @@ export class ScrollbarComponent implements OnInit {
       this.viewportSize = (( this.visibleRange['currentValue']['visibleRange'].end -  this.visibleRange['currentValue']['visibleRange'].start) / this.trailData.miles.length) * 100;
       this.viewportOffset = (this.visibleRange['currentValue']['scrollX'] / (this.trailData.miles.length * ((this.main.nativeElement.clientWidth) / 4.5))) * 100;
 
-    } else if (changes.resize) {
+    }
 
-      this._svgWidth = Math.ceil(this.main.nativeElement.clientWidth);
-      this._svgHeight = Math.ceil(this.main.nativeElement.clientHeight);
+    if (changes.resize) {
+
+      this._svgWidth = this.main.nativeElement.clientWidth;
+      this._svgHeight = this.main.nativeElement.clientHeight;
 
       // update svg size
       if (this._svgCanvas) {
@@ -94,6 +92,8 @@ export class ScrollbarComponent implements OnInit {
 
     const l = (this._svgWidth / this.trailData.waypoints.length);
 
+    console.log(this._svgWidth, this._svgHeight);
+
     // start points
     drawPoints.push([0, max]);
     elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2), this.trailData['waypoints'][0]['elevation'], min, range, this._verticalPadding));
@@ -103,14 +103,13 @@ export class ScrollbarComponent implements OnInit {
     let prevPoint: object;
     let totalDistancePerc = 0;
 
-    for (const waypoint of this.trailData.waypoints) {
+    for (var i = 0; i < this.trailData.waypoints.length; i += Settings.USERSETTINGS.scrollbarSegmentSize) {
+
+      const waypoint:Waypoint = this.trailData.waypoints[i];
 
       // calculate distance, starting at 2nd point
       if (counter > 0) {
-
-        const waypointDistPerc: number = geolib.getDistance(prevPoint as Waypoint, waypoint as Waypoint, 6, 6) / this.trailData['calcLength'];
-
-        totalDistancePerc += toMile(waypointDistPerc);
+        totalDistancePerc = (waypoint.distanceTotal / Settings.MILE) / this.trailData['length'];
       }
 
       elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2), waypoint.elevation, min, range, this._verticalPadding));

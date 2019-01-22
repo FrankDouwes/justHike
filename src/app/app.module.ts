@@ -13,9 +13,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
   faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle,
   faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faCar, faTrain, faDoorOpen,
-  faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar
+  faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle
   } from '@fortawesome/free-solid-svg-icons';
-import { faCompass, faDotCircle, faQuestionCircle} from '@fortawesome/free-regular-svg-icons';
+import { faCompass, faDotCircle} from '@fortawesome/free-regular-svg-icons';
 
 // virtual scroll & material
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -47,6 +47,7 @@ import { LocatorComponent} from './component/locator/locator.component';
 import { LoaderOverlayComponent } from './component/loader-overlay/loader-overlay.component';
 import { PoiListComponent } from './component/poi-list/poi-list.component';
 import { PoiListItemComponent } from './component/poi-list/poi-list-item/poi-list-item.component';
+import { PoiUserComponent } from './component/poi-list/poi-user/poi-user.component';
 import { LeafletMapComponent } from './component/leaflet-map/leaflet-map.component';
 
 // dialog
@@ -78,7 +79,8 @@ import { IconComponent } from './display/icon/icon.component';
     PoiListItemComponent,
     FaSamplerComponent,
     FaIconComponent,
-    IconComponent
+    IconComponent,
+    PoiUserComponent
   ],
   entryComponents: [SettingsDialogComponent, MarkerDialogComponent],
   imports: [

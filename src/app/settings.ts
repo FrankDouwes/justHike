@@ -20,7 +20,9 @@ export class Settings {
     distanceOffTrail: 250,          // distance (in feet?) that a water source has to be off trail to be rendered as such
 
     showExtraDesign: true,          // show extra design features in elevation profile (trees)
-    greyScale: false                // map greyscale mode
+    greyScale: false,               // map greyscale mode
+    maxPoiDistance: 0.1,            // maximum poi distance from trail (in mi)
+    scrollbarSegmentSize: 26        // scrollbar (elevation profile) renders 1 point for every X points)
   };
 
   public static TRAILS: Array<Trail> = [
@@ -28,8 +30,8 @@ export class Settings {
       id: 0,
       name: 'Pacific Crest Trail - CA section 1',
       abbr: 'PCT',
-      length: 109.5,      //estimated length (according to halfmile pct data
-      dataPath: 'PCT/'
+      length: 109.5,      //estimated length (including 8mi into Canada) (according to halfmile pct data (first section is 109.5)
+      dataPath: 'PCT/X'
     }, {
       id: 1,
       name: 'Continental Divide Trail',
@@ -133,7 +135,7 @@ export class Settings {
       type: 'end',
       label: 'sign',
       color: '#d9c558',
-      iconType: 'fas',
+      iconType: 'fa',
       icon: 'flag'
     },
 
@@ -151,7 +153,7 @@ export class Settings {
       type: 'unknown',
       label: '',
       color: '#6dd958',
-      iconType: 'far',
+      iconType: 'fa',
       icon: 'question-circle'
     }
 

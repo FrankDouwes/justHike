@@ -55,13 +55,6 @@ export class LeafletMapComponent implements OnInit {
 
   ngAfterViewInit() {
 
-    // inputs are always strings (needs getter/setter XXX)
-    // this.showPois = this.toBoolean(this.showPois);
-    // this.showMapTiles = this.toBoolean(this.showMapTiles);
-    // this.showElevationTiles = this.toBoolean(this.showElevationTiles);
-    // this.allowPanning = this.toBoolean(this.allowPanning);
-    // this.allowZooming = this.toBoolean(this.allowZooming);
-
     L.Icon.Default.prototype.options.iconUrl = '/assets/icons/marker-icon.png';
     L.Icon.Default.prototype.options.iconRetinaUrl = '/assets/icons/marker-icon-2x.png';
     L.Icon.Default.prototype.options.shadowUrl = '/assets/icons/marker-shadow.png';
@@ -106,15 +99,13 @@ export class LeafletMapComponent implements OnInit {
     let _centerpoint: object;
     let _bounds: Array<object> = [];
 
-    // L.AwesomeMarkers.Icon.prototype.options.prefix = 'fa';
+    for (let i = 0; i < this.milesData.length; i++) {
 
-    for (let mile of this.milesData) {
+      let mile =this.milesData[i];
 
       // startMile marker
-
-      var _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + (mile.id - 1) + '</div>'});
-      let _marker = L.marker([mile.waypoints[0].latitude, mile.waypoints[0].longitude], {icon: _labelIcon}).addTo(this._map);
-
+      let _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + (mile.id - 1) + '</div>'});
+      const _marker = L.marker([mile.waypoints[0].latitude, mile.waypoints[0].longitude], {icon: _labelIcon}).addTo(this._map);
 
       if (mile.id === this.activeMileId) {
         _centerpoint = mile.centerpoint;
@@ -122,8 +113,9 @@ export class LeafletMapComponent implements OnInit {
 
       //render pois
       if (this.showPois && mile.pois) {
-        for (let poi of mile.pois) {
-          //if (poi['icon'] === 'WaterSource') {
+
+
+          for (let poi of mile.pois) {
 
             let _poiMarker = this.createmarker(poi as Poi);
 
@@ -136,25 +128,33 @@ export class LeafletMapComponent implements OnInit {
                   {
                     offset: '100%',
                     repeat: 0,
-                    symbol: L.Symbol.arrowHead({pixelSize: 5, headAngle: 90, polygon: false, pathOptions: {color: 'rgb(187, 97, 0)', weight: 2}})
+                    symbol: L.Symbol.arrowHead({
+                      pixelSize: 5,
+                      headAngle: 90,
+                      polygon: false,
+                      pathOptions: {color: 'rgb(187, 97, 0)', weight: 2}
+                    })
                   },
                   {
                     offset: '0%',
                     repeat: 0,
-                    symbol: L.Symbol.arrowHead({pixelSize: 5, headAngle: 270, polygon: false, pathOptions: {color: 'rgb(187, 97, 0)', weight: 2}})
+                    symbol: L.Symbol.arrowHead({
+                      pixelSize: 5,
+                      headAngle: 270,
+                      polygon: false,
+                      pathOptions: {color: 'rgb(187, 97, 0)', weight: 2}
+                    })
                   }
                 ]
               }).addTo(this._map);
             }
 
-
             _markers.push(_poiMarker);
 
-            if (mile.id >= this.activeMileId - 1 && mile.id >= this.activeMileId + 1) {
+            if (mile.id === this.activeMileId) {
               _bounds.push(_poiMarker._latlng);
             }
-          //}
-        }
+          }
       }
 
       for (let waypoint of mile.waypoints) {
@@ -229,11 +229,7 @@ export class LeafletMapComponent implements OnInit {
     return _firstpolyline;
   }
 
-  toBoolean(value: any) {
-    return (String(value) === "true") ? true : false;
-  }
-
-  // linked directly to svg marker
+  // linked directly to svg marker (scope change)
   onMarkerClick (event: MouseEvent) {
 
     const _event: CustomEvent = new CustomEvent(
@@ -241,7 +237,7 @@ export class LeafletMapComponent implements OnInit {
       {
         bubbles: true,
         cancelable: true,
-        detail: this.data
+        detail: this['data']
       });
 
     // get DOM element on changed scope

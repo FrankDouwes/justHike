@@ -1,13 +1,13 @@
-<button id="left" (click)="onPan('backward')">back</button>
+<!--<button id="left" (click)="onPan('backward')">back</button>-->
 
 <div id="main" #main>
 
   <div id="scroll-map" (click)="onClick($event)"></div>
 
-  <!--<div class="viewport-wrapper" [ngStyle]="{'padding-left': this.viewportOffset + 'vw'}" (click)="onClick($event)">-->
-    <!--<div class="viewport" [ngStyle]="{'width': this.viewportSize + 'vw'}"></div>-->
-  <!--</div>-->
+  <div class="viewport-wrapper" [ngStyle]="{'padding-left': this.viewportOffset + 'vw'}" (click)="onClick($event)">
+    <div class="viewport" [ngStyle]="{'width': this.viewportSize + 'vw'}"></div>
+  </div>
 
 </div>
 
-<button id="right" (click)="onPan('forward')">forw</button>
+<!--<button id="right" (click)="onPan('forward')">forw</button>-->

@@ -64,8 +64,6 @@ export function sampleFaIcon(iconId:string) {
 // create leaflet poi marker (using font-awesome 5 webfont)
 export function createFaLeafletMarker(icon: string, iconPrefix: string, color:string) {
 
-  console.log(iconPrefix);
-
   var redMarker = L.VectorMarkers.icon({
     icon: icon,
     markerColor: color,

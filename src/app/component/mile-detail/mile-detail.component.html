@@ -11,12 +11,12 @@
       showMapTiles="true"
       showElevationTiles="true"
 
-      [milesData]="this.visibleMiles"
+      [milesData]="this.visibleMilesLeaflet"
       [activeMileId]="this.routedMile"
     >
     </leaflet-map>
   </div>
   <div id="list">
-    <poi-list [milesData]="this.visibleMiles"></poi-list>
+    <poi-list [milesData]="this.visibleMilesList"></poi-list>
   </div>
 </div>
