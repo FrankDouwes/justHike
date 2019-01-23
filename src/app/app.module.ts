@@ -47,7 +47,7 @@ import { LocatorComponent} from './component/locator/locator.component';
 import { LoaderOverlayComponent } from './component/loader-overlay/loader-overlay.component';
 import { PoiListComponent } from './component/poi-list/poi-list.component';
 import { PoiListItemComponent } from './component/poi-list/poi-list-item/poi-list-item.component';
-import { PoiUserComponent } from './component/poi-list/poi-user/poi-user.component';
+import { PoiUserItemComponent } from './component/poi-list/poi-user-item/poi-user-item.component';
 import { LeafletMapComponent } from './component/leaflet-map/leaflet-map.component';
 
 // dialog
@@ -56,6 +56,11 @@ import { SettingsDialogComponent } from './component/dialog/settings-dialog/sett
 import { FaSamplerComponent } from './component/fa-sampler/fa-sampler.component';
 import { FaIconComponent } from './component/fa-sampler/fa-icon/fa-icon.component';
 import { IconComponent } from './display/icon/icon.component';
+
+// pipes
+import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
+import { DistancePipe } from './pipe/distance.pipe';
+import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-item.component';
 
 @NgModule({
   declarations: [
@@ -76,13 +81,21 @@ import { IconComponent } from './display/icon/icon.component';
     MarkerDialogComponent,
     PoiListComponent,
     LeafletMapComponent,
-    PoiListItemComponent,
     FaSamplerComponent,
     FaIconComponent,
     IconComponent,
-    PoiUserComponent
+    PoiSortingPipe,
+    DistancePipe,
+    PoiUserItemComponent,
+    PoiListItemComponent,
+    DynamicItemComponent
   ],
-  entryComponents: [SettingsDialogComponent, MarkerDialogComponent],
+  entryComponents: [
+    SettingsDialogComponent,
+    MarkerDialogComponent,
+    PoiUserItemComponent,
+    PoiListItemComponent
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,

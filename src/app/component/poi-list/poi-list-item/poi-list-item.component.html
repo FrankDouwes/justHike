@@ -1,7 +1,7 @@
 <div id="content" class="left" matRipple>
   <div class="main noselect">
     <h2>{{data.label}}</h2>
-    <small>{{this.poiMi}} {{this.offTrail}}</small>
+    <small>{{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} {{this.data.waypoint.distance | distance:'meters':'miles':true}}</small>
   </div>
 
   <display-icon class="icon" [data]="this.poiTypes" showRating="true"></display-icon>

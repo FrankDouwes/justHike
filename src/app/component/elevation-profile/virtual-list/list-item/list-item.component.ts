@@ -28,7 +28,7 @@ import {getPoiTypeByType} from '../../../../_util/poi';
   selector: 'display-list-item',
   templateUrl: './list-item.component.html',
   styleUrls: ['./list-item.component.sass'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class ListItemComponent implements OnInit {
@@ -66,8 +66,8 @@ export class ListItemComponent implements OnInit {
 
   ngAfterViewInit() {
 
-    // this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
-    this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
+    this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
+    // this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
     this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
 
 
@@ -96,8 +96,8 @@ export class ListItemComponent implements OnInit {
 
     if (changes.resize) {
 
-      // this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
-      this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
+      this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
+      // this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
       this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
 
       // update svg size

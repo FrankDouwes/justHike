@@ -1,6 +1,6 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {Poi, PoiType} from '../../../type/poi';
-import {distanceInMilesFeet, getPoiTypeByType} from '../../../_util/poi';
+import {getPoiTypeByType} from '../../../_util/poi';
 
 @Component({
   selector: 'poi-list-item',
@@ -11,8 +11,6 @@ export class PoiListItemComponent implements OnInit {
 
   @Input() data: Poi;
   public poiTypes: Array<PoiType> = [];
-  public poiMi;
-  public offTrail;
 
   constructor() { }
 
@@ -44,21 +42,6 @@ export class PoiListItemComponent implements OnInit {
       if (this.poiTypes.length === 0) {
         this.poiTypes.push(getPoiTypeByType('unknown'));
       }
-
-      const convMileage: object = distanceInMilesFeet(this.data.anchorPoint.distanceTotal, 'mi');
-      this.poiMi = 'Mile ' + convMileage['distance'];
-
-      const convOffTrail: object = distanceInMilesFeet(this.data.waypoint.distance);
-      if (convOffTrail['distance'] < 10 && convOffTrail['unit'] === 'ft.') {
-        this.offTrail = '';
-      } else {
-        this.offTrail = '(~' + convOffTrail['distance'] + ' ' + convOffTrail['unit'] + ' off trail)';
-      }
-
     }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    // console.log(changes);
   }
 }

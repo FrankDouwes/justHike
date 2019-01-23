@@ -25,18 +25,18 @@ export class LeafletMapComponent implements OnInit {
   @Input() userLocation: Waypoint;    // the user location
 
   // map tiles
-  @Input() showMapTiles: string;
-  @Input() showElevationTiles: string;
+  @Input() showMapTiles: boolean;
+  @Input() showElevationTiles: boolean;
 
   // map controls
-  @Input() allowPanning: string;
-  @Input() allowZooming: string;
+  @Input() allowPanning: boolean;
+  @Input() allowZooming: boolean;
 
   // elements
-  @Input() showPois: string;
+  @Input() showPois: boolean;
 
   private _map: L;
-  private _initialized: Boolean = false;
+  private _initialized: boolean = false;
 
   constructor(
     private _route: ActivatedRoute,
@@ -61,11 +61,11 @@ export class LeafletMapComponent implements OnInit {
 
     let _tileLayers: Array<any> = [];
 
-    if (this.showMapTiles === 'true') {
+    if (this.showMapTiles === true) {
       _tileLayers.push(mapTiles());
     }
 
-    if (this.showElevationTiles === 'true') {
+    if (this.showElevationTiles === true) {
       _tileLayers.push(elevationLines());
     }
 
@@ -74,11 +74,11 @@ export class LeafletMapComponent implements OnInit {
       layers: _tileLayers
     });
 
-    if (this.allowPanning !== 'true') {
+    if (this.allowPanning !== true) {
       this._map.dragging.disable();
     }
 
-    if (this.allowZooming !== 'true') {
+    if (this.allowZooming !== true) {
       this._map['scrollWheelZoom'].disable();
       this._map.touchZoom.disable();
       this._map.doubleClickZoom.disable();
@@ -114,6 +114,7 @@ export class LeafletMapComponent implements OnInit {
       //render pois
       if (this.showPois && mile.pois) {
 
+        console.log('???');
 
           for (let poi of mile.pois) {
 
@@ -151,7 +152,7 @@ export class LeafletMapComponent implements OnInit {
 
             _markers.push(_poiMarker);
 
-            if (mile.id === this.activeMileId) {
+            if (mile.id === this.activeMileId && poi.waypoint.distance <= Settings.USERSETTINGS.distanceOffTrail * 2) {
               _bounds.push(_poiMarker._latlng);
             }
           }
@@ -191,6 +192,7 @@ export class LeafletMapComponent implements OnInit {
 
     } else {
 
+      console.log('centerpoint')
       // set map to center on centerpoint of selected mile
       this._map.setView({lat: _centerpoint['latitude'], lon: _centerpoint['longitude']}, 16);
 

@@ -1,15 +1,12 @@
 <div id="wrap">
-  <!--templateCacheSize="5"-->
-  <!--minBufferPx = "{{itemWidth * 3}}"-->
-  <!--maxBufferPx = "{{itemWidth * 6}}"-->
 
   <cdk-virtual-scroll-viewport
     #scrollViewport
 
     itemSize="{{itemWidth}}"
-    templateCacheSize="0"
     orientation="horizontal"
     class="virtual-list"
+    templateCacheSize="14"
 
     (window:resize)="onResize($event)"
     (scrolledIndexChange)="onScroll(scrollViewport, $event)">

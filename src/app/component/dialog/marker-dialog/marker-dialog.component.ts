@@ -11,8 +11,6 @@ import {distanceInMilesFeet, getPoiTypeByType} from '../../../_util/poi';
 export class MarkerDialogComponent implements OnInit {
 
   public poiTypes:  Array<PoiType> = [];
-  public poiMi: string;
-  public offTrail: string;
 
   constructor(
     public dialogRef: MatDialogRef<MarkerDialogComponent>,
@@ -46,19 +44,6 @@ export class MarkerDialogComponent implements OnInit {
     if (this.poiTypes.length === 0) {
       this.poiTypes.push(getPoiTypeByType('unknown'));
     }
-
-    // round mileage as string
-    const convMileage: object = distanceInMilesFeet(this.data.anchorPoint.distanceTotal, 'mi');
-    this.poiMi = 'Mile ' + convMileage['distance'];
-
-    // round distance from trail as string
-    const convOffTrail: object = distanceInMilesFeet(this.data.waypoint.distance);
-    if (convOffTrail['distance'] < 10 && convOffTrail['unit'] === 'ft.') {
-      this.offTrail = 'on trail';
-    } else {
-      this.offTrail = '~' + convOffTrail['distance'] + ' ' + convOffTrail['unit'] + ' off trail.';
-    }
-
   }
 
   onNoClick(): void {

@@ -10,6 +10,7 @@ import {Subscription} from 'rxjs';
   templateUrl: './poi-list.component.html',
   styleUrls: ['./poi-list.component.sass']
 })
+
 export class PoiListComponent implements OnInit {
 
   @ViewChild('poiList') container: ElementRef;
@@ -20,15 +21,26 @@ export class PoiListComponent implements OnInit {
   private _locationStatusSubscription:    Subscription;
 
   // vars
-  public poisArray:           Array<Poi>  = [];
+  public combinedPoisArray:     Array<Poi>  = [];       // combines static and user
 
-  private _status:            string      = 'idle';
-  private _userPoi:           Poi;
+  private _status:                string      = 'idle';
+  private _staticPoisArray:     Array<Poi>  = [];
+  private _userPoi:             Poi;
+
 
   constructor(
     private _location:          Location,
     private _locationService:   LocationService,
   ) {
+
+    // user location poi
+    this._userPoi = {
+      id: -1,
+      waypoint: undefined,
+      anchorPoint: undefined,
+      type: 'user',
+      label: 'idle'
+    };
 
     // set up subscriptions
     this._locationStatusSubscription = _locationService.locationStatus.subscribe(
@@ -44,20 +56,7 @@ export class PoiListComponent implements OnInit {
 
   ngOnInit() {
 
-    this.poisArray = [];
-
-
-    // user location poi
-
-    this._userPoi = {
-      id: -1,
-      trail: "USER",
-      waypoint: {latitude: 0, longitude: 0, elevation: 0},
-      type: 'location-arrow',
-      label: this._status
-    }
-
-    this.poisArray.push(this._userPoi);
+    this._staticPoisArray = [];
 
     const _self = this;
 
@@ -65,18 +64,23 @@ export class PoiListComponent implements OnInit {
     if (this.milesData) {
       this.milesData.forEach(function (mile: Mile, index: number) {
         if (mile.pois && mile.pois.length > 0) {
-          _self.poisArray = _self.poisArray.concat(mile.pois);
+          _self._staticPoisArray = _self._staticPoisArray.concat(mile.pois);
         }
       });
     }
 
+    this.combinedPoisArray = this._staticPoisArray.concat(this._userPoi);
+
   }
-
-
 
   // EVENT HANDLERS
 
-  onListItemClick(poi) {
+  onListItemClick(poi: Poi) {
+
+    if (poi.type === 'user') {
+      return;
+    }
+
     const _event: CustomEvent = new CustomEvent(
       'markerClick',
       {
@@ -88,39 +92,38 @@ export class PoiListComponent implements OnInit {
     this.container['elementRef'].nativeElement.dispatchEvent(_event);
   }
 
-
-
   // SUBSCRIPTION HANDLERS
 
   private onStatusChange(status: string): void {
 
     // if we're switching to tracking
     if (this._status !== 'tracking' && status === 'tracking') {
-
-      this._status = status;
-      this._userPoi.label = status;
+      //xxx
     }
+
+    this._status = status;
+    this._userPoi.label = status;
   }
 
   private onLocationChange(location: any): void {
 
-    console.log("location", location, this._status);
-
     // // if tracking
-    // if (location && this._status === 'tracking') {
+    if (location && this._status !== 'idle') {
 
-      let _userPoi: Poi = {
-        id: -1,
-        trail: "USER",
-        waypoint: {latitude: location.coords.latitude, longitude: location.coords.longitude, elevation: location.coords.altitude},
-        type: 'user',
-        label: 'user'
-      }
+      this._userPoi['waypoint'] = location['waypoint'];
 
-      this.poisArray.unshift(_userPoi);
+      this._userPoi['anchorPoint'] = location['anchorPoint'];
 
-    // } else {
-    //
-    // }
+      this.combinedPoisArray = this._staticPoisArray.concat(this._userPoi);
+
+      // figure out where the pois are in relation to the user
+      // this.poisArray.forEach(function(poi:Poi, index:number) {
+      //   console.log(poi, index);
+      // })
+
+    } else {
+      this._userPoi['waypoint'] = this._userPoi['anchorPoint'] = undefined;
+      this.combinedPoisArray = this._staticPoisArray.concat(this._userPoi);
+    }
   }
 }

@@ -28,7 +28,10 @@ export class MileDetailComponent implements OnInit {
       .subscribe(result => {
         const _milesBehind = 2;
         const _milesAhead = 1;
-        const _mapLineSegmentPadding = 0;     // extra line segments to show, at start/end, since leaflet works with zoom levels.
+
+        // extra line segments to show, at start/end, since leaflet works with fixed zoom levels
+        // fitting map to markers/line segments using bounds isn't precise
+        const _mapLineSegmentPadding = 1;
 
         this.visibleMilesList = this.getMilesSegmentData(result, _milesBehind, _milesAhead);
         this.visibleMilesLeaflet =  this.getMilesSegmentData(result, (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));

@@ -60,6 +60,7 @@ export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: A
 
   console.log('linked pois to miles');
 
+  trailData = trail;
   return trail;
 }
 
@@ -224,9 +225,15 @@ export function findNearestMileInTree(location: Waypoint):object {
     }
   }
 
-  return {id: parseInt(nearestMile['key']), distance: nearestMile['distance']};
+  return {id: parseInt(nearestMile['key']), distance: nearestMile['distance'], mile:trailData.miles[nearestMile['key']]};
 }
 
+
+export function findNearestWaypointInMile(waypoint:Waypoint, nearestMile:Mile): object {
+
+  return geolib.orderByDistance({latitude: waypoint.latitude, longitude: waypoint.longitude} as geolib.PositionAsDecimal,
+    nearestMile.waypoints);
+}
 
 function linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
 
@@ -236,11 +243,9 @@ function linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
     poi.waypoint.elevation = poi.waypoint.elevation / Settings.FOOT;
 
     // find nearest mile
-    const _nearestMile = miles[findNearestMileInTree({latitude:poi.waypoint.latitude, longitude:poi.waypoint.longitude} as Waypoint)['id']];
+    const _nearestMile: Mile = miles[findNearestMileInTree({latitude:poi.waypoint.latitude, longitude:poi.waypoint.longitude} as Waypoint)['id']];
 
-    const _nearestWaypointRef: object =
-      geolib.orderByDistance({latitude: poi.waypoint.latitude, longitude: poi.waypoint.longitude} as geolib.PositionAsDecimal,
-        _nearestMile.waypoints);
+    const _nearestWaypointRef: object = findNearestWaypointInMile(poi.waypoint, _nearestMile);
 
     const _anchorData = anchorDistanceCalculation(poi.waypoint, _nearestMile, _nearestWaypointRef);
 

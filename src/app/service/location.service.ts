@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
+import * as GeoLib from 'geolib';
 
-import { findNearestMileInTree } from '../_geo/geoCalc';
+import {findNearestMileInTree, findNearestWaypointInMile} from '../_geo/geoCalc';
 
 import { Waypoint } from '../type/waypoint';
+import {Mile} from '../type/mile';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +13,9 @@ import { Waypoint } from '../type/waypoint';
 
 export class LocationService {
 
-  // subjects
-  private _locationStatus:  Subject<string>     = new Subject<string>();
-  private _location:        Subject<object>     = new Subject<object>();
+  // behaviour subjects see https://stackoverflow.com/questions/37174598/how-to-get-last-value-when-subscribing-to-an-observable
+  private _locationStatus:  BehaviorSubject<string>     = new BehaviorSubject<string>("idle");
+  private _location:        BehaviorSubject<object>     = new BehaviorSubject<object>(undefined);
 
   // Observable streams
   public locationStatus:    Observable<string>  = this._locationStatus.asObservable();
@@ -61,19 +63,17 @@ export class LocationService {
 
   private stopTracking(): void {
     navigator.geolocation.clearWatch(this._locationWatcher);
-    this._location.next();
+    this._location.next(undefined);
     this._previousLocation = null;
     this.updateStatusLabel('idle');
   }
 
   private parseLocation(location): void {
 
-    // FIXED POSITION XXX
-    // const _tempLocation = {
-    //   coords: {latitude: 33.257092, longitude: -116.615705, altitude: 3436.2532808398946, accuracy: 53, altitudeAccuracy: 1},
-    //   timestamp: 1546899591215
-    // };
-    // location = _tempLocation;
+    const _waypoint: Waypoint = {
+      latitude: location['coords']['latitude'],
+      longitude: location['coords']['longitude'],
+      elevation: location['coords']['altitude']} as Waypoint;
 
     // only execute if location changed (optimisation)
     if (!this._previousLocation ||
@@ -82,12 +82,14 @@ export class LocationService {
       this._previousLocation['coords']['altitude'] !== location['coords']['altitude']) {
 
       // figure out the nearest mile
-      const mileData = findNearestMileInTree(
-        { latitude: location['coords']['latitude'],
-          longitude: location['coords']['longitude'],
-          elevation: location['coords']['altitude']} as Waypoint);
+      const mileData = findNearestMileInTree(_waypoint);
+      location['mile'] = mileData['mile'] as Mile;
 
-      location['mile'] = mileData;
+      const _nearestWaypoint = findNearestWaypointInMile(_waypoint, location['mile'])[0];
+      location['anchorPoint'] = location['mile'].waypoints[Number(_nearestWaypoint.key)];
+
+      location['waypoint'] = _waypoint as Waypoint;
+      location['waypoint'].distance = _nearestWaypoint.distance;
 
       this.updateLocation(location);
     }
@@ -128,5 +130,7 @@ export class LocationService {
       this._locationStatusLocal = label;
       this._locationStatus.next(this._locationStatusLocal);
     }
+
+    console.log(label);
   }
 }

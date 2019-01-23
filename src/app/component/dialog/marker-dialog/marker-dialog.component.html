@@ -6,8 +6,7 @@
 <div id="left-panel">
   <h1 mat-dialog-title>{{data.label}}</h1>
   <p [innerHTML]="data.description"></p>
-  <p>{{this.poiMi}}</p>
-  <p>{{this.offTrail}}</p>
+  <small *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} {{data.waypoint.distance | distance:'meters':'miles':true}}</small>
   <poi-list class="poi-list"></poi-list>
 </div>
 

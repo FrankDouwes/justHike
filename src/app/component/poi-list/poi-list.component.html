@@ -5,7 +5,10 @@
   orientation="vertical"
   itemSize="20%"
   templateCacheSize="8">
-  <poi-user></poi-user>
-  <poi-list-item class="list-item" *cdkVirtualFor="let poi of this.poisArray" [data]="poi" (click)="onListItemClick(poi)"></poi-list-item>
+
+  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedPoisArray | poisorting" [data]="poi" (click)="onListItemClick(poi)" class="list-item"></poi-dynamic-item>
 
 </cdk-virtual-scroll-viewport>
+
+
+<!--<ng-template ngFor [ngForOf]="this.combinedPoisArray" [ngForTemplate]="template"></ng-template>-->

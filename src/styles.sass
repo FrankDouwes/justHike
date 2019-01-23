@@ -9,9 +9,9 @@ html, body
 
 body
   overscroll-behavior: contain
-  margin: 0
-  padding: 0
+  margin: 0px 0px 0px 0.4px     // margin left keeps cdk scroll smooth on mobile (android)
 
+// hide webkit scrollbar
 ::-webkit-scrollbar
   width: 0px  /* remove scrollbar space */
   height: 0px
@@ -19,21 +19,21 @@ body
 
 // make text unable to select
 .noselect
+  pointer-events: none
   -webkit-touch-callout: none
     -webkit-user-select: none
      -khtml-user-select: none
        -moz-user-select: none
         -ms-user-select: none
             user-select: none
-  pointer-events: none
 
 // cant be accessed from within component structure?
 #elevation-profile-list
   .cdk-virtual-scroll-viewport
     background: url('./assets/images/overlay.png') repeat-x
     background-size: auto 100%;
-    -webkit-transform: translate3d(0, 0, 0)
-    transform: translate3d(0, 0, 0)
+    -webkit-transform: translate3d(0, 0, 0)     // smoother animation
+    transform: translate3d(0, 0, 0)             // smoother animation
 
   .fa-marker
     color: white
@@ -56,7 +56,7 @@ body
   padding: 0 !important
 
 
-// leaflet-map, scoping issues?
+// leaflet-map, scoping issues
 .mile-marker
 
   .label
@@ -81,6 +81,8 @@ body
     font-size: 12px
     text-align: center
 
+
+// mile detail markers (scoping issues)
 .vector-marker
   position: absolute
   top: 0
