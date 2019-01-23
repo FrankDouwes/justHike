@@ -8,7 +8,15 @@ export class DistancePipe implements PipeTransform {
   // converts a number in a string indicating distance
   // optional: distance from trail
 
-  transform(value: number, currentUnit: string, desiredUnit: string, fromTrailIndicator: boolean = false, round:number = 2, force:boolean = false): string {
+  transform(
+    value: number,
+    currentUnit: string,
+    desiredUnit: string,
+
+    fromTrailIndicator: boolean = false,
+    round:number = 2,
+    force:boolean = false
+  ): string {
 
     let _currentUnit: string = (currentUnit) ? currentUnit : 'meters';
     let _convertedValue: number;

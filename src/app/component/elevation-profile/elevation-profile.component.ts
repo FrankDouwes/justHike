@@ -1,5 +1,5 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
 
 @Component({
@@ -19,7 +19,12 @@ export class ElevationProfileComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
+
+
+
+  // LIFECYCLE HOOKS
+
+  ngOnInit(): void {
 
     this._route.data
       .subscribe(result => {
@@ -27,15 +32,20 @@ export class ElevationProfileComponent implements OnInit {
       });
   }
 
-  onScroll(response: object) {
+
+
+
+  // EVENT HANDLERS
+
+  private onScroll(response: object): void {
     this.visibleRange = response;
   }
 
-  onResize(response: object) {
+  private onResize(response: object): void {
     this.resize = response;
   }
 
-  onScrollTo(response: number) {
+  private onScrollTo(response: number): void {
     this.scrollTo = response;
   }
 }

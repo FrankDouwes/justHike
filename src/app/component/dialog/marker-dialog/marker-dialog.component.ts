@@ -46,7 +46,11 @@ export class MarkerDialogComponent implements OnInit {
     }
   }
 
-  onNoClick(): void {
+
+
+  // EVENT HANDLERS
+
+  private onNoClick(): void {
     this.dialogRef.close();
   }
 }

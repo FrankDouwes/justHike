@@ -16,7 +16,7 @@ import {createFaLeafletMarker} from '../../_util/markers';
   templateUrl: './leaflet-map.component.html',
   styleUrls: ['./leaflet-map.component.sass']
 })
-export class LeafletMapComponent implements OnInit {
+export class LeafletMapComponent implements OnInit, AfterViewInit, OnChanges {
 
   // data
   @Input() name: String;
@@ -42,10 +42,10 @@ export class LeafletMapComponent implements OnInit {
     private _route: ActivatedRoute,
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
 
     if (this._initialized) {
       this.drawMap();
@@ -53,7 +53,7 @@ export class LeafletMapComponent implements OnInit {
   }
 
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
 
     L.Icon.Default.prototype.options.iconUrl = '/assets/icons/marker-icon.png';
     L.Icon.Default.prototype.options.iconRetinaUrl = '/assets/icons/marker-icon-2x.png';
@@ -92,7 +92,11 @@ export class LeafletMapComponent implements OnInit {
     this._initialized = true;
   }
 
-  drawMap():void {
+
+
+  // ELEMENT CREATION
+
+  drawMap(): void {
 
     let _points:Array<any> = [];
     var _markers: Array<object> = [];
@@ -200,7 +204,7 @@ export class LeafletMapComponent implements OnInit {
     }
   }
 
-  createmarker(poi: Poi) {
+  createmarker(poi: Poi): any {
 
     let _poiType: PoiType = getPoiTypeByType(poi.type);
 
@@ -215,7 +219,7 @@ export class LeafletMapComponent implements OnInit {
     return _poi;
   }
 
-  createPoiGuideLine(poi: Poi) {
+  createPoiGuideLine(poi: Poi): any {
 
     let poiLoc = new L.latLng(poi.waypoint.latitude, poi.waypoint.longitude, poi.waypoint.elevation);
     let anchorLoc = new L.latLng(poi.anchorPoint.latitude, poi.anchorPoint.longitude, poi.anchorPoint.elevation);
@@ -230,6 +234,10 @@ export class LeafletMapComponent implements OnInit {
 
     return _firstpolyline;
   }
+
+
+
+  // EVENT HANDLERS
 
   // linked directly to svg marker (scope change)
   onMarkerClick (event: MouseEvent) {

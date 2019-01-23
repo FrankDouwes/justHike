@@ -32,7 +32,7 @@ import {Trail} from '../../../type/trail';
   styleUrls: ['./virtual-list.component.sass'],
   // changeDetection: ChangeDetectionStrategy.OnPush       // needs testing, especially with iOS/Safaris weird scroll event.
 })
-export class VirtualListComponent implements OnInit {
+export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('scrollViewport') scrollViewport: CdkVirtualScrollViewport;
 

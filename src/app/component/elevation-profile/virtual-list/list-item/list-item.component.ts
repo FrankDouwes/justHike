@@ -1,9 +1,9 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   ElementRef, EventEmitter,
-  Input,
+  Input, OnChanges,
   OnInit,
   Output,
   SimpleChanges,
@@ -15,7 +15,7 @@ import {OHLC} from '../../../../type/ohlc';
 import {Mile} from '../../../../type/mile';
 import {Settings} from '../../../../settings';
 
-declare const SVG: any;    // fixed SVG installation bug
+declare const SVG: any;    // fixes SVGjs bug
 import 'svg.filter.js';
 import {svgPath} from '../../../../_geo/smoothLine';
 import {Poi} from '../../../../type/poi';
@@ -31,29 +31,29 @@ import {getPoiTypeByType} from '../../../../_util/poi';
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ListItemComponent implements OnInit {
+export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('map') map: ElementRef;
 
-  @Input() data: Mile;
-  @Input() isLast: boolean;
-  @Input() visibleOHLC: OHLC;
-  @Input() guides: Array<object>;
-  @Input() resize: number;
-  @Input() current: object;
+  @Input() data:                Mile;
+  @Input() visibleOHLC:         OHLC;
+  @Input() guides:              Array<object>;
+  @Input() isLast:              boolean;
+  @Input() resize:              number;
+  @Input() current:             object;
 
   @Output() markerEvent: EventEmitter<number> = new EventEmitter<number>();
 
-  public showCampsites: boolean;
+  public showCampsites:         boolean;
 
   // SVG MAP
   private _svgCanvas;
   private _markerSvgCanvas;
-  private _svgWidth: number;
-  private _svgHeight: number;
+  private _svgWidth:            number;
+  private _svgHeight:           number;
   private _polyline;
   private _userMarker;
-  private _initialized: boolean;      // can only draw after initialization
+  private _initialized:         boolean;      // can only draw after initialization
 
   constructor() {}
 
@@ -116,7 +116,7 @@ export class ListItemComponent implements OnInit {
     }
   }
 
-  drawMap() {
+  private drawMap(): void {
 
     this.clearCanvas(true, true);
 
@@ -134,7 +134,7 @@ export class ListItemComponent implements OnInit {
 
 // DRAW ELEMENTS
 
-  clearCanvas(polyline: boolean = true, markers: boolean = false) {
+  private clearCanvas(polyline: boolean = true, markers: boolean = false): void {
 
     // polyline canvas
     if (this._svgCanvas && polyline) {
@@ -151,7 +151,7 @@ export class ListItemComponent implements OnInit {
     }
   }
 
-  drawLine () {
+  private drawLine(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -192,7 +192,7 @@ export class ListItemComponent implements OnInit {
     this._polyline = this._svgCanvas.path(svgPath(drawPoints)).fill('rgba(233,225,210, 0.5)').stroke({ color: _strokeColor, width: Settings.LINEHEIGHT});
   }
 
-  drawSnow() {
+  private drawSnow(): void {
 
     const _snowArray: Array<Snowpoint> = this.data.snowData;
     const _waypointsArr = this.data.waypoints;
@@ -248,7 +248,7 @@ export class ListItemComponent implements OnInit {
     }
   }
 
-  drawPois () {
+  private drawPois(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -339,7 +339,7 @@ export class ListItemComponent implements OnInit {
 
   }
 
-  drawUser () {
+  private drawUser(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -375,7 +375,7 @@ export class ListItemComponent implements OnInit {
   }
 
   // draw "random" trees below line
-  drawTrees () {
+  private drawTrees(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -402,16 +402,19 @@ export class ListItemComponent implements OnInit {
     }
   }
 
+
+
+
 // EVENT HANDLERS
 
-  onUserClick (event: MouseEvent) {
+  private onUserClick(event: MouseEvent): void {
     event.stopPropagation();
     event.stopImmediatePropagation();
     console.log('user', event, this.data.id);
   }
 
   // linked directly to svg marker
-  onMarkerClick (event: MouseEvent) {
+  private onMarkerClick(event: MouseEvent): void {
     event.stopPropagation();
     event.stopImmediatePropagation();
 

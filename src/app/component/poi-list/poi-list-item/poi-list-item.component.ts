@@ -14,7 +14,7 @@ export class PoiListItemComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit(): void {
 
     const _self = this;
 

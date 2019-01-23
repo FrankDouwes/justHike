@@ -1,31 +1,26 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
-import { findNearestMileInTree, trailData } from '../../_geo/geoCalc';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { trailData } from '../../_geo/geoCalc';
 import { LocationService } from '../../service/location.service';
 
-import {Waypoint} from '../../type/waypoint';
-import * as L from 'leaflet';
-import {Subscription} from 'rxjs';
-import {Poi} from '../../type/poi';
-import {elevationLines} from '../../_util/tiles';
-import {Mile} from '../../type/mile';
+import { Waypoint } from '../../type/waypoint';
+import { Subscription } from 'rxjs';
+import { Mile } from '../../type/mile';
 
 @Component({
   selector: 'locator',
   templateUrl: './locator.component.html',
   styleUrls: ['./locator.component.sass']
 })
-export class LocatorComponent implements OnInit {
+export class LocatorComponent implements OnInit, OnDestroy {
 
-  public status: string = 'idle';
-  public mileIdClosestToUser: number = -1;
-  public visibleMiles: Array<Mile>;
-  public userLocation: Waypoint;
+  public status:                  string = 'idle';
+  public mileIdClosestToUser:     number = -1;
+  public visibleMiles:            Array<Mile>;
+  public userLocation:            Waypoint;
 
-  private _locationSubscription: Subscription;
-  private _locationStatusSubscription: Subscription;
-
-  private _map;
-  private _location;
+  private _locationSubscription:            Subscription;
+  private _locationStatusSubscription:      Subscription;
+  private _location:              object;
 
   constructor(private _locationService: LocationService) {
 
@@ -40,11 +35,32 @@ export class LocatorComponent implements OnInit {
       });
   }
 
-  ngOnInit() {
+
+
+  // LIFECYCLE HOOKS
+
+  ngOnInit(): void {
 
   }
 
-  onStatusChange(status: string) {
+  ngOnDestroy(): void {
+    this._locationSubscription.unsubscribe();
+    this._locationStatusSubscription.unsubscribe();
+  }
+
+
+
+  // EVENT HANDLERS
+
+  private onClick(): void {
+    this._locationService.toggleTracking();
+  }
+
+
+
+  // OTHER
+
+  private onStatusChange(status: string): void {
 
     this.status = status;
 
@@ -53,28 +69,16 @@ export class LocatorComponent implements OnInit {
     }
   }
 
-  onLocationChange(location: object) {
+  private onLocationChange(location: object): void {
     this._location = location;
   }
 
-  showPosition(position) {
+  private showPosition(position): void {
 
     // get the nearest 3 miles
-
     this.mileIdClosestToUser = position.mile.id;
-
     this.visibleMiles = trailData.miles.slice(position.mile.id - 1, position.mile.id + 2);
-
     this.userLocation = position.coords as Waypoint;
-  }
-
-  onClick() {
-    this._locationService.toggleTracking();
-  }
-
-  ngOnDestroy() {
-    this._locationSubscription.unsubscribe();
-    this._locationStatusSubscription.unsubscribe();
   }
 
 }

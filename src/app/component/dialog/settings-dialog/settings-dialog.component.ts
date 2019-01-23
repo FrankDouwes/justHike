@@ -13,9 +13,9 @@ export class SettingsDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: object
   ) {}
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  onNoClick(): void {
+  private onNoClick(): void {
     this.dialogRef.close();
   }
 }

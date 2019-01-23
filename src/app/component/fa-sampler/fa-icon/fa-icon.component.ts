@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {PoiType} from '../../../type/poi';
 
 @Component({
@@ -6,19 +6,18 @@ import {PoiType} from '../../../type/poi';
   templateUrl: './fa-icon.component.html',
   styleUrls: ['./fa-icon.component.sass']
 })
-export class FaIconComponent implements OnInit {
+export class FaIconComponent implements OnInit, AfterViewInit {
 
   @Input() data: PoiType;
 
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
 
     // fix svg icons, the SVGs need the ID of its container
     const _faWrapper = document.getElementById('wrapper-' + this.data.type);
     _faWrapper.childNodes[0]['id'] = 'sample-' + this.data.type;
   }
-
 }

@@ -54,7 +54,12 @@ export class PoiListComponent implements OnInit {
       });
   }
 
-  ngOnInit() {
+
+
+
+  // LIFECYCLE HOOKS
+
+  ngOnInit(): void {
 
     this._staticPoisArray = [];
 
@@ -73,9 +78,12 @@ export class PoiListComponent implements OnInit {
 
   }
 
+
+
+
   // EVENT HANDLERS
 
-  onListItemClick(poi: Poi) {
+  private onListItemClick(poi: Poi): void {
 
     if (poi.type === 'user') {
       return;
@@ -91,6 +99,9 @@ export class PoiListComponent implements OnInit {
 
     this.container['elementRef'].nativeElement.dispatchEvent(_event);
   }
+
+
+
 
   // SUBSCRIPTION HANDLERS
 

@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {PoiType} from '../../type/poi';
-import {getPoiTypeByType} from '../../_util/poi';
 
 @Component({
   selector: 'display-button',
@@ -19,9 +18,6 @@ export class ButtonComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-
-    // if (!this.poiTypes) {
-    // }
 
   }
 }

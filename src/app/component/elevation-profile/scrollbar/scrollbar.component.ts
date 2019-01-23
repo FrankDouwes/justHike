@@ -1,4 +1,15 @@
-import {Component, Input, OnInit, OnChanges, ElementRef, SimpleChanges, Output, EventEmitter, ViewChild} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  OnChanges,
+  ElementRef,
+  SimpleChanges,
+  Output,
+  EventEmitter,
+  ViewChild,
+  AfterViewInit
+} from '@angular/core';
 import {toMile} from '../../../_geo/geoCalc';
 import {Trail} from '../../../type/trail';
 import {Settings} from '../../../settings';
@@ -11,32 +22,35 @@ declare const SVG: any;    // fixed SVG installation bug
   templateUrl: './scrollbar.component.html',
   styleUrls: ['./scrollbar.component.sass']
 })
-export class ScrollbarComponent implements OnInit {
+export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('main') main: ElementRef;
 
-  @Input() trailData: Trail;
-  @Input() visibleRange: object;
-  @Input() resize: object;
+  @Input() trailData:       Trail;
+  @Input() visibleRange:    object;
+  @Input() resize:          object;
 
   @Output() scrollToEvent: EventEmitter<number> = new EventEmitter<number>();
 
-  private _verticalPadding = 10;
-
-  // SVG MAP
-  private _svgCanvas;
-  private _svgWidth: number;
-  private _svgHeight: number;
-
-  // VIEWPORT
   public viewportSize = 0;
   public viewportOffset = 0;
 
+  private _verticalPadding: number = 10;
+  private _svgCanvas;
+  private _svgWidth:        number;
+  private _svgHeight:       number;
+
+
   constructor() {}
 
-  ngOnInit() {}
 
-  ngAfterViewInit() {
+
+
+  // LIFECYCLE HOOKS
+
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
 
     this._svgWidth =  this.main.nativeElement.clientWidth;
     this._svgHeight =  this.main.nativeElement.clientHeight;
@@ -48,7 +62,7 @@ export class ScrollbarComponent implements OnInit {
     this.drawMap();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
 
     if (changes.visibleRange && changes.visibleRange.currentValue) {
       this.visibleRange = changes.visibleRange;
@@ -78,7 +92,12 @@ export class ScrollbarComponent implements OnInit {
     }
   }
 
-  drawMap() {
+
+
+
+  // DRAW
+
+  private drawMap(): void {
 
     const min: number = Number(this.trailData.elevationRange.low) / Settings.FOOT;
     const max: number = Number(this.trailData.elevationRange.high) / Settings.FOOT;
@@ -131,11 +150,15 @@ export class ScrollbarComponent implements OnInit {
   }
 
   // svg draws from lop to bottom
-  invertValue(input) {
+  private invertValue(input): number {
     return Math.abs(input - 1) + this._verticalPadding;
   }
 
-  onClick(event: MouseEvent): void {
+
+
+  // EVENT HANDLERS
+
+  private onClick(event: MouseEvent): void {
     const percent = event.clientX / this.main.nativeElement.clientWidth;
     this.scrollToEvent.emit(percent);
   }

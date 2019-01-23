@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import {Settings} from '../../settings';
+import { Settings } from '../../settings';
 
 @Component({
   selector: 'fa-sampler',
   templateUrl: './fa-sampler.component.html',
   styleUrls: ['./fa-sampler.component.sass']
 })
+
 export class FaSamplerComponent implements OnInit {
 
   // create a Font awesome icon for each poi type
@@ -16,5 +17,5 @@ export class FaSamplerComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 }

@@ -9,7 +9,7 @@ import {interpolateColors} from '../../../../_util/color';
   templateUrl: './labels.component.html',
   styleUrls: ['./labels.component.sass']
 })
-export class LabelsComponent implements OnInit {
+export class LabelsComponent implements OnInit, OnChanges {
 
   @Input() visibleOHLC: OHLC;
   @Input() guides: Array<object>;
@@ -22,9 +22,9 @@ export class LabelsComponent implements OnInit {
     this._container = _element;
   };
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
 
     if (this.visibleOHLC) {
 
@@ -67,17 +67,4 @@ export class LabelsComponent implements OnInit {
       });
     }
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

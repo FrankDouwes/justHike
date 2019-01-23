@@ -9,7 +9,7 @@ import {Settings} from '../../../../settings';
   templateUrl: './guides.component.html',
   styleUrls: ['./guides.component.sass']
 })
-export class GuidesComponent implements OnInit {
+export class GuidesComponent implements OnInit, OnChanges {
 
   @Input() visibleOHLC: OHLC;
   @Input() guides: Array<object>;
@@ -22,9 +22,9 @@ export class GuidesComponent implements OnInit {
     this._container = _element;
   };
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
 
     if (this.visibleOHLC) {
 

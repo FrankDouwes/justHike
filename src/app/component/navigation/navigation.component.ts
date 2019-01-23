@@ -11,14 +11,18 @@ export class NavigationComponent implements OnInit {
 
   @Output() navEvent: EventEmitter<string> = new EventEmitter<string>();
 
-  public visibleClass = 'hide';
-  public oppositeClass = 'show';
-  private _backIndex: object;
+  public visibleClass:      string = 'hide';
+  public oppositeClass:     string = 'show';
+
+  private _backIndex:       object;
 
   constructor(
-    private _location: Location,
-    private _route: ActivatedRoute,
-    private _router: Router) {
+
+    private _location:      Location,
+    private _route:         ActivatedRoute,
+    private _router:        Router
+
+  ) {
 
     _router.events.forEach((event) => {
 
@@ -37,14 +41,21 @@ export class NavigationComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-  }
 
-  onSettingsClick() {
+
+  // LIFECYCLE HOOKS
+
+  ngOnInit(): void {}
+
+
+
+  // EVENT HANDLERS
+
+  private onSettingsClick(): void {
     this.navEvent.emit('settings');
   }
 
-  onBackClick() {
+  private onBackClick(): void {
     this.visibleClass = 'hide';
     this.oppositeClass = 'show';
     // this._location.back();

@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
-import {Mile} from '../../type/mile';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Mile } from '../../type/mile';
 
 @Component({
   selector: 'app-mile-detail',
@@ -10,16 +10,20 @@ import {Mile} from '../../type/mile';
 
 export class MileDetailComponent implements OnInit {
 
-  public visibleMilesList: Array<Mile>;
-  public visibleMilesLeaflet: Array<Mile>;
-
-  public routedMile: number;
+  public visibleMilesList:        Array<Mile>;
+  public visibleMilesLeaflet:     Array<Mile>;
+  public routedMile:              number;
 
   constructor(
-    private _route: ActivatedRoute,
+    private _route:               ActivatedRoute,
   ) {}
 
-  ngOnInit() {
+
+
+
+  // LIFECYCLE HOOKS
+
+  ngOnInit(): void {
 
     // get miles data based on route id
     this.routedMile = Number(this._route.snapshot.paramMap.get('id'));
@@ -38,7 +42,12 @@ export class MileDetailComponent implements OnInit {
       });
   }
 
-  getMilesSegmentData(data: any, milesBehind: number, milesAhead: number) {
+
+
+  // OTHER
+  // the mile (line) segments data to show using leaflet
+  // there's some overlap so you can look ahead/behind.
+  private getMilesSegmentData(data: any, milesBehind: number, milesAhead: number): Array<Mile> {
 
     const _startIndex: number = (this.routedMile >= milesBehind) ? this.routedMile - milesBehind : 0;
     const _endIndex: number = (this.routedMile + milesAhead <= data.trailData.miles.length) ? this.routedMile + milesAhead : data.trailData.miles.length;
