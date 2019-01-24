@@ -11,7 +11,7 @@ export class Poi {
   distance?:          number;             // distance from trail (from nearest line segment (2 waypoints) within mile, in meters
   description?:       string;             // optional description
   distanceFromUser?:  number;             // distance from user in meters
-};
+}
 
 export class PoiType {
   type:       string;           // string
@@ -20,6 +20,6 @@ export class PoiType {
   iconType:   string;           // Font Awesome has prefixes for different icons styles (fa, fas)
   icon:       string;           // the Font Awesome icon name
   rateable?:  boolean;          // can be rated (optional)
-};
+}
 
 

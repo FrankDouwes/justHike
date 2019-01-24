@@ -103,7 +103,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
     const max: number = Number(this.trailData.elevationRange.high) / Settings.FOOT;
     let elevation: number;
 
-    const drawPoints: Array<any> = new Array<Array<number>>();
+    const drawPoints: Array<any> = [];
 
     let counter = 0;
 

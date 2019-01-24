@@ -41,4 +41,4 @@ function ohlc(waypoints:Array<Waypoint>){
   }
 
   return {open:_open, high:_high, low:_low, close:_close};
-};
+}

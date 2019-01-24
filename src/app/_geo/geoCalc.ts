@@ -46,7 +46,7 @@ export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: A
   const flatMileCoordinates: Array<Waypoint> = trail.miles.map(function(elem) {
       return elem.centerpoint as Waypoint;
     }
-  )
+  );
 
   console.log('created miles');
 
@@ -298,7 +298,7 @@ export function anchorDistanceCalculation(location: Waypoint, nearestMile: Mile,
   const _2ndNearestWaypoint = nearestMile.waypoints[nearestWaypoints[1]['key'] as number];
 
   // create an anchor waypoint (an on trail point nearest to the poi (simple triangulation)
-  const _diffDistPercentage = (nearestWaypoints[0]['distance'] / nearestWaypoints[1]['distance'])
+  const _diffDistPercentage = (nearestWaypoints[0]['distance'] / nearestWaypoints[1]['distance']);
   const _lat = _nearestWaypoint.latitude + ((_2ndNearestWaypoint.latitude - _nearestWaypoint.latitude) * _diffDistPercentage);
   const _lon = _nearestWaypoint.longitude + ((_2ndNearestWaypoint.longitude - _nearestWaypoint.longitude) * _diffDistPercentage);
   const _ele = _nearestWaypoint.elevation + ((_2ndNearestWaypoint.elevation - _nearestWaypoint.elevation) * _diffDistPercentage);

@@ -26,7 +26,7 @@ export class PoiListComponent implements OnInit {
   // public combinedPoisArray:     Array<Poi>  = [];       // combines static and user
   public combinedPoisArray: BehaviorSubject<Array<Poi>> = new BehaviorSubject([]);
 
-  public status:                 = 'idle';
+  public status = 'idle';
   public timestamp:             number;                 // used to update visible items when user location changes
 
   private _staticPoisArray:     Array<Poi>  = [];

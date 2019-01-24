@@ -13,8 +13,8 @@ import { Mile } from '../../type/mile';
 })
 export class LocatorComponent implements OnInit, OnDestroy {
 
-  public status:                  = 'idle';
-  public mileIdClosestToUser:     = -1;
+  public status = 'idle';
+  public mileIdClosestToUser = -1;
   public visibleMiles:            Array<Mile>;
   public userLocation:            Waypoint;
 
