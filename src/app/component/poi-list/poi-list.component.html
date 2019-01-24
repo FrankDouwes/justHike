@@ -1,14 +1,26 @@
 <cdk-virtual-scroll-viewport
+  class="mat-list mat-list-base"
   id="poi-list"
-  #poiList
 
   orientation="vertical"
-  itemSize="20%"
-  templateCacheSize="8">
+  itemSize="72px"
+  templateCacheSize="10"
 
-  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedPoisArray | poisorting" [data]="poi" (click)="onListItemClick(poi)" class="list-item"></poi-dynamic-item>
+  #poiList>
+
+  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedPoisArray"
+
+                    class="mat-list-item mat-2-line mat-list-item-avatar mat-list-item-with-avatar"
+
+                    [data]="poi"
+                    [status]="poi.type === 'user' ? status : null"
+                    [timestamp] = "timestamp"
+
+                    (click)="onListItemClick(poi)"
+
+                    matRipple>
+  </poi-dynamic-item>
 
 </cdk-virtual-scroll-viewport>
 
-
-<!--<ng-template ngFor [ngForOf]="this.combinedPoisArray" [ngForTemplate]="template"></ng-template>-->
+<!--poisorting-->

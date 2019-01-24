@@ -1,9 +1,10 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, ViewChild} from '@angular/core';
 import {Mile} from '../../type/mile';
 import {Poi} from '../../type/poi';
 import {Location} from '@angular/common';
 import {LocationService} from '../../service/location.service';
-import {Subscription} from 'rxjs';
+import {BehaviorSubject, Subscription} from 'rxjs';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'poi-list',
@@ -13,7 +14,8 @@ import {Subscription} from 'rxjs';
 
 export class PoiListComponent implements OnInit {
 
-  @ViewChild('poiList') container: ElementRef;
+  @ViewChild('poiList') container: CdkVirtualScrollViewport;
+
   @Input() milesData: Array<Mile>;
 
   // subs
@@ -21,17 +23,22 @@ export class PoiListComponent implements OnInit {
   private _locationStatusSubscription:    Subscription;
 
   // vars
-  public combinedPoisArray:     Array<Poi>  = [];       // combines static and user
+  // public combinedPoisArray:     Array<Poi>  = [];       // combines static and user
+  public combinedPoisArray: BehaviorSubject<Array<Poi>> = new BehaviorSubject([]);
 
-  private _status:                string      = 'idle';
+  public status:                 = 'idle';
+  public timestamp:             number;                 // used to update visible items when user location changes
+
   private _staticPoisArray:     Array<Poi>  = [];
   private _userPoi:             Poi;
-
+  private _userIndex:           number;
 
   constructor(
     private _location:          Location,
     private _locationService:   LocationService,
   ) {
+
+    this.timestamp = new Date().getTime();
 
     // user location poi
     this._userPoi = {
@@ -61,6 +68,7 @@ export class PoiListComponent implements OnInit {
 
   ngOnInit(): void {
 
+
     this._staticPoisArray = [];
 
     const _self = this;
@@ -74,8 +82,12 @@ export class PoiListComponent implements OnInit {
       });
     }
 
-    this.combinedPoisArray = this._staticPoisArray.concat(this._userPoi);
+    this.combinedPoisArray.subscribe(
+      data => {
+        this.scrollToUser();
+      });
 
+    this.sortListData(this._staticPoisArray.concat(this._userPoi));
   }
 
 
@@ -86,6 +98,7 @@ export class PoiListComponent implements OnInit {
   private onListItemClick(poi: Poi): void {
 
     if (poi.type === 'user') {
+      this._locationService.toggleTracking();
       return;
     }
 
@@ -100,6 +113,16 @@ export class PoiListComponent implements OnInit {
     this.container['elementRef'].nativeElement.dispatchEvent(_event);
   }
 
+  private scrollToUser() {
+
+    const _self = this;
+    if (this.container) {
+      const _delay = setTimeout(function () {
+        _self.container.scrollToOffset(72 * _self._userIndex, 'auto');
+      }, 1);
+    }
+  }
+
 
 
 
@@ -108,33 +131,59 @@ export class PoiListComponent implements OnInit {
   private onStatusChange(status: string): void {
 
     // if we're switching to tracking
-    if (this._status !== 'tracking' && status === 'tracking') {
-      //xxx
+    if (this.status !== 'tracking' && status === 'tracking') {
+      // xxx
     }
 
-    this._status = status;
+    this.status = status;
     this._userPoi.label = status;
   }
 
   private onLocationChange(location: any): void {
 
+    const _self = this;
+
     // // if tracking
-    if (location && this._status !== 'idle') {
+    if (location && this.status !== 'idle') {
 
       this._userPoi['waypoint'] = location['waypoint'];
 
       this._userPoi['anchorPoint'] = location['anchorPoint'];
 
-      this.combinedPoisArray = this._staticPoisArray.concat(this._userPoi);
+      this.sortListData(this._staticPoisArray.concat(this._userPoi));
+      this.timestamp = location.timestamp;
 
       // figure out where the pois are in relation to the user
-      // this.poisArray.forEach(function(poi:Poi, index:number) {
-      //   console.log(poi, index);
-      // })
+      this._staticPoisArray.forEach(function(poi: Poi) {
+        poi.distanceFromUser = poi.anchorPoint.distanceTotal - _self._userPoi.anchorPoint.distanceTotal;
+      });
 
     } else {
       this._userPoi['waypoint'] = this._userPoi['anchorPoint'] = undefined;
-      this.combinedPoisArray = this._staticPoisArray.concat(this._userPoi);
+      this.sortListData(this._staticPoisArray.concat(this._userPoi));
     }
+  }
+
+
+
+  // OTHER
+
+  private sortListData(data: Array<Poi>) {
+    if (!data) {
+      return;
+    }
+
+    // sort array by the trail distance of the anchor point (the nearest on trail location)
+    data.sort(
+      function(a, b) {
+
+        const _aDist = (a.anchorPoint && a.anchorPoint.distanceTotal) ? a.anchorPoint.distanceTotal : 0;
+        const _bDist = (b.anchorPoint && b.anchorPoint.distanceTotal) ? b.anchorPoint.distanceTotal : 0;
+
+        return _aDist - _bDist;
+      });
+
+    this._userIndex = data.findIndex(poi => poi.type === 'user');
+    this.combinedPoisArray.next(data);
   }
 }

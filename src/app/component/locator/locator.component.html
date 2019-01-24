@@ -1,21 +1,26 @@
 <button id="locator" (click)="onClick()" [className]="status === 'tracking' ? 'active' : 'inactive'">
-  <!--<div id="mini-map" [className]="status === 'tracking' ? 'visible' : 'invisible'"></div>-->
-  <leaflet-map
 
-    [className]="status === 'tracking' ? 'visible' : 'invisible'"
+  <!--[className] = "visible"-->
+  <span>
+    <leaflet-map
 
-    name="mini-map"
+      id="mini-map"
 
-    [allowPanning]=false
-    [showPois]=false
-    [showMapTiles]=false
-    [showElevationTiles]=true
+      [className]="status === 'tracking' ? 'visible' : 'invisible'"
 
-    [milesData]="this.visibleMiles"
-    [activeMileId]="this.mileIdClosestToUser"
-    [userLocation]="this.userLocation"
-  >
-  </leaflet-map>
+      name="mini-map"
+
+      [allowPanning]=false
+      [showPois]=false
+      [showMapTiles]=false
+      [showElevationTiles]=true
+
+      [milesData]="this.visibleMiles"
+      [activeMileId]="this.mileIdClosestToUser"
+      [userLocation]="this.userLocation"
+    >
+    </leaflet-map>
+  </span>
   <fa-icon icon="location-arrow" size="2x" [className]="status === 'idle' ? 'visible' : 'invisible'"></fa-icon>
   <fa-icon [icon]="['far', 'compass']" [spin]="true" size="2x" [className]="status === 'fetching' ? 'visible' : 'invisible'"></fa-icon>
   <fa-icon id="error" icon="exclamation-triangle" size="2x" [className]="status === 'error' ? 'visible' : 'invisible'"></fa-icon>

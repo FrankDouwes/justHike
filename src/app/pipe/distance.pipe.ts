@@ -9,13 +9,16 @@ export class DistancePipe implements PipeTransform {
   // optional: distance from trail
 
   transform(
-    value: number,
-    currentUnit: string,
-    desiredUnit: string,
 
-    fromTrailIndicator: boolean = false,
-    round:number = 2,
-    force:boolean = false
+    value:                  number,
+    currentUnit:            string,
+    desiredUnit:            string,
+
+    fromTrailIndicator:     boolean       = false,
+    round:                  number        = 2,
+    force:                  boolean       = false,
+    relative:               boolean       = false
+
   ): string {
 
     let _currentUnit: string = (currentUnit) ? currentUnit : 'meters';
@@ -39,7 +42,7 @@ export class DistancePipe implements PipeTransform {
       if (value / Settings.MILE >= 0.1 || force === true) {
 
         _convertedValue = Number((value / Settings.MILE).toFixed(round));
-        _format = 'mile';
+        _format = 'mi';
 
       } else {
 
@@ -68,6 +71,12 @@ export class DistancePipe implements PipeTransform {
       } else {
         return '(on trail)';
       }
+    } else if (relative) {
+
+      const _relativeString = (value > 0) ? ' ahead' : ' behind';
+
+      return Math.abs(_convertedValue) + ' ' + _format + ' ' + _relativeString;
+
     } else {
       // return distance
       return _format + ' ' + _convertedValue;

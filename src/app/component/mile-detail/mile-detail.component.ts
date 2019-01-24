@@ -55,5 +55,3 @@ export class MileDetailComponent implements OnInit {
     return data.trailData.miles.slice(_startIndex, _endIndex);
   }
 }
-
-

@@ -1,4 +1,14 @@
-import {Component, OnInit, OnDestroy, ViewChild, ViewContainerRef, Input, ComponentRef, ComponentFactoryResolver} from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ViewContainerRef,
+  Input,
+  ComponentRef,
+  ComponentFactoryResolver,
+  HostBinding, OnChanges, SimpleChanges
+} from '@angular/core';
 import {PoiListItemComponent} from '../poi-list-item/poi-list-item.component';
 import {PoiUserItemComponent} from '../poi-user-item/poi-user-item.component';
 
@@ -7,13 +17,16 @@ import {PoiUserItemComponent} from '../poi-user-item/poi-user-item.component';
   templateUrl: './dynamic-item.component.html',
   styleUrls: ['./dynamic-item.component.sass']
 })
-export class DynamicItemComponent implements OnInit, OnDestroy {
+export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
   @ViewChild('container', { read: ViewContainerRef }) container: ViewContainerRef;
 
   @Input() data: any;
+  @Input() status: string;
+  @Input() timestamp: number;
 
   private _componentRef: ComponentRef<{}>;
+  private _poiUserItem;
 
   // use multiple components as list items in a CDK virtual scroll
   // if type === user, use user-item, else use poi-item
@@ -32,6 +45,21 @@ export class DynamicItemComponent implements OnInit, OnDestroy {
     // set dynamic component data
     const instance = <any> this._componentRef.instance;
     instance.data = this.data;
+
+    if (this.data.type === 'user') {
+      this._poiUserItem = instance;
+      instance.status = this.status;
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this._poiUserItem && changes.status) {
+      this._poiUserItem.status = changes.status.currentValue;
+    }
+
+    if (changes.timestamp) {
+      console.log('stamp changed');
+    }
   }
 
   ngOnDestroy(): void {

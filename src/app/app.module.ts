@@ -30,6 +30,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 
+import {MatIconModule} from '@angular/material/icon';
+
 // display component
 import { ButtonComponent } from './display/button/button.component';
 
@@ -113,7 +115,8 @@ import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-
     MatButtonModule,
     MatListModule,
     AngularFittextModule,
-    MatRippleModule
+    MatRippleModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent]

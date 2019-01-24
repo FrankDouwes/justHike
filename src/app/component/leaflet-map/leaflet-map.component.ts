@@ -21,7 +21,7 @@ export class LeafletMapComponent implements OnInit, AfterViewInit, OnChanges {
   // data
   @Input() name: String;
   @Input() milesData: Array<Mile>;    // miles data for the visible range
-  @Input() activeMileId: number;      // id of the currently active mile (the selected mile in the overview or the mile nearest to the user location)
+  @Input() activeMileId: number;      // id of the currently active mile (selected mile in the overview or the mile nearest to the user location)
   @Input() userLocation: Waypoint;    // the user location
 
   // map tiles
@@ -36,7 +36,7 @@ export class LeafletMapComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() showPois: boolean;
 
   private _map: L;
-  private _initialized: boolean = false;
+  private _initialized = false;
 
   constructor(
     private _route: ActivatedRoute,
@@ -112,13 +112,13 @@ export class LeafletMapComponent implements OnInit, AfterViewInit, OnChanges {
       const _marker = L.marker([mile.waypoints[0].latitude, mile.waypoints[0].longitude], {icon: _labelIcon}).addTo(this._map);
 
       if (mile.id === this.activeMileId) {
+
+        // needs to be user location XXX
         _centerpoint = mile.centerpoint;
       }
 
       //render pois
       if (this.showPois && mile.pois) {
-
-        console.log('???');
 
           for (let poi of mile.pois) {
 
@@ -196,10 +196,8 @@ export class LeafletMapComponent implements OnInit, AfterViewInit, OnChanges {
 
     } else {
 
-      console.log('centerpoint')
       // set map to center on centerpoint of selected mile
       this._map.setView({lat: _centerpoint['latitude'], lon: _centerpoint['longitude']}, 16);
-
       // this._map.fitBounds(_bounds, {padding: [4,4]});
     }
   }

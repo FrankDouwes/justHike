@@ -3,13 +3,14 @@ import {Poi, PoiType} from '../../../type/poi';
 import {getPoiTypeByType} from '../../../_util/poi';
 
 @Component({
-  selector: 'poi-list-item',
+  selector: 'poi-list-item[class=mat-list-item-content]',
   templateUrl: './poi-list-item.component.html',
   styleUrls: ['./poi-list-item.component.sass']
 })
 export class PoiListItemComponent implements OnInit {
 
   @Input() data: Poi;
+
   public poiTypes: Array<PoiType> = [];
 
   constructor() { }
@@ -18,14 +19,14 @@ export class PoiListItemComponent implements OnInit {
 
     const _self = this;
 
-    if(this.data) {
+    if (this.data) {
 
       // generate poiTypes (icons)
-      let _poiStrArr: Array<string> = this.data['type'].split(', ');
+      const _poiStrArr: Array<string> = this.data['type'].split(', ');
 
       _poiStrArr.forEach(function(poi, index) {
 
-        let _poiData = getPoiTypeByType(poi);
+        const _poiData = getPoiTypeByType(poi);
 
         if (_poiData !== undefined) {
 

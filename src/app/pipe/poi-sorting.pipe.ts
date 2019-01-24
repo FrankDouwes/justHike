@@ -1,11 +1,18 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import {Poi} from '../type/poi';
+import {BehaviorSubject} from 'rxjs';
 
 @Pipe({ name: 'poisorting' })
 
 export class PoiSortingPipe implements PipeTransform {
 
-  transform(poiArray: Array<Poi>) {
+  transform(subject: BehaviorSubject<Array<Poi>>) {
+
+    if (!subject) {
+      return;
+    }
+
+    const poiArray: Array<Poi> = subject.getValue();
 
     // sort array by the trail distance of the anchor point (the nearest on trail location)
     poiArray.sort(
@@ -18,5 +25,5 @@ export class PoiSortingPipe implements PipeTransform {
       });
 
     return poiArray;
-  };
+  }
 }

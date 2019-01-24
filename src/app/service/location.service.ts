@@ -14,7 +14,7 @@ import {Mile} from '../type/mile';
 export class LocationService {
 
   // behaviour subjects see https://stackoverflow.com/questions/37174598/how-to-get-last-value-when-subscribing-to-an-observable
-  private _locationStatus:  BehaviorSubject<string>     = new BehaviorSubject<string>("idle");
+  private _locationStatus:  BehaviorSubject<string>     = new BehaviorSubject<string>('idle');
   private _location:        BehaviorSubject<object>     = new BehaviorSubject<object>(undefined);
 
   // Observable streams
@@ -24,8 +24,8 @@ export class LocationService {
   // watcher
   private _locationWatcher:         number;
   private _previousLocation:        Location;
-  private _toggleStatus:            boolean     = false;
-  private _locationStatusLocal:     string      = '';
+  private _toggleStatus     = false;
+  private _locationStatusLocal      = '';
 
   /* track user location and status:
       location = gps data
@@ -130,7 +130,5 @@ export class LocationService {
       this._locationStatusLocal = label;
       this._locationStatus.next(this._locationStatusLocal);
     }
-
-    console.log(label);
   }
 }

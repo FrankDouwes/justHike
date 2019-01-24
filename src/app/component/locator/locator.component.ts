@@ -13,8 +13,8 @@ import { Mile } from '../../type/mile';
 })
 export class LocatorComponent implements OnInit, OnDestroy {
 
-  public status:                  string = 'idle';
-  public mileIdClosestToUser:     number = -1;
+  public status:                  = 'idle';
+  public mileIdClosestToUser:     = -1;
   public visibleMiles:            Array<Mile>;
   public userLocation:            Waypoint;
 
@@ -61,9 +61,7 @@ export class LocatorComponent implements OnInit, OnDestroy {
   // OTHER
 
   private onStatusChange(status: string): void {
-
     this.status = status;
-
     if (this.status === 'tracking') {
       this.showPosition(this._location);
     }
@@ -71,14 +69,19 @@ export class LocatorComponent implements OnInit, OnDestroy {
 
   private onLocationChange(location: object): void {
     this._location = location;
+    if (this.status === 'tracking') {
+      this.showPosition(this._location);
+    }
   }
 
   private showPosition(position): void {
 
+    console.log(position);
+
     // get the nearest 3 miles
     this.mileIdClosestToUser = position.mile.id;
     this.visibleMiles = trailData.miles.slice(position.mile.id - 1, position.mile.id + 2);
-    this.userLocation = position.coords as Waypoint;
+    this.userLocation = position.anchorPoint as Waypoint;
   }
 
 }

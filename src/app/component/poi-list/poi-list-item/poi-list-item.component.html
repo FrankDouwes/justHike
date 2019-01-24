@@ -1,8 +1,10 @@
-<div id="content" class="left" matRipple>
-  <div class="main noselect">
-    <h2>{{data.label}}</h2>
-    <small>{{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} {{this.data.waypoint.distance | distance:'meters':'miles':true}}</small>
-  </div>
+<display-icon class="" [data]="this.poiTypes" showRating="true"></display-icon>
 
-  <display-icon class="icon" [data]="this.poiTypes" showRating="true"></display-icon>
+<div class="mat-list-text">
+  <h2 matLine> {{data.label}} </h2>
+  <p matLine>
+    <span *ngIf="!data.distanceFromUser"> {{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} </span>
+    <span *ngIf="data.distanceFromUser"> {{data.distanceFromUser | distance:'meters':'miles':false:2:true:true}} </span>
+    <span> {{this.data.waypoint.distance | distance:'meters':'miles':true}} </span>
+  </p>
 </div>

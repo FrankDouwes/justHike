@@ -1,15 +1,17 @@
-<div id="content" class="left" (click)="toggleTracking()" matRipple>
-  <div class="main noselect">
-    <h2>You ({{data.label}})</h2>
-    <small *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} {{data.waypoint.distance | distance:'meters':'miles':true}}</small>
-  </div>
-  <!--<button (click)="toggleTracking()">-->
-    <!--track-->
-  <!--</button>-->
-  <fa-icon icon="location-arrow" class="icon" size="2x" [className]="data.label === 'idle' ? 'visible' : 'invisible'"></fa-icon>
-  <fa-icon [icon]="['far', 'compass']" class="icon" [spin]="true" size="2x" [className]="data.label === 'fetching' ? 'visible' : 'invisible'"></fa-icon>
-  <fa-icon [icon]="['fa', 'hiking']" class="icon" size="2x" [className]="data.label === 'tracking' ? 'visible' : 'invisible'"></fa-icon>
-  <fa-icon id="error" class="icon" icon="exclamation-triangle" size="2x" [className]="data.label === 'error' ? 'visible' : 'invisible'"></fa-icon>
+<div class="icon noselect fa-2x">
+  <fa-layers id="icons" [fixedWidth]="true">
+    <fa-icon icon="location-arrow" [className]="data.label === 'idle' ? 'visible' : 'invisible'"></fa-icon>
+    <fa-icon [icon]="['far', 'compass']" [spin]="true" [className]="data.label === 'fetching' ? 'visible' : 'invisible'"></fa-icon>
+    <fa-icon [icon]="['fa', 'hiking']" [className]="data.label === 'tracking' ? 'visible' : 'invisible'"></fa-icon>
+    <fa-icon id="error" icon="exclamation-triangle" [className]="data.label === 'error' ? 'visible' : 'invisible'"></fa-icon>
+  </fa-layers>
+</div>
 
-  <!--<display-icon class="icon" [data]="this.poiTypes" showRating="true"></display-icon>-->
+<div class="mat-list-text">
+  <h2 matLine>You</h2>
+  <p matLine>
+    <span *ngIf="data.label !== 'tracking'">{{data.label}}</span>
+    <span *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} {{data.waypoint.distance | distance:'meters':'miles':true}}</span>
+  </p>
+  <button *ngIf="data.label === 'tracking'">center</button>
 </div>

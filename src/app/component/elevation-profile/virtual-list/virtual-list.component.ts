@@ -53,16 +53,16 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
   public itemWidth:     number;
 
   public guides:        Array<object>     = [];
-  public scrollOffset:  number            = 0;
+  public scrollOffset       = 0;
 
   // private
   private _visibleRange:      object;
   private _resizeTimer:       any;
 
-  private _currentIndex:      number      = 0;
-  private _initialIndex:      number      = 0;
-  private _currentMile:       number      = -1;
-  private _status:            string      = 'idle';
+  private _currentIndex      = 0;
+  private _initialIndex      = 0;
+  private _currentMile      = -1;
+  private _status      = 'idle';
 
 
   constructor(
@@ -95,15 +95,15 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
 
   ngOnInit(): void {
 
-    this._initialIndex = Number(this._route.snapshot.queryParams["id"])
+    this._initialIndex = Number(this._route.snapshot.queryParams['id']);
     this.setupEventListeners();
   }
 
   ngAfterViewInit() {
 
-    let _self = this;
+    const _self = this;
 
-    let _delay = setTimeout(function() {
+    const _delay = setTimeout(function() {
       _self.scrollViewport.scrollToIndex(_self._initialIndex, 'auto');
     }, 1);
   }
@@ -112,8 +112,10 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
 
     if (changes.scrollTo) {
       if (changes.scrollTo.currentValue) {
-        this._currentIndex = Math.floor(this.scrollViewport.getDataLength() * changes.scrollTo.currentValue);
-        this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
+        if (this.scrollViewport) {
+          this._currentIndex = Math.floor(this.scrollViewport.getDataLength() * changes.scrollTo.currentValue);
+          this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
+        }
       }
     }
   }
@@ -131,7 +133,7 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
   private onStatusChange(status: string): void {
 
     // if we're switching to tracking
-    if (this._status !== 'tracking' && status === 'tracking') {
+    if (this._status !== 'tracking' && status === 'tracking' && this.scrollViewport) {
       this.scrollViewport.scrollToIndex(this._currentMile - 1, 'auto');
     }
 
