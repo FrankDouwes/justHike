@@ -19,12 +19,12 @@
       [resize]="resize"
       [data]="li"
       [isLast]="last"
-      [current]="(li.isCurrent) ? userLocation : false"
+      [current]="(user && li.id === user.nearestMileId) ? user : null"
       [visibleOHLC]="visibleOHLC"
       [guides]="guides"
 
       (click)="onClick(li)">
-
+      matRipple
     </display-list-item>
 
     <!-- runs under marker layer (in list item) -->

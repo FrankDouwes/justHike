@@ -64,14 +64,14 @@ export function sampleFaIcon(iconId:string) {
 // create leaflet poi marker (using font-awesome 5 webfont)
 export function createFaLeafletMarker(icon: string, iconPrefix: string, color:string) {
 
-  var redMarker = L.VectorMarkers.icon({
+  const _marker = L.VectorMarkers.icon({
     icon: icon,
     markerColor: color,
     prefix: iconPrefix,
     markerBorderColor: shadeColor(color, -10)
   });
 
-  return redMarker;
+  return _marker;
 }
 
 // modified version of https://github.com/hiasinho/Leaflet.vector-markers

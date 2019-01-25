@@ -87,8 +87,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
 
-    // console.log("lala", changes);
-
     // since this component requires the dom for drawing svg, it'll have to wait until initialization finishes
     if (!this._initialized) {
       return;
@@ -188,7 +186,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
     });
 
     // draw line
-    const _strokeColor: string = (this.data.isCurrent) ? '#429832' : 'red';
+    const _strokeColor: string = (this.current) ? '#429832' : 'red';
     this._polyline = this._svgCanvas.path(svgPath(drawPoints)).fill('rgba(233,225,210, 0.5)').stroke({ color: _strokeColor, width: Settings.LINEHEIGHT});
   }
 
@@ -229,9 +227,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
           // if trail drops below snowlevel
           const snowLine = this._svgCanvas.path(svgPath(drawPoints)).fill('rgba(255,255,255,0)').stroke({ color: 'rgba(255,255,255,0.9)', width: Settings.LINEHEIGHT * 2, linecap: 'round'});
 
-          // let _mask = this._polyline.clone().fill("white");
-          // snowLine.maskWith(_mask);
-
           drawPoints = [];
         }
 
@@ -241,9 +236,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
       if (drawPoints.length >= 1) {
 
         const snowLine = this._svgCanvas.path(svgPath(drawPoints)).fill('rgba(255,255,255,0)').stroke({ color: 'rgba(255,255,255,0.9)', width: Settings.LINEHEIGHT * 2, linecap: 'round'});
-
-        // let _mask = this._polyline.clone().fill("white");
-        // snowLine.maskWith(_mask);
       }
     }
   }
@@ -346,7 +338,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
     const range = (max - min);
 
     // draw user
-    if (this.data.isCurrent === true && this.current) {
+    if (this.current) {
 
       let _userElevation = 0;
 

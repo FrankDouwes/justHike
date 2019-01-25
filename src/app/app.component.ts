@@ -1,8 +1,9 @@
-import {Component, ElementRef} from '@angular/core';
+import {Component, ElementRef, Injector} from '@angular/core';
 import {LoaderService} from './service/loader.service';
 import {MatDialog} from '@angular/material';
 import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
 import {MarkerDialogComponent} from './component/dialog/marker-dialog/marker-dialog.component';
+import {LocationService} from './service/location.service';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +19,14 @@ export class AppComponent {
 
   constructor(
     private _dialog: MatDialog,
-
     private _loaderService: LoaderService,
-    private _element: ElementRef
+    private _element: ElementRef,
+    private _injector: Injector
   ) {
+
+    // makes locationService globally accessible, needed for inheritance
+    LocationService.injector = this._injector;
+
     _element.nativeElement.addEventListener('markerClick', this.onMarkerClick.bind(this), false);
   }
 

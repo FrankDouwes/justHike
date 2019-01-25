@@ -15,7 +15,7 @@ export class Settings {
     useFeet: true,                  // feet (true), meters (false) for elevation gain/loss
     matchEstimatedTrailLength: true,     // calculated trail length wont match what the data claims, this compensates for that
 
-    showCampSites: true,            // show campsites in elevation profile
+    showCampSites: false,            // show campsites in elevation profile
     showMinimap: true,              // show mini map in elevation profile
     distanceOffTrail: 250,          // distance (in feet?) that a water source has to be off trail to be rendered as such
 

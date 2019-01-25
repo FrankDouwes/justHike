@@ -14,17 +14,19 @@ import {
 
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Location} from '@angular/common';
 
 import {Subscription} from 'rxjs';
 
-import {LocationService} from '../../../service/location.service';
 import {anchorDistanceCalculation} from '../../../_geo/geoCalc';
 
 // type classes
 import {OHLC} from '../../../type/ohlc';
 import {Mile} from '../../../type/mile';
 import {Trail} from '../../../type/trail';
+import {LocationBasedComponent} from '../../../display/location-based/location-based.component';
+import {Poi} from '../../../type/poi';
+import {User} from '../../../type/user';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'virtual-list-component',
@@ -32,7 +34,7 @@ import {Trail} from '../../../type/trail';
   styleUrls: ['./virtual-list.component.sass'],
   // changeDetection: ChangeDetectionStrategy.OnPush       // needs testing, especially with iOS/Safaris weird scroll event.
 })
-export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('scrollViewport') scrollViewport: CdkVirtualScrollViewport;
 
@@ -41,10 +43,6 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
 
   @Output() scrollEvent: EventEmitter<object> = new EventEmitter<object>();
   @Output() resizeEvent: EventEmitter<object> = new EventEmitter<object>();
-
-  // subs
-  private _locationSubscription:          Subscription;
-  private _locationStatusSubscription:    Subscription;
 
   // public
   public userLocation:  Object;
@@ -59,33 +57,18 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
   private _visibleRange:      object;
   private _resizeTimer:       any;
 
-  private _currentIndex      = 0;
-  private _initialIndex      = 0;
-  private _currentMile      = -1;
-  private _status      = 'idle';
+  private _currentIndex       = 0;
+  private _initialIndex       = 0;
+  private _status             = 'idle';
 
 
   constructor(
-
     private _router:            Router,
     private _route:             ActivatedRoute,
-    private _location:          Location,
-    private _locationService:   LocationService,
-
   ) {
 
+    super();
     this.itemWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
-
-    // set up subscriptions
-    this._locationStatusSubscription = _locationService.locationStatus.subscribe(
-      status => {
-        this.onStatusChange(status);
-      });
-
-    this._locationSubscription = _locationService.location.subscribe(
-      location => {
-        this.onLocationChange(location);
-      });
   }
 
 
@@ -94,6 +77,8 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
 // LIFECYCLE HOOKS
 
   ngOnInit(): void {
+
+    super.ngOnInit();
 
     this._initialIndex = Number(this._route.snapshot.queryParams['id']);
     this.setupEventListeners();
@@ -120,71 +105,21 @@ export class VirtualListComponent implements OnInit, AfterViewInit, OnChanges, O
     }
   }
 
-  ngOnDestroy(): void {
-    this._locationSubscription.unsubscribe();
-    this._locationStatusSubscription.unsubscribe();
-  }
-
-
 
 
 // SUBSCRIPTION HANDLERS
 
-  private onStatusChange(status: string): void {
+  public onStatusChange(status: string): void {
 
-    // if we're switching to tracking
-    if (this._status !== 'tracking' && status === 'tracking' && this.scrollViewport) {
-      this.scrollViewport.scrollToIndex(this._currentMile - 1, 'auto');
-    }
-
-    this._status = status;
+    this.onUserLocationChange(this.user);
   }
 
-  private onLocationChange(location: object): void {
+  public onUserLocationChange(user: User): void {
 
-    // if tracking
-    if (location && this._status === 'tracking' || location && this._status === 'fetching') {
-
-      if (this._currentMile !== location['mile']['id']) {
-
-        // set old active mile to false
-        if (this._currentMile !== -1) {
-          this.trailData.miles[this._currentMile].isCurrent = false;
-        }
-
-        // set new active mile to true
-        this._currentMile = location['mile']['id'];
-        // this.trailData.miles[location['mile']['id']].isCurrent = true;
-      }
-
-      // calculate user location (might move this somewhere else XXX)
-
-      // get nearest mile
-      const _nearestMile: Mile = this.trailData.miles[this._currentMile];
-
-      // find nearest waypoints
-      const _nearestWaypointRef: object =
-        geolib.orderByDistance({latitude: location['coords'].latitude, longitude: location['coords'].longitude} as geolib.PositionAsDecimal,
-          _nearestMile.waypoints);
-
-      // create trail anchor for user location
-      const _anchorData = anchorDistanceCalculation({latitude: location['coords'].latitude, longitude: location['coords'].longitude}, _nearestMile, _nearestWaypointRef);
-
-      // data thats needed: distance from trail (in meters), distance in mile (in meters), elevation (in meters)
-      this.userLocation = {distance: _nearestWaypointRef[0]['distance'], anchorDistance: _anchorData.anchorPoint.distance, elevation: location['coords'].altitude || 0};
-      _nearestMile.isCurrent = true;
-
-    } else {
-
-      this.userLocation = null;
-
-      // set old active mile to false
-      if (this._currentMile !== -1) {
-        this.trailData.miles[this._currentMile].isCurrent = false;
-        this._currentMile = -1;
-      }
-
-      this.userLocation = null;
+    // if we're switching to tracking
+    if (this._status !== 'tracking' && this.status === 'tracking' && this.scrollViewport) {
+      this.scrollViewport.scrollToIndex(this.user.nearestMileId, 'auto');
+      this._status = status;
     }
   }
 

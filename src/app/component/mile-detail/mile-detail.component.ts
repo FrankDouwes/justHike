@@ -18,9 +18,6 @@ export class MileDetailComponent implements OnInit {
     private _route:               ActivatedRoute,
   ) {}
 
-
-
-
   // LIFECYCLE HOOKS
 
   ngOnInit(): void {
@@ -38,11 +35,9 @@ export class MileDetailComponent implements OnInit {
         const _mapLineSegmentPadding = 1;
 
         this.visibleMilesList = this.getMilesSegmentData(result, _milesBehind, _milesAhead);
-        this.visibleMilesLeaflet =  this.getMilesSegmentData(result, (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
+        this.visibleMilesLeaflet = this.getMilesSegmentData(result, (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
       });
   }
-
-
 
   // OTHER
   // the mile (line) segments data to show using leaflet

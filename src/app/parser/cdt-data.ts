@@ -7,7 +7,7 @@ export function parseCDTData (trail: Trail, trailData: string, poiData: string, 
   return new Trail();
 }
 
-// figure out what type of POIS exist in raw data, assign them to poi types XXX
+// figure out what type of POIS exist in raw data, assign them to poi types TODO
 function parsePois(pois: Array<object>): Array<Poi> {
 
   return [];

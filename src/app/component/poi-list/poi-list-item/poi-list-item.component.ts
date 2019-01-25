@@ -10,6 +10,7 @@ import {getPoiTypeByType} from '../../../_util/poi';
 export class PoiListItemComponent implements OnInit {
 
   @Input() data: Poi;
+  @Input('status') status: string = "idle";
 
   public poiTypes: Array<PoiType> = [];
 

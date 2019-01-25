@@ -239,7 +239,7 @@ function linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
 
   for (let poi of pois) {
 
-    // update elevation to feet XXX
+    // update elevation to feet TODO
     poi.waypoint.elevation = poi.waypoint.elevation / Settings.FOOT;
 
     // find nearest mile

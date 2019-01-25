@@ -85,7 +85,7 @@ export function elevationLines (): any {
 // }),
 
 
-// TEMP!!! XXX
+// TEMP!!! TODO
 export function mapTiles (): any {
   return new L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
     attribution: '',

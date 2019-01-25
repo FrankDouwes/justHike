@@ -36,6 +36,7 @@ import {MatIconModule} from '@angular/material/icon';
 import { ButtonComponent } from './display/button/button.component';
 
 // component
+import { LocationBasedComponent } from './display/location-based/location-based.component';
 import { SettingsComponent } from './component/settings/settings.component';
 import { ListItemComponent } from './component/elevation-profile/virtual-list/list-item/list-item.component';
 import { ElevationProfileComponent } from './component/elevation-profile/elevation-profile.component';
@@ -67,6 +68,7 @@ import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-
 @NgModule({
   declarations: [
     AppComponent,
+    LocationBasedComponent,
     SettingsComponent,
     ElevationProfileComponent,
     MileDetailComponent,

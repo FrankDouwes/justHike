@@ -1,6 +1,4 @@
 <button id="locator" (click)="onClick()" [className]="status === 'tracking' ? 'active' : 'inactive'">
-
-  <!--[className] = "visible"-->
   <span>
     <leaflet-map
 
@@ -14,14 +12,16 @@
       [showPois]=false
       [showMapTiles]=false
       [showElevationTiles]=true
-
-      [milesData]="this.visibleMiles"
-      [activeMileId]="this.mileIdClosestToUser"
-      [userLocation]="this.userLocation"
+      [activeMileId]="nearestMileId"
+      [milesData]="visibleMiles"
+      [centerUser]=true
     >
+
     </leaflet-map>
   </span>
   <fa-icon icon="location-arrow" size="2x" [className]="status === 'idle' ? 'visible' : 'invisible'"></fa-icon>
   <fa-icon [icon]="['far', 'compass']" [spin]="true" size="2x" [className]="status === 'fetching' ? 'visible' : 'invisible'"></fa-icon>
   <fa-icon id="error" icon="exclamation-triangle" size="2x" [className]="status === 'error' ? 'visible' : 'invisible'"></fa-icon>
 </button>
+
+<!--[update]="timestamp"-->

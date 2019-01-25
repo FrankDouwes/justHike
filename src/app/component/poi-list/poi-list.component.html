@@ -8,12 +8,12 @@
 
   #poiList>
 
-  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedPoisArray"
+  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedData"
 
                     class="mat-list-item mat-2-line mat-list-item-avatar mat-list-item-with-avatar"
 
                     [data]="poi"
-                    [status]="poi.type === 'user' ? status : null"
+                    [status]="status"
                     [timestamp] = "timestamp"
 
                     (click)="onListItemClick(poi)"

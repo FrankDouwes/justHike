@@ -18,7 +18,7 @@ export class TrailService {
   constructor(private _http: HttpClient) {}
 
   /* SERVICE to fetch raw (xml/gpx) data and convert it into usable JSON data,
-  // this will eventually be replaced with a fetch of already parsed/optimised JSON data XXX */
+  // this will eventually be replaced with a fetch of already parsed/optimised JSON data TODO */
   getTrailData(path: string): Observable<object> {
 
     // if cached
@@ -31,12 +31,12 @@ export class TrailService {
     const _poi = this._http.get(this._baseUrl + path + 'poi.gpx', {responseType: 'text'});
     const _snow = this._http.get(this._baseUrl + path + 'snow.json', {responseType: 'json'});
 
-    // needs error handling ??? XXX
+    // needs error handling ??? TODO
 
     return forkJoin([_trail, _poi, _snow]);
   }
 
-  // only to parse raw (external) trail data to usable data, data as text (string), will be replaced XXX
+  // only to parse raw (external) trail data to usable data, data as text (string), will be replaced TODO
   parseTrailData(trail: Trail, waypoints: string, pois: string, snow: object): Trail {
     if (trail.abbr === 'PCT') {
       return (this._cachedData) ? this._cachedData : this._cachedData = parsePCTData(trail, waypoints, pois, snow);
@@ -51,7 +51,7 @@ export class TrailService {
     }
     // return throwError('Something bad happened; please try again later.');
 
-    // show popup with retry button XXX
+    // show popup with retry button TODO
   }
 
 }

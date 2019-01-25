@@ -1,14 +1,4 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  ViewChild,
-  ViewContainerRef,
-  Input,
-  ComponentRef,
-  ComponentFactoryResolver,
-  HostBinding, OnChanges, SimpleChanges
-} from '@angular/core';
+import {Component, OnInit, OnDestroy, ViewChild, ViewContainerRef, Input, ComponentRef, ComponentFactoryResolver, OnChanges, SimpleChanges} from '@angular/core';
 import {PoiListItemComponent} from '../poi-list-item/poi-list-item.component';
 import {PoiUserItemComponent} from '../poi-user-item/poi-user-item.component';
 
@@ -21,12 +11,12 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
   @ViewChild('container', { read: ViewContainerRef }) container: ViewContainerRef;
 
-  @Input() data: any;
-  @Input() status: string;
+  @Input() data: object;
+  @Input() status: string = "idle";
   @Input() timestamp: number;
 
   private _componentRef: ComponentRef<{}>;
-  private _poiUserItem;
+  private _instance: any;             // the dynamic list item instance (user or poi)
 
   // use multiple components as list items in a CDK virtual scroll
   // if type === user, use user-item, else use poi-item
@@ -37,24 +27,27 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
   ngOnInit(): void {
 
-    const componentType: any = (this.data.type === 'user') ? PoiUserItemComponent : PoiListItemComponent;
+    const componentType: any = (this.data['type'] === 'user') ? PoiUserItemComponent : PoiListItemComponent;
 
     const factory = this._componentFactoryResolver.resolveComponentFactory(componentType);
     this._componentRef = this.container.createComponent(factory);
 
     // set dynamic component data
-    const instance = <any> this._componentRef.instance;
-    instance.data = this.data;
+    this._instance = <any> this._componentRef.instance;
 
-    if (this.data.type === 'user') {
-      this._poiUserItem = instance;
-      instance.status = this.status;
-    }
+    // inject data
+    this._instance.data = this.data;
+    this._instance.status = this.status;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this._poiUserItem && changes.status) {
-      this._poiUserItem.status = changes.status.currentValue;
+
+    if (!this._instance) {
+      return;
+    }
+
+    if (changes.status) {
+      this._instance.status = changes.status.currentValue;
     }
 
     if (changes.timestamp) {

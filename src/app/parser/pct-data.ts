@@ -58,7 +58,7 @@ export function parsePCTData (trail: Trail, trailData: string, poiData: string, 
 
 
 
-  // SNOW (the current snow pack, from postholer.com XXX
+  // SNOW (the current snow pack, from postholer.com TODO
 
   // 1. parse only the current SWE data
   const _snow = parseSnow(snow['datasets'][0]);
@@ -73,7 +73,7 @@ export function parsePCTData (trail: Trail, trailData: string, poiData: string, 
   return _result;
 }
 
-// figure out what type of POIS exist in raw data, assign them to poi types XXX
+// figure out what type of POIS exist in raw data, assign them to poi types TODO
 function parsePois(pois: Array<object>): Array<Poi> {
 
   const _poisLength: number = pois.length;     // faster

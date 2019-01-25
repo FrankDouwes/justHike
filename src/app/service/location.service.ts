@@ -1,11 +1,7 @@
-import { Injectable } from '@angular/core';
+import {Injectable, Injector} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import * as GeoLib from 'geolib';
-
-import {findNearestMileInTree, findNearestWaypointInMile} from '../_geo/geoCalc';
-
 import { Waypoint } from '../type/waypoint';
-import {Mile} from '../type/mile';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +9,9 @@ import {Mile} from '../type/mile';
 
 export class LocationService {
 
-  // behaviour subjects see https://stackoverflow.com/questions/37174598/how-to-get-last-value-when-subscribing-to-an-observable
+  static injector: Injector;
+
+  // behaviour subjects
   private _locationStatus:  BehaviorSubject<string>     = new BehaviorSubject<string>('idle');
   private _location:        BehaviorSubject<object>     = new BehaviorSubject<object>(undefined);
 
@@ -23,12 +21,12 @@ export class LocationService {
 
   // watcher
   private _locationWatcher:         number;
-  private _previousLocation:        Location;
-  private _toggleStatus     = false;
+  private _previousLocation:        object;
+  private _toggleStatus             = false;
   private _locationStatusLocal      = '';
 
   /* track user location and status:
-      location = gps data
+      location = gps data > converted to Poi
       status = idle/fetching/tracking/stopping
    */
 
@@ -68,12 +66,7 @@ export class LocationService {
     this.updateStatusLabel('idle');
   }
 
-  private parseLocation(location): void {
-
-    const _waypoint: Waypoint = {
-      latitude: location['coords']['latitude'],
-      longitude: location['coords']['longitude'],
-      elevation: location['coords']['altitude']} as Waypoint;
+  private parseLocation(location: Position): void {
 
     // only execute if location changed (optimisation)
     if (!this._previousLocation ||
@@ -81,23 +74,13 @@ export class LocationService {
       this._previousLocation['coords']['longitude'] !== location['coords']['longitude'] &&
       this._previousLocation['coords']['altitude'] !== location['coords']['altitude']) {
 
-      // figure out the nearest mile
-      const mileData = findNearestMileInTree(_waypoint);
-      location['mile'] = mileData['mile'] as Mile;
-
-      const _nearestWaypoint = findNearestWaypointInMile(_waypoint, location['mile'])[0];
-      location['anchorPoint'] = location['mile'].waypoints[Number(_nearestWaypoint.key)];
-
-      location['waypoint'] = _waypoint as Waypoint;
-      location['waypoint'].distance = _nearestWaypoint.distance;
-
       this.updateLocation(location);
     }
 
     this._previousLocation = location;
   }
 
-  private updateLocation(location): void {
+  private updateLocation(location: object): void {
     this._location.next(location);
     this.updateStatusLabel('tracking');
   }
@@ -106,7 +89,7 @@ export class LocationService {
 
     this.updateStatusLabel('error');
 
-    // needs to show popup, telling user to enable gps on phone! XXX
+    // needs to show popup, telling user to enable gps on phone! TODO
 
     switch (error.code) {
       case error.PERMISSION_DENIED:
