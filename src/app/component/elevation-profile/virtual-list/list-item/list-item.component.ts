@@ -275,7 +275,8 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
           const _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, Settings.LINEHEIGHT / 2);
 
-          if (_poiTypes.length > 1 && _visibleTypes.length > 1) {
+          console.log(_visibleTypes);
+          if (_poiTypes.length > 1 && _visibleTypes.length > 2) {
             _markerColor = getPoiTypeByType('multiple').color;
             _iconSize = 13;
             _extraOffset = (_iconSize / 2);

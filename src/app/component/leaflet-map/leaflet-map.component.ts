@@ -63,7 +63,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (this._initialized) {
       this.drawMap();
-      // this.onUserLocationChange(this.user);
+      this.onUserLocationChange(this.user);
       this.centerMap(this.centerUser);
     }
   }
@@ -75,7 +75,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // only draw if there's data
     if (this.milesData && this.milesData.length > 0) {
       this.drawMap();
-      // this.onUserLocationChange(this.user);
+      this.onUserLocationChange(this.user);
       this.centerMap(this.centerUser);
     }
 
@@ -160,7 +160,32 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   }
 
-  private drawSnow(mile: Mile, index: number): void {}
+  private drawSnow(mile: Mile, index: number): void {
+
+    let _waypoints: Array<any> = [];
+
+    for (let waypoint of mile.waypoints) {
+
+      let _wp: L.latLng = new L.latLng(waypoint.latitude, waypoint.longitude, waypoint.elevation);
+
+      _waypoints.push(_wp);
+
+      if (mile.id === this.activeMileId) {
+        this._bounds.push(_wp);
+      }
+    }
+
+    // show the trail
+    let _trailLine = new L.Polyline(_waypoints, {
+      color: 'red',
+      weight: 4,
+      opacity: 1,
+      smoothFactor: 1
+    });
+
+    _trailLine.addTo(this._map);
+
+  }
 
   private drawPois(mile: Mile, index: number): void {
 
@@ -199,7 +224,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private drawUser(): void {
 
-    if (!this._userMarker && this._map) {
+    if (!this._userMarker && this._map && this.user.waypoint) {
 
       this._userMarker = this.createUserMarker(this.user);
       this._userMarker.addTo(this._map);
@@ -233,6 +258,39 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
 
 
+  // EVENT HANDLERS
+
+  // linked directly to svg marker (scope change)
+  private onMarkerClick (event: MouseEvent) {
+
+    const _event: CustomEvent = new CustomEvent(
+      'markerClick',
+      {
+        bubbles: true,
+        cancelable: true,
+        detail: this['data']
+      });
+
+    // get DOM element on changed scope
+    this['self']._map._container.dispatchEvent(_event);
+  }
+
+
+  public onStatusChange(status: string): void {
+    this.onUserLocationChange(this.user);
+
+  }
+  public onUserLocationChange(user: User): void {
+
+    if (this._map) {
+      this.drawUser();
+    }
+  }
+
+
+
+
+
   // CREATE MAP ELEMENTS
 
   private createLabelMarker(label: string, waypoint: Waypoint) {
@@ -242,6 +300,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   }
 
   private createUserMarker(user: User): any {
+
+    console.log('create user');
 
     let _user = L.marker([user.anchorPoint.latitude, user.anchorPoint.longitude], {icon: createFaLeafletMarker('cog', 'fa', '#FFFF00'),user:user});
     return _user;
@@ -300,43 +360,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       ]
     }).addTo(this._map);
 
-
     _guideLine.addTo(this._map);
-  }
-
-
-
-  // EVENT HANDLERS
-
-  // linked directly to svg marker (scope change)
-  private onMarkerClick (event: MouseEvent) {
-
-    const _event: CustomEvent = new CustomEvent(
-      'markerClick',
-      {
-        bubbles: true,
-        cancelable: true,
-        detail: this['data']
-      });
-
-    // get DOM element on changed scope
-    this['self']._map._container.dispatchEvent(_event);
-  }
-
-  public onStatusChange(status: string): void {
-
-    // console.log("status changed", this.name, status);
-    this.onUserLocationChange(this.user);
-
-  }
-  public onUserLocationChange(user: User): void {
-
-    console.log('hier?');
-    if (this.status === 'tracking' && this._initialized) {
-      this.drawUser();
-    }
-
-    // console.log("location changed", this.name, location);
   }
 }
 

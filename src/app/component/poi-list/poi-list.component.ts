@@ -56,6 +56,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
       });
 
     this.sortListData(this._staticPoisArray.concat(this.user));
+    this.onUserLocationChange(this.user);
   }
 
   // SUBSCRIPTION HANDLERS

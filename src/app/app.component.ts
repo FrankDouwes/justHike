@@ -31,6 +31,7 @@ export class AppComponent {
   }
 
   ngOnInit() {
+
     this._loaderService.status.subscribe((val: boolean) => {
       this.showLoader = val;
     });
