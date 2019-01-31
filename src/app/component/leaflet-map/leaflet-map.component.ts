@@ -85,10 +85,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   setupMap() {
 
-    const _tileLayers: Array<any> = [];
+    let _tileLayers: Array<any> = [];
 
     if (this.showMapTiles === true) {
-      _tileLayers.push(mapTiles());
+      _tileLayers = _tileLayers.concat(mapTiles());
     }
 
     if (this.showElevationTiles === true) {
@@ -116,8 +116,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   // ELEMENT CREATION
 
   private drawMap(): void {
-
-    console.log('data?', this.milesData);
 
     const _self = this;
 
@@ -212,7 +210,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
         this._markers.push(_poiMarker);
 
-        if (mile.id === this.activeMileId && poi.waypoint.distance <= Settings.USERSETTINGS.distanceOffTrail * 2) {
+        if (mile.id === this.activeMileId && poi.waypoint.distance <= Settings.USERSETTINGS.poiDistanceOffTrail * 2) {
           this._bounds.push(_poiMarker._latlng);
         }
       }
@@ -224,16 +222,18 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private drawUser(): void {
 
-    if (!this._userMarker && this._map && this.user.waypoint) {
+    if (this._userMarker) {
+      this._map.removeLayer(this._userMarker); // remove
+      this._userMarker = null;
+    }
+
+    if (this.user && !this._userMarker && this._map && this.user.waypoint) {
 
       this._userMarker = this.createUserMarker(this.user);
-      this._userMarker.addTo(this._map);
-
-    } else if (this._userMarker) {
-
-      // change color & position
       const _userLocation = new L.LatLng(this.user.anchorPoint.latitude, this.user.anchorPoint.longitude);
       this._userMarker.setLatLng(_userLocation);
+
+      this._userMarker.addTo(this._map);
     }
   }
 
@@ -278,8 +278,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   public onStatusChange(status: string): void {
     this.onUserLocationChange(this.user);
-
   }
+
   public onUserLocationChange(user: User): void {
 
     if (this._map) {
@@ -301,9 +301,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private createUserMarker(user: User): any {
 
-    console.log('create user');
+    let _color = (this.status === "tracking") ? '#00FF00' : '#AAAAAA';
 
-    let _user = L.marker([user.anchorPoint.latitude, user.anchorPoint.longitude], {icon: createFaLeafletMarker('cog', 'fa', '#FFFF00'),user:user});
+    let _user = L.marker([user.anchorPoint.latitude, user.anchorPoint.longitude], {icon: createFaLeafletMarker('hiking', 'fa', _color),user:user});
     return _user;
   }
 

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectionStrategy, HostBinding} from '@angular/core';
+import {Component, Input, OnInit, HostBinding} from '@angular/core';
 import {Poi} from '../../../type/poi';
 
 @Component({
@@ -17,6 +17,7 @@ export class PoiUserItemComponent implements OnInit {
   public userStatus: string;
 
   @Input() data: Poi;
+  @Input() timestamp: number;
   @Input('status') set status(value: string) {
 
     if (!value) {
@@ -42,6 +43,5 @@ export class PoiUserItemComponent implements OnInit {
 
   constructor() {}
 
-  // LIFECYCLE HOOKS
   ngOnInit(): void {}
 }

@@ -107,7 +107,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
 
 
-// SUBSCRIPTION HANDLERS
+// OVERRIDES
 
   public onStatusChange(status: string): void {
 
@@ -117,10 +117,11 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   public onUserLocationChange(user: User): void {
 
     // if we're switching to tracking
-    if (this._status !== 'tracking' && this.status === 'tracking' && this.scrollViewport) {
-      this.scrollViewport.scrollToIndex(this.user.nearestMileId, 'auto');
-      this._status = status;
+    if (user && this._status !== 'tracking' && this.status === 'tracking' && this.scrollViewport) {
+      this.scrollViewport.scrollToIndex(user.nearestMileId - 1, 'auto');
     }
+
+    this._status = this.status;
   }
 
 

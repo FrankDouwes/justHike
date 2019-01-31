@@ -10,19 +10,22 @@ export class Settings {
   // user preferences
   public static USERSETTINGS = {
 
-    isMale: true,                   // male (true), female (false) used for user icon in elevation profile
     useMiles: true,                 // miles (true), km (false)
     useFeet: true,                  // feet (true), meters (false) for elevation gain/loss
     matchEstimatedTrailLength: true,     // calculated trail length wont match what the data claims, this compensates for that
 
     showCampSites: true,            // show campsites in elevation profile
     showMinimap: true,              // show mini map in elevation profile
-    distanceOffTrail: 250,          // distance (in feet?) that a water source has to be off trail to be rendered as such
+    poiDistanceOffTrail: 250,       // distance (in feet?) that a water source has to be off trail to be rendered as such
+    userDistanceOffTrail: 10,       // the distance (in feet?) that a user has to be off trail for marker to change
 
     showExtraDesign: true,          // show extra design features in elevation profile (trees)
     greyScale: false,               // map greyscale mode
-    maxPoiDistance: 0.1,            // maximum poi distance from trail (in mi)
-    scrollbarSegmentSize: 26        // scrollbar (elevation profile) renders 1 point for every X points)
+
+    // internal
+    maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app
+    scrollbarSegmentSize: 26,       // scrollbar (elevation profile) renders 1 point for every X points)
+    simulatedMile: -1               // the simulated mile number
   };
 
   public static TRAILS: Array<Trail> = [
@@ -48,6 +51,14 @@ export class Settings {
   ];
 
   public static POITYPES: Array<PoiType> = [
+
+    {
+      type: 'user',
+      label: 'user',
+      iconType: 'fa',
+      icon: 'hiking'
+    },
+
     {
       type: 'water',
       label: 'water',

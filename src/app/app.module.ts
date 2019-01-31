@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AngularFittextModule } from 'angular-fittext';
+
 import {NgForageModule, NgForageConfig, Driver} from 'ngforage';
 
 // font awesome
@@ -29,6 +30,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
 
 import {MatIconModule} from '@angular/material/icon';
 
@@ -64,6 +68,13 @@ import { IconComponent } from './display/icon/icon.component';
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-item.component';
+import { OfftrailDialogComponent } from './component/dialog/offtrail-dialog/offtrail-dialog.component';
+import { ElevationSettingsComponent } from './component/dialog/settings-dialog/panels/elevation-settings/elevation-settings.component';
+import { PurchaseSettingsComponent } from './component/dialog/settings-dialog/panels/purchase-settings/purchase-settings.component';
+import { DetailSettingsComponent } from './component/dialog/settings-dialog/panels/detail-settings/detail-settings.component';
+import { GeneralSettingsComponent } from './component/dialog/settings-dialog/panels/general-settings/general-settings.component';
+import { AboutComponent } from './component/dialog/settings-dialog/panels/about/about.component';
+import { InstructionsComponent } from './component/dialog/settings-dialog/panels/instructions/instructions.component';
 
 @NgModule({
   declarations: [
@@ -83,6 +94,7 @@ import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-
     LoaderOverlayComponent,
     SettingsDialogComponent,
     MarkerDialogComponent,
+    OfftrailDialogComponent,
     PoiListComponent,
     LeafletMapComponent,
     FaSamplerComponent,
@@ -92,11 +104,18 @@ import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-
     DistancePipe,
     PoiUserItemComponent,
     PoiListItemComponent,
-    DynamicItemComponent
+    DynamicItemComponent,
+    ElevationSettingsComponent,
+    PurchaseSettingsComponent,
+    DetailSettingsComponent,
+    GeneralSettingsComponent,
+    AboutComponent,
+    InstructionsComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
     MarkerDialogComponent,
+    OfftrailDialogComponent,
     PoiUserItemComponent,
     PoiListItemComponent
   ],
@@ -118,7 +137,9 @@ import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-
     MatListModule,
     AngularFittextModule,
     MatRippleModule,
-    MatIconModule
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

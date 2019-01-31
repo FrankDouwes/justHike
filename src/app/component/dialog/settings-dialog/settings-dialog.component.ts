@@ -8,6 +8,16 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 })
 export class SettingsDialogComponent implements OnInit {
 
+  public listItems: Array<object> = [
+    {title: 'Trail Data', panel: 'purchase'},
+    {title: 'General Settings', panel: 'general'},
+    {title: 'Elevation Profile', panel: 'elevation'},
+    {title: 'Mile Overview', panel: 'detail'},
+    {title: 'About', panel: 'about'}
+  ];
+
+  public activePanel: string;
+
   constructor(
     public dialogRef: MatDialogRef<SettingsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: object
@@ -15,7 +25,7 @@ export class SettingsDialogComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  private onNoClick(): void {
-    this.dialogRef.close();
+  onClick(item) {
+    this.activePanel = item.panel;
   }
 }

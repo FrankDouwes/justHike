@@ -55,8 +55,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
         this.scrollToUser();
       });
 
-    this.sortListData(this._staticPoisArray.concat(this.user));
-    this.onUserLocationChange(this.user);
+    const _userRef: User = (this.user !== undefined) ? this.user : super.createBlankUser();
+    this.sortListData(this._staticPoisArray.concat(_userRef));
+    this.onUserLocationChange(_userRef);
   }
 
   // SUBSCRIPTION HANDLERS
@@ -80,13 +81,13 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
 
       // figure out where the pois are in relation to the user
       this._staticPoisArray.forEach(function(poi: Poi) {
-        poi.distanceFromUser = poi.anchorPoint.distanceTotal - _self.user.anchorPoint.distanceTotal;
+        poi.distanceFromUser = poi.anchorPoint.distanceTotal - user.anchorPoint.distanceTotal;
       });
 
     } else {
 
-      this.user['waypoint'] = this.user['anchorPoint'] = undefined;
-      this.sortListData(this._staticPoisArray.concat(this.user));
+      user.waypoint = user.anchorPoint = undefined;
+      this.sortListData(this._staticPoisArray.concat(user));
     }
   }
 
@@ -142,5 +143,6 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
 
     this._userIndex = data.findIndex(poi => poi.type === 'user');
     this.combinedData.next(data);
+    this.timestamp = new Date().getTime();
   }
 }

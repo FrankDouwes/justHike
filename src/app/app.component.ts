@@ -1,16 +1,17 @@
-import {Component, ElementRef, Injector} from '@angular/core';
+import {Component, ElementRef, Injector, OnInit} from '@angular/core';
 import {LoaderService} from './service/loader.service';
 import {MatDialog} from '@angular/material';
 import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
 import {MarkerDialogComponent} from './component/dialog/marker-dialog/marker-dialog.component';
 import {LocationService} from './service/location.service';
+import {OfftrailDialogComponent} from './component/dialog/offtrail-dialog/offtrail-dialog.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.sass']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   public showLoader:      boolean      = true;      // show loader/spinner by default
 
@@ -27,10 +28,11 @@ export class AppComponent {
     // makes locationService globally accessible, needed for inheritance
     LocationService.injector = this._injector;
 
-    _element.nativeElement.addEventListener('markerClick', this.onMarkerClick.bind(this), false);
+    _element.nativeElement.addEventListener('markerClick', this.onCustomEvent.bind(this), false);
+    _element.nativeElement.addEventListener('offtrail', this.onCustomEvent.bind(this), false);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
 
     this._loaderService.status.subscribe((val: boolean) => {
       this.showLoader = val;
@@ -49,28 +51,31 @@ export class AppComponent {
   // EVENT HANDLERS
 
   // angular event handler for navEvents
-  onNavEvent(event: string) {
+  private onNavEvent(event: string): void {
 
     if (event === 'settings') {
       this.openSettingsDialog();
     }
   }
   // on marker click (using standard events as angular events don't bubble
-  onMarkerClick(event: Event) {
+  private onCustomEvent(event: Event): void {
 
     // destination reached
     event.stopImmediatePropagation();
     event.stopPropagation();
 
-    this.openMarkerDialog(event);
+    if(event.type === 'offtrail') {
+      this.openOfftrailDialog(event);
+    } else {
+      this.openMarkerDialog(event);
+    }
   }
-
 
 
 
   // DIALOGS
 
-  openMarkerDialog(event) {
+  private openMarkerDialog(event): void {
 
     // get marker poi data
     if (this.navIsVisible) {
@@ -89,7 +94,7 @@ export class AppComponent {
     });
   }
 
-  openSettingsDialog() {
+  private openSettingsDialog(): void {
 
     if (this.navIsVisible) {
       this.toggleNavigationVisibility();
@@ -108,7 +113,27 @@ export class AppComponent {
     });
   }
 
-  toggleNavigationVisibility() {
+  private openOfftrailDialog(event): void {
+    if (this.navIsVisible) {
+      this.toggleNavigationVisibility();
+    }
+    const _offtrailDialog = this._dialog.open(OfftrailDialogComponent, {
+      autoFocus: false,
+      width: '85%',
+      height: '75%',
+      data: event.detail
+    });
+
+    _offtrailDialog.afterClosed().subscribe(result => {
+      console.log(result);
+      this.toggleNavigationVisibility();
+
+      const _simulate = (result) ? true : false;
+      this._injector.get(LocationService).toggleTracking(_simulate);
+    });
+  }
+
+  private toggleNavigationVisibility(): void {
     this.navIsVisible = !this.navIsVisible;
   }
 }

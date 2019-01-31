@@ -1,6 +1,6 @@
-<button id="locator" (click)="onClick()" [className]="status === 'tracking' ? 'active' : 'inactive'">
+<button id="locator" (click)="onClick()" [className]="status === 'tracking' ? 'active' : 'inactive'" #container>
   <span>
-    <leaflet-map
+    <leaflet-map *ngIf="user"
 
       id="mini-map"
 

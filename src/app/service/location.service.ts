@@ -2,6 +2,8 @@ import {Injectable, Injector} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import * as GeoLib from 'geolib';
 import { Waypoint } from '../type/waypoint';
+import {Settings} from '../settings';
+import {trailData} from '../_geo/geoCalc';
 
 @Injectable({
   providedIn: 'root'
@@ -35,17 +37,33 @@ export class LocationService {
   }
 
   // enable / disable location tracking
-  toggleTracking(): void {
+  toggleTracking(force: boolean = false): void {
 
-    this._toggleStatus = !this._toggleStatus;
+    const _simulate: boolean = (Settings.USERSETTINGS.simulatedMile !== -1);
+
+    this._toggleStatus = (!force) ? !this._toggleStatus : force;
 
     if (this._toggleStatus) {
+
       this.updateStatusLabel('fetching');
-      this.trackLocation();
+
+      if (_simulate) {
+        this.stopTracking(true);
+        this.simulateLocation();
+      } else {
+        this.trackLocation();
+      }
+
     } else {
       this.updateStatusLabel('stopping');
       this.stopTracking();
     }
+  }
+
+  // simulate location
+  private simulateLocation(): void {
+    // simulate mile number
+    this.parseLocation(Settings.USERSETTINGS.simulatedMile);
   }
 
   private trackLocation(): void {
@@ -59,28 +77,53 @@ export class LocationService {
     }
   }
 
-  private stopTracking(): void {
-    navigator.geolocation.clearWatch(this._locationWatcher);
-    this._location.next(undefined);
-    this._previousLocation = null;
-    this.updateStatusLabel('idle');
-  }
+  private stopTracking(simulate: boolean = false): void {
+    if (navigator.geolocation) {
+      navigator.geolocation.clearWatch(this._locationWatcher);
 
-  private parseLocation(location: Position): void {
-
-    // only execute if location changed (optimisation)
-    if (!this._previousLocation ||
-      this._previousLocation['coords']['latitude'] !== location['coords']['latitude'] &&
-      this._previousLocation['coords']['longitude'] !== location['coords']['longitude'] &&
-      this._previousLocation['coords']['altitude'] !== location['coords']['altitude']) {
-
-      this.updateLocation(location);
+      if (!simulate) {
+        this._location.next(undefined);
+        Settings.USERSETTINGS.simulatedMile = -1;
+        this._previousLocation = null;
+        this.updateStatusLabel('idle');
+      }
     }
-
-    this._previousLocation = location;
   }
 
-  private updateLocation(location: object): void {
+  private parseLocation(location: any): void {
+
+    if (typeof location === 'number') {
+
+      // get first waypoints of mile
+      const _firstWaypoint = trailData.miles[location].waypoints[0];
+
+      location = {
+        coords: {
+          latitude: _firstWaypoint.latitude,
+          longitude: _firstWaypoint.longitude,
+          altitude: _firstWaypoint.elevation,
+        },
+        timestamp: new Date().getTime()
+      };
+
+      this.updateLocation(location, true);
+
+    } else if (location){
+
+      // only execute if location changed (optimisation)
+      if (!this._previousLocation ||
+        this._previousLocation['coords']['latitude'] !== location['coords']['latitude'] &&
+        this._previousLocation['coords']['longitude'] !== location['coords']['longitude'] &&
+        this._previousLocation['coords']['altitude'] !== location['coords']['altitude']) {
+
+        this.updateLocation(location);
+      }
+
+      this._previousLocation = location;
+    }
+  }
+
+  private updateLocation(location: object, simulate: boolean = false): void {
     this._location.next(location);
     this.updateStatusLabel('tracking');
   }

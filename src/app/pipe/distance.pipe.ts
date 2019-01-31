@@ -67,9 +67,9 @@ export class DistancePipe implements PipeTransform {
     if (fromTrailIndicator) {
 
       if (value > 10) {
-        return '(~' + _convertedValue + ' ' + _format + ' off trail)';
+        return '~' + _convertedValue + ' ' + _format + ' off trail';
       } else {
-        return '(on trail)';
+        return 'on trail';
       }
     } else if (relative) {
 

@@ -53,6 +53,10 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
     if (changes.timestamp) {
       console.log('stamp changed');
     }
+
+    if (changes.data) {
+      this._instance.data = changes.data.currentValue;
+    }
   }
 
   ngOnDestroy(): void {

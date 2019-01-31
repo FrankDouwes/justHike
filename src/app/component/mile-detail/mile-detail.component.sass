@@ -2,13 +2,24 @@
 
   #layout
     display: grid
-    grid-template-columns: 60vw auto
+    grid-template-columns: 61.8vw auto
     grid-template-areas: 'main list'
     height: 100vh
 
     #main
       height: 100%
       grid-area: main
+
+      #overlay
+        position: absolute
+        top: 0
+        width: 61.8vw
+        height: 100vh
+        pointer-events: none
+        -webkit-box-shadow: inset -15px 0px 20px -20px rgba(0,0,0,0.5)
+        -moz-box-shadow: inset -15px 0px 20px -20px rgba(0,0,0,0.5)
+        box-shadow: inset -15px 0px 20px -20px rgba(0,0,0,0.5)
+        z-index: 1000
 
     #list
       grid-area: list

@@ -11,15 +11,19 @@
     (window:resize)="onResize($event)"
     (scrolledIndexChange)="onScroll(scrollViewport, $event)">
 
-    <!-- the virtual list item -->
+    <!-- the virtual list item trackBy: trackElementBy -->
     <display-list-item
       class="list-item"
 
-      *cdkVirtualFor="let li of trailData.miles; let last = last; trackBy: trackElementBy"
+      *cdkVirtualFor="let li of trailData.miles; let last = last"
       [resize]="resize"
       [data]="li"
       [isLast]="last"
-      [current]="(user && li.id === user.nearestMileId) ? user : null"
+
+      [user]="(user && li.id === user.nearestMileId) ? user : null"
+      [triggerUserUpdate]="(user && status === 'tracking' && li.id === user.nearestMileId) ? timestamp : null"
+      [userStatus] = "(user && li.id === user.nearestMileId) ? status : null"
+
       [visibleOHLC]="visibleOHLC"
       [guides]="guides"
 

@@ -11,6 +11,6 @@
   <h2 matLine>You</h2>
   <p matLine>
     <span *ngIf="userStatus !== 'tracking'">{{userStatus}}</span>
-    <span *ngIf="userStatus === 'tracking' && data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} {{data.waypoint.distance | distance:'meters':'miles':true}}</span>
+    <span *ngIf="userStatus === 'tracking' && data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</span>
   </p>
 </div>

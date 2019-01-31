@@ -38,10 +38,13 @@ export class LocatorComponent extends LocationBasedComponent implements OnInit {
 
   public onUserLocationChange(user: User): void {
 
-    if (this.status === 'tracking') {
+    console.log('update map 2', this.user);
+
+    if (this.user && this.status === 'tracking') {
       this.nearestMileId = user.nearestMileId;
       // get the nearest 3 miles
-      this.visibleMiles = trailData.miles.slice(user.nearestMileId - 1, user.nearestMileId + 2);
+      this.visibleMiles = trailData.miles.slice(user.nearestMileId - 2, user.nearestMileId + 1);
+      console.log(this.visibleMiles);
     }
   }
 }
