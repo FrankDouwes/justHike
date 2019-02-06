@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import {forkJoin, Observable, throwError} from 'rxjs';
-
+import { of } from 'rxjs';
 import { parsePCTData  } from '../parser/pct-data';
-import {Trail} from '../type/trail';
+import {getTrailDataById, Trail} from '../type/trail';
 import {catchError, map} from 'rxjs/operators';
+import {parseDemoData} from '../parser/demo-data';
+import {parseCDTData} from '../parser/cdt-data';
+import {parseATData} from '../parser/at-data';
 
 @Injectable({
   providedIn: 'root'
@@ -13,33 +16,45 @@ import {catchError, map} from 'rxjs/operators';
 export class TrailService {
 
   private _baseUrl = 'assets/data/';
-  private _cachedData: Trail;
+  private _cachedTrail: Trail;
 
   constructor(private _http: HttpClient) {}
 
   /* SERVICE to fetch raw (xml/gpx) data and convert it into usable JSON data,
-  // this will eventually be replaced with a fetch of already parsed/optimised JSON data TODO */
-  getTrailData(path: string): Observable<object> {
+  // TODO: this will eventually be replaced with a fetch of already parsed/optimised JSON data */
+  getTrailData(trailId: number): Observable<object> {
 
-    // if cached
+    const _trailMeta = getTrailDataById(trailId);
+    const _metaAsObservable = of(_trailMeta);     // so it can be passed into the forkjoin
 
-    // else load parsed
+    const _trail = this._http.get(this._baseUrl + _trailMeta.dataPath + 'trail.gpx', {responseType: 'text'});
+    const _poi = this._http.get(this._baseUrl + _trailMeta.dataPath + 'poi.gpx', {responseType: 'text'});
+    const _snow = this._http.get(this._baseUrl + _trailMeta.dataPath + 'snow.json', {responseType: 'json'});
 
-    // else download raw
+    // TODO: needs error handling ???
 
-    const _trail = this._http.get(this._baseUrl + path + 'trail.gpx', {responseType: 'text'});
-    const _poi = this._http.get(this._baseUrl + path + 'poi.gpx', {responseType: 'text'});
-    const _snow = this._http.get(this._baseUrl + path + 'snow.json', {responseType: 'json'});
-
-    // needs error handling ??? TODO
-
-    return forkJoin([_trail, _poi, _snow]);
+    return forkJoin([_metaAsObservable, _trail, _poi, _snow]);
   }
 
-  // only to parse raw (external) trail data to usable data, data as text (string), will be replaced TODO
+  // TODO: only to parse raw (external) trail data to usable data, data as text (string), will be replaced
   parseTrailData(trail: Trail, waypoints: string, pois: string, snow: object): Trail {
-    if (trail.abbr === 'PCT') {
-      return (this._cachedData) ? this._cachedData : this._cachedData = parsePCTData(trail, waypoints, pois, snow);
+
+    // if it matches the cached trail
+    if (this._cachedTrail && this._cachedTrail.abbr === trail.abbr) {
+      return this._cachedTrail;
+    }
+
+    // else parse new trail data (slow)
+    else {
+      if (trail.abbr === 'DEMO') {
+        return  this._cachedTrail = parseDemoData(trail, waypoints, pois, snow);
+      } else if (trail.abbr === 'PCT') {
+        return this._cachedTrail = parsePCTData(trail, waypoints, pois, snow);
+      } else if (trail.abbr === 'CDT') {
+        return this._cachedTrail = parseCDTData(trail, waypoints, pois, snow);
+      } else if (trail.abbr === 'AT') {
+        return this._cachedTrail = parseATData(trail, waypoints, pois, snow);
+      }
     }
   }
 
@@ -51,7 +66,7 @@ export class TrailService {
     }
     // return throwError('Something bad happened; please try again later.');
 
-    // show popup with retry button TODO
+    // TODO: show popup with retry button
   }
 
 }

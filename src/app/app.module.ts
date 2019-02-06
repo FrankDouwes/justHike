@@ -5,14 +5,13 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AngularFittextModule } from 'angular-fittext';
-
-import {NgForageModule, NgForageConfig, Driver} from 'ngforage';
+import {LocalStorageService, NgxWebstorageModule} from 'ngx-webstorage';
 
 // font awesome
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
-  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle,
+  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt,
   faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faCar, faTrain, faDoorOpen,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle
   } from '@fortawesome/free-solid-svg-icons';
@@ -41,7 +40,6 @@ import { ButtonComponent } from './display/button/button.component';
 
 // component
 import { LocationBasedComponent } from './display/location-based/location-based.component';
-import { SettingsComponent } from './component/settings/settings.component';
 import { ListItemComponent } from './component/elevation-profile/virtual-list/list-item/list-item.component';
 import { ElevationProfileComponent } from './component/elevation-profile/elevation-profile.component';
 import { MileDetailComponent } from './component/mile-detail/mile-detail.component';
@@ -56,6 +54,14 @@ import { PoiListComponent } from './component/poi-list/poi-list.component';
 import { PoiListItemComponent } from './component/poi-list/poi-list-item/poi-list-item.component';
 import { PoiUserItemComponent } from './component/poi-list/poi-user-item/poi-user-item.component';
 import { LeafletMapComponent } from './component/leaflet-map/leaflet-map.component';
+import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-item.component';
+import { OfftrailDialogComponent } from './component/dialog/offtrail-dialog/offtrail-dialog.component';
+import { ElevationSettingsComponent } from './component/dialog/settings-dialog/panels/elevation-settings/elevation-settings.component';
+import { PurchaseSettingsComponent } from './component/dialog/settings-dialog/panels/purchase-settings/purchase-settings.component';
+import { DetailSettingsComponent } from './component/dialog/settings-dialog/panels/detail-settings/detail-settings.component';
+import { GeneralSettingsComponent } from './component/dialog/settings-dialog/panels/general-settings/general-settings.component';
+import { AboutComponent } from './component/dialog/settings-dialog/panels/about/about.component';
+import { InstructionsComponent } from './component/dialog/settings-dialog/panels/instructions/instructions.component';
 
 // dialog
 import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
@@ -67,20 +73,13 @@ import { IconComponent } from './display/icon/icon.component';
 // pipes
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
-import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-item.component';
-import { OfftrailDialogComponent } from './component/dialog/offtrail-dialog/offtrail-dialog.component';
-import { ElevationSettingsComponent } from './component/dialog/settings-dialog/panels/elevation-settings/elevation-settings.component';
-import { PurchaseSettingsComponent } from './component/dialog/settings-dialog/panels/purchase-settings/purchase-settings.component';
-import { DetailSettingsComponent } from './component/dialog/settings-dialog/panels/detail-settings/detail-settings.component';
-import { GeneralSettingsComponent } from './component/dialog/settings-dialog/panels/general-settings/general-settings.component';
-import { AboutComponent } from './component/dialog/settings-dialog/panels/about/about.component';
-import { InstructionsComponent } from './component/dialog/settings-dialog/panels/instructions/instructions.component';
+import { environment } from '../environments/environment.prod';
+import { SettingsPanelComponent } from './display/settings-panel/settings-panel.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LocationBasedComponent,
-    SettingsComponent,
     ElevationProfileComponent,
     MileDetailComponent,
     NavigationComponent,
@@ -110,7 +109,8 @@ import { InstructionsComponent } from './component/dialog/settings-dialog/panels
     DetailSettingsComponent,
     GeneralSettingsComponent,
     AboutComponent,
-    InstructionsComponent
+    InstructionsComponent,
+    SettingsPanelComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -121,8 +121,8 @@ import { InstructionsComponent } from './component/dialog/settings-dialog/panels
   ],
   imports: [
     BrowserModule,
+    NgxWebstorageModule.forRoot(),
     HttpClientModule,
-    NgForageModule.forRoot(),
     ScrollingModule,
     BrowserAnimationsModule,
     MatProgressSpinnerModule,
@@ -145,22 +145,44 @@ import { InstructionsComponent } from './component/dialog/settings-dialog/panels
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(ngfConfig: NgForageConfig) {
 
-    // local forage
-    ngfConfig.configure({
-      name: 'JustHike',
-      driver: [
-        Driver.INDEXED_DB,
-        Driver.WEB_SQL,
-        Driver.LOCAL_STORAGE
-      ]
-    });
+  constructor(
+    private _localStorage: LocalStorageService
+  ) {
+
+    this.firstRun();
 
     // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
-      faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen,
+      faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt,
       faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar,
       faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus);
+  }
+
+
+  // set default user settings (unless they exist)
+  private firstRun() {
+
+    // DEBUG: FORCE FIRST RUN
+    // this._localStorage.store('firstRun', undefined);
+    this._localStorage.store('activeTrailId', 0);
+
+    const _firstRun = this._localStorage.retrieve('firstRun');
+
+    if (_firstRun !== false) {
+      this._localStorage.store('firstRun', true);
+    }
+
+    for (const key in environment.DEFAULT_USER_SETTINGS) {
+
+      const _value = environment.DEFAULT_USER_SETTINGS[key];
+
+      if (this._localStorage.retrieve(key) === null) {
+        this._localStorage.store(key, _value);
+      }
+    }
+
+    // always clear simulatedMile
+    this._localStorage.store('simulatedMile', -1);
   }
 }

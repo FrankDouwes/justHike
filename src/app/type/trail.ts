@@ -2,6 +2,7 @@ import { Waypoint} from './waypoint';
 import {Mile} from './mile';
 import {OHLC} from './ohlc';
 import {Poi} from './poi';
+import {environment} from '../../environments/environment.prod';
 
 export class Trail {
   // STATIC
@@ -10,6 +11,7 @@ export class Trail {
   abbr:           string;
   length:         number;             // the given length of the trail (so not calculated with available waypoints)
   dataPath:       string;             // path to data file(s)
+  scrollbarSegmentSize: number;       // one scrollbar segment for every X miles
 
   // weatherPath?:   string;             // path to weather data (optional)
   // waterPath?:     string;             // path to water data (optional)
@@ -23,4 +25,15 @@ export class Trail {
   waterSources?:      Array<Poi>;         // all water sources (including multi-pois that also have water)
 
   poiTypes?:          Array<object>;      // the poiTypes available for this trail (used for icons / labels)
+}
+
+export function getTrailDataById(id: Number): Trail {
+
+  for (const key in environment.TRAILS) {
+    if (environment.TRAILS[key].id === id) {
+      return environment.TRAILS[key] as Trail;
+    }
+  }
+
+  throw new Error('Trail not found!');
 }

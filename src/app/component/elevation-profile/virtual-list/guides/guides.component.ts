@@ -2,7 +2,7 @@ import {Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef} from '@a
 import {OHLC} from '../../../../type/ohlc';
 import {interpolateColors} from '../../../../_util/color';
 import {normalizeElevation} from '../../../../_util/math';
-import {Settings} from '../../../../settings';
+import {environment} from '../../../../../environments/environment.prod';
 
 @Component({
   selector: 'guides',
@@ -14,13 +14,13 @@ export class GuidesComponent implements OnInit, OnChanges {
   @Input() visibleOHLC: OHLC;
   @Input() guides: Array<object>;
 
-  public processedGuides:Array<object> = [];
+  public processedGuides: Array<object> = [];
 
   private _container: ElementRef;
 
   constructor(_element: ElementRef) {
     this._container = _element;
-  };
+  }
 
   ngOnInit(): void {}
 
@@ -33,17 +33,18 @@ export class GuidesComponent implements OnInit, OnChanges {
        this.processedGuides.splice(this.processedGuides.length - this.guides.length, this.processedGuides.length - this.guides.length);
       }
 
-      let min: number = this.visibleOHLC.low;   // high point
-      let max: number = this.visibleOHLC.high;  // low point
-      let range = (max- min);
+      const min: number = this.visibleOHLC.low;   // high point
+      const max: number = this.visibleOHLC.high;  // low point
+      const range = (max - min);
 
-      let _colors: Array<string> = interpolateColors("rgb(187, 97, 0)", "rgb(62, 125, 158)", this.guides.length);
+      const _colors: Array<string> = interpolateColors('rgb(187, 97, 0)', 'rgb(62, 125, 158)', this.guides.length);
 
-      var _self = this;
+      const _self = this;
 
       this.guides.forEach(function(guide, index) {
 
-        let elevation: number = normalizeElevation(_self._container.nativeElement.clientHeight, guide['elevation'], min, range, Settings.LINEHEIGHT);
+        const elevation: number = normalizeElevation(_self._container.nativeElement.clientHeight
+          , guide['elevation'], min, range, environment.LINEHEIGHT);
 
         // if item already exists, update
         if (_self.processedGuides[index]) {
@@ -51,10 +52,7 @@ export class GuidesComponent implements OnInit, OnChanges {
           _self.processedGuides[index]['offset'] = elevation;
           _self.processedGuides[index]['range'] = guide['range'];
           _self.processedGuides[index]['color'] = 'rgba(' + String(_colors[index]) + ',0.5)';
-        }
-
-        // else add
-        else {
+        } else {
 
           _self.processedGuides.push(
             {

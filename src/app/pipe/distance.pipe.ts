@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {Settings} from '../settings';
+import {environment} from '../../environments/environment.prod';
 
 @Pipe({ name: 'distance' })
 
@@ -28,10 +28,10 @@ export class DistancePipe implements PipeTransform {
     // convert to meters
     if (_currentUnit !== 'meters') {
       if (_currentUnit === 'miles' || _currentUnit === 'mile') {
-        value = value * Settings.MILE;
+        value = value * environment.MILE;
       }
       if (_currentUnit === 'feet' || _currentUnit === 'foot') {
-        value = value * Settings.FOOT;
+        value = value * environment.FOOT;
       }
       _currentUnit = 'meters';
     }
@@ -39,14 +39,14 @@ export class DistancePipe implements PipeTransform {
     // convert value from meters to desiredUnit (if needed)
     if (desiredUnit === 'miles' || desiredUnit === 'mile') {
 
-      if (value / Settings.MILE >= 0.1 || force === true) {
+      if (value / environment.MILE >= 0.1 || force === true) {
 
-        _convertedValue = Number((value / Settings.MILE).toFixed(round));
+        _convertedValue = Number((value / environment.MILE).toFixed(round));
         _format = 'mi';
 
       } else {
 
-        _convertedValue = Number((value / Settings.FOOT).toFixed(0));
+        _convertedValue = Number((value / environment.FOOT).toFixed(0));
         _format = (_convertedValue > 1) ? 'feet' : 'foot';
         _format = (fromTrailIndicator) ? _format : 'ft.';
 
@@ -54,7 +54,7 @@ export class DistancePipe implements PipeTransform {
 
     } else if (desiredUnit === 'feet' || desiredUnit === 'foot') {
 
-      _convertedValue = Number((value / Settings.FOOT).toFixed(0));
+      _convertedValue = Number((value / environment.FOOT).toFixed(0));
       _format = (_convertedValue > 1) ? 'feet' : 'foot';
       _format = (fromTrailIndicator) ? _format : 'ft.';
 

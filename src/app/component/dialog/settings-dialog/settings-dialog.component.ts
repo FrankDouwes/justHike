@@ -17,15 +17,27 @@ export class SettingsDialogComponent implements OnInit {
   ];
 
   public activePanel: string;
+  private _settingsChanged: boolean = false;
 
   constructor(
-    public dialogRef: MatDialogRef<SettingsDialogComponent>,
+    private _dialogRef: MatDialogRef<SettingsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: object
-  ) {}
+  ) {
+
+    _dialogRef.disableClose = true; // disable default close operation
+    _dialogRef.backdropClick().subscribe(result => {
+      _dialogRef.close(this._settingsChanged);
+    });
+  }
 
   ngOnInit(): void {}
 
   onClick(item) {
     this.activePanel = item.panel;
+  }
+
+  // only triggered if true
+  onSettingsChanged(event) {
+    this._settingsChanged = event;
   }
 }

@@ -1,4 +1,5 @@
 import {Settings} from '../settings';
+import {environment} from '../../environments/environment.prod';
 
 // since poiType is an array, we'll have to filter subobjects to select one by type
 export function getPoiTypeByType(type:string) {
@@ -18,16 +19,16 @@ export function distanceInMilesFeet(distanceMeters:number, force: string = ""): 
   let _distance: number;
   let _unit: string;
 
-  if (distanceMeters / Settings.MILE >= 0.1 && force !== 'ft' || force === 'mi') {
+  if (distanceMeters / environment.MILE >= 0.1 && force !== 'ft' || force === 'mi') {
     // show in miles
 
-    _distance = Number((distanceMeters / Settings.MILE).toFixed(2));
+    _distance = Number((distanceMeters / environment.MILE).toFixed(2));
     _unit = 'mi.'
 
   } else {
     // show in feet
 
-    _distance = Number((distanceMeters / Settings.FOOT).toFixed(0));
+    _distance = Number((distanceMeters / environment.FOOT).toFixed(0));
     _unit = 'ft.';
   }
 

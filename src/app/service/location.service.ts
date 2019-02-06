@@ -4,6 +4,7 @@ import * as GeoLib from 'geolib';
 import { Waypoint } from '../type/waypoint';
 import {Settings} from '../settings';
 import {trailData} from '../_geo/geoCalc';
+import {LocalStorageService} from 'ngx-webstorage';
 
 @Injectable({
   providedIn: 'root'
@@ -32,14 +33,18 @@ export class LocationService {
       status = idle/fetching/tracking/stopping
    */
 
-  constructor() {
+  constructor(
+    private _localStorage: LocalStorageService
+  ) {
     this.updateStatusLabel('idle');
   }
 
   // enable / disable location tracking
   toggleTracking(force: boolean = false): void {
 
-    const _simulate: boolean = (Settings.USERSETTINGS.simulatedMile !== -1);
+    const _simulate: boolean = (this._localStorage.retrieve('simulatedMile') !== -1);
+
+    console.log(this._localStorage.retrieve('simulatedMile'));
 
     this._toggleStatus = (!force) ? !this._toggleStatus : force;
 
@@ -63,7 +68,7 @@ export class LocationService {
   // simulate location
   private simulateLocation(): void {
     // simulate mile number
-    this.parseLocation(Settings.USERSETTINGS.simulatedMile);
+    this.parseLocation(this._localStorage.retrieve('simulatedMile'));
   }
 
   private trackLocation(): void {
@@ -83,7 +88,7 @@ export class LocationService {
 
       if (!simulate) {
         this._location.next(undefined);
-        Settings.USERSETTINGS.simulatedMile = -1;
+        this._localStorage.store('simulatedMile', -1);
         this._previousLocation = null;
         this.updateStatusLabel('idle');
       }

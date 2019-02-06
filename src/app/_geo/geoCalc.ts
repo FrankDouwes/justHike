@@ -1,18 +1,16 @@
 import { OHLC, calculateOHLC } from '../type/ohlc';
 import {Waypoint} from '../type/waypoint';
 import {Mile} from '../type/mile';
-import { Settings } from '../settings';
 import {Poi} from '../type/poi';
 import {Trail} from '../type/trail';
 import * as GeoLib from 'geolib';
 import {Snowpoint} from '../type/snowpoint';
-import PositionAsDecimal = geolib.PositionAsDecimal;     // fixes compile bug
-
+import PositionAsDecimal = geolib.PositionAsDecimal;
+import {environment} from '../../environments/environment.prod';
 
 const tolerance = 0.0001;
 export let trailData: Trail;
 let _tree: Array<Array<Waypoint>>;
-
 
 export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: Array<Poi>, snow: Array<object>): Trail {
 
@@ -26,14 +24,14 @@ export function generateMiles (trail: Trail, waypoints: Array<Waypoint>, pois: A
   console.log('optimised waypoints');
 
   // 2. calculate trail properties
-  let flatPoints: Array<object> = [];
+  const flatPoints: Array<object> = [];
 
   // remove elevation, causes errors
   for (let i = 0; i < _optimisedWaypoints.length; i++) {
     flatPoints.push({latitude: _optimisedWaypoints[i].latitude, longitude: _optimisedWaypoints[i].longitude});
   }
 
-  trail.calcLength = geolib.getPathLength(flatPoints as Array<PositionAsDecimal>) / Settings.MILE;
+  trail.calcLength = geolib.getPathLength(flatPoints as Array<PositionAsDecimal>) / environment.MILE;
   trail.scale = (trail.length / trail.calcLength);
   trail.elevationRange = calculateOHLC(trail.waypoints, {start: 0, end: waypoints.length - 1});
 
@@ -103,27 +101,21 @@ function createMiles (waypoints: Array<object>, pois: Array<Poi>, snow: Array<ob
 
     const _waypoint: Waypoint = waypoints[i] as Waypoint;
 
-    _waypoint.elevation = _waypoint.elevation / Settings.FOOT;
+    _waypoint.elevation = _waypoint.elevation / environment.FOOT;
 
     let _elevationChange = 0;
 
     // calucalte distance between points
     if (_prevPoint) {
 
-      // _distance = geolib.getDistance(
-      //   _prevPoint,
-      //   _waypoint, 6, 6
-      // );
-
-
       _distance = geolib.getDistance(
         {latitude: _prevPoint.latitude, longitude: _prevPoint.longitude},
         {latitude: _waypoint.latitude, longitude: _waypoint.longitude}
       );
 
-      if (Settings.USERSETTINGS.matchEstimatedTrailLength === true) {
-        _distance = _distance * scale;
-      }
+      // TODO: hook up to user settings
+      _distance = _distance * scale;
+
 
       _totalDistance += _distance;
       _bridgedDistance += _distance;
@@ -137,13 +129,13 @@ function createMiles (waypoints: Array<object>, pois: Array<Poi>, snow: Array<ob
       }
     }
 
-    _waypoint.distance = _totalDistance - (_miles.length * Settings.MILE);     // the mile distance
+    _waypoint.distance = _totalDistance - (_miles.length * environment.MILE);     // the mile distance
     _waypoint.distanceTotal = _totalDistance;                                   // the total distance
 
     _mileWaypoints.push(_waypoint);
 
     // if a distance of 1 mile+ has been bridged, or end of waypoints reached
-    if (_bridgedDistance > Settings.MILE || waypoints.length - 1 === i) {
+    if (_bridgedDistance > environment.MILE || waypoints.length - 1 === i) {
 
       const _combinedWaypoints: Array<Waypoint> = (_poisWaypoints.length > 0) ? _mileWaypoints.concat(_poisWaypoints) : _mileWaypoints;
 
@@ -163,7 +155,7 @@ function createMiles (waypoints: Array<object>, pois: Array<Poi>, snow: Array<ob
       });
 
       // clear data
-      _bridgedDistance -= Settings.MILE;
+      _bridgedDistance -= environment.MILE;
       _totalGain = _totalLoss = 0;
       _mileWaypoints.splice(0, _mileWaypoints.length - 2);    // keep last 2
       _milePois = [];
@@ -172,7 +164,7 @@ function createMiles (waypoints: Array<object>, pois: Array<Poi>, snow: Array<ob
 
       // adjust offset for the last 2 (which are now the first 2)
       for (const wp of _mileWaypoints) {
-        wp.distance -= Settings.MILE;
+        wp.distance -= environment.MILE;
       }
     }
 
@@ -240,7 +232,7 @@ function linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
   for (let poi of pois) {
 
     // update elevation to feet TODO
-    poi.waypoint.elevation = poi.waypoint.elevation / Settings.FOOT;
+    poi.waypoint.elevation = poi.waypoint.elevation / environment.FOOT;
 
     // find nearest mile
     const _nearestMile: Mile = miles[findNearestMileInTree({latitude:poi.waypoint.latitude, longitude:poi.waypoint.longitude} as Waypoint)['id']];
@@ -459,5 +451,5 @@ function getSquareSegmentDistance(p, p1, p2) {
 }
 
 export function toMile(number: number): number {
-  return number / Settings.MILE;
+  return number / environment.MILE;
 }

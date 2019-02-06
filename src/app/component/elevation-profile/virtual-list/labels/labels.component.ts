@@ -1,8 +1,7 @@
 import {Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef} from '@angular/core';
 import {OHLC} from '../../../../type/ohlc';
 import {normalizeElevation} from '../../../../_util/math';
-import {Settings} from '../../../../settings';
-import {interpolateColors} from '../../../../_util/color';
+import {environment} from '../../../../../environments/environment.prod';
 
 @Component({
   selector: 'axis',
@@ -43,7 +42,8 @@ export class LabelsComponent implements OnInit, OnChanges {
 
       this.guides.forEach(function (guide, index) {
 
-        let elevation: number = normalizeElevation(_self._container.nativeElement.clientHeight, guide['elevation'], min, range, Settings.LINEHEIGHT);
+        let elevation: number = normalizeElevation(_self._container.nativeElement.clientHeight
+          , guide['elevation'], min, range, environment.LINEHEIGHT);
 
         // if item already exists, update
         if (_self.processedGuides[index]) {

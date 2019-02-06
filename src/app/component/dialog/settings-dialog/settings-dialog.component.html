@@ -24,16 +24,16 @@
     <instructions *ngIf="!activePanel"></instructions>
 
     <!-- purchase / download panel -->
-    <purchase-settings *ngIf="activePanel === 'purchase'"></purchase-settings>
+    <purchase-settings *ngIf="activePanel === 'purchase'" (onSettingsChanged)="onSettingsChanged($event)"></purchase-settings>
 
     <!-- general settings panel -->
-    <general-settings *ngIf="activePanel === 'general'"></general-settings>
+    <general-settings *ngIf="activePanel === 'general'" (onSettingsChanged)="onSettingsChanged($event)"></general-settings>
 
     <!-- elevation profile settings panel -->
-    <elevation-settings *ngIf="activePanel === 'elevation'"></elevation-settings>
+    <elevation-settings *ngIf="activePanel === 'elevation'" (onSettingsChanged)="onSettingsChanged($event)"></elevation-settings>
 
     <!-- mile detail profile settings panel -->
-    <detail-settings *ngIf="activePanel === 'detail'"></detail-settings>
+    <detail-settings *ngIf="activePanel === 'detail'" (onSettingsChanged)="onSettingsChanged($event)"></detail-settings>
 
     <!-- about panel-->
     <about *ngIf="activePanel === 'about'"></about>

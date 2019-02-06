@@ -13,6 +13,8 @@ import {LocationBasedComponent} from '../../display/location-based/location-base
 import {User} from '../../type/user';
 import {Location} from '@angular/common';
 import {Waypoint} from '../../type/waypoint';
+import {Snowpoint} from '../../type/snowpoint';
+import {environment} from '../../../environments/environment.prod';
 
 @Component({
   selector: 'leaflet-map',
@@ -44,6 +46,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _centerpoint: object;
   private _bounds: Array<object> = [];
+  private _allElementsBounds: Array<object> = [];
   private _markers: Array<any> = [];
   private _userMarker;
 
@@ -144,10 +147,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       if (mile.id === this.activeMileId) {
         this._bounds.push(_wp);
       }
+
+      this._allElementsBounds.push(_wp);
     }
 
-    // show the trail
-    let _trailLine = new L.Polyline(_waypoints, {
+    // draw waypoints
+    const _trailLine = new L.Polyline(_waypoints, {
       color: 'red',
       weight: 4,
       opacity: 1,
@@ -160,29 +165,55 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private drawSnow(mile: Mile, index: number): void {
 
-    let _waypoints: Array<any> = [];
+    let _snowPoints: Array<any> = [];
 
-    for (let waypoint of mile.waypoints) {
+    if (mile.snowData) {
 
-      let _wp: L.latLng = new L.latLng(waypoint.latitude, waypoint.longitude, waypoint.elevation);
+      mile.waypoints.forEach((waypoint, index) => {
 
-      _waypoints.push(_wp);
+        let _elevation = 0;
 
-      if (mile.id === this.activeMileId) {
-        this._bounds.push(_wp);
+        function elevationRange(): number {
+          // waypoint distance (%) on snowarray elevation range
+          const _computedElevation = mile.snowData[0].elevation + ((waypoint.distance / environment.MILE) * ((mile.snowData[1].elevation - mile.snowData[0].elevation)));
+          return _computedElevation;
+        }
+
+        //if waypoint is above showline
+        if (waypoint.elevation >= elevationRange()) {
+
+          // add point
+          let _wp: L.latLng = new L.latLng(waypoint.latitude, waypoint.longitude, waypoint.elevation);
+          _snowPoints.push(_wp);
+
+        } else if (waypoint.elevation < elevationRange() && _snowPoints.length > 0) {
+
+          this.drawSnowLine(_snowPoints);
+
+          _snowPoints = [];
+        }
+
+      });
+
+      // if there is still snow to be drawn at the end of loop
+      if (_snowPoints.length > 0) {
+
+        this.drawSnowLine(_snowPoints);
       }
     }
+  }
 
-    // show the trail
-    let _trailLine = new L.Polyline(_waypoints, {
-      color: 'red',
-      weight: 4,
-      opacity: 1,
+  private drawSnowLine(waypoints: Array<any>):void {
+
+    // draw waypoints
+    const _trailLine = new L.Polyline(waypoints, {
+      color: 'white',
+      weight: 8,
+      opacity: 0.9,
       smoothFactor: 1
     });
 
     _trailLine.addTo(this._map);
-
   }
 
   private drawPois(mile: Mile, index: number): void {
@@ -199,20 +230,24 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // pois sit on top of label markers
     if (this.showPois && mile.pois) {
 
+      const _maxPoiDistanceOffTrail = this.localStorage.retrieve('poiDistanceOffTrail');
+
       for (const poi of mile.pois) {
 
         const _poiMarker = this.createmarker(poi as Poi);
 
-        if (poi.waypoint.distance >= Settings.MILE / 8) {
+        if (poi.waypoint.distance >= environment.MILE / 8) {
 
           this.createPoiGuideLine(poi as Poi);
         }
 
         this._markers.push(_poiMarker);
 
-        if (mile.id === this.activeMileId && poi.waypoint.distance <= Settings.USERSETTINGS.poiDistanceOffTrail * 2) {
+        if (mile.id === this.activeMileId && poi.waypoint.distance <= _maxPoiDistanceOffTrail * 2) {
           this._bounds.push(_poiMarker._latlng);
         }
+
+        this._allElementsBounds.push(_poiMarker._latlng);
       }
 
       const _markerGroup = L.featureGroup(this._markers);
@@ -246,12 +281,14 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       _markerGroup.addTo(this._map);
 
       this._map.fitBounds(L.latLngBounds(this._bounds).pad(0.1));
-
     } else {
 
       // set map to center on centerpoint of selected mile
       this._map.setView([this.user.anchorPoint.latitude, this.user.anchorPoint.longitude], 16);
     }
+
+    // set the panning bounds
+    this._map.setMaxBounds(L.latLngBounds(this._allElementsBounds).pad(0.1));
   }
 
 

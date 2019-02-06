@@ -3,53 +3,6 @@ import {PoiType} from './type/poi';
 
 export class Settings {
 
-  public static MILE = 1609.344;    // mile in meters
-  public static FOOT = 0.3048;      // foot in meters
-  public static LINEHEIGHT = 4;     // main line thickness
-
-  // user preferences
-  public static USERSETTINGS = {
-
-    useMiles: true,                 // miles (true), km (false)
-    useFeet: true,                  // feet (true), meters (false) for elevation gain/loss
-    matchEstimatedTrailLength: true,     // calculated trail length wont match what the data claims, this compensates for that
-
-    showCampSites: true,            // show campsites in elevation profile
-    showMinimap: true,              // show mini map in elevation profile
-    poiDistanceOffTrail: 250,       // distance (in feet?) that a water source has to be off trail to be rendered as such
-    userDistanceOffTrail: 10,       // the distance (in feet?) that a user has to be off trail for marker to change
-
-    showExtraDesign: true,          // show extra design features in elevation profile (trees)
-    greyScale: false,               // map greyscale mode
-
-    // internal
-    maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app
-    scrollbarSegmentSize: 26,       // scrollbar (elevation profile) renders 1 point for every X points)
-    simulatedMile: -1               // the simulated mile number
-  };
-
-  public static TRAILS: Array<Trail> = [
-    {
-      id: 0,
-      name: 'Pacific Crest Trail - CA section 1',
-      abbr: 'PCT',
-      length: 109.5,      //estimated length (including 8mi into Canada) (according to halfmile pct data (first section is 109.5)
-      dataPath: 'PCT/X'
-    }, {
-      id: 1,
-      name: 'Continental Divide Trail',
-      abbr: 'CDT',
-      length: 3100,      //estimated length
-      dataPath: 'CDT/'
-    }, {
-      id: 2,
-      name: 'Appalachian Trail',
-      abbr: 'AT',
-      length: 2199,      //estimated length
-      dataPath: 'AT/'
-    }
-  ];
-
   public static POITYPES: Array<PoiType> = [
 
     {

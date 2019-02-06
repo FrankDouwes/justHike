@@ -10,11 +10,11 @@ import {
   ViewChild,
   AfterViewInit
 } from '@angular/core';
-import {toMile} from '../../../_geo/geoCalc';
 import {Trail} from '../../../type/trail';
 import {Settings} from '../../../settings';
 import {Waypoint} from '../../../type/waypoint';
 import {normalizeElevation} from '../../../_util/math';
+import {environment} from '../../../../environments/environment.prod';
 declare const SVG: any;    // fixed SVG installation bug
 
 @Component({
@@ -99,8 +99,8 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   private drawMap(): void {
 
-    const min: number = Number(this.trailData.elevationRange.low) / Settings.FOOT;
-    const max: number = Number(this.trailData.elevationRange.high) / Settings.FOOT;
+    const min: number = Number(this.trailData.elevationRange.low) / environment.FOOT;
+    const max: number = Number(this.trailData.elevationRange.high) / environment.FOOT;
     let elevation: number;
 
     const drawPoints: Array<any> = [];
@@ -111,27 +111,27 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
     const l = (this._svgWidth / this.trailData.waypoints.length);
 
-    console.log(this._svgWidth, this._svgHeight);
-
     // start points
     drawPoints.push([0, max]);
-    elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2), this.trailData['waypoints'][0]['elevation'], min, range, this._verticalPadding));
+    elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
+      , this.trailData['waypoints'][0]['elevation'], min, range, this._verticalPadding));
 
     drawPoints.push([0, elevation]);
 
     let prevPoint: object;
     let totalDistancePerc = 0;
 
-    for (var i = 0; i < this.trailData.waypoints.length; i += Settings.USERSETTINGS.scrollbarSegmentSize) {
+    for (var i = 0; i < this.trailData.waypoints.length; i += this.trailData.scrollbarSegmentSize) {
 
-      const waypoint:Waypoint = this.trailData.waypoints[i];
+      const waypoint: Waypoint = this.trailData.waypoints[i];
 
       // calculate distance, starting at 2nd point
       if (counter > 0) {
-        totalDistancePerc = (waypoint.distanceTotal / Settings.MILE) / this.trailData['length'];
+        totalDistancePerc = (waypoint.distanceTotal / environment.MILE) / this.trailData['length'];
       }
 
-      elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2), waypoint.elevation, min, range, this._verticalPadding));
+      elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
+        , waypoint.elevation, min, range, this._verticalPadding));
 
       drawPoints.push([this._svgWidth * totalDistancePerc, elevation]);
       counter += l;
