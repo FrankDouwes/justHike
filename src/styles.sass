@@ -1,5 +1,13 @@
 /* generic styling */
 
+@font-face
+  font-family: "NationalPark"
+  src: url('assets/fonts/nationalpark-regular-webfont.eot')
+  src: local('NationalPark')
+  src: url('assets/fonts/nationalpark-regular-webfont.woff') format('woff')
+  src: url('assets/fonts/nationalpark-regular-webfont.otf') format('opentype')
+  src: url('assets/fonts/nationalpark-regular-webfont.ttf') format('truetype')
+
 html, body
   display: block
   min-height: 100%
@@ -11,6 +19,11 @@ body
   overscroll-behavior: contain
   margin: 0px 0px 0px 0.4px     // margin left keeps cdk scroll smooth on mobile (android)
   font-family: Roboto, "Helvetica Neue", sans-serif;
+
+h1, h2, h3, h4, h5, h6
+  font-family: 'NationalPark', Roboto, sans-serif
+  font-weight: normal
+  font-style: normal
 
 // hide webkit scrollbar
 ::-webkit-scrollbar

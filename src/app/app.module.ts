@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 
-import { NgModule } from '@angular/core';
+import {isDevMode, NgModule} from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AngularFittextModule } from 'angular-fittext';
@@ -14,6 +14,7 @@ import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationAr
   faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt,
   faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faCar, faTrain, faDoorOpen,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle
+  , faSnowflake, faAtlas, faMountain, faSpinner, faTrash
   } from '@fortawesome/free-solid-svg-icons';
 import { faCompass, faDotCircle} from '@fortawesome/free-regular-svg-icons';
 
@@ -31,7 +32,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-
+import { MatTabsModule } from '@angular/material/tabs';
 
 import {MatIconModule} from '@angular/material/icon';
 
@@ -75,6 +76,7 @@ import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { environment } from '../environments/environment.prod';
 import { SettingsPanelComponent } from './display/settings-panel/settings-panel.component';
+import { DownloaderComponent } from './component/dialog/settings-dialog/panels/purchase-settings/downloader/downloader.component';
 
 @NgModule({
   declarations: [
@@ -110,7 +112,8 @@ import { SettingsPanelComponent } from './display/settings-panel/settings-panel.
     GeneralSettingsComponent,
     AboutComponent,
     InstructionsComponent,
-    SettingsPanelComponent
+    SettingsPanelComponent,
+    DownloaderComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -139,7 +142,8 @@ import { SettingsPanelComponent } from './display/settings-panel/settings-panel.
     MatRippleModule,
     MatIconModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatTabsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
@@ -156,15 +160,16 @@ export class AppModule {
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt,
       faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar,
-      faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus);
+      faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake,
+      faAtlas, faMountain, faSpinner, faTrash);
   }
 
 
   // set default user settings (unless they exist)
   private firstRun() {
 
-    // DEBUG: FORCE FIRST RUN
-    // this._localStorage.store('firstRun', undefined);
+    // DEBUG: FORCE FIRST RUN XXX todo
+    this._localStorage.store('purchasedTrails', []);
     this._localStorage.store('activeTrailId', 0);
 
     const _firstRun = this._localStorage.retrieve('firstRun');

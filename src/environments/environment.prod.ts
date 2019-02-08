@@ -3,6 +3,9 @@ import {Trail} from '../app/type/trail';
 export const environment = {
   production: true,
 
+  version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
+  fileBaseUrl: 'https://hike.frankdouwes.com/files/',
+
   MILE: 1609.344,    // mile in meters
   FOOT: 0.3048,      // foot in meters
   LINEHEIGHT: 4,     // main line thickness
@@ -10,10 +13,9 @@ export const environment = {
   // user preferences
   DEFAULT_USER_SETTINGS: {
 
-    version: 0.1,                   // current application version that settings belong to (in case of update to settings structure)
 
     activeTrailId: 0,               // the ID of the current trail
-    purchasedTrails: [1, 2],        // IDs of purchased trails
+    purchasedTrails: [],            // IDs of purchased trails
 
     useMiles: true,                 // miles (true), km (false) (UNUSED)
     useFeet: true,                  // feet (true), meters (false) for elevation gain/loss
@@ -39,28 +41,47 @@ export const environment = {
       abbr: 'DEMO',
       length: 109.5,      //estimated length (first section is 109.5)
       dataPath: 'DEMO/',
-      scrollbarSegmentSize: 10      // one scrollbar segment for every X miles
+      tileDataSize: 1024,
+      lineDataSize: 512,
+      snowDataSize: 128,
+      scrollbarSegmentSize: 10,      // one scrollbar segment for every X miles
+      availableForPurchase: false,
+      isFree: true                    // always free
+
     }, {
       id: 1,
       name: 'Pacific Crest Trail',
       abbr: 'PCT',
       length: 2660,      //estimated length (including 8mi into Canada) according to halfmile pct data
       dataPath: 'PCT/',
-      scrollbarSegmentSize: 26      // one scrollbar segment for every X miles
+      tileDataSize: 10241,
+      lineDataSize: 5121,
+      snowDataSize: 1281,
+      scrollbarSegmentSize: 26,      // one scrollbar segment for every X miles
+      availableForPurchase: true,
+      isFree: true                    // free in V1
     }, {
       id: 2,
       name: 'Continental Divide Trail',
       abbr: 'CDT',
       length: 3100,      //estimated length
       dataPath: 'CDT/',
-      scrollbarSegmentSize: 31      // one scrollbar segment for every X miles
+      tileDataSize: 10242,
+      lineDataSize: 5122,
+      snowDataSize: 1282,
+      scrollbarSegmentSize: 31,      // one scrollbar segment for every X miles
+      availableForPurchase: false
     }, {
       id: 3,
       name: 'Appalachian Trail',
       abbr: 'AT',
       length: 2199,      //estimated length
       dataPath: 'AT/',
-      scrollbarSegmentSize: 22      // one scrollbar segment for every X miles
+      tileDataSize: 10234,
+      lineDataSize: 5123,
+      snowDataSize: 1283,
+      scrollbarSegmentSize: 22,      // one scrollbar segment for every X miles
+      availableForPurchase: false
     }
   ]
 };

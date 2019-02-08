@@ -50,6 +50,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _markers: Array<any> = [];
   private _userMarker;
 
+  private _onlineMode: boolean;
+
 
 
   constructor(

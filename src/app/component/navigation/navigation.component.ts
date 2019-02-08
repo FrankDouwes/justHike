@@ -1,6 +1,9 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { Location } from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
+import {DownloadService} from '../../service/download.service';
+import {HttpEventType, HttpResponse} from '@angular/common/http';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'navigation-component',
@@ -11,16 +14,19 @@ export class NavigationComponent implements OnInit {
 
   @Output() navEvent: EventEmitter<string> = new EventEmitter<string>();
 
-  public visibleClass:      string = 'hide';
-  public oppositeClass:     string = 'show';
+  public visibleClass:                string = 'hide';
+  public oppositeClass:               string = 'show';
+  public isDownloading:               boolean;
 
-  private _backIndex:       object;
+  private _backIndex:                 object;
+  private _downloadSubScription:      Subscription;
 
   constructor(
 
     private _location:      Location,
     private _route:         ActivatedRoute,
-    private _router:        Router
+    private _router:        Router,
+    private _downloadService:     DownloadService
 
   ) {
 
@@ -45,7 +51,11 @@ export class NavigationComponent implements OnInit {
 
   // LIFECYCLE HOOKS
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+     this._downloadSubScription = this._downloadService.isDownloadingSubscription.subscribe(isDownloading => {
+       this.isDownloading = isDownloading;
+    });
+  }
 
 
 

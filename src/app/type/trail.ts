@@ -30,7 +30,7 @@ export class Trail {
 export function getTrailDataById(id: Number): Trail {
 
   for (const key in environment.TRAILS) {
-    if (environment.TRAILS[key].id === id) {
+    if (environment.TRAILS[Number(key)].id === id) {
       return environment.TRAILS[key] as Trail;
     }
   }

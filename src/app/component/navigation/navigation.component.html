@@ -1,5 +1,7 @@
 <display-button class="button back {{this.visibleClass}}" label="" icon="arrow-left" (click)="onBackClick()"></display-button>
 
+<mat-spinner *ngIf="isDownloading"></mat-spinner>
+
 <div class="right {{this.oppositeClass}}">
   <locator></locator>
 </div>

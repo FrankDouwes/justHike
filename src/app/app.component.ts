@@ -1,13 +1,12 @@
 import {Component, ElementRef, Injector, isDevMode, OnInit} from '@angular/core';
-import { EventManager } from '@angular/platform-browser';
 import {LoaderService} from './service/loader.service';
 import {MatDialog} from '@angular/material';
 import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
 import {MarkerDialogComponent} from './component/dialog/marker-dialog/marker-dialog.component';
 import {LocationService} from './service/location.service';
 import {OfftrailDialogComponent} from './component/dialog/offtrail-dialog/offtrail-dialog.component';
+import {DownloadService} from './service/download.service';
 import {LocalStorageService} from 'ngx-webstorage';
-import {ActivatedRoute, Router} from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -27,18 +26,11 @@ export class AppComponent implements OnInit {
     private _element: ElementRef,
     private _injector: Injector,
     private _localStorage: LocalStorageService,
-    private _eventManager: EventManager
+    private _downloadService: DownloadService
   ) {
-
-    // listen for on/offline
-    this._eventManager.addGlobalEventListener('window', 'online', this.onOffLineToggle);
-    this._eventManager.addGlobalEventListener('window', 'offline', this.onOffLineToggle);
 
     // makes constructor props accessible through LocationService, needed for inheritance
     LocationService.injector = this._injector;
-
-    _element.nativeElement.addEventListener('markerClick', this.onCustomEvent.bind(this), false);
-    _element.nativeElement.addEventListener('offtrail', this.onCustomEvent.bind(this), false);
   }
 
   ngOnInit(): void {
@@ -158,11 +150,6 @@ export class AppComponent implements OnInit {
 
   private toggleNavigationVisibility(): void {
     this.navIsVisible = !this.navIsVisible;
-  }
-
-  // adds class to body for online/offline
-  private onOffLineToggle(event): void {
-    console.log(event);
   }
 }
 

@@ -44,8 +44,6 @@ export class LocationService {
 
     const _simulate: boolean = (this._localStorage.retrieve('simulatedMile') !== -1);
 
-    console.log(this._localStorage.retrieve('simulatedMile'));
-
     this._toggleStatus = (!force) ? !this._toggleStatus : force;
 
     if (this._toggleStatus) {
