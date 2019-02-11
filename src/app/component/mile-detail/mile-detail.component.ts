@@ -25,8 +25,7 @@ export class MileDetailComponent implements OnInit {
     // get miles data based on route id
     this.routedMile = Number(this._route.snapshot.paramMap.get('id'));
 
-    this._route.data
-      .subscribe(result => {
+    this._route.data.subscribe(result => {
         const _milesBehind = 2;
         const _milesAhead = 1;
 
@@ -34,8 +33,8 @@ export class MileDetailComponent implements OnInit {
         // fitting map to markers/line segments using bounds isn't precise
         const _mapLineSegmentPadding = 1;
 
-        this.visibleMilesList = this.getMilesSegmentData(result, _milesBehind, _milesAhead);
-        this.visibleMilesLeaflet = this.getMilesSegmentData(result, (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
+        this.visibleMilesList = this.getMilesSegmentData(result.data['trail'], _milesBehind, _milesAhead);
+        this.visibleMilesLeaflet = this.getMilesSegmentData(result.data['trail'], (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
       });
   }
 
@@ -45,8 +44,8 @@ export class MileDetailComponent implements OnInit {
   private getMilesSegmentData(data: any, milesBehind: number, milesAhead: number): Array<Mile> {
 
     const _startIndex: number = (this.routedMile >= milesBehind) ? this.routedMile - milesBehind : 0;
-    const _endIndex: number = (this.routedMile + milesAhead <= data.trailData.miles.length) ? this.routedMile + milesAhead : data.trailData.miles.length;
+    const _endIndex: number = (this.routedMile + milesAhead <= data.miles.length) ? this.routedMile + milesAhead : data.miles.length;
 
-    return data.trailData.miles.slice(_startIndex, _endIndex);
+    return data.miles.slice(_startIndex, _endIndex);
   }
 }

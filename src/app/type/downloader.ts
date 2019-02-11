@@ -1,7 +1,10 @@
 import {HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse} from '@angular/common/http';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
+import {share} from 'rxjs/operators';
 
 // file downloader
+// has type (for json/blob etc)
+// has caching (for large files)
 
 export class Downloader {
 
@@ -17,23 +20,26 @@ export class Downloader {
   ) {
 
     // setup status subscription
-    this.meta  = this._meta.asObservable();
+    this.meta  = this._meta.asObservable().pipe(share());
   }
 
-  public downloadFile(url: string): void {
+  public downloadFile(url: string, type: string = 'json', cache: boolean = true): void {
 
     this.setStatus('fetching file', null, false);
 
-    const _headers = new HttpHeaders(
-      {'Content-Type': 'application/json; charset=utf-8'});
+    let _headers = new HttpHeaders();
+    _headers = _headers.append('Content-Type', 'application/json; charset=utf-8');
 
-    // 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' TODO not sure about caching
+    if (!cache) {
+      _headers = _headers.append('Cache-Control', 'no-cache');
+      _headers = _headers.append('Pragma', 'no-cache');
+    }
 
     // download file
     const req = new HttpRequest('GET', url, {
       reportProgress: true,
       headers: _headers,
-      responseType: 'blob'
+      responseType: type
     });
 
 
@@ -49,6 +55,7 @@ export class Downloader {
       } else if (event instanceof HttpResponse) {
 
         // TODO unzip & write to filesystem
+        this.downloadedFile = event.body;
 
         this.setStatus('downloaded', {file: this.downloadedFile}, false);
 

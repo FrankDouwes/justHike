@@ -3,7 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef, EventEmitter,
-  Input, OnChanges,
+  Input, OnChanges, OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
@@ -16,18 +16,20 @@ import {Settings} from '../../../../settings';
 import {OHLC} from '../../../../type/ohlc';
 import {Mile} from '../../../../type/mile';
 import {User} from '../../../../type/user';
-import {Snowpoint} from '../../../../type/snowpoint';
 import {Poi} from '../../../../type/poi';
 
 declare const SVG: any;    // fixes SVGjs bug
 import 'svg.filter.js';
 
-import {svgPath} from '../../../../_geo/smoothLine';
+import {svgPath} from '../../../../_util/smoothLine';
 import {isPrime, normalizeElevation} from '../../../../_util/math';
 import {createSvgCircleMarker, createSvgFaElement, createSvgPointMarker, sampleFaIcon} from '../../../../_util/markers';
 import {getPoiTypeByType} from '../../../../_util/poi';
 import {environment} from '../../../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
+import {Subscription} from 'rxjs';
+import {TrailGeneratorService} from '../../../../service/trail-generator.service';
+import {SnowGeneratorService, Snowpoint} from '../../../../service/snow-generator.service';
 
 
 
@@ -35,10 +37,10 @@ import {LocalStorageService} from 'ngx-webstorage';
   selector: 'display-list-item',
   templateUrl: './list-item.component.html',
   styleUrls: ['./list-item.component.sass'],
-  // changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
+export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('map') map: ElementRef;
 
@@ -55,8 +57,10 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() triggerUserUpdate?:  number;           // timestamp, set when user location is updated.
   @Input() userStatus?:         string;           // idle/fetching/tracking
 
-
   public showCampsites:         boolean;
+  private _showSnowPack:        boolean;
+
+  private _snowData:            Array<Array<Snowpoint>>;
 
   // SVG MAP
   private _lineCanvas;                            // line (trail/snow) canvas
@@ -69,23 +73,37 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
   // OTHER
   private _initialized:         boolean;          // can only draw after initialization
+  private _campSubscription:    Subscription;
+  private _snowSubscription:    Subscription;
 
   constructor(
-    private _localStorage: LocalStorageService
+    private _localStorage: LocalStorageService,
+    private _trailGenerator: TrailGeneratorService,
+    private _snowGenerator: SnowGeneratorService
   ) {}
 
 // LIFECYCLE HOOKS
 
-  ngOnInit() {
+  ngOnInit(): void {
 
     this.showCampsites = this._localStorage.retrieve('showCampSites');
+    this._campSubscription = this._localStorage.observe('showCampSites').subscribe(result => {
+      this.showCampsites = result;
+      this.drawMap();
+    });
+
+    this._showSnowPack = this._localStorage.retrieve('showSnowPack');
+    this._snowSubscription = this._localStorage.observe('showSnowPack').subscribe(result => {
+      this._showSnowPack = result;
+      this.drawMap();
+    });
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
 
-    this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
-    // this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
-    this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
+    // @ViewChild not always available, so get whichever is largest
+    this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth) / 4.5);
+    this._svgHeight = Math.floor(Math.max(document.documentElement.clientHeight, window.innerHeight) * 0.6);
 
     this._lineCanvas = SVG('map_' + this.data.id)
       .size(this._svgWidth, this._svgHeight)
@@ -101,18 +119,24 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
     this._initialized = true;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
 
     // since this component requires the dom for drawing svg, it'll have to wait until initialization finishes
     if (!this._initialized) {
       return;
     }
 
+    if (changes.data || changes.visibleOHLC) {
+      this._snowData = this._snowGenerator.getSnowForMile(this.data.id);
+      this.drawMap();
+    }
+
     if (changes.resize) {
 
-      this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
-      // this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
-      this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
+      // this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
+      // this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
+      this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth) / 4.5);
+      this._svgHeight = Math.floor(Math.max(document.documentElement.clientHeight, window.innerHeight) * 0.6);
 
       // update svg size
       if (this._lineCanvas) {
@@ -125,13 +149,14 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
       }
     }
 
-    if (this.visibleOHLC) {
-      this.drawMap();
-    }
-
     if (changes.triggerUserUpdate || changes.user) {
       this.updateUserLocation();
     }
+  }
+
+  ngOnDestroy(): void {
+    this._campSubscription.unsubscribe();
+    this._snowSubscription.unsubscribe();
   }
 
   private drawMap(): void {
@@ -140,7 +165,10 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
     // line
     this.drawLine();
-    this.drawSnow();
+
+    if (this._showSnowPack) {
+      this.drawSnow();
+    }
 
     // pois
     this.drawTrees();
@@ -216,7 +244,11 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
   private drawSnow(): void {
 
-    const _snowArray: Array<Snowpoint> = this.data.snowData;
+    if (!this._snowData[0] || this._snowData[0].length < 0) {
+      return;
+    }
+
+    const _snowArray: any = this._snowData[0];
     const _waypointsArr = this.data.waypoints;
 
     // if there is snow
@@ -234,8 +266,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
         function elevationRange(): number {
           // waypoint distance (%) on snowarray elevation range
-          const _computedElevation = _snowArray[0].elevation + ((waypoint.distance / environment.MILE) * ((_snowArray[1].elevation - _snowArray[0].elevation)));
-          return _computedElevation;
+          return _snowArray[0].elevation + ((waypoint.distance / environment.MILE) * ((_snowArray[1].elevation - _snowArray[0].elevation)));
         }
 
         // if waypoint is above showline
@@ -388,27 +419,32 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
 
   private drawUserMarker(): void {
 
+    // clear old
+    if (this._userMarker) {
+      this._userMarker.remove();
+      this._userMarker = null;
+    }
+
+    if(!this.user) {
+      return;
+    }
+
     const _color: string = (this.userStatus === 'tracking') ? '#00FF00' : '#CCCCCC';
     const _onTrail: boolean = (this.user.distance <= this._localStorage.retrieve('userDistanceOffTrail'));
 
-      // clear old
-      if (this._userMarker) {
-        this._userMarker.remove();
-        this._userMarker = null;
-      }
 
-      if (_onTrail) {
+    if (_onTrail) {
 
-        this._userMarker = createSvgPointMarker(this._markerSvgCanvas, _color, 1);
-        this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -39);
+      this._userMarker = createSvgPointMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -39);
 
-      } else {
+    } else {
 
-        this._userMarker = createSvgCircleMarker(this._markerSvgCanvas, _color, 1);
-        this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -8);
-      }
+      this._userMarker = createSvgCircleMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -8);
+    }
 
-      this._userMarker.click(this.onUserClick.bind(this));
+    this._userMarker.click(this.onUserClick.bind(this));
   }
 
 
@@ -436,7 +472,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges {
     // changed scope
     this['self'].map.nativeElement.dispatchEvent(_event);
   }
-  
+
   private updateUserLocation(): void {
 
     const min: number = this.visibleOHLC.low;   // high point

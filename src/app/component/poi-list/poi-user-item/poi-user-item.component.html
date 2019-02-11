@@ -1,6 +1,7 @@
 <div class="icon noselect fa-2x">
   <fa-layers id="icons" [fixedWidth]="true">
-    <fa-icon icon="location-arrow" [className]="userStatus === 'idle' ? 'visible' : 'invisible'"></fa-icon>
+    {{userStatus}}
+    <fa-icon icon="location-arrow" [className]="!userStatus || userStatus === 'idle' ? 'visible' : 'invisible'"></fa-icon>
     <fa-icon [icon]="['far', 'compass']" [spin]="true" [className]="userStatus === 'fetching' ? 'visible' : 'invisible'"></fa-icon>
     <fa-icon [icon]="['fa', 'hiking']" [className]="userStatus === 'tracking' ? 'visible' : 'invisible'"></fa-icon>
     <fa-icon id="error" icon="exclamation-triangle" [className]="userStatus === 'error' ? 'visible' : 'invisible'"></fa-icon>

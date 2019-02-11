@@ -1,18 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {LocationBasedComponent} from '../../display/location-based/location-based.component';
-import { trailData } from '../../_geo/geoCalc';
 import { Mile } from '../../type/mile';
 import {User} from '../../type/user';
+import {LocalStorageService} from 'ngx-webstorage';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'locator',
   templateUrl: './locator.component.html',
   styleUrls: ['./locator.component.sass']
 })
-export class LocatorComponent extends LocationBasedComponent implements OnInit {
+export class LocatorComponent extends LocationBasedComponent implements OnInit, OnDestroy {
 
   public visibleMiles:            Array<Mile>;
-  public nearestMileId: number;
+  public nearestMileId:           number;
+  public showMiniMap:             boolean;
+
+  private _mapObserver:           Subscription;
 
   constructor() {
     super();
@@ -22,11 +26,26 @@ export class LocatorComponent extends LocationBasedComponent implements OnInit {
 
   ngOnInit(): void {
     super.ngOnInit();
+
+    this.showMiniMap = this.localStorage.retrieve('showMiniMap');
+    this._mapObserver = this.localStorage.observe('showMiniMap').subscribe(result => {
+      console.log(result);
+      this.showMiniMap = result;
+    });
   }
+
+  ngOnDestroy():void {
+
+    this._mapObserver.unsubscribe();
+
+    super.ngOnDestroy();
+  }
+
+
 
   // EVENT HANDLERS
 
-  private onClick(): void {
+  public onClick(): void {
     this.locationService.toggleTracking();
   }
 
@@ -38,13 +57,10 @@ export class LocatorComponent extends LocationBasedComponent implements OnInit {
 
   public onUserLocationChange(user: User): void {
 
-    console.log('update map 2', this.user);
-
     if (this.user && this.status === 'tracking') {
       this.nearestMileId = user.nearestMileId;
       // get the nearest 3 miles
-      this.visibleMiles = trailData.miles.slice(user.nearestMileId - 2, user.nearestMileId + 1);
-      console.log(this.visibleMiles);
+      this.visibleMiles = this.trailGenerator.trailData.miles.slice(user.nearestMileId - 2, user.nearestMileId + 1);
     }
   }
 }

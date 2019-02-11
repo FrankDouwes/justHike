@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, isDevMode, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
+import {Snow} from '../../service/snow-generator.service';
 
 @Component({
   selector: 'app-elevation-profile',
@@ -10,6 +11,8 @@ import { Trail } from '../../type/trail';
 export class ElevationProfileComponent implements OnInit {
 
   public trailData:     Trail;
+  public snowData:      Snow;
+
   public visibleRange:  object;
   public resize:        object;
   public scrollTo:      number;
@@ -21,14 +24,20 @@ export class ElevationProfileComponent implements OnInit {
 
 
 
-
   // LIFECYCLE HOOKS
 
   ngOnInit(): void {
 
     this._route.data
       .subscribe(result => {
-        this.trailData = result.trailData;
+
+        if (isDevMode()) {
+          console.log('data loaded: ', result.data);
+        }
+
+        this.trailData = result.data.trail;
+        this.snowData = result.data.snow;
+
       });
   }
 
@@ -37,15 +46,15 @@ export class ElevationProfileComponent implements OnInit {
 
   // EVENT HANDLERS
 
-  private onScroll(response: object): void {
+  public onScroll(response: object): void {
     this.visibleRange = response;
   }
 
-  private onResize(response: object): void {
+  public onResize(response: object): void {
     this.resize = response;
   }
 
-  private onScrollTo(response: number): void {
+  public onScrollTo(response: number): void {
     this.scrollTo = response;
   }
 }

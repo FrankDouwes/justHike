@@ -2,10 +2,10 @@
 
 <div id="main" #main>
 
-  <div id="scroll-map" (click)="onClick($event)"></div>
+  <div id="scroll-map" (click)="onClick($event)" [ngStyle]="{'left': -mapOffset + 'px'}"></div>
 
-  <div class="viewport-wrapper" [ngStyle]="{'padding-left': this.viewportOffset + 'vw'}" (click)="onClick($event)">
-    <div class="viewport" [ngStyle]="{'width': this.viewportSize + 'vw'}"></div>
+  <div class="viewport-wrapper" [ngStyle]="{'padding-left': viewportOffset + 'px'}">
+    <div class="viewport" [ngStyle]="{'width': viewportSize + 'px'}" #viewport></div>
   </div>
 
 </div>

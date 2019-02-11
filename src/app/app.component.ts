@@ -1,4 +1,4 @@
-import {Component, ElementRef, Injector, isDevMode, OnInit} from '@angular/core';
+import {Component, ElementRef, Injector, isDevMode, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {LoaderService} from './service/loader.service';
 import {MatDialog} from '@angular/material';
 import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
@@ -7,18 +7,24 @@ import {LocationService} from './service/location.service';
 import {OfftrailDialogComponent} from './component/dialog/offtrail-dialog/offtrail-dialog.component';
 import {DownloadService} from './service/download.service';
 import {LocalStorageService} from 'ngx-webstorage';
+import {environment} from '../environments/environment.prod';
+import {Subscription} from 'rxjs';
+import {getTrailDataById, Trail} from './type/trail';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.sass']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+
+  @ViewChild('loader', { read: ViewContainerRef }) loader: ViewContainerRef;
 
   public showLoader      = true;    // show loader/spinner by default
+  public navIsVisible    = true;    // nav visibility
 
-  // navbar
-  public navIsVisible      = true;  // nav visibility
+  private _downloadSubscription: Subscription;
+  private _currentTrail: Trail;
 
   constructor(
     private _dialog: MatDialog,
@@ -34,17 +40,22 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this._currentTrail = getTrailDataById(this._localStorage.retrieve('activeTrailId'));
+
     const _self = this;
+
+    // check app version
+    this.versionCheck();
 
     // storage (user settings)
     this._localStorage.observe('timestamp').subscribe((value) => {
       window.location.reload();
-      // this._router.navigate(['/']);
     });
 
     // loader (spinner)
-    this._loaderService.status.subscribe((val: boolean) => {
-      this.showLoader = val;
+    this._loaderService.observe.subscribe((obj: object) => {
+      this.showLoader = (obj['type'] === 'self') ? (obj['action'] === 'show') : this.showLoader;
     });
 
     // show settings on first load
@@ -55,12 +66,82 @@ export class AppComponent implements OnInit {
         _self.openSettingsDialog();
       }, 250);
     }
+
+    this._element.nativeElement.addEventListener('markerClick', this.onCustomEvent.bind(this), false);
+    this._element.nativeElement.addEventListener('offtrail', this.onCustomEvent.bind(this), false);
+
   }
+
+  ngOnDestroy(): void {
+    this._downloadSubscription.unsubscribe();
+    this._element.nativeElement.removeEventListener('markerClick', this.onCustomEvent.bind(this));
+    this._element.nativeElement.removeEventListener('offtrail', this.onCustomEvent.bind(this), false);
+  }
+
+
+
+
+  // STARTUP
+
+  // compare data version to online data version
+  private versionCheck(): void {
+
+    // only check once every 24 hours
+    const _lastCheck = this._localStorage.retrieve('lastVersionCheck');
+    if (_lastCheck && _lastCheck + environment.updateCheckInterval > new Date().getTime()) {
+      return;
+    }
+
+    // download version file for current trail
+    const _versionDownloader = this._downloadService.createDownloader('versionChecker');
+
+    this._downloadSubscription = _versionDownloader.meta.subscribe( status => {
+
+      // if download complete
+      if (status['label'] && status['label'] === 'downloaded') {
+
+        // check snow data (auto update, depending on settings) todo
+        if (this._currentTrail.snowVersion !== status['snowVersion']) {
+          this.updateSnowData();
+        }
+
+        // check tile data (manual update) todo
+        if (environment.version === _versionDownloader.downloadedFile['tileVersion']) {
+          console.log('versions matched');
+        } else {
+          console.log('version mismatch, toggle warning');
+        }
+      }
+
+    });
+
+    _versionDownloader.downloadFile(environment.appDomain + 'files/' + this._currentTrail.abbr + '/version.json', 'json', false);
+  }
+
+  // update the snow data (using auto update setting)
+  private updateSnowData(): void {
+
+    const _url = environment.appDomain + environment.fileBaseUrl + this._currentTrail.abbr + '/snow.json';
+    const _snowDownloader = this._downloadService.createDownloader(this._currentTrail.abbr + '_snow');
+
+    this._downloadSubscription.unsubscribe();
+    this._downloadSubscription = _snowDownloader.meta.subscribe( status => {
+      console.log(status);
+    });
+
+    // _snowDownloader.downloadFile(_url, 'json', false);
+
+    // if () {
+    //
+    // }
+  }
+
+
 
   // EVENT HANDLERS
 
-  // angular event handler for navEvents
-  private onNavEvent(event: string): void {
+  // angular event handler for navEvents (public for aot)
+  public onNavEvent(event: string): void {
 
     if (event === 'settings') {
       this.openSettingsDialog();
@@ -84,6 +165,7 @@ export class AppComponent implements OnInit {
 
   // DIALOGS
 
+  // marker dialog
   private openMarkerDialog(event): void {
 
     // get marker poi data
@@ -103,6 +185,7 @@ export class AppComponent implements OnInit {
     });
   }
 
+  // settings dialog
   private openSettingsDialog(): void {
 
     if (this.navIsVisible) {
@@ -118,16 +201,18 @@ export class AppComponent implements OnInit {
     _settingsDialog.afterClosed().subscribe(result => {
       this.toggleNavigationVisibility();
       if (result) {
-        this._loaderService.display(true);
+        this._loaderService.showOverlay();
         this._localStorage.store('timestamp', new Date().getTime());
       }
     });
   }
 
+  // off trail dialog (mile simulator)
   private openOfftrailDialog(event): void {
     if (this.navIsVisible) {
       this.toggleNavigationVisibility();
     }
+
     const _offtrailDialog = this._dialog.open(OfftrailDialogComponent, {
       autoFocus: false,
       width: '65%',
@@ -143,7 +228,7 @@ export class AppComponent implements OnInit {
         this._localStorage.store('simulatedMile', Number(result.simulatedMile))
       }
 
-      const _simulate = (result) ? true : false;
+      const _simulate = !!(result);
       this._injector.get(LocationService).toggleTracking(_simulate);
     });
   }

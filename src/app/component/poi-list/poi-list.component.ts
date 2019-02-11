@@ -81,7 +81,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
 
       // figure out where the pois are in relation to the user
       this._staticPoisArray.forEach(function(poi: Poi) {
-        poi.distanceFromUser = poi.anchorPoint.distanceTotal - user.anchorPoint.distanceTotal;
+        if (user.anchorPoint) {
+          poi.distanceFromUser = poi.anchorPoint.distanceTotal - user.anchorPoint.distanceTotal;
+        }
       });
 
     } else {

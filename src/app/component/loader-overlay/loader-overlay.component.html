@@ -2,5 +2,10 @@
   <div id="loader">
     <div id="box"></div>
     <div id="hill"></div>
+    <div id="meta">
+      <div id="spinner" *ngIf="spinner">spin</div>
+      <p id="message" *ngIf="message">{{message}}</p>
+      <button id="button" *ngIf="button">{{button.label}}</button>
+    </div>
   </div>
 </div>

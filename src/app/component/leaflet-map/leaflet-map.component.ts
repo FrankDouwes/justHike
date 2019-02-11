@@ -3,18 +3,15 @@ import {Mile} from '../../type/mile';
 import {ActivatedRoute} from '@angular/router';
 import * as L from 'leaflet';
 import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
-
 import {Poi, PoiType} from '../../type/poi';
-import {Settings} from '../../settings';
 import {elevationLines, mapTiles} from '../../_util/tiles';
 import {getPoiTypeByType} from '../../_util/poi';
 import {createFaLeafletMarker} from '../../_util/markers';
 import {LocationBasedComponent} from '../../display/location-based/location-based.component';
 import {User} from '../../type/user';
-import {Location} from '@angular/common';
 import {Waypoint} from '../../type/waypoint';
-import {Snowpoint} from '../../type/snowpoint';
 import {environment} from '../../../environments/environment.prod';
+import {SnowGeneratorService, Snowpoint} from '../../service/snow-generator.service';
 
 @Component({
   selector: 'leaflet-map',
@@ -49,19 +46,26 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _allElementsBounds: Array<object> = [];
   private _markers: Array<any> = [];
   private _userMarker;
-
-  private _onlineMode: boolean;
+  private _snowData: Array<Array<Snowpoint>>;
 
 
 
   constructor(
     private _route:             ActivatedRoute,
+    private _snowGenerator:     SnowGeneratorService
   ) {
     super();
   }
 
   ngOnInit(): void {
     super.ngOnInit();
+
+    let _mileIds: Array<number> = [];
+    this.milesData.forEach(function(mile:Mile, index) {
+      _mileIds.push(mile.id);
+    })
+
+    this._snowData = this._snowGenerator.getSnowForMile(_mileIds);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -131,7 +135,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       }
 
       _self.drawTrail(mile, index);
-      _self.drawSnow(mile, index);
+      _self.drawSnow(mile, _self._snowData[index], index);
       _self.drawPois(mile, index);
     });
   }
@@ -165,23 +169,20 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   }
 
-  private drawSnow(mile: Mile, index: number): void {
+  private drawSnow(mile: Mile, snowMile: Array<Snowpoint>, index: number): void {
 
     let _snowPoints: Array<any> = [];
 
-    if (mile.snowData) {
+    if (snowMile) {
 
-      mile.waypoints.forEach((waypoint, index) => {
-
-        let _elevation = 0;
+      mile.waypoints.forEach((waypoint) => {
 
         function elevationRange(): number {
           // waypoint distance (%) on snowarray elevation range
-          const _computedElevation = mile.snowData[0].elevation + ((waypoint.distance / environment.MILE) * ((mile.snowData[1].elevation - mile.snowData[0].elevation)));
-          return _computedElevation;
+          return snowMile[0].elevation + ((waypoint.distance / environment.MILE) * ((snowMile[1].elevation - snowMile[0].elevation)));
         }
 
-        //if waypoint is above showline
+        // if waypoint is above showline
         if (waypoint.elevation >= elevationRange()) {
 
           // add point
@@ -402,5 +403,3 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     _guideLine.addTo(this._map);
   }
 }
-
-

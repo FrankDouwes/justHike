@@ -9,7 +9,7 @@ import {Poi} from '../../../type/poi';
 export class PoiUserItemComponent implements OnInit {
 
   // there has to be a an easier way to add classes to the host... TODO
-  @HostBinding('class.idle') isIdle = false;
+  @HostBinding('class.idle') isIdle = true;
   @HostBinding('class.fetching') isFetching = false;
   @HostBinding('class.tracking') isTracking = false;
   @HostBinding('class.error') isError = false;
@@ -20,11 +20,10 @@ export class PoiUserItemComponent implements OnInit {
   @Input() timestamp: number;
   @Input('status') set status(value: string) {
 
-    if (!value) {
-      return;
+    if (value) {
+      this.userStatus = value;
     }
 
-    this.userStatus = value;
 
     if (value === 'tracking') {
       this.isTracking = true;
@@ -36,6 +35,7 @@ export class PoiUserItemComponent implements OnInit {
       this.isError = true;
       this.isIdle = this.isFetching = this.isTracking = false;
     } else {
+      console.log('undefined so idle?');
       this.isIdle = true;
       this.isFetching = this.isTracking = this.isError = false;
     }

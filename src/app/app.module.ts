@@ -1,8 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
-
-import {isDevMode, NgModule} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
+import { environment } from '../environments/environment.prod';
 import { AppComponent } from './app.component';
 import { AngularFittextModule } from 'angular-fittext';
 import {LocalStorageService, NgxWebstorageModule} from 'ngx-webstorage';
@@ -18,7 +19,7 @@ import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationAr
   } from '@fortawesome/free-solid-svg-icons';
 import { faCompass, faDotCircle} from '@fortawesome/free-regular-svg-icons';
 
-// virtual scroll & material
+// material
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -32,7 +33,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatCarouselModule } from '@ngmodule/material-carousel';
 
 import {MatIconModule} from '@angular/material/icon';
 
@@ -50,7 +51,6 @@ import { ScrollbarComponent } from './component/elevation-profile/scrollbar/scro
 import { LabelsComponent } from './component/elevation-profile/virtual-list/labels/labels.component';
 import { GuidesComponent } from './component/elevation-profile/virtual-list/guides/guides.component';
 import { LocatorComponent} from './component/locator/locator.component';
-import { LoaderOverlayComponent } from './component/loader-overlay/loader-overlay.component';
 import { PoiListComponent } from './component/poi-list/poi-list.component';
 import { PoiListItemComponent } from './component/poi-list/poi-list-item/poi-list-item.component';
 import { PoiUserItemComponent } from './component/poi-list/poi-user-item/poi-user-item.component';
@@ -63,6 +63,9 @@ import { DetailSettingsComponent } from './component/dialog/settings-dialog/pane
 import { GeneralSettingsComponent } from './component/dialog/settings-dialog/panels/general-settings/general-settings.component';
 import { AboutComponent } from './component/dialog/settings-dialog/panels/about/about.component';
 import { InstructionsComponent } from './component/dialog/settings-dialog/panels/instructions/instructions.component';
+import { SettingsPanelComponent } from './display/settings-panel/settings-panel.component';
+import { DownloaderComponent } from './component/dialog/settings-dialog/panels/purchase-settings/downloader/downloader.component';
+import { LoaderOverlayComponent } from './component/loader-overlay/loader-overlay.component';
 
 // dialog
 import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
@@ -74,9 +77,8 @@ import { IconComponent } from './display/icon/icon.component';
 // pipes
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
-import { environment } from '../environments/environment.prod';
-import { SettingsPanelComponent } from './display/settings-panel/settings-panel.component';
-import { DownloaderComponent } from './component/dialog/settings-dialog/panels/purchase-settings/downloader/downloader.component';
+import { FilesizePipe } from './pipe/filesize.pipe';
+import {LoaderService} from './service/loader.service';
 
 @NgModule({
   declarations: [
@@ -92,7 +94,6 @@ import { DownloaderComponent } from './component/dialog/settings-dialog/panels/p
     ScrollbarComponent,
     LabelsComponent,
     GuidesComponent,
-    LoaderOverlayComponent,
     SettingsDialogComponent,
     MarkerDialogComponent,
     OfftrailDialogComponent,
@@ -103,6 +104,7 @@ import { DownloaderComponent } from './component/dialog/settings-dialog/panels/p
     IconComponent,
     PoiSortingPipe,
     DistancePipe,
+    FilesizePipe,
     PoiUserItemComponent,
     PoiListItemComponent,
     DynamicItemComponent,
@@ -113,7 +115,8 @@ import { DownloaderComponent } from './component/dialog/settings-dialog/panels/p
     AboutComponent,
     InstructionsComponent,
     SettingsPanelComponent,
-    DownloaderComponent
+    DownloaderComponent,
+    LoaderOverlayComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -124,6 +127,7 @@ import { DownloaderComponent } from './component/dialog/settings-dialog/panels/p
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     NgxWebstorageModule.forRoot(),
     HttpClientModule,
     ScrollingModule,
@@ -143,7 +147,7 @@ import { DownloaderComponent } from './component/dialog/settings-dialog/panels/p
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatTabsModule
+    MatCarouselModule
   ],
   providers: [],
   bootstrap: [AppComponent]
@@ -151,7 +155,8 @@ import { DownloaderComponent } from './component/dialog/settings-dialog/panels/p
 export class AppModule {
 
   constructor(
-    private _localStorage: LocalStorageService
+    private _localStorage: LocalStorageService,
+    private _loaderService: LoaderService
   ) {
 
     this.firstRun();
@@ -169,12 +174,11 @@ export class AppModule {
   private firstRun() {
 
     // DEBUG: FORCE FIRST RUN XXX todo
-    this._localStorage.store('purchasedTrails', []);
-    this._localStorage.store('activeTrailId', 0);
 
     const _firstRun = this._localStorage.retrieve('firstRun');
 
     if (_firstRun !== false) {
+      this._loaderService.showMessage('initializing first run');
       this._localStorage.store('firstRun', true);
     }
 

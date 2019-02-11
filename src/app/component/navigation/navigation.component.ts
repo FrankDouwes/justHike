@@ -61,14 +61,13 @@ export class NavigationComponent implements OnInit {
 
   // EVENT HANDLERS
 
-  private onSettingsClick(): void {
+  public onSettingsClick(): void {
     this.navEvent.emit('settings');
   }
 
-  private onBackClick(): void {
+  public onBackClick(): void {
     this.visibleClass = 'hide';
     this.oppositeClass = 'show';
-    // this._location.back();
     this._router.navigate(['elevation-profile/'], {queryParams: {id: this._backIndex}});
     this.navEvent.emit('elevation-profile');
   }

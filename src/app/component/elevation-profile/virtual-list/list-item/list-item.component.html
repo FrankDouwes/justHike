@@ -10,7 +10,7 @@
   </div>
 
   <div class="icons">
-    <span *ngIf="data.hasCamp && !showCampSites"><fa-icon [icon]="['fas', 'campground']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
+    <span *ngIf="data.hasCamp && !showCampsites"><fa-icon [icon]="['fas', 'campground']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
     <span *ngIf="data.hasEscape"><fa-icon [icon]="['fas', 'road']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
     <span *ngIf="data.pois && data.pois.length > 0"><fa-icon [icon]="['fas', 'map-marker-alt']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
   </div>

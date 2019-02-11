@@ -1,6 +1,6 @@
-<button id="locator" (click)="onClick()" [className]="status === 'tracking' ? 'active' : 'inactive'" #container>
-  <span>
-    <leaflet-map *ngIf="user"
+<button id="locator" (click)="onClick()" [className]="(status === 'tracking' && showMiniMap) ? 'active' : 'inactive'" #container>
+  <span *ngIf="user && showMiniMap">
+    <leaflet-map
 
       id="mini-map"
 
@@ -21,6 +21,7 @@
   </span>
   <fa-icon icon="location-arrow" size="2x" [className]="status === 'idle' ? 'visible' : 'invisible'"></fa-icon>
   <fa-icon [icon]="['far', 'compass']" [spin]="true" size="2x" [className]="status === 'fetching' ? 'visible' : 'invisible'"></fa-icon>
+  <fa-icon icon="hiking" size="2x" [className]="status === 'tracking' && !showMiniMap ? 'visible' : 'invisible'"></fa-icon>
   <fa-icon id="error" icon="exclamation-triangle" size="2x" [className]="status === 'error' ? 'visible' : 'invisible'"></fa-icon>
 </button>
 

@@ -1,5 +1,6 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'settings-dialog',
@@ -8,11 +9,13 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 })
 export class SettingsDialogComponent implements OnInit {
 
+  @ViewChild('contentPanel') contentPanel: ElementRef;
+
   public listItems: Array<object> = [
     {title: 'Trail Data', panel: 'purchase'},
     {title: 'General Settings', panel: 'general'},
-    {title: 'Elevation Profile', panel: 'elevation'},
-    {title: 'Mile Overview', panel: 'detail'},
+    // {title: 'Elevation Profile', panel: 'elevation'},
+    // {title: 'Mile Overview', panel: 'detail'},
     {title: 'About', panel: 'about'}
   ];
 
@@ -34,6 +37,7 @@ export class SettingsDialogComponent implements OnInit {
 
   onClick(item) {
     this.activePanel = item.panel;
+    this.contentPanel.nativeElement.scrollTo(0, 0);
   }
 
   // only triggered if true

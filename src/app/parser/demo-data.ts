@@ -1,9 +1,8 @@
 import * as X2JS from 'x2js';
 import { Waypoint } from '../type/waypoint';
-import { generateMiles } from '../_geo/geoCalc';
 import { Poi } from '../type/poi';
 import { Trail } from '../type/trail';
-import {parseSnow} from '../_geo/snow';
+import {parseSnow} from '../service/snow-generator.service';
 
 const _x2js = new X2JS({
   attributePrefix : ''    // no attribute prefix
@@ -11,9 +10,7 @@ const _x2js = new X2JS({
 
 // trail specific parser for PCT data
 
-export function parseDemoData (trail: Trail, trailData: string, poiData: string, snow: object): Trail {
-
-
+export function parseDEMOData (trail: Trail, trailData: string, poiData: string, snow: object): Array<object> {
 
   // TRAIL
   let _waypoints: Array<Waypoint> = [];
@@ -55,21 +52,17 @@ export function parseDemoData (trail: Trail, trailData: string, poiData: string,
   // 3. adjust poi data
   const _pois: Array<Poi> = parsePois(poiAsJson['gpx']['wpt']);
 
+  // SNOW (the current snow pack, from postholer.com
 
-
-  // SNOW (the current snow pack, from postholer.com TODO
-
-  // 1. parse only the current SWE data
-  const _snow = parseSnow(snow['datasets'][0]);
-
-
-
-  // GEOCALC (to generic data parser (same for all trails)
-
-  const _result = generateMiles(trail, _waypoints, _pois, _snow);
+  let _snow: Array<any> = [];
+  snow['datasets'][0].forEach(function(point, index) {
+    if (point.x <= trail.length) {
+      _snow.push(point);
+    }
+  })
 
   // return
-  return _result;
+  return [trail, _waypoints, _pois, _snow];
 }
 
 // figure out what type of POIS exist in raw data, assign them to poi types TODO

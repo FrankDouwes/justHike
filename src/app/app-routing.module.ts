@@ -13,14 +13,14 @@ const routes: Routes = [
     path: "elevation-profile",
     component: ElevationProfileComponent,
     resolve: {
-      trailData: TrailResolverService
+      data: TrailResolverService
     }
   },
   {
     path: "detail/:id",
     component: MileDetailComponent,
     resolve: {
-      trailData: TrailResolverService
+      data: TrailResolverService
     }
   },
   {

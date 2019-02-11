@@ -1,7 +1,7 @@
 import { Waypoint } from './waypoint';
 import { OHLC } from './ohlc';
 import {Poi} from './poi';
-import {Snowpoint} from './snowpoint';
+import {Snowpoint} from '../service/snow-generator.service';
 
 export class Mile {
   id:                 number;             // id (mile number, starts at 1 not 0)
@@ -11,9 +11,9 @@ export class Mile {
   elevationRange:     OHLC;               // the elevation range (open/high/low/close)
   scale:              number;             // scale factor (the calculated trail length does not match the provided trail length)
   centerpoint:        object;             // calculated centerpoint of waypoints array, for leaflet
-  snowData:           Array<Snowpoint>;      // snow data, can be empty
 
   // OPTIONAL
+  snowData?:          Array<Snowpoint>;   // snow data, can be empty
   pois?:              Array<Poi>;         // points of interest that belong to this mile (triangulation)
   hasWater?:          boolean;            // contains water
   hasCamp?:           boolean;            // contains campsite

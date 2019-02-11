@@ -17,8 +17,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 
 import {Subscription} from 'rxjs';
 
-import {anchorDistanceCalculation} from '../../../_geo/geoCalc';
-
 // type classes
 import {OHLC} from '../../../type/ohlc';
 import {Mile} from '../../../type/mile';

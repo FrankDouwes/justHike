@@ -1,4 +1,5 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input, OnInit, OnChanges, SimpleChanges, isDevMode} from '@angular/core';
+import {LoaderService} from '../../service/loader.service';
 
 @Component({
   selector: 'loader-overlay',
@@ -10,12 +11,43 @@ export class LoaderOverlayComponent implements OnInit, OnChanges {
 
   @Input() showLoader: boolean;
 
-  public state: string = 'show';
+  public state = 'show';
+  public spinner: boolean;
+  public message: number;
+  public button: object;
+
+  public activeMetaObjects: Array<string> = [];
 
   // simple loader animation component, uses the loader service
-  constructor() {}
+  constructor(
+    private _loaderService: LoaderService
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+
+    this._loaderService.observe.subscribe((obj: object) => {
+
+      if (isDevMode()) {
+        console.log(obj['action'], obj['type'], obj['data']);
+      }
+      if (obj['action'] === 'show' && obj['type'] !== 'self') {
+
+        if (obj['type'] === 'spinner') {
+          this.spinner = true;
+        } else {
+          this[obj['type']] = obj['data'] as String;
+        }
+
+      } else if (obj['action'] === 'hide' && obj['type'] !== 'self') {
+
+         if (obj['type'] === 'spinner') {
+            this.spinner = false;
+         } else {
+           this[obj['type']] = null;
+         }
+      }
+    });
+  }
 
   // only gets triggered through @Input showLoader
   ngOnChanges(changes: SimpleChanges): void {

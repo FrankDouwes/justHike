@@ -24,11 +24,14 @@
   height: 10vh
 
   #scroll-map
+    position: absolute
+    left: 0
     filter: drop-shadow(0 0 10px rgba(255,255,255,0.25));
     height: 100%
 
   .viewport-wrapper
     grid-area: main
+    pointer-events: none
     display: block
     box-sizing: border-box
     position: absolute
@@ -42,6 +45,7 @@
     //background-color: red
 
     .viewport
+      pointer-events: none
       position: absolute
       box-sizing: border-box
       width: 100%

@@ -1,10 +1,8 @@
 import {Injectable, Injector} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import * as GeoLib from 'geolib';
-import { Waypoint } from '../type/waypoint';
-import {Settings} from '../settings';
-import {trailData} from '../_geo/geoCalc';
 import {LocalStorageService} from 'ngx-webstorage';
+import {Waypoint} from '../type/waypoint';
+import {TrailGeneratorService} from './trail-generator.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,17 +28,18 @@ export class LocationService {
 
   /* track user location and status:
       location = gps data > converted to Poi
-      status = idle/fetching/tracking/stopping
-   */
+      holds a mile tree (centerpoints per mile, for nearest trail location)
+      status = idle/fetching/tracking/stopping */
 
   constructor(
-    private _localStorage: LocalStorageService
+    private _localStorage: LocalStorageService,
+    private _trailGenerator: TrailGeneratorService
   ) {
     this.updateStatusLabel('idle');
   }
 
   // enable / disable location tracking
-  toggleTracking(force: boolean = false): void {
+  public toggleTracking(force: boolean = false): void {
 
     const _simulate: boolean = (this._localStorage.retrieve('simulatedMile') !== -1);
 
@@ -98,7 +97,7 @@ export class LocationService {
     if (typeof location === 'number') {
 
       // get first waypoints of mile
-      const _firstWaypoint = trailData.miles[location].waypoints[0];
+      const _firstWaypoint = this._trailGenerator.trailData.miles[location].waypoints[0];
 
       location = {
         coords: {

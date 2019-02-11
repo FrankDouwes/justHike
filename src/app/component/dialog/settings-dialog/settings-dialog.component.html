@@ -1,5 +1,5 @@
   <div id="center-icon" >
-    <display-button class="button" label="" icon="{{data.icon}}" routerLink=""></display-button>
+    <display-button class="button" label="" icon="{{data['icon']}}" routerLink=""></display-button>
   </div>
 
   <!-- left -->
@@ -18,7 +18,7 @@
   </div>
 
   <!-- right -->
-  <div id="right-panel">
+  <div id="right-panel" #contentPanel>
 
     <!-- purchase / download panel -->
     <instructions *ngIf="!activePanel"></instructions>
@@ -30,10 +30,10 @@
     <general-settings *ngIf="activePanel === 'general'" (onSettingsChanged)="onSettingsChanged($event)"></general-settings>
 
     <!-- elevation profile settings panel -->
-    <elevation-settings *ngIf="activePanel === 'elevation'" (onSettingsChanged)="onSettingsChanged($event)"></elevation-settings>
+    <!--<elevation-settings *ngIf="activePanel === 'elevation'" (onSettingsChanged)="onSettingsChanged($event)"></elevation-settings>-->
 
     <!-- mile detail profile settings panel -->
-    <detail-settings *ngIf="activePanel === 'detail'" (onSettingsChanged)="onSettingsChanged($event)"></detail-settings>
+    <!--<detail-settings *ngIf="activePanel === 'detail'" (onSettingsChanged)="onSettingsChanged($event)"></detail-settings>-->
 
     <!-- about panel-->
     <about *ngIf="activePanel === 'about'"></about>

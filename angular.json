@@ -37,7 +37,9 @@
               "./node_modules/svg.filter.js/dist/svg.filter.js",
               "./node_modules/geolib/dist/geolib.js",
               "./node_modules/geolib/dist/geolib.elevation.js",
-              "./node_modules/seedrandom/seedrandom.js"
+              "./node_modules/seedrandom/seedrandom.js",
+              "./node_modules/hammerjs/hammer.min.js",
+              "./node_modules/hammer-touchemulator/touch-emulator.js"
             ]
           },
           "configurations": {
@@ -102,7 +104,10 @@
               "./node_modules/svg.filter.js/dist/svg.filter.js",
               "./node_modules/geolib/dist/geolib.js",
               "./node_modules/geolib/dist/geolib.elevation.js",
-              "./node_modules/seedrandom/seedrandom.js"
+              "./node_modules/seedrandom/seedrandom.js",
+              "./node_modules/hammerjs/hammer.min.js",
+              "./node_modules/hammer-touchemulator/touch-emulator.js"
+
             ],
             "assets": [
               "src/favicon.ico",
