@@ -38,6 +38,7 @@
     "leaflet": "^1.4.0",
     "leaflet-polylinedecorator": "^1.6.0",
     "leaflet.awesome-markers": "^2.0.5",
+    "leaflet.functionaltilelayer": "git+https://github.com/ismyrnow/Leaflet.functionaltilelayer.git",
     "localforage": "^1.7.3",
     "ngforage": "^4.0.2",
     "ngx-web-worker": "^7.0.0",

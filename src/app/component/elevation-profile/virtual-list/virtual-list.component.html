@@ -15,7 +15,7 @@
     <display-list-item
       class="list-item"
 
-      *cdkVirtualFor="let li of trailData.miles; let last = last"
+      *cdkVirtualFor="let li of trailData.miles; let last = last; templateCacheSize: trailData.miles.length / 10; trackBy: trackElementBy"
       [resize]="resize"
       [data]="li"
       [isLast]="last"

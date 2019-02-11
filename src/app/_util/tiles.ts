@@ -1,4 +1,5 @@
 import * as L from 'leaflet';
+import 'leaflet.functionaltilelayer/src/leaflet.functionaltilelayer';
 
 // unused: google elevation shade (+ labels)
 // L.tileLayer('http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', {
@@ -158,4 +159,19 @@ export function mapTiles (): Array<any> {
   //   maxNativeZoom: 15,
   //   opacity: 1
   // });
+}
+
+L.TileLayer.blob = L.TileLayer.extend({
+  getTileUrl: function(coords) {
+    console.log(coords);
+    var i = Math.ceil( Math.random() * 4 );
+    return "https://placekitten.com/256/256?image=" + i;
+  },
+  // getAttribution: function() {
+  //   return "<a href='https://placekitten.com/attribution.html'>PlaceKitten</a>"
+  // }
+});
+
+export function storedTileLayer(): Array<any> {
+  return [new L.TileLayer.blob()];
 }

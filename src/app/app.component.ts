@@ -10,6 +10,7 @@ import {LocalStorageService} from 'ngx-webstorage';
 import {environment} from '../environments/environment.prod';
 import {Subscription} from 'rxjs';
 import {getTrailDataById, Trail} from './type/trail';
+import {ZipService} from './service/zip.service';
 
 @Component({
   selector: 'app-root',
@@ -32,9 +33,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private _element: ElementRef,
     private _injector: Injector,
     private _localStorage: LocalStorageService,
-    private _downloadService: DownloadService
+    private _downloadService: DownloadService,
+    private _zipService: ZipService
   ) {
-
     // makes constructor props accessible through LocationService, needed for inheritance
     LocationService.injector = this._injector;
   }

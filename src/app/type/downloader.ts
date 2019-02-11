@@ -23,8 +23,9 @@ export class Downloader {
     this.meta  = this._meta.asObservable().pipe(share());
   }
 
-  public downloadFile(url: string, type: string = 'json', cache: boolean = true): void {
+  public downloadFile(url: string, type: string, cache: boolean = true): void {
 
+    console.log(type);
     this.setStatus('fetching file', null, false);
 
     let _headers = new HttpHeaders();

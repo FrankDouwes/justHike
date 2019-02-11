@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef} from '@angular/core';
+import {Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef, ChangeDetectionStrategy} from '@angular/core';
 import {OHLC} from '../../../../type/ohlc';
 import {normalizeElevation} from '../../../../_util/math';
 import {environment} from '../../../../../environments/environment.prod';
@@ -6,8 +6,10 @@ import {environment} from '../../../../../environments/environment.prod';
 @Component({
   selector: 'axis',
   templateUrl: './labels.component.html',
-  styleUrls: ['./labels.component.sass']
+  styleUrls: ['./labels.component.sass'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class LabelsComponent implements OnInit, OnChanges {
 
   @Input() visibleOHLC: OHLC;

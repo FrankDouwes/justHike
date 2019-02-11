@@ -4,7 +4,7 @@ import {ActivatedRoute} from '@angular/router';
 import * as L from 'leaflet';
 import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
 import {Poi, PoiType} from '../../type/poi';
-import {elevationLines, mapTiles} from '../../_util/tiles';
+import {elevationLines, mapTiles, storedTileLayer} from '../../_util/tiles';
 import {getPoiTypeByType} from '../../_util/poi';
 import {createFaLeafletMarker} from '../../_util/markers';
 import {LocationBasedComponent} from '../../display/location-based/location-based.component';
@@ -49,7 +49,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _snowData: Array<Array<Snowpoint>>;
 
 
-
   constructor(
     private _route:             ActivatedRoute,
     private _snowGenerator:     SnowGeneratorService
@@ -61,7 +60,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     super.ngOnInit();
 
     let _mileIds: Array<number> = [];
-    this.milesData.forEach(function(mile:Mile, index) {
+    this.milesData.forEach(function(mile: Mile, index) {
       _mileIds.push(mile.id);
     })
 
@@ -97,7 +96,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     let _tileLayers: Array<any> = [];
 
     if (this.showMapTiles === true) {
-      _tileLayers = _tileLayers.concat(mapTiles());
+      _tileLayers = _tileLayers.concat(new L.TileLayer.blob());
     }
 
     if (this.showElevationTiles === true) {

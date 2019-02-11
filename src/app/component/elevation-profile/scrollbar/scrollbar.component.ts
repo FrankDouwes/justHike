@@ -8,10 +8,9 @@ import {
   Output,
   EventEmitter,
   ViewChild,
-  AfterViewInit
+  AfterViewInit, ChangeDetectionStrategy
 } from '@angular/core';
 import {Trail} from '../../../type/trail';
-import {Settings} from '../../../settings';
 import {Waypoint} from '../../../type/waypoint';
 import {normalizeElevation} from '../../../_util/math';
 import {environment} from '../../../../environments/environment.prod';
@@ -21,7 +20,8 @@ declare const SVG: any;    // fixed SVG installation bug
 @Component({
   selector: 'scrollbar-component',
   templateUrl: './scrollbar.component.html',
-  styleUrls: ['./scrollbar.component.sass']
+  styleUrls: ['./scrollbar.component.sass'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
@@ -38,7 +38,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   public viewportOffset = 0;
   public mapOffset: number;
 
-  private _verticalPadding: number = 10;
+  private _verticalPadding: number = 8;
   private _svgCanvas;
   private _svgWidth:        number;
   private _svgHeight:       number;
@@ -73,7 +73,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
       .viewbox(0, 0, this._svgWidth, this._svgHeight);
 
     this.drawMap();
-    this.drawGuides();
+    //this.drawGuides();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -83,6 +83,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
       this.visibleRange = changes.visibleRange;
       const _start: number = this.visibleRange['currentValue']['visibleRange'].start;
       const _end: number = this.visibleRange['currentValue']['visibleRange'].end;
+      const _range: number = _end - _start;
       const _scrollX: number = this.visibleRange['currentValue']['scrollX'];
 
       // map
@@ -92,7 +93,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
       this.mapOffset = (_scrollXPerc * _maxOffset);
 
       // viewport
-      const _viewPortWidthPerc = (_end - _start) / this._sectionLength;
+      const _viewPortWidthPerc = _range / this._sectionLength;
       const _viewPortWidth = _viewPortWidthPerc * this.main.nativeElement.clientWidth;
 
       // todo: not sure why this is...
@@ -101,7 +102,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
         _maxViewPortOffset = this.main.nativeElement.clientWidth - _viewPortWidth;
       }
 
-      this.viewportOffset = (_scrollXPerc * _maxViewPortOffset);
+      this.viewportOffset = (_scrollXPerc * (_maxViewPortOffset + 5));
       this.viewportSize = _viewPortWidth;
     }
 
@@ -122,7 +123,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
       if (this.visibleRange) {
         this.drawMap();
-        this.drawGuides();
+        //this.drawGuides();
       }
     }
   }

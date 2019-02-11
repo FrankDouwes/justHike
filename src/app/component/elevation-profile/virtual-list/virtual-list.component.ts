@@ -249,6 +249,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
   // define ID for better li recycling (according to the CDK virtual scroll docs)
   trackElementBy(index: number, element: any): number {
-    return element ? element.id : null;
+    return element.id;
   }
 }

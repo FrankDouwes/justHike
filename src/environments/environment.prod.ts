@@ -2,8 +2,8 @@ import {Trail} from '../app/type/trail';
 
 export const environment = {
 
-  production: false,               //  parsing raw data will trigger file download if set to false
-    useRawData: true,            //  use raw data (create json), production must be set to false
+  production: true,               //  parsing raw data will trigger file download if set to false
+    useRawData: false,            //  use raw data (create json), production must be set to false
       dowloadParsedData: false,   //  use raw data must be set to true in order for this to work
     simulateTouch: true,            //  simulate touch with hammerjs, production must be set to false
 

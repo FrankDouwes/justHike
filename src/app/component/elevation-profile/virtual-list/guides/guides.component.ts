@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef} from '@angular/core';
+import {Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef, ChangeDetectionStrategy} from '@angular/core';
 import {OHLC} from '../../../../type/ohlc';
 import {interpolateColors} from '../../../../_util/color';
 import {normalizeElevation} from '../../../../_util/math';
@@ -7,8 +7,10 @@ import {environment} from '../../../../../environments/environment.prod';
 @Component({
   selector: 'guides',
   templateUrl: './guides.component.html',
-  styleUrls: ['./guides.component.sass']
+  styleUrls: ['./guides.component.sass'],
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class GuidesComponent implements OnInit, OnChanges {
 
   @Input() visibleOHLC: OHLC;
