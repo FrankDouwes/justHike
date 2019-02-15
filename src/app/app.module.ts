@@ -33,8 +33,10 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCarouselModule } from '@ngmodule/material-carousel';
-
 import {MatIconModule} from '@angular/material/icon';
+
+// ionic native
+// import { Geolocation } from '@ionic-native/core';
 
 // display component
 import { ButtonComponent } from './display/button/button.component';
