@@ -4,7 +4,7 @@ import {ActivatedRoute} from '@angular/router';
 import * as L from 'leaflet';
 import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
 import {Poi, PoiType} from '../../type/poi';
-import {elevationLines, mapTiles, storedTileLayer} from '../../_util/tiles';
+import {elevationLines, fallbackLayer} from '../../_util/tiles';
 import {getPoiTypeByType} from '../../_util/poi';
 import {createFaLeafletMarker} from '../../_util/markers';
 import {LocationBasedComponent} from '../../display/location-based/location-based.component';
@@ -96,14 +96,27 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     let _tileLayers: Array<any> = [];
 
     if (this.showMapTiles === true) {
-      _tileLayers = _tileLayers.concat(new L.TileLayer.blob());
+      // this.fileSystem.rootPath + this.trailGenerator.trailData.abbr + '/{x}/{y}.png'
+
+      const tilesFallback = fallbackLayer(this.fileSystem.rootPath + this.trailGenerator.trailData.abbr + '/{x}/{y}.png', {
+
+        // min & max zoom prp causes flickering
+
+          maxNativeZoom: 15,
+          fallbackTileUrl: 'http://caltopo.com/tile/mb_topo/{z}/{x}/{y}.png',
+          errorTileUrl: './assets/images/missing.png',
+        });
+
+      _tileLayers = _tileLayers.concat(tilesFallback);
     }
 
-    if (this.showElevationTiles === true) {
-      _tileLayers.push(elevationLines());
-    }
+    // if (this.showElevationTiles === true) {
+    //   _tileLayers.push(elevationLines());
+    // }
 
     this._map = new L.map('leaflet_' + this.name, {
+      minZoom: 15,
+      maxZoom: 15,
       zoomControl: false, attributionControl: false,
       layers: _tileLayers
     });

@@ -27,13 +27,11 @@ export function parsePCTData (trail: Trail, trailData: string, poiData: string, 
 
   // 3. parse json
   // get just the main trail data, ignore side-trails
-    trailAsJson['gpx']['trk'].filter(function(track) {
+  trailAsJson['gpx']['trk'].filter(function(track) {
       return track.extensions.TrackExtension.DisplayColor.__text.includes('Red');
   }).map(function(track) {
     _waypoints = _waypoints.concat(track.trkseg.trkpt);
   });
-
-
 
   // POIS (=points of interest. water sources, campsites etc.)
 

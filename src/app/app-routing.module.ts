@@ -7,26 +7,41 @@ import { ElevationProfileComponent } from './component/elevation-profile/elevati
 
 // resolvers
 import { TrailResolverService } from './service/trail-resolver.service';
+import {PlaygroundComponent} from './component/playground/playground.component';
+import {LocalStorageService} from 'ngx-webstorage';
+import {FilesystemService} from './service/filesystem.service';
+
+// cordova
+declare let cordova;
+// declare let device;
 
 const routes: Routes = [
   {
-    path: "elevation-profile",
+    path: 'elevation-profile',
     component: ElevationProfileComponent,
     resolve: {
       data: TrailResolverService
     }
   },
   {
-    path: "detail/:id",
+    path: 'detail/:id',
     component: MileDetailComponent,
     resolve: {
       data: TrailResolverService
     }
   },
   {
-    path: "",
-    redirectTo: "elevation-profile",
-    pathMatch: "full"
+    // dev
+    path: 'playground',
+    component: PlaygroundComponent,
+    resolve: {
+      data: TrailResolverService
+    }
+  },
+  {
+    path: '',
+    redirectTo: 'elevation-profile',
+    pathMatch: 'full'
   }
 ];
 
@@ -35,4 +50,9 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 
-export class AppRoutingModule { }
+export class AppRoutingModule {
+
+  // STARTUP
+
+  constructor() {}
+}

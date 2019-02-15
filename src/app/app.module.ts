@@ -6,7 +6,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { environment } from '../environments/environment.prod';
 import { AppComponent } from './app.component';
 import { AngularFittextModule } from 'angular-fittext';
-import {LocalStorageService, NgxWebstorageModule} from 'ngx-webstorage';
 
 // font awesome
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -79,6 +78,8 @@ import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
 import {LoaderService} from './service/loader.service';
+import { PlaygroundComponent } from './component/playground/playground.component';
+import {LocalStorageService, NgxWebstorageModule} from 'ngx-webstorage';
 
 @NgModule({
   declarations: [
@@ -116,7 +117,8 @@ import {LoaderService} from './service/loader.service';
     InstructionsComponent,
     SettingsPanelComponent,
     DownloaderComponent,
-    LoaderOverlayComponent
+    LoaderOverlayComponent,
+    PlaygroundComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -170,10 +172,8 @@ export class AppModule {
   }
 
 
-  // set default user settings (unless they exist)
+  // set default user settings (unless they already exist)
   private firstRun() {
-
-    // DEBUG: FORCE FIRST RUN XXX todo
 
     const _firstRun = this._localStorage.retrieve('firstRun');
 

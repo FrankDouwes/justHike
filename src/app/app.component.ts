@@ -10,7 +10,7 @@ import {LocalStorageService} from 'ngx-webstorage';
 import {environment} from '../environments/environment.prod';
 import {Subscription} from 'rxjs';
 import {getTrailDataById, Trail} from './type/trail';
-import {ZipService} from './service/zip.service';
+import {FilesystemService} from './service/filesystem.service';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private _injector: Injector,
     private _localStorage: LocalStorageService,
     private _downloadService: DownloadService,
-    private _zipService: ZipService
+    private _fileSystemService: FilesystemService
   ) {
     // makes constructor props accessible through LocationService, needed for inheritance
     LocationService.injector = this._injector;
@@ -42,17 +42,24 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-    this._currentTrail = getTrailDataById(this._localStorage.retrieve('activeTrailId'));
+    if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
+      console.log('running on mobile device:', navigator.userAgent);
+    } else {
+      console.log('running in browser');
+      this.onWebReady();
+    }
 
+    // reload on storage timestamp change (user settings changed that require a reload)
+    this._localStorage.observe('timestamp').subscribe((value) => {
+      window.location.reload();
+    });
+
+    // get active trail (default = 0)
+    this._currentTrail = getTrailDataById(this._localStorage.retrieve('activeTrailId'));
     const _self = this;
 
     // check app version
     this.versionCheck();
-
-    // storage (user settings)
-    this._localStorage.observe('timestamp').subscribe((value) => {
-      window.location.reload();
-    });
 
     // loader (spinner)
     this._loaderService.observe.subscribe((obj: object) => {
@@ -70,7 +77,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this._element.nativeElement.addEventListener('markerClick', this.onCustomEvent.bind(this), false);
     this._element.nativeElement.addEventListener('offtrail', this.onCustomEvent.bind(this), false);
-
   }
 
   ngOnDestroy(): void {
@@ -80,9 +86,17 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
 
-
-
   // STARTUP
+
+  onWebReady(): void {
+    // activate filesystem
+    this._fileSystemService.initializeStorage();
+
+    // reload on storage timestamp change (user settings changed that require a reload)
+    this._localStorage.observe('timestamp').subscribe((value) => {
+      window.location.reload();
+    });
+  }
 
   // compare data version to online data version
   private versionCheck(): void {
@@ -129,12 +143,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this._downloadSubscription = _snowDownloader.meta.subscribe( status => {
       console.log(status);
     });
-
-    // _snowDownloader.downloadFile(_url, 'json', false);
-
-    // if () {
-    //
-    // }
   }
 
 

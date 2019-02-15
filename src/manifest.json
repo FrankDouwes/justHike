@@ -1,5 +1,16 @@
 {
   "background_color": "#EEEEEE",
   "display":      "standalone",     /* Could be "fullscreen", "standalone", "minimal-ui", or "browser" */
-  "orientation":  "landscape"       /* Could be "landscape" or "portrait" */
+  "orientation":  "landscape",       /* Could be "landscape" or "portrait" */
+
+  // todo: research https://developer.chrome.com/apps/declare_permissions
+  "permissions": [
+    "geolocation",
+    "storage",
+    "webview",
+    "virtualKeyboard",
+    "unlimitedStorage",
+    "system.storage",
+    "fileSystem"
+  ]
 }

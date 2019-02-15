@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Mile } from '../../type/mile';
+import {getTrailDataById} from '../../type/trail';
 
 @Component({
   selector: 'app-mile-detail',
