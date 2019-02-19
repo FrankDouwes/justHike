@@ -15,8 +15,6 @@ import {
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {ActivatedRoute, Router} from '@angular/router';
 
-import {Subscription} from 'rxjs';
-
 // type classes
 import {OHLC} from '../../../type/ohlc';
 import {Mile} from '../../../type/mile';
@@ -79,7 +77,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     super.ngOnInit();
 
     this._initialIndex = Number(this._route.snapshot.queryParams['id']);
-    this.setupEventListeners();
+    this._setupEventListeners();
   }
 
   ngAfterViewInit() {
@@ -108,7 +106,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 // OVERRIDES
 
   public onStatusChange(status: string): void {
-
     this.onUserLocationChange(this.user);
   }
 
@@ -127,7 +124,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
 // EVENTS & HANDLERS
 
-  private setupEventListeners(): void {
+  private _setupEventListeners(): void {
 
     const _self = this;
 
@@ -148,12 +145,12 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     }, true);
   }
 
-  onClick(listItem: Mile): void {
+  public onClick(listItem: Mile): void {
     this._router.navigate(['detail/', listItem.id], {queryParams: {back: this._currentIndex}});
   }
 
   // only executed once every 250ms as it's a redraw of all list items
-  onResize(event): void {
+  private _onResize(event): void {
 
     const self = this;
 
@@ -163,13 +160,13 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
       self.itemWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
       self.resize = new Date().getTime();
       self.resizeEvent.emit({resize: new Date().getTime()});
-      self.redraw();
+      self._redraw();
     }, 250);
   }
 
-  onScroll(viewport: CdkVirtualScrollViewport, index: number): void {
+  public onScroll(viewport: CdkVirtualScrollViewport, index: number): void {
       this._currentIndex = index;
-      this.redraw();
+      this._redraw();
   }
 
 
@@ -179,7 +176,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
   // calculate the open high low close (for high/low range) for the currently visible elements
   // used to vertically scale svg content and calculate guides etc.
-  private calculateVisOHLC(visibleRange: object): OHLC {
+  private _calculateVisOHLC(visibleRange: object): OHLC {
 
     const _visibleItems = this.trailData.miles.slice(visibleRange['start'], visibleRange['end']);
 
@@ -203,7 +200,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   }
 
   // calculate the number of guides and their values (used for labels and guides)
-  private calculateGuides(): void {
+  private _calculateGuides(): void {
 
     this.guides = [];
 
@@ -230,15 +227,15 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   }
 
   // redraw guides and trigger a scroll event (that redraws the list)
-  private redraw(): void {
+  private _redraw(): void {
     const _oldRange = this._visibleRange;
     this._visibleRange = this.scrollViewport.getRenderedRange();
 
     // only if really needed!
     if (_oldRange !==  this._visibleRange) {
       this.scrollEvent.emit({visibleRange: this._visibleRange, scrollX: this.scrollViewport.getOffsetToRenderedContentStart()});
-      this.visibleOHLC = this.calculateVisOHLC(this._visibleRange);
-      this.calculateGuides();
+      this.visibleOHLC = this._calculateVisOHLC(this._visibleRange);
+      this._calculateGuides();
     }
   }
 
@@ -248,7 +245,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 // OPTIMISING
 
   // define ID for better li recycling (according to the CDK virtual scroll docs)
-  trackElementBy(index: number, element: any): number {
+  public trackElementBy(index: number, element: any): number {
     return element.id;
   }
 }

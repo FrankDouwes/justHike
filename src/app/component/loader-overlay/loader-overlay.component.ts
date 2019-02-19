@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, OnChanges, SimpleChanges, isDevMode} from '@angular/core';
-import {LoaderService} from '../../service/loader.service';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, isDevMode } from '@angular/core';
+import { LoaderService } from '../../service/loader.service';
 
 @Component({
   selector: 'loader-overlay',

@@ -1,5 +1,3 @@
-import {isDevMode} from '@angular/core';
-import {environment} from '../../environments/environment.prod';
 import { saveAs } from 'file-saver';
 
 export function saveFileAs(data:any, filename:string, ): void {

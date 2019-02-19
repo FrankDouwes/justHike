@@ -1,9 +1,8 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {LocationBasedComponent} from '../../display/location-based/location-based.component';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 import { Mile } from '../../type/mile';
-import {User} from '../../type/user';
-import {LocalStorageService} from 'ngx-webstorage';
-import {Subscription} from 'rxjs';
+import { User } from '../../type/user';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'locator',
@@ -56,7 +55,6 @@ export class LocatorComponent extends LocationBasedComponent implements OnInit, 
   }
 
   public onUserLocationChange(user: User): void {
-
     if (this.user && this.status === 'tracking') {
       this.nearestMileId = user.nearestMileId;
       // get the nearest 3 miles

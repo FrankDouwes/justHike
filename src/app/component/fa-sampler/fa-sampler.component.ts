@@ -9,9 +9,8 @@ import { Settings } from '../../settings';
 
 export class FaSamplerComponent implements OnInit {
 
-  // create a Font awesome icon for each poi type
-  // hide all icons
-  // give the svg element the correct id so it can be sampled by svgjs (through _utils/martker.ts)
+  // create a Font awesome icon for each poi type and hide it)
+  // give the svg element the correct id so it can be sampled/cloned by svgjs (through _utils/marker.ts)
 
   public data: object = Settings.POITYPES;
 

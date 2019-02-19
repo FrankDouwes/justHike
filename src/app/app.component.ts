@@ -1,16 +1,21 @@
-import {Component, ElementRef, Injector, isDevMode, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
-import {LoaderService} from './service/loader.service';
-import {MatDialog} from '@angular/material';
-import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
-import {MarkerDialogComponent} from './component/dialog/marker-dialog/marker-dialog.component';
-import {LocationService} from './service/location.service';
-import {OfftrailDialogComponent} from './component/dialog/offtrail-dialog/offtrail-dialog.component';
-import {DownloadService} from './service/download.service';
-import {LocalStorageService} from 'ngx-webstorage';
-import {environment} from '../environments/environment.prod';
-import {Subscription} from 'rxjs';
-import {getTrailDataById, Trail} from './type/trail';
-import {FilesystemService} from './service/filesystem.service';
+import { Component, ElementRef, Injector, isDevMode, OnDestroy, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { LoaderService } from './service/loader.service';
+import { MatDialog } from '@angular/material';
+import { SettingsDialogComponent } from './component/dialog/settings-dialog/settings-dialog.component';
+import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
+import { LocationService } from './service/location.service';
+import { OfftrailDialogComponent } from './component/dialog/offtrail-dialog/offtrail-dialog.component';
+import { DownloadService } from './service/download.service';
+import { LocalStorageService } from 'ngx-webstorage';
+import { environment } from '../environments/environment.prod';
+import { Subscription } from 'rxjs';
+import { Trail } from './type/trail';
+import { FilesystemService } from './service/filesystem.service';
+import { getTrailDataById } from './_util/trail';
+
+// capacitor
+import { Plugins } from '@capacitor/core';
+const { SplashScreen } = Plugins;
 
 @Component({
   selector: 'app-root',
@@ -42,11 +47,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    // check user agent
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
       console.log('running on mobile device:', navigator.userAgent);
     } else {
       console.log('running in browser');
-      this.onWebReady();
+      this._onWebReady();
     }
 
     // reload on storage timestamp change (user settings changed that require a reload)
@@ -59,11 +65,12 @@ export class AppComponent implements OnInit, OnDestroy {
     const _self = this;
 
     // check app version
-    this.versionCheck();
+    this._versionCheck();
 
     // loader (spinner)
     this._loaderService.observe.subscribe((obj: object) => {
       this.showLoader = (obj['type'] === 'self') ? (obj['action'] === 'show') : this.showLoader;
+      SplashScreen.hide();
     });
 
     // show settings on first load
@@ -71,24 +78,23 @@ export class AppComponent implements OnInit, OnDestroy {
     if (_firstRun) {
       this._localStorage.store('firstRun', false);
       const timeOut = setTimeout(() => {
-        _self.openSettingsDialog();
+        _self._openSettingsDialog();
       }, 250);
     }
 
-    this._element.nativeElement.addEventListener('markerClick', this.onCustomEvent.bind(this), false);
-    this._element.nativeElement.addEventListener('offtrail', this.onCustomEvent.bind(this), false);
+    this._element.nativeElement.addEventListener('markerClick', this._onCustomEvent.bind(this), false);
+    this._element.nativeElement.addEventListener('offtrail', this._onCustomEvent.bind(this), false);
   }
 
   ngOnDestroy(): void {
     this._downloadSubscription.unsubscribe();
-    this._element.nativeElement.removeEventListener('markerClick', this.onCustomEvent.bind(this));
-    this._element.nativeElement.removeEventListener('offtrail', this.onCustomEvent.bind(this), false);
+    this._element.nativeElement.removeEventListener('markerClick', this._onCustomEvent.bind(this));
+    this._element.nativeElement.removeEventListener('offtrail', this._onCustomEvent.bind(this), false);
   }
-
 
   // STARTUP
 
-  onWebReady(): void {
+  private _onWebReady(): void {
     // activate filesystem
     this._fileSystemService.initializeStorage();
 
@@ -99,7 +105,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   // compare data version to online data version
-  private versionCheck(): void {
+  private _versionCheck(): void {
 
     // only check once every 24 hours
     const _lastCheck = this._localStorage.retrieve('lastVersionCheck');
@@ -117,7 +123,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
         // check snow data (auto update, depending on settings) todo
         if (this._currentTrail.snowVersion !== status['snowVersion']) {
-          this.updateSnowData();
+          this._updateSnowData();
         }
 
         // check tile data (manual update) todo
@@ -134,7 +140,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   // update the snow data (using auto update setting)
-  private updateSnowData(): void {
+  private _updateSnowData(): void {
 
     const _url = environment.appDomain + environment.fileBaseUrl + this._currentTrail.abbr + '/snow.json';
     const _snowDownloader = this._downloadService.createDownloader(this._currentTrail.abbr + '_snow');
@@ -153,20 +159,20 @@ export class AppComponent implements OnInit, OnDestroy {
   public onNavEvent(event: string): void {
 
     if (event === 'settings') {
-      this.openSettingsDialog();
+      this._openSettingsDialog();
     }
   }
   // on marker click (using standard events as angular events don't bubble
-  private onCustomEvent(event: Event): void {
+  private _onCustomEvent(event: Event): void {
 
     // destination reached
     event.stopImmediatePropagation();
     event.stopPropagation();
 
     if (event.type === 'offtrail') {
-      this.openOfftrailDialog(event);
+      this._openOfftrailDialog(event);
     } else {
-      this.openMarkerDialog(event);
+      this._openMarkerDialog(event);
     }
   }
 
@@ -175,11 +181,11 @@ export class AppComponent implements OnInit, OnDestroy {
   // DIALOGS
 
   // marker dialog
-  private openMarkerDialog(event): void {
+  private _openMarkerDialog(event): void {
 
     // get marker poi data
     if (this.navIsVisible) {
-      this.toggleNavigationVisibility();
+      this._toggleNavigationVisibility();
     }
 
     const _markerDialog = this._dialog.open(MarkerDialogComponent, {
@@ -190,15 +196,15 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     _markerDialog.afterClosed().subscribe(result => {
-      this.toggleNavigationVisibility();
+      this._toggleNavigationVisibility();
     });
   }
 
   // settings dialog
-  private openSettingsDialog(): void {
+  private _openSettingsDialog(): void {
 
     if (this.navIsVisible) {
-      this.toggleNavigationVisibility();
+      this._toggleNavigationVisibility();
     }
     const _settingsDialog = this._dialog.open(SettingsDialogComponent, {
       autoFocus: false,
@@ -208,7 +214,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     _settingsDialog.afterClosed().subscribe(result => {
-      this.toggleNavigationVisibility();
+      this._toggleNavigationVisibility();
       if (result) {
         this._loaderService.showOverlay();
         this._localStorage.store('timestamp', new Date().getTime());
@@ -217,9 +223,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   // off trail dialog (mile simulator)
-  private openOfftrailDialog(event): void {
+  private _openOfftrailDialog(event): void {
     if (this.navIsVisible) {
-      this.toggleNavigationVisibility();
+      this._toggleNavigationVisibility();
     }
 
     const _offtrailDialog = this._dialog.open(OfftrailDialogComponent, {
@@ -231,7 +237,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     _offtrailDialog.afterClosed().subscribe(result => {
 
-      this.toggleNavigationVisibility();
+      this._toggleNavigationVisibility();
 
       if (result) {
         this._localStorage.store('simulatedMile', Number(result.simulatedMile))
@@ -242,7 +248,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
   }
 
-  private toggleNavigationVisibility(): void {
+  private _toggleNavigationVisibility(): void {
     this.navIsVisible = !this.navIsVisible;
   }
 }

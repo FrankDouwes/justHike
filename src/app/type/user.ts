@@ -1,4 +1,4 @@
-import {Waypoint} from './waypoint';
+import { Waypoint } from './waypoint';
 
 // !user does not hold a status property (idle, fetching, tracking, error)
 

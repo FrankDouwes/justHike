@@ -2,7 +2,6 @@ import * as X2JS from 'x2js';
 import { Waypoint } from '../type/waypoint';
 import { Poi } from '../type/poi';
 import { Trail } from '../type/trail';
-import {parseSnow} from '../service/snow-generator.service';
 
 const _x2js = new X2JS({
   attributePrefix : ''    // no attribute prefix

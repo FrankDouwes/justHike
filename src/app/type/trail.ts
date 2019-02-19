@@ -1,8 +1,7 @@
 import { Waypoint} from './waypoint';
-import {Mile} from './mile';
-import {OHLC} from './ohlc';
-import {Poi} from './poi';
-import {environment} from '../../environments/environment.prod';
+import { Mile } from './mile';
+import { OHLC } from './ohlc';
+import { Poi } from './poi';
 
 export class Trail {
   // STATIC
@@ -29,15 +28,4 @@ export class Trail {
   miles?:             Array<Mile>;        // the calculated miles
   waterSources?:      Array<Poi>;         // all water sources (including multi-pois that also have water)
   poiTypes?:          Array<object>;      // the poiTypes available for this trail (used for icons / labels)
-}
-
-export function getTrailDataById(id: Number): Trail {
-
-  for (const key in environment.TRAILS) {
-    if (environment.TRAILS[Number(key)].id === id) {
-      return environment.TRAILS[key] as Trail;
-    }
-  }
-
-  throw new Error('Trail not found!');
 }

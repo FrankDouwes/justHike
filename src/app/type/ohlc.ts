@@ -1,4 +1,4 @@
-import {Waypoint} from './waypoint';
+import { Waypoint } from './waypoint';
 
 export class OHLC {
   open:       number;
@@ -13,18 +13,18 @@ export function calculateOHLC(data: any, range: object, identifier: string = 'el
   // select sub data set to use for calculations
   let _subArr = data.slice(range["start"], range["end"]);
 
-  return ohlc(_subArr);
+  return _ohlc(_subArr);
 }
 
 
 // calculate ohlc of single data point?
-function ohlc(waypoints:Array<Waypoint>){
+function _ohlc(waypoints:Array<Waypoint>){
 
   // calculate OHLC
-  let _open:    number    = Number(waypoints[0].elevation);
-  let _high:    number    = Number(_open);
-  let _low:     number    = Number(_open);
-  let _close:   number    = Number(waypoints[waypoints.length - 1].elevation);
+  const   _open:    number    = Number(waypoints[0].elevation);
+  let     _high:    number    = Number(_open);
+  let     _low:     number    = Number(_open);
+  const   _close:   number    = Number(waypoints[waypoints.length - 1].elevation);
 
   for (let waypoint of waypoints) {
 

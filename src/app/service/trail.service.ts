@@ -1,20 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import {forkJoin, Observable} from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { of } from 'rxjs';
-import {getTrailDataById, Trail} from '../type/trail';
-import {LocalStorageService} from 'ngx-webstorage';
-import {LoaderService} from './loader.service';
-import {TrailGeneratorService} from './trail-generator.service';
-import {Waypoint} from '../type/waypoint';
-import {Poi} from '../type/poi';
+import { Trail } from '../type/trail';
+import { LocalStorageService } from 'ngx-webstorage';
+import { LoaderService } from './loader.service';
+import { TrailGeneratorService } from './trail-generator.service';
+import { Waypoint } from '../type/waypoint';
+import { Poi } from '../type/poi';
+import { getTrailDataById } from '../_util/trail';
+import { SnowGeneratorService } from './snow-generator.service';
+import { parseSnow, reverseSnow } from '../_util/snow';
 
 // dynamically called
-import {parsePCTData} from '../parser/pct-data';
-import {parseDEMOData} from '../parser/demo-data';
-import {parseCDTData} from '../parser/cdt-data';
-import {parseATData} from '../parser/at-data';
-import {parseSnow, reverseSnow, Snow, SnowGeneratorService} from './snow-generator.service';
+import { parsePCTData } from '../parser/pct-data';
+import { parseDEMOData } from '../parser/demo-data';
+import { parseCDTData } from '../parser/cdt-data';
+import { parseATData } from '../parser/at-data';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +45,7 @@ export class TrailService {
   ) {}
 
   // Get raw trail data, for parsing (dev mode
-  getRawTrailData(trailId: number): Observable<object> {
+  public getRawTrailData(trailId: number): Observable<object> {
 
     this._loaderService.showMessage('fetching raw trail data');
 
@@ -60,7 +62,7 @@ export class TrailService {
   }
 
   // Get the pre parsed trail data (regular user), returns a promise
-  getPreParsedTrailData(trailId: number, direction: number): Observable<object> {
+  public getPreParsedTrailData(trailId: number, direction: number): Observable<object> {
 
     this._loaderService.showMessage('fetching trail data');
 
@@ -90,7 +92,7 @@ export class TrailService {
   }
 
   // Parse the raw data (routines for each trail), returns a promise
-  parseTrailData(trail: Trail, waypoints: string, pois: string, snow: object, direction: number): object {
+  public parseTrailData(trail: Trail, waypoints: string, pois: string, snow: object, direction: number): object {
 
     this._loaderService.showMessage('parsing trail data');
 

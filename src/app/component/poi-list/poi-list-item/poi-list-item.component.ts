@@ -1,6 +1,6 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Poi, PoiType} from '../../../type/poi';
-import {getPoiTypeByType} from '../../../_util/poi';
+import { Component, Input, OnInit } from '@angular/core';
+import { Poi, PoiType } from '../../../type/poi';
+import { getPoiTypeByType } from '../../../_util/poi';
 
 @Component({
   selector: 'poi-list-item[class=mat-list-item-content]',

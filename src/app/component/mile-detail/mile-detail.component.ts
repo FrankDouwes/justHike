@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Mile } from '../../type/mile';
-import {getTrailDataById} from '../../type/trail';
 
 @Component({
   selector: 'app-mile-detail',
@@ -34,15 +33,15 @@ export class MileDetailComponent implements OnInit {
         // fitting map to markers/line segments using bounds isn't precise
         const _mapLineSegmentPadding = 1;
 
-        this.visibleMilesList = this.getMilesSegmentData(result.data['trail'], _milesBehind, _milesAhead);
-        this.visibleMilesLeaflet = this.getMilesSegmentData(result.data['trail'], (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
+        this.visibleMilesList = this._getMilesSegmentData(result.data['trail'], _milesBehind, _milesAhead);
+        this.visibleMilesLeaflet = this._getMilesSegmentData(result.data['trail'], (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
       });
   }
 
   // OTHER
   // the mile (line) segments data to show using leaflet
   // there's some overlap so you can look ahead/behind.
-  private getMilesSegmentData(data: any, milesBehind: number, milesAhead: number): Array<Mile> {
+  private _getMilesSegmentData(data: any, milesBehind: number, milesAhead: number): Array<Mile> {
 
     const _startIndex: number = (this.routedMile >= milesBehind) ? this.routedMile - milesBehind : 0;
     const _endIndex: number = (this.routedMile + milesAhead <= data.miles.length) ? this.routedMile + milesAhead : data.miles.length;

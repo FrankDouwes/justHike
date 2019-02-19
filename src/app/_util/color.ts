@@ -10,14 +10,14 @@ export function interpolateColors(color1, color2, steps){
   color2 = color2.match(/\d+/g).map(Number);
 
   for (let i = 0; i < steps; i++) {
-    interpolatedColorArray.push(interpolateColor(color1, color2, stepFactor * i));
+    interpolatedColorArray.push(_interpolateColor(color1, color2, stepFactor * i));
   }
 
   return interpolatedColorArray;
 }
 
 // based on https://codepen.io/njmcode/pen/axoyD?editors=0010
-function interpolateColor(color1, color2, factor) {
+function _interpolateColor(color1, color2, factor) {
   if (arguments.length < 3) {
     factor = 0.5;
   }

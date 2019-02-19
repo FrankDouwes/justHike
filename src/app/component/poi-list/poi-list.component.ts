@@ -1,12 +1,12 @@
-import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {LocationBasedComponent} from '../../display/location-based/location-based.component';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 
-import {BehaviorSubject} from 'rxjs';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
+import { BehaviorSubject } from 'rxjs';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
-import {Mile} from '../../type/mile';
-import {Poi} from '../../type/poi';
-import {User} from '../../type/user';
+import { Mile } from '../../type/mile';
+import { Poi } from '../../type/poi';
+import { User } from '../../type/user';
 
 @Component({
   selector: 'poi-list',
@@ -52,11 +52,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
 
     this.combinedData.subscribe(
       data => {
-        this.scrollToUser();
+        this._scrollToUser();
       });
 
     const _userRef: User = (this.user !== undefined) ? this.user : super.createBlankUser();
-    this.sortListData(this._staticPoisArray.concat(_userRef));
+    this._sortListData(this._staticPoisArray.concat(_userRef));
     this.onUserLocationChange(_userRef);
   }
 
@@ -77,7 +77,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
     // // if tracking
     if (location && this.status !== 'idle') {
 
-      this.sortListData(this._staticPoisArray.concat(user));
+      this._sortListData(this._staticPoisArray.concat(user));
 
       // figure out where the pois are in relation to the user
       this._staticPoisArray.forEach(function(poi: Poi) {
@@ -89,14 +89,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
     } else {
 
       user.waypoint = user.anchorPoint = undefined;
-      this.sortListData(this._staticPoisArray.concat(user));
+      this._sortListData(this._staticPoisArray.concat(user));
     }
   }
 
 
   // EVENT HANDLERS
 
-  private onListItemClick(poi: Poi): void {
+  public onListItemClick(poi: Poi): void {
 
     if (poi.type === 'user') {
       this.locationService.toggleTracking();
@@ -114,7 +114,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
     this.container['elementRef'].nativeElement.dispatchEvent(_event);
   }
 
-  private scrollToUser() {
+  private _scrollToUser(): void {
 
     const _self = this;
     if (this.container) {
@@ -128,7 +128,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
 
   // OTHER
 
-  private sortListData(data: Array<any>) {
+  private _sortListData(data: Array<any>): void {
     if (!data) {
       return;
     }

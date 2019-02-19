@@ -1,7 +1,7 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {Poi, PoiType} from '../../../type/poi';
-import {distanceInMilesFeet, getPoiTypeByType} from '../../../_util/poi';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
+import { Poi, PoiType } from '../../../type/poi';
+import { getPoiTypeByType } from '../../../_util/poi';
 
 @Component({
   selector: 'marker-dialog',
@@ -50,7 +50,7 @@ export class MarkerDialogComponent implements OnInit {
 
   // EVENT HANDLERS
 
-  private onNoClick(): void {
-    this.dialogRef.close();
-  }
+  // private onNoClick(): void {
+  //   this.dialogRef.close();
+  // }
 }

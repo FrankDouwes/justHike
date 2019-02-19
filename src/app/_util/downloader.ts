@@ -1,6 +1,6 @@
-import {HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse} from '@angular/common/http';
-import {BehaviorSubject, Observable, Subscription} from 'rxjs';
-import {share} from 'rxjs/operators';
+import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
+import { share } from 'rxjs/operators';
 
 // file downloader
 // has type (for json/blob etc)
@@ -26,7 +26,7 @@ export class Downloader {
   public downloadFile(url: string, type: string, cache: boolean = true): void {
 
     console.log(type);
-    this.setStatus('fetching file', null, false);
+    this._setStatus('fetching file', null, false);
 
     let _headers = new HttpHeaders();
     _headers = _headers.append('Content-Type', 'application/json; charset=utf-8');
@@ -51,14 +51,14 @@ export class Downloader {
         const _downloadPercentage = Number(((event.loaded / event.total) * 100).toFixed(2));
         const _fileSize = Number(event.total);
 
-        this.setStatus('downloading', {percentage: _downloadPercentage, fileSize: _fileSize}, true);
+        this._setStatus('downloading', {percentage: _downloadPercentage, fileSize: _fileSize}, true);
 
       } else if (event instanceof HttpResponse) {
 
         // TODO unzip & write to filesystem
         this.downloadedFile = event.body;
 
-        this.setStatus('downloaded', {file: this.downloadedFile}, false);
+        this._setStatus('downloaded', {file: this.downloadedFile}, false);
 
       }
 
@@ -71,16 +71,16 @@ export class Downloader {
     if (this._downloadRequest) {
       this._downloadRequest.unsubscribe();
     }
-    this.setStatus('', null, false);
+    this._setStatus('', null, false);
   }
 
   public clearFile(): void {
 
     delete this.downloadedFile;
-    this.setStatus('download cleared', null, false);
+    this._setStatus('download cleared', null, false);
   }
 
-  private setStatus(message: string, data?: object, active?: boolean): void {
+  private _setStatus(message: string, data?: object, active?: boolean): void {
 
     if (this.isActiveSubject.getValue() !== active) {
       this.isActiveSubject.next(active);

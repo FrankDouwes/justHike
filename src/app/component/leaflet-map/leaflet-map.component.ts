@@ -1,17 +1,18 @@
-import {Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges} from '@angular/core';
-import {Mile} from '../../type/mile';
-import {ActivatedRoute} from '@angular/router';
+import { Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges } from '@angular/core';
+import { Mile } from '../../type/mile';
+import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
 import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
-import {Poi, PoiType} from '../../type/poi';
-import {elevationLines, fallbackLayer} from '../../_util/tiles';
-import {getPoiTypeByType} from '../../_util/poi';
-import {createFaLeafletMarker} from '../../_util/markers';
-import {LocationBasedComponent} from '../../display/location-based/location-based.component';
-import {User} from '../../type/user';
-import {Waypoint} from '../../type/waypoint';
-import {environment} from '../../../environments/environment.prod';
-import {SnowGeneratorService, Snowpoint} from '../../service/snow-generator.service';
+import { Poi, PoiType } from '../../type/poi';
+import { fallbackLayer } from '../../_util/tiles';
+import { getPoiTypeByType } from '../../_util/poi';
+import { createFaLeafletMarker } from '../../_util/markers';
+import { LocationBasedComponent } from '../../display/location-based/location-based.component';
+import { User } from '../../type/user';
+import { Waypoint } from '../../type/waypoint';
+import { environment } from '../../../environments/environment.prod';
+import { SnowGeneratorService } from '../../service/snow-generator.service';
+import { Snowpoint } from '../../type/snow';
 
 @Component({
   selector: 'leaflet-map',
@@ -70,28 +71,28 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   ngOnChanges(changes: SimpleChanges): void {
 
     if (this._initialized) {
-      this.drawMap();
+      this._drawMap();
       this.onUserLocationChange(this.user);
-      this.centerMap(this.centerUser);
+      this._centerMap(this.centerUser);
     }
   }
 
   ngAfterViewInit(): void {
 
-    this.setupMap();
+    this._setupMap();
 
     // only draw if there's data
     if (this.milesData && this.milesData.length > 0) {
-      this.drawMap();
+      this._drawMap();
       this.onUserLocationChange(this.user);
-      this.centerMap(this.centerUser);
+      this._centerMap(this.centerUser);
     }
 
     this._initialized = true;
   }
 
 
-  setupMap() {
+  private _setupMap(): void {
 
     let _tileLayers: Array<any> = [];
 
@@ -136,7 +137,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   // ELEMENT CREATION
 
-  private drawMap(): void {
+  private _drawMap(): void {
 
     const _self = this;
 
@@ -146,15 +147,15 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         _self._centerpoint = mile.centerpoint;
       }
 
-      _self.drawTrail(mile, index);
-      _self.drawSnow(mile, _self._snowData[index], index);
-      _self.drawPois(mile, index);
+      _self._drawTrail(mile, index);
+      _self._drawSnow(mile, _self._snowData[index], index);
+      _self._drawPois(mile, index);
     });
   }
 
-  private drawTrail(mile: Mile, index: number): void {
+  private _drawTrail(mile: Mile, index: number): void {
 
-    let _waypoints: Array<any> = [];
+    const _waypoints: Array<any> = [];
 
     for (let waypoint of mile.waypoints) {
 
@@ -181,7 +182,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   }
 
-  private drawSnow(mile: Mile, snowMile: Array<Snowpoint>, index: number): void {
+  private _drawSnow(mile: Mile, snowMile: Array<Snowpoint>, index: number): void {
 
     let _snowPoints: Array<any> = [];
 
@@ -203,7 +204,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
         } else if (waypoint.elevation < elevationRange() && _snowPoints.length > 0) {
 
-          this.drawSnowLine(_snowPoints);
+          this._drawSnowLine(_snowPoints);
 
           _snowPoints = [];
         }
@@ -213,12 +214,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       // if there is still snow to be drawn at the end of loop
       if (_snowPoints.length > 0) {
 
-        this.drawSnowLine(_snowPoints);
+        this._drawSnowLine(_snowPoints);
       }
     }
   }
 
-  private drawSnowLine(waypoints: Array<any>):void {
+  private _drawSnowLine(waypoints: Array<any>):void {
 
     // draw waypoints
     const _trailLine = new L.Polyline(waypoints, {
@@ -231,15 +232,15 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     _trailLine.addTo(this._map);
   }
 
-  private drawPois(mile: Mile, index: number): void {
+  private _drawPois(mile: Mile, index: number): void {
 
     // startMile marker
-    this.createLabelMarker((mile.id - 1) + '', mile.waypoints[0]);
+    this._createLabelMarker((mile.id - 1) + '', mile.waypoints[0]);
 
     // endMile marker
     if (index === this.milesData.length - 1) {
       const _wps: Array<Waypoint> = mile.waypoints;
-      this.createLabelMarker(mile.id + '', _wps[_wps.length - 1]);
+      this._createLabelMarker(mile.id + '', _wps[_wps.length - 1]);
     }
 
     // pois sit on top of label markers
@@ -249,11 +250,11 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       for (const poi of mile.pois) {
 
-        const _poiMarker = this.createmarker(poi as Poi);
+        const _poiMarker = this._createmarker(poi as Poi);
 
         if (poi.waypoint.distance >= environment.MILE / 8) {
 
-          this.createPoiGuideLine(poi as Poi);
+          this._createPoiGuideLine(poi as Poi);
         }
 
         this._markers.push(_poiMarker);
@@ -270,7 +271,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
   }
 
-  private drawUser(): void {
+  private _drawUser(): void {
 
     if (this._userMarker) {
       this._map.removeLayer(this._userMarker); // remove
@@ -279,7 +280,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (this.user && !this._userMarker && this._map && this.user.waypoint) {
 
-      this._userMarker = this.createUserMarker(this.user);
+      this._userMarker = this._createUserMarker(this.user);
       const _userLocation = new L.LatLng(this.user.anchorPoint.latitude, this.user.anchorPoint.longitude);
       this._userMarker.setLatLng(_userLocation);
 
@@ -287,7 +288,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
   }
 
-  private centerMap(forceCenter:boolean = false): void {
+  private _centerMap(forceCenter:boolean = false): void {
 
     if (this._markers.length > 0 && !forceCenter) {
 
@@ -313,7 +314,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   // EVENT HANDLERS
 
   // linked directly to svg marker (scope change)
-  private onMarkerClick (event: MouseEvent) {
+  private _onMarkerClick (event: MouseEvent) {
 
     const _event: CustomEvent = new CustomEvent(
       'markerClick',
@@ -335,7 +336,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   public onUserLocationChange(user: User): void {
 
     if (this._map) {
-      this.drawUser();
+      this._drawUser();
     }
   }
 
@@ -345,13 +346,13 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   // CREATE MAP ELEMENTS
 
-  private createLabelMarker(label: string, waypoint: Waypoint) {
+  private _createLabelMarker(label: string, waypoint: Waypoint) {
 
     let _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + label + '</div>'});
     let _marker = L.marker([waypoint.latitude, waypoint.longitude], {icon: _labelIcon}).addTo(this._map);
   }
 
-  private createUserMarker(user: User): any {
+  private _createUserMarker(user: User): any {
 
     let _color = (this.status === "tracking") ? '#00FF00' : '#AAAAAA';
 
@@ -359,7 +360,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     return _user;
   }
 
-  private createmarker(poi: Poi): any {
+  private _createmarker(poi: Poi): any {
 
     let _poiType: PoiType = getPoiTypeByType(poi.type);
 
@@ -369,12 +370,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     let _poi = L.marker([poi.waypoint.latitude, poi.waypoint.longitude], {icon: createFaLeafletMarker(_poiType.icon, _poiType.iconType, _poiType.color), poi:poi});
 
-    _poi.on('click', this.onMarkerClick.bind({data:poi, self:this}));
+    _poi.on('click', this._onMarkerClick.bind({data:poi, self:this}));
 
     return _poi;
   }
 
-  private createPoiGuideLine(poi: Poi): void {
+  private _createPoiGuideLine(poi: Poi): void {
 
     let poiLoc = new L.latLng(poi.waypoint.latitude, poi.waypoint.longitude, poi.waypoint.elevation);
     let anchorLoc = new L.latLng(poi.anchorPoint.latitude, poi.anchorPoint.longitude, poi.anchorPoint.elevation);

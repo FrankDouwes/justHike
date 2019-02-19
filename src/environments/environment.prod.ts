@@ -3,9 +3,9 @@ import {Trail} from '../app/type/trail';
 export const environment = {
 
   production: true,               //  parsing raw data will trigger file download if set to false
-    useRawData: false,            //  use raw data (create json), production must be set to false
-      dowloadParsedData: false,   //  use raw data must be set to true in order for this to work
-    simulateTouch: true,            //  simulate touch with hammerjs, production must be set to false
+    useRawData: false,              //  use raw data (create json), production must be set to false
+      dowloadParsedData: false,       //  use raw data must be set to true in order for this to work
+    simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
   appDomain: 'https://hike.frankdouwes.com/',

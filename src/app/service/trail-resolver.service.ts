@@ -1,15 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Router, Resolve, RouterStateSnapshot, ActivatedRouteSnapshot} from '@angular/router';
-import { Observable, of, EMPTY } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { TrailService }  from './trail.service';
-import {LoaderService} from './loader.service';
-import {LocalStorageService} from 'ngx-webstorage';
-import {Trail} from '../type/trail';
-import {environment} from '../../environments/environment.prod';
-import {Waypoint} from '../type/waypoint';
-import {TrailGeneratorService} from './trail-generator.service';
-import {parseSnow, reverseSnow, Snow, SnowGeneratorService} from './snow-generator.service';
+import { LoaderService } from './loader.service';
+import { LocalStorageService } from 'ngx-webstorage';
+import { Trail } from '../type/trail';
+import { environment } from '../../environments/environment.prod';
+import { Waypoint } from '../type/waypoint';
+import { TrailGeneratorService } from './trail-generator.service';
+import { SnowGeneratorService } from './snow-generator.service';
+import { Snow } from '../type/snow';
+import { reverseSnow } from '../_util/snow';
 
 @Injectable({
   providedIn: 'root'

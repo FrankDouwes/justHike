@@ -33,10 +33,10 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCarouselModule } from '@ngmodule/material-carousel';
-import {MatIconModule} from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 
-// ionic native
-// import { Geolocation } from '@ionic-native/core';
+// ionic capacitor
+import '@ionic/pwa-elements';
 
 // display component
 import { ButtonComponent } from './display/button/button.component';
@@ -79,9 +79,8 @@ import { IconComponent } from './display/icon/icon.component';
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
-import {LoaderService} from './service/loader.service';
-import { PlaygroundComponent } from './component/playground/playground.component';
-import {LocalStorageService, NgxWebstorageModule} from 'ngx-webstorage';
+import { LoaderService } from './service/loader.service';
+import { LocalStorageService, NgxWebstorageModule } from 'ngx-webstorage';
 
 @NgModule({
   declarations: [
@@ -119,8 +118,7 @@ import {LocalStorageService, NgxWebstorageModule} from 'ngx-webstorage';
     InstructionsComponent,
     SettingsPanelComponent,
     DownloaderComponent,
-    LoaderOverlayComponent,
-    PlaygroundComponent
+    LoaderOverlayComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -163,7 +161,7 @@ export class AppModule {
     private _loaderService: LoaderService
   ) {
 
-    this.firstRun();
+    this._firstRun();
 
     // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
@@ -175,7 +173,7 @@ export class AppModule {
 
 
   // set default user settings (unless they already exist)
-  private firstRun() {
+  private _firstRun() {
 
     const _firstRun = this._localStorage.retrieve('firstRun');
 

@@ -10,9 +10,7 @@ export class Settings {
       label: 'user',
       iconType: 'fa',
       icon: 'hiking'
-    },
-
-    {
+    }, {
       type: 'water',
       label: 'water',
       color: '#58aed9',

@@ -11,8 +11,6 @@ import {
 } from '@angular/core';
 import 'seedrandom/seedrandom';
 
-import {Settings} from '../../../../settings';
-
 import {OHLC} from '../../../../type/ohlc';
 import {Mile} from '../../../../type/mile';
 import {User} from '../../../../type/user';
@@ -21,15 +19,16 @@ import {Poi} from '../../../../type/poi';
 declare const SVG: any;    // fixes SVGjs bug
 import 'svg.filter.js';
 
-import {svgPath} from '../../../../_util/smoothLine';
-import {isPrime, normalizeElevation} from '../../../../_util/math';
-import {createSvgCircleMarker, createSvgFaElement, createSvgPointMarker, sampleFaIcon} from '../../../../_util/markers';
-import {getPoiTypeByType} from '../../../../_util/poi';
-import {environment} from '../../../../../environments/environment.prod';
-import {LocalStorageService} from 'ngx-webstorage';
-import {Subscription} from 'rxjs';
-import {TrailGeneratorService} from '../../../../service/trail-generator.service';
-import {SnowGeneratorService, Snowpoint} from '../../../../service/snow-generator.service';
+import { svgPath } from '../../../../_util/smoothLine';
+import { isPrime, normalizeElevation } from '../../../../_util/math';
+import { createSvgCircleMarker, createSvgFaElement, createSvgPointMarker, sampleFaIcon } from '../../../../_util/markers';
+import { getPoiTypeByType } from '../../../../_util/poi';
+import { environment } from '../../../../../environments/environment.prod';
+import { LocalStorageService } from 'ngx-webstorage';
+import { Subscription } from 'rxjs';
+import { TrailGeneratorService } from '../../../../service/trail-generator.service';
+import { SnowGeneratorService } from '../../../../service/snow-generator.service';
+import {Snowpoint} from '../../../../type/snow';
 
 
 
@@ -89,13 +88,13 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this.showCampsites = this._localStorage.retrieve('showCampSites');
     this._campSubscription = this._localStorage.observe('showCampSites').subscribe(result => {
       this.showCampsites = result;
-      this.drawMap();
+      this._drawMap();
     });
 
     this._showSnowPack = this._localStorage.retrieve('showSnowPack');
     this._snowSubscription = this._localStorage.observe('showSnowPack').subscribe(result => {
       this._showSnowPack = result;
-      this.drawMap();
+      this._drawMap();
     });
   }
 
@@ -128,7 +127,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     if (changes.data || changes.visibleOHLC) {
       this._snowData = this._snowGenerator.getSnowForMile(this.data.id);
-      this.drawMap();
+      this._drawMap();
     }
 
     if (changes.resize) {
@@ -150,7 +149,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
 
     if (changes.triggerUserUpdate || changes.user) {
-      this.updateUserLocation();
+      this._updateUserLocation();
     }
   }
 
@@ -159,23 +158,23 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this._snowSubscription.unsubscribe();
   }
 
-  private drawMap(): void {
+  private _drawMap(): void {
 
-    this.clearCanvas(true, true);
+    this._clearCanvas(true, true);
 
     // line
-    this.drawLine();
+    this._drawLine();
 
     if (this._showSnowPack) {
-      this.drawSnow();
+      this._drawSnow();
     }
 
     // pois
-    this.drawTrees();
-    this.drawPois();
+    this._drawTrees();
+    this._drawPois();
 
     if (this.user) {
-      this.updateUserLocation();
+      this._updateUserLocation();
     }
   }
 
@@ -184,7 +183,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
 // DRAW ELEMENTS
 
-  private clearCanvas(polyline: boolean = true, markers: boolean = false): void {
+  private _clearCanvas(polyline: boolean = true, markers: boolean = false): void {
 
     // polyline canvas
     if (this._lineCanvas && polyline) {
@@ -201,7 +200,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
-  private drawLine(): void {
+  private _drawLine(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -242,7 +241,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       .stroke({ color: 'red', width: environment.LINEHEIGHT});
   }
 
-  private drawSnow(): void {
+  private _drawSnow(): void {
 
     if (!this._snowData[0] || this._snowData[0].length < 0) {
       return;
@@ -296,7 +295,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
-  private drawPois(): void {
+  private _drawPois(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -380,7 +379,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
             });
           }
 
-          _marker.click(this.onMarkerClick.bind({data:_poi, self:this}));
+          _marker.click(this._onMarkerClick.bind({data:_poi, self:this}));
           _marker.move(this._svgWidth * (_poi.anchorPoint.distance / environment.MILE), _markerElevation);
         }
 
@@ -390,7 +389,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   }
 
   // draw "random" trees below line
-  private drawTrees(): void {
+  private _drawTrees(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -417,7 +416,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
-  private drawUserMarker(): void {
+  private _drawUserMarker(): void {
 
     // clear old
     if (this._userMarker) {
@@ -444,20 +443,20 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -8);
     }
 
-    this._userMarker.click(this.onUserClick.bind(this));
+    this._userMarker.click(this._onUserClick.bind(this));
   }
 
 
 
 // EVENT HANDLERS
 
-  private onUserClick(event: MouseEvent): void {
+  private _onUserClick(event: MouseEvent): void {
     event.stopPropagation();
     event.stopImmediatePropagation();
   }
 
   // linked directly to svg marker
-  private onMarkerClick(event: MouseEvent): void {
+  private _onMarkerClick(event: MouseEvent): void {
     event.stopPropagation();
     event.stopImmediatePropagation();
 
@@ -473,13 +472,13 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this['self'].map.nativeElement.dispatchEvent(_event);
   }
 
-  private updateUserLocation(): void {
+  private _updateUserLocation(): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
     const range = (max - min);
 
-    this.drawUserMarker();
+    this._drawUserMarker();
 
     if (this.user && this._userMarker) {
 

@@ -1,9 +1,10 @@
 import { Waypoint } from './waypoint';
 import { OHLC } from './ohlc';
-import {Poi} from './poi';
-import {Snowpoint} from '../service/snow-generator.service';
+import { Poi } from './poi';
+import { Snowpoint } from './snow';
 
 export class Mile {
+
   id:                 number;             // id (mile number, starts at 1 not 0)
   elevationGain:      number;             // the elevation gain
   elevationLoss:      number;             // the elevation loss
@@ -19,6 +20,5 @@ export class Mile {
   hasCamp?:           boolean;            // contains campsite
   hasEscape?:         boolean;            // has a road crossing
   hasOther?:          boolean;            // has other
-
   isCurrent:          boolean;            // holds user location
 }

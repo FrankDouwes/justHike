@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class LoaderService {
 
   // to communicate with the overlay loader component
@@ -11,7 +12,6 @@ export class LoaderService {
 
   private _overlaySubject:  BehaviorSubject<object>     = new BehaviorSubject<object>({});
   public observe:    Observable<object>  = this._overlaySubject.asObservable();
-
 
   public showOverlay(): void {
 

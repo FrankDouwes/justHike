@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, HostBinding} from '@angular/core';
-import {Poi} from '../../../type/poi';
+import { Component, Input, OnInit, HostBinding } from '@angular/core';
+import { Poi } from '../../../type/poi';
 
 @Component({
   selector: 'poi-user-item[class=mat-list-item-content]',

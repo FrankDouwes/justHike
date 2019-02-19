@@ -1,7 +1,7 @@
 import {Component, isDevMode, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
-import {Snow} from '../../service/snow-generator.service';
+import {Snow} from '../../type/snow';
 
 @Component({
   selector: 'app-elevation-profile',

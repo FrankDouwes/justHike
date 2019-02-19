@@ -7,7 +7,6 @@ import { ElevationProfileComponent } from './component/elevation-profile/elevati
 
 // resolvers
 import { TrailResolverService } from './service/trail-resolver.service';
-import {PlaygroundComponent} from './component/playground/playground.component';
 import {LocalStorageService} from 'ngx-webstorage';
 import {FilesystemService} from './service/filesystem.service';
 
@@ -26,14 +25,6 @@ const routes: Routes = [
   {
     path: 'detail/:id',
     component: MileDetailComponent,
-    resolve: {
-      data: TrailResolverService
-    }
-  },
-  {
-    // dev
-    path: 'playground',
-    component: PlaygroundComponent,
     resolve: {
       data: TrailResolverService
     }

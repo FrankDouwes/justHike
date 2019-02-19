@@ -31,7 +31,7 @@
     color: #555
 
     transition: all 200ms ease
-    transition-property: width, height, border-radius
+    transition-property: width, height, border-radius, padding
 
     fa-icon
       filter: drop-shadow(-1px -2px 1px rgba(0,0,0,0.1)) drop-shadow(2px 3px 2px white);
@@ -60,6 +60,7 @@
       color: red
 
   .active
+    padding: env(safe-area-inset-right)
     width: 15vw
     height: 15vw
     border-radius: 5%

@@ -57,7 +57,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
     var sliderManager = new Hammer.Manager(this.main.nativeElement);
     sliderManager.add(new Hammer.Pan({threshold: 0, pointers: 0, direction: Hammer.DIRECTION_HORIZONTAL}));
-    sliderManager.on('pan', this.onSlide.bind(this));
+    sliderManager.on('pan', this._onSlide.bind(this));
   }
 
   ngAfterViewInit(): void {
@@ -72,8 +72,8 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
       .size(this._svgWidth, this._svgHeight)
       .viewbox(0, 0, this._svgWidth, this._svgHeight);
 
-    this.drawMap();
-    //this.drawGuides();
+    this._drawMap();
+    //this._drawGuides();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -122,8 +122,8 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
       }
 
       if (this.visibleRange) {
-        this.drawMap();
-        //this.drawGuides();
+        this._drawMap();
+        //this._drawGuides();
       }
     }
   }
@@ -133,7 +133,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   // DRAW
 
-  private drawMap(): void {
+  private _drawMap(): void {
 
     const min: number = Number(this.trailData.elevationRange.low) / environment.FOOT;
     const max: number = Number(this.trailData.elevationRange.high) / environment.FOOT;
@@ -149,7 +149,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
     // start points
     drawPoints.push([0, max]);
-    elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
+    elevation = this._invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
       , this.trailData.waypoints[0]['elevation'], min, range, this._verticalPadding));
 
     drawPoints.push([0, elevation]);
@@ -166,7 +166,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
         totalDistancePerc = (waypoint.distanceTotal / environment.MILE) / this.trailData.length;
       }
 
-      elevation = this.invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
+      elevation = this._invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
         , waypoint.elevation, min, range, this._verticalPadding));
 
       drawPoints.push([this._svgWidth * totalDistancePerc, elevation]);
@@ -185,7 +185,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
     const polyline = this._svgCanvas.polyline(drawPoints).fill('#C3C3C3');
   }
 
-  private drawGuides(): void {
+  private _drawGuides(): void {
 
     for (let i = 1; i < Math.ceil(this._segments); i++) {
       const line = this._svgCanvas.line(this.main.nativeElement.clientWidth * i, 0, this.main.nativeElement.clientWidth * i, this._svgHeight).stroke({ width: 1, color: '#AAA', opacity: '0.85', dasharray: '2, 2'});
@@ -194,7 +194,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   // svg draws from lop to bottom
-  private invertValue(input): number {
+  private _invertValue(input): number {
     return Math.abs(input - 1) + this._verticalPadding;
   }
 
@@ -208,7 +208,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   // fast scrolling
-  private onSlide(event): void {
+  private _onSlide(event): void {
     const percent = event.srcEvent.x / this.main.nativeElement.clientWidth;
     this.scrollToEvent.emit(percent);
   }

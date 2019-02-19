@@ -2,7 +2,6 @@ import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import { Location } from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {DownloadService} from '../../service/download.service';
-import {HttpEventType, HttpResponse} from '@angular/common/http';
 import {Subscription} from 'rxjs';
 
 @Component({

@@ -35,13 +35,13 @@ export class SettingsDialogComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  onClick(item) {
+  public onClick(item): void {
     this.activePanel = item.panel;
     this.contentPanel.nativeElement.scrollTo(0, 0);
   }
 
   // only triggered if true
-  onSettingsChanged(event) {
+  public onSettingsChanged(event): void {
     this._settingsChanged = event;
   }
 }

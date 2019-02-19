@@ -1,6 +1,6 @@
-import {Component, OnInit, OnDestroy, ViewChild, ViewContainerRef, Input, ComponentRef, ComponentFactoryResolver, OnChanges, SimpleChanges} from '@angular/core';
-import {PoiListItemComponent} from '../poi-list-item/poi-list-item.component';
-import {PoiUserItemComponent} from '../poi-user-item/poi-user-item.component';
+import { Component, OnInit, OnDestroy, ViewChild, ViewContainerRef, Input, ComponentRef, ComponentFactoryResolver, OnChanges, SimpleChanges } from '@angular/core';
+import { PoiListItemComponent } from '../poi-list-item/poi-list-item.component';
+import { PoiUserItemComponent } from '../poi-user-item/poi-user-item.component';
 
 @Component({
   selector: 'poi-dynamic-item',
