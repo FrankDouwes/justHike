@@ -1,5 +1,4 @@
 \:host
-  //background-color: black
   width: 100%
   float: left
   top: 0
@@ -7,24 +6,24 @@
   z-index: 1000
   pointer-events: none
 
-  .back
-    padding: 10px 0 0 10px
+  #container
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)
 
-  .button, .right
-    pointer-events: all
-    color: #555
+    .button, .right
+      pointer-events: all
+      color: #555
 
-  .right
-    float: right
+    .right
+      float: right
 
-  .show
-    visibility: visible
-    opacity: 1
-    transition: opacity 0.15s linear
-    pointer-events: all
+    .show
+      visibility: visible
+      opacity: 1
+      transition: opacity 0.15s linear
+      pointer-events: all
 
-  .hide
-    visibility: hidden
-    opacity: 0
-    transition: visibility 0.15s linear, opacity 0.15s linear
-    pointer-events: none
+    .hide
+      visibility: hidden
+      opacity: 0
+      transition: visibility 0.15s linear, opacity 0.15s linear
+      pointer-events: none

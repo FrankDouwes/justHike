@@ -19,7 +19,6 @@ body
   overscroll-behavior: contain
   margin: 0px 0px 0px 0.4px     // margin left keeps cdk scroll smooth on mobile (android)
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  padding: env(safe-area-inset-top)
 
 h1, h2, h3, h4, h5, h6
   font-family: 'NationalPark', Roboto, sans-serif
@@ -27,10 +26,11 @@ h1, h2, h3, h4, h5, h6
   font-style: normal
 
 // hide webkit scrollbar
-::-webkit-scrollbar
-  width: 0px  /* remove scrollbar space */
-  height: 0px
-  background: transparent  /* optional: just make scrollbar invisible */
+::-webkit-scrollbar, ::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb
+  width: 0 !important  /* remove scrollbar space */
+  height: 0 !important
+  background: transparent !important /* optional: just make scrollbar invisible */
+  display: none
 
 // make text unable to select
 .noselect
@@ -43,6 +43,7 @@ h1, h2, h3, h4, h5, h6
             user-select: none
 
 // cant be accessed from within component structure?
+
 #elevation-profile-list
   .cdk-virtual-scroll-viewport
     background: url('./assets/images/overlay.png') repeat-x

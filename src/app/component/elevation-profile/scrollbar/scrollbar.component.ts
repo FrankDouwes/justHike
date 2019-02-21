@@ -38,7 +38,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   public viewportOffset = 0;
   public mapOffset: number;
 
-  private _verticalPadding: number = 8;
+  private _verticalPadding = 8;
   private _svgCanvas;
   private _svgWidth:        number;
   private _svgHeight:       number;
@@ -55,7 +55,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngOnInit(): void {
 
-    var sliderManager = new Hammer.Manager(this.main.nativeElement);
+    let sliderManager = new Hammer.Manager(this.main.nativeElement);
     sliderManager.add(new Hammer.Pan({threshold: 0, pointers: 0, direction: Hammer.DIRECTION_HORIZONTAL}));
     sliderManager.on('pan', this._onSlide.bind(this));
   }
@@ -73,7 +73,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
       .viewbox(0, 0, this._svgWidth, this._svgHeight);
 
     this._drawMap();
-    //this._drawGuides();
+    // this._drawGuides();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -123,7 +123,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
       if (this.visibleRange) {
         this._drawMap();
-        //this._drawGuides();
+        // this._drawGuides();
       }
     }
   }
@@ -157,7 +157,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
     let prevPoint: object;
     let totalDistancePerc = 0;
 
-    for (var i = 0; i < this.trailData.waypoints.length; i += this.trailData.scrollbarSegmentSize) {
+    for (let i = 0; i < this.trailData.waypoints.length; i += this.trailData.scrollbarSegmentSize) {
 
       const waypoint: Waypoint = this.trailData.waypoints[i];
 
@@ -209,7 +209,10 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   // fast scrolling
   private _onSlide(event): void {
-    const percent = event.srcEvent.x / this.main.nativeElement.clientWidth;
+
+    // support touch events and mouse events
+    const _xPos: number = event.srcEvent.x || event.srcEvent.pageX || 0;
+    const percent = _xPos / this.main.nativeElement.clientWidth;
     this.scrollToEvent.emit(percent);
   }
 

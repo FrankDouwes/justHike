@@ -61,7 +61,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     super.ngOnInit();
 
     let _mileIds: Array<number> = [];
-    this.milesData.forEach(function(mile: Mile, index) {
+    this.milesData.forEach(function(mile: Mile) {
       _mileIds.push(mile.id);
     })
 

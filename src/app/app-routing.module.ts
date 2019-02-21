@@ -4,15 +4,10 @@ import { Routes, RouterModule } from '@angular/router';
 // component
 import { MileDetailComponent } from './component/mile-detail/mile-detail.component';
 import { ElevationProfileComponent } from './component/elevation-profile/elevation-profile.component';
+import {PlaygroundComponent} from './component/playground/playground.component';
 
 // resolvers
 import { TrailResolverService } from './service/trail-resolver.service';
-import {LocalStorageService} from 'ngx-webstorage';
-import {FilesystemService} from './service/filesystem.service';
-
-// cordova
-declare let cordova;
-// declare let device;
 
 const routes: Routes = [
   {
@@ -29,10 +24,18 @@ const routes: Routes = [
       data: TrailResolverService
     }
   },
+  // {
+  //   path: '',
+  //   redirectTo: 'elevation-profile',
+  //   pathMatch: 'full'
+  // }
+  // // todo: temp playground component
   {
     path: '',
-    redirectTo: 'elevation-profile',
-    pathMatch: 'full'
+    component: PlaygroundComponent,
+    resolve: {
+      data: TrailResolverService
+    }
   }
 ];
 

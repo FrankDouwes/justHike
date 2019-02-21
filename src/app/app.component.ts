@@ -10,11 +10,12 @@ import { LocalStorageService } from 'ngx-webstorage';
 import { environment } from '../environments/environment.prod';
 import { Subscription } from 'rxjs';
 import { Trail } from './type/trail';
-import { FilesystemService } from './service/filesystem.service';
 import { getTrailDataById } from './_util/trail';
 
 // capacitor
 import { Plugins } from '@capacitor/core';
+// import {FsService} from './service/fs.service';
+import {FilesystemService} from './service/filesystem.service';
 const { SplashScreen } = Plugins;
 
 @Component({
@@ -31,6 +32,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private _downloadSubscription: Subscription;
   private _currentTrail: Trail;
+
+  private _offtrailDialog: any;
 
   constructor(
     private _dialog: MatDialog,
@@ -50,6 +53,9 @@ export class AppComponent implements OnInit, OnDestroy {
     // check user agent
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
       console.log('running on mobile device:', navigator.userAgent);
+      document.addEventListener('deviceready', function() {
+        _self._onWebReady();
+      });
     } else {
       console.log('running in browser');
       this._onWebReady();
@@ -228,14 +234,18 @@ export class AppComponent implements OnInit, OnDestroy {
       this._toggleNavigationVisibility();
     }
 
-    const _offtrailDialog = this._dialog.open(OfftrailDialogComponent, {
+    if (this._offtrailDialog) {
+      return;
+    }
+
+    this._offtrailDialog = this._dialog.open(OfftrailDialogComponent, {
       autoFocus: false,
       width: '65%',
       height: '45%',
       data: event.detail
     });
 
-    _offtrailDialog.afterClosed().subscribe(result => {
+    this._offtrailDialog.afterClosed().subscribe(result => {
 
       this._toggleNavigationVisibility();
 
@@ -245,6 +255,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
       const _simulate = !!(result);
       this._injector.get(LocationService).toggleTracking(_simulate);
+
+      this._offtrailDialog = null;
     });
   }
 

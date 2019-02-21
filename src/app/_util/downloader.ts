@@ -6,13 +6,18 @@ import { share } from 'rxjs/operators';
 // has type (for json/blob etc)
 // has caching (for large files)
 
+export class DownloaderStatus {
+  label: string;
+  data: object;
+}
+
 export class Downloader {
 
-  public meta:                        Observable<object>;
+  public meta:                        Observable<DownloaderStatus>;
   public downloadedFile:              any;
   public isActiveSubject:             BehaviorSubject<boolean>    = new BehaviorSubject<boolean>(false);
 
-  private _meta:                      BehaviorSubject<object>     = new BehaviorSubject<object>({});
+  private _meta:                      BehaviorSubject<DownloaderStatus>     = new BehaviorSubject<DownloaderStatus>(new DownloaderStatus());
   private _downloadRequest:           Subscription;
 
   constructor(
@@ -25,8 +30,7 @@ export class Downloader {
 
   public downloadFile(url: string, type: string, cache: boolean = true): void {
 
-    console.log(type);
-    this._setStatus('fetching file', null, false);
+    this._setStatus('fetching', null, false);
 
     let _headers = new HttpHeaders();
     _headers = _headers.append('Content-Type', 'application/json; charset=utf-8');
@@ -54,14 +58,10 @@ export class Downloader {
         this._setStatus('downloading', {percentage: _downloadPercentage, fileSize: _fileSize}, true);
 
       } else if (event instanceof HttpResponse) {
-
-        // TODO unzip & write to filesystem
+        console.log(event);
         this.downloadedFile = event.body;
-
-        this._setStatus('downloaded', {file: this.downloadedFile}, false);
-
+        this._setStatus('complete', {file: this.downloadedFile}, false);
       }
-
       // TODO error handling
     });
   }
@@ -70,14 +70,20 @@ export class Downloader {
 
     if (this._downloadRequest) {
       this._downloadRequest.unsubscribe();
+      this._downloadRequest = null;
     }
+
+    this.clearFile();
+
     this._setStatus('', null, false);
   }
 
   public clearFile(): void {
 
-    delete this.downloadedFile;
-    this._setStatus('download cleared', null, false);
+    if (this.downloadedFile) {
+      this.downloadedFile = null;
+    }
+    this._setStatus('cleared', null, false);
   }
 
   private _setStatus(message: string, data?: object, active?: boolean): void {
@@ -89,7 +95,7 @@ export class Downloader {
     if (message !== '') {
       this._meta.next({label: message, data: data});
     } else {
-      this._meta.next({});
+      this._meta.next(new DownloaderStatus());
     }
   }
 }

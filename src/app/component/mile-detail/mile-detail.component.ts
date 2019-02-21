@@ -14,6 +14,14 @@ export class MileDetailComponent implements OnInit {
   public visibleMilesLeaflet:     Array<Mile>;
   public routedMile:              number;
 
+  private _trail: object;
+
+  private _mapLineSegmentPadding = 1;
+  private _milesBehindExtra: number = 0;
+  private _milesAheadExtra: number = 0;
+  private _milesBehind: number = 2;
+  private _milesAhead: number = 1;
+
   constructor(
     private _route:               ActivatedRoute,
   ) {}
@@ -26,16 +34,26 @@ export class MileDetailComponent implements OnInit {
     this.routedMile = Number(this._route.snapshot.paramMap.get('id'));
 
     this._route.data.subscribe(result => {
-        const _milesBehind = 2;
-        const _milesAhead = 1;
 
-        // extra line segments to show, at start/end, since leaflet works with fixed zoom levels
-        // fitting map to markers/line segments using bounds isn't precise
-        const _mapLineSegmentPadding = 1;
+      // extra line segments to show, at start/end, since leaflet works with fixed zoom levels
+      // fitting map to markers/line segments using bounds isn't precise
 
-        this.visibleMilesList = this._getMilesSegmentData(result.data['trail'], _milesBehind, _milesAhead);
-        this.visibleMilesLeaflet = this._getMilesSegmentData(result.data['trail'], (_milesBehind + _mapLineSegmentPadding), (_milesAhead + _mapLineSegmentPadding));
-      });
+        this._trail = result.data['trail'];
+        this._isolateVisibleMiles();
+      }
+    );
+
+    const _self = this;
+
+    setInterval(function() {
+      _self.loadAhead();
+    }, 5000)
+  }
+
+  private _isolateVisibleMiles(): void {
+
+    this.visibleMilesList = this._getMilesSegmentData(this._trail, this._milesBehind + this._milesAheadExtra, this._milesAhead + this._milesAheadExtra);
+    this.visibleMilesLeaflet = this._getMilesSegmentData(this._trail, (this._milesBehind + this._milesAheadExtra + this._mapLineSegmentPadding), (this._milesAhead + this._milesAheadExtra + this._mapLineSegmentPadding));
   }
 
   // OTHER
@@ -47,5 +65,15 @@ export class MileDetailComponent implements OnInit {
     const _endIndex: number = (this.routedMile + milesAhead <= data.miles.length) ? this.routedMile + milesAhead : data.miles.length;
 
     return data.miles.slice(_startIndex, _endIndex);
+  }
+
+  public loadAhead(): void {
+    this._milesAheadExtra += 3;
+    this._isolateVisibleMiles();
+  }
+
+  public loadBehind(): void {
+    this._milesBehindExtra += 3;
+    this._isolateVisibleMiles();
   }
 }

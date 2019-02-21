@@ -37,6 +37,8 @@ import { MatIconModule } from '@angular/material/icon';
 
 // ionic capacitor
 import '@ionic/pwa-elements';
+import { File } from '@ionic-native/file/ngx';
+import { Zip } from '@ionic-native/zip/ngx';
 
 // display component
 import { ButtonComponent } from './display/button/button.component';
@@ -79,8 +81,11 @@ import { IconComponent } from './display/icon/icon.component';
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
+
+// services
 import { LoaderService } from './service/loader.service';
 import { LocalStorageService, NgxWebstorageModule } from 'ngx-webstorage';
+import { PlaygroundComponent } from './component/playground/playground.component';
 
 @NgModule({
   declarations: [
@@ -118,7 +123,8 @@ import { LocalStorageService, NgxWebstorageModule } from 'ngx-webstorage';
     InstructionsComponent,
     SettingsPanelComponent,
     DownloaderComponent,
-    LoaderOverlayComponent
+    LoaderOverlayComponent,
+    PlaygroundComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -151,7 +157,7 @@ import { LocalStorageService, NgxWebstorageModule } from 'ngx-webstorage';
     MatInputModule,
     MatCarouselModule
   ],
-  providers: [],
+  providers: [File, Zip],
   bootstrap: [AppComponent]
 })
 export class AppModule {

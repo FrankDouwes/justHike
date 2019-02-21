@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import {Component, Input, OnInit, ViewChild, OnChanges, SimpleChanges} from '@angular/core';
 import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 
 import { BehaviorSubject } from 'rxjs';
@@ -14,7 +14,7 @@ import { User } from '../../type/user';
   styleUrls: ['./poi-list.component.sass']
 })
 
-export class PoiListComponent extends LocationBasedComponent implements OnInit {
+export class PoiListComponent extends LocationBasedComponent implements OnInit, OnChanges {
 
   @ViewChild('poiList') container: CdkVirtualScrollViewport;
 
@@ -22,6 +22,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
 
   // user and pois combined in a single array
   public combinedData: BehaviorSubject<Array<any>> = new BehaviorSubject([]);
+  public timestamp: number;       // used to trigger reload
 
   private _staticPoisArray:     Array<any>  = [];
   private _userIndex:           number;
@@ -37,6 +38,28 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
 
     super.ngOnInit();
 
+    this.combinedData.subscribe(
+      data => {
+        this._scrollToUser();
+      });
+
+    this.setup();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+
+    if (changes.milesData) {
+      console.log('setup');
+      this.setup();
+    }
+  }
+
+
+
+  // SUBSCRIPTION HANDLERS
+
+  private setup(): void {
+
     this._staticPoisArray = [];
 
     const _self = this;
@@ -50,17 +73,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
       });
     }
 
-    this.combinedData.subscribe(
-      data => {
-        this._scrollToUser();
-      });
 
     const _userRef: User = (this.user !== undefined) ? this.user : super.createBlankUser();
     this._sortListData(this._staticPoisArray.concat(_userRef));
     this.onUserLocationChange(_userRef);
   }
-
-  // SUBSCRIPTION HANDLERS
 
   public onStatusChange(status: string): void {
 
@@ -146,5 +163,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit {
     this._userIndex = data.findIndex(poi => poi.type === 'user');
     this.combinedData.next(data);
     this.timestamp = new Date().getTime();
+    this.container.checkViewportSize();  // magically fixes everything! somehow...
+
   }
 }
