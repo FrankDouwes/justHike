@@ -45,9 +45,9 @@ export class MileDetailComponent implements OnInit {
 
     const _self = this;
 
-    setInterval(function() {
-      _self.loadAhead();
-    }, 5000)
+    // setInterval(function() {
+    //   _self.loadAhead();
+    // }, 5000)
   }
 
   private _isolateVisibleMiles(): void {
