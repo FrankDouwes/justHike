@@ -1,5 +1,13 @@
 # JustHike
 
+still a mess...
+
+uses capaciter, so > ng build > npx cap copy > npx cap open > select platform (iOS or Android)
+
+has 2 file downloader/parser/filesystem routines, neither work like I want em to work...
+
+probably missing some dependencies...
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
 ## Development server
