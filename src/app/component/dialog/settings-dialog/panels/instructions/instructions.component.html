@@ -1,0 +1,16 @@
+<!--<mat-tab label="•"> on/offline indicator </mat-tab>-->
+<!--<mat-tab label="•"> icons </mat-tab>-->
+<!--<mat-tab label="•"> syncing/updating </mat-tab>-->
+
+<mat-carousel>
+  <mat-carousel-slide
+    #matCarouselSlide
+    *ngFor="let slide of slides; let i = index"
+    [image]="slide.image"
+    maxWidth="auto"
+    loop="true"
+    slides="3"
+    hideIndicators=false
+    color="unset"
+  ></mat-carousel-slide>
+</mat-carousel>

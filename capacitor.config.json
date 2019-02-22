@@ -1,0 +1,7 @@
+{
+  "appId": "com.frankdouwes.hike",
+  "appName": "just hike",
+  "bundledWebRuntime": true,
+  "webDir": "dist",
+  "allowMixedContent": true
+}

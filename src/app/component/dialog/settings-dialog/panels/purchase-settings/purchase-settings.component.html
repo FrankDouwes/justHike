@@ -1,0 +1,58 @@
+<mat-card id="purchase-trails">
+
+  <h2>Purchase Trail Expansions</h2>
+
+  <mat-card-content>
+    <section class="purchase">
+      <div id="purchase-container">
+        <div class="sign" *ngFor="let trail of availableTrailList">
+          <img class="cap" src="../assets/images/sign-post/post-cap.png"/>
+          <div class="post">
+            <button mat-raised-button
+                    [value]="trail.id"
+                    (click)="onTrailPurchased(trail.id)"
+                    [disabled]="!trail.availableForPurchase">
+              <img class="marker" src="../assets/images/logos/{{trail.abbr}}.png" width="48" height="48"/>
+              <!--<div class="unavailable" *ngIf="!trail.availableForPurchase">Unavailable</div>-->
+              <!--<div class="free" *ngIf="trail.isFree">Free</div>-->
+              <p>{{trail.name}}
+                <!--<small>({{trail.length}} mi)</small>-->
+              </p>
+              <div>•</div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </mat-card-content>
+
+</mat-card>
+
+<mat-card id="trail-selector">
+
+  <h2>Select Trail</h2>
+
+  <mat-card-content>
+    <section>
+      <mat-form-field class="select-form-field">
+        <mat-select [value]="activeTrail.id" (selectionChange)="onTrailSelect($event)">
+          <mat-option *ngFor="let trail of purchasedTrailList" [value]="trail.id">
+            {{trail.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </section>
+
+    <img id="image"/>
+
+    <section id="download">
+      <!--<downloader *ngIf="activeTrail.snowDataSize" [trailAbbr]="activeTrail.abbr" [type]="json"  [label]="'Trail data'" [fileSize]="activeTrail.snowDataSize" [downloadPath]="basePath + 'trail.json'" [name]="activeTrail.abbr + '_trail'"></downloader>-->
+      <!--<downloader *ngIf="activeTrail.snowDataSize" [trailAbbr]="activeTrail.abbr" [type]="json" [label]="'Snowpack data'" [fileSize]="activeTrail.snowDataSize" [downloadPath]="basePath + 'snow.json'" [name]="activeTrail.abbr + '_snow'"></downloader>-->
+      <!--<hr/>-->
+      <downloader *ngIf="activeTrail.tileDataSize" [trailAbbr]="activeTrail.abbr" [label]="'Map image tiles'" [fileSize]="activeTrail.tileDataSize" [downloadPath]="basePath + version + '/tiles.zip'"  [name]="activeTrail.abbr + '_tiles'"></downloader>
+      <!--<downloader *ngIf="activeTrail.lineDataSize" [trailAbbr]="activeTrail.abbr" type="blob" [label]="'Map elevation tiles'" [fileSize]="activeTrail.lineDataSize" [downloadPath]="basePath + version + '/lines.zip'"  [name]="activeTrail.abbr + '_lines'"></downloader>-->
+    </section>
+
+  </mat-card-content>
+
+</mat-card>

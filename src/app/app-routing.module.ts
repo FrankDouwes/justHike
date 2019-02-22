@@ -24,19 +24,19 @@ const routes: Routes = [
       data: TrailResolverService
     }
   },
-  // {
-  //   path: '',
-  //   redirectTo: 'elevation-profile',
-  //   pathMatch: 'full'
-  // }
-  // // todo: temp playground component
   {
     path: '',
-    component: PlaygroundComponent,
-    resolve: {
-      data: TrailResolverService
-    }
+    redirectTo: 'elevation-profile',
+    pathMatch: 'full'
   }
+  // todo: temp playground component
+  // {
+  //   path: '',
+  //   component: PlaygroundComponent,
+  //   resolve: {
+  //     data: TrailResolverService
+  //   }
+  // }
 ];
 
 @NgModule({

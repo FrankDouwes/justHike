@@ -12,9 +12,10 @@ import { Subscription } from 'rxjs';
 import { Trail } from './type/trail';
 import { getTrailDataById } from './_util/trail';
 
+declare let downloader;
+
 // capacitor
 import { Plugins } from '@capacitor/core';
-// import {FsService} from './service/fs.service';
 import {FilesystemService} from './service/filesystem.service';
 const { SplashScreen } = Plugins;
 
@@ -29,6 +30,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   public showLoader      = true;    // show loader/spinner by default
   public navIsVisible    = true;    // nav visibility
+
+  public uri: string;
+  public uri2: string;
 
   private _downloadSubscription: Subscription;
   private _currentTrail: Trail;
@@ -54,11 +58,11 @@ export class AppComponent implements OnInit, OnDestroy {
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
       console.log('running on mobile device:', navigator.userAgent);
       document.addEventListener('deviceready', function() {
-        _self._onWebReady();
+        _self._onReady();
       });
     } else {
       console.log('running in browser');
-      this._onWebReady();
+      this._onReady();
     }
 
     // reload on storage timestamp change (user settings changed that require a reload)
@@ -100,7 +104,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // STARTUP
 
-  private _onWebReady(): void {
+  private _onReady(): void {
+
     // activate filesystem
     this._fileSystemService.initializeStorage();
 
@@ -142,7 +147,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     });
 
-    _versionDownloader.downloadFile(environment.appDomain + 'files/' + this._currentTrail.abbr + '/version.json', 'json', false);
+    _versionDownloader.downloadFile(environment.appDomain + 'files/' + this._currentTrail.abbr + '/version.json', false);
   }
 
   // update the snow data (using auto update setting)

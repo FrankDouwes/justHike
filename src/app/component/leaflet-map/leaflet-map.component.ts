@@ -97,12 +97,14 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     let _tileLayers: Array<any> = [];
 
     if (this.showMapTiles === true) {
-      // this.fileSystem.rootPath + this.trailGenerator.trailData.abbr + '/{x}/{y}.png'
 
-      const tilesFallback = fallbackLayer(this.fileSystem.rootPath + this.trailGenerator.trailData.abbr + '/{x}/{y}.png', {
+      // appends the ionic compatible root directory URL
+      const _url = this.fileSystem.rootPath + this.trailGenerator.trailData.abbr + '/{x}/{y}.png';
+
+      const tilesFallback = fallbackLayer(_url,
+      {
 
         // min & max zoom prp causes flickering
-
           maxNativeZoom: 15,
           fallbackTileUrl: 'http://caltopo.com/tile/mb_topo/{z}/{x}/{y}.png',
           errorTileUrl: './assets/images/missing.png',

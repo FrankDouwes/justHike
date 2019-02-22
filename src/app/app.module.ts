@@ -36,9 +36,8 @@ import { MatCarouselModule } from '@ngmodule/material-carousel';
 import { MatIconModule } from '@angular/material/icon';
 
 // ionic capacitor
-import '@ionic/pwa-elements';
+// import '@ionic/pwa-elements';
 import { File } from '@ionic-native/file/ngx';
-import { Zip } from '@ionic-native/zip/ngx';
 
 // display component
 import { ButtonComponent } from './display/button/button.component';
@@ -157,7 +156,7 @@ import { PlaygroundComponent } from './component/playground/playground.component
     MatInputModule,
     MatCarouselModule
   ],
-  providers: [File, Zip],
+  providers: [File],
   bootstrap: [AppComponent]
 })
 export class AppModule {

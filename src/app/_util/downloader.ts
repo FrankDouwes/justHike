@@ -1,10 +1,13 @@
 import { HttpClient, HttpEventType, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { share } from 'rxjs/operators';
+import {getExtensionFromString} from './file';
+import {FilesystemService} from '../service/filesystem.service';
 
 // file downloader
-// has type (for json/blob etc)
+// sets type using file extension, currently supports json & blob
 // has caching (for large files)
+// has saving (to filesystem), including auto unzipping
 
 export class DownloaderStatus {
   label: string;
@@ -14,13 +17,14 @@ export class DownloaderStatus {
 export class Downloader {
 
   public meta:                        Observable<DownloaderStatus>;
-  public downloadedFile:              any;
+  public downloadedFile:              any;      // only available if file is not being saved
   public isActiveSubject:             BehaviorSubject<boolean>    = new BehaviorSubject<boolean>(false);
 
   private _meta:                      BehaviorSubject<DownloaderStatus>     = new BehaviorSubject<DownloaderStatus>(new DownloaderStatus());
   private _downloadRequest:           Subscription;
 
   constructor(
+    private _filesystemService:       FilesystemService,
     private _httpClient:              HttpClient
   ) {
 
@@ -28,7 +32,14 @@ export class Downloader {
     this.meta  = this._meta.asObservable().pipe(share());
   }
 
-  public downloadFile(url: string, type: string, cache: boolean = true): void {
+  // savePath is the location to save the file, blank == no save, allows renaming (so 'download.zip' can be saved as 'DEMO/test-file.zip')
+  public downloadFile(url: string, cache: boolean = true, savePath: string = null): void {
+
+    const _extension = getExtensionFromString(url);
+
+    const _type: string = (_extension === 'json') ? _extension : 'blob';
+
+    console.log(_type);
 
     this._setStatus('fetching', null, false);
 
@@ -44,7 +55,7 @@ export class Downloader {
     const req = new HttpRequest('GET', url, {
       reportProgress: true,
       headers: _headers,
-      responseType: type
+      responseType: _type
     });
 
 
@@ -58,11 +69,22 @@ export class Downloader {
         this._setStatus('downloading', {percentage: _downloadPercentage, fileSize: _fileSize}, true);
 
       } else if (event instanceof HttpResponse) {
-        console.log(event);
-        this.downloadedFile = event.body;
-        this._setStatus('complete', {file: this.downloadedFile}, false);
+
+
+        if (savePath) {
+
+          console.log('Blob size', event.body['size']);
+
+          this._saveFile(event.body, savePath);
+
+        } else {
+          this.downloadedFile = event.body;
+          this._setStatus('complete', {file: this.downloadedFile}, false);
+        }
       }
-      // TODO error handling
+    }, error => {
+      this.cancelDownload();
+      this._setStatus('error', error, false);
     });
   }
 
@@ -85,6 +107,20 @@ export class Downloader {
     }
     this._setStatus('cleared', null, false);
   }
+
+
+  // FILE SAVING
+
+  private _saveFile(data: any, pathName: string):void {
+
+    console.log('DOWNLOADER SAVE FILE', data);
+
+    this._filesystemService.saveFile(data, null, pathName, function(result) {
+      console.log(result);
+    });
+  }
+
+  // STATUS
 
   private _setStatus(message: string, data?: object, active?: boolean): void {
 

@@ -1,6 +1,7 @@
 import * as L from 'leaflet';
 import * as Util from 'leaflet/src/core/Util';
 import * as Browser from 'leaflet/src/core/Browser';
+import {FilesystemService} from '../service/filesystem.service';
 
 
 // unused: google elevation shade (+ labels)
@@ -170,7 +171,6 @@ export function mapTiles (): Array<any> {
 const FallbackTileLayer = L.TileLayer.extend({
 
   createTile: function (coords, done) {
-
     let _tile = L.TileLayer.prototype.createTile.call(this, coords, done);
     _tile.setAttribute('coords', JSON.stringify(coords));
     _tile.setAttribute('state', 'default');
@@ -182,6 +182,8 @@ const FallbackTileLayer = L.TileLayer.extend({
 
     const _tileState = tile.getAttribute('state');
     const _tileCoords = JSON.parse(tile.getAttribute('coords'));
+
+    console.log(tile.src);
 
     if (_tileState === 'default') {
       tile.setAttribute('state', 'fallback');
