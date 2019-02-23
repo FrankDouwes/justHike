@@ -17,7 +17,6 @@ import {User} from '../../../../type/user';
 import {Poi} from '../../../../type/poi';
 
 declare const SVG: any;    // fixes SVGjs bug
-import 'svg.filter.js';
 
 import { svgPath } from '../../../../_util/smoothLine';
 import { isPrime, normalizeElevation } from '../../../../_util/math';
