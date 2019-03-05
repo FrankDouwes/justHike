@@ -62,6 +62,10 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
 
+    if (!this.trailData) {
+      return;
+    }
+
     // show 100 miles
     this._segments = (Math.ceil(this.trailData.length) / this._sectionLength < 1) ? 1 : Math.ceil(this.trailData.length) / this._sectionLength;
 

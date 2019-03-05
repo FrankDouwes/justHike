@@ -16,5 +16,9 @@ getTestBed().initTestEnvironment(
 );
 // Then we find all the tests.
 const context = require.context('./', true, /\.spec\.ts$/);
+
+// test a single component
+// const context = require.context('./', true, /poi-list.component\.spec\.ts$/);
+
 // And load the modules.
 context.keys().map(context);

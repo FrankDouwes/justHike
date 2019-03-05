@@ -49,7 +49,7 @@ export class PurchaseSettingsComponent extends SettingsPanelComponent implements
     this.purchasedTrailList = [];
 
     environment.TRAILS.forEach(function(trail, index) {
-      if (_self._purchasedTrails.indexOf(trail.id) === -1 && trail.abbr !== 'DEMO') {
+      if (_self._purchasedTrails && _self._purchasedTrails.indexOf(trail.id) === -1 && trail.abbr !== 'DEMO') {
         _self.availableTrailList.push(trail);
       } else {
         _self.purchasedTrailList.push(trail);

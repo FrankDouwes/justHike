@@ -36,10 +36,12 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
   constructor() {
 
     // since we're extending this class, we shouldn't inject through the constructor props
-    this.locationService = LocationService.injector.get(LocationService);
-    this.localStorage = LocationService.injector.get(LocalStorageService);
-    this.trailGenerator = LocationService.injector.get(TrailGeneratorService);
-    this.fileSystem = LocationService.injector.get(FilesystemService);
+    if (LocationService.injector) {
+      this.locationService = LocationService.injector.get(LocationService);
+      this.localStorage = LocationService.injector.get(LocalStorageService);
+      this.trailGenerator = LocationService.injector.get(TrailGeneratorService);
+      this.fileSystem = LocationService.injector.get(FilesystemService);
+    }
 
     this.timestamp = new Date().getTime();
 
@@ -52,6 +54,12 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
   // LIFECYCLE
 
   ngOnInit() {
+
+    // why attempt location based stuff if there's no location service?
+    if (!this.locationService) {
+      //throw new Error('location service error!');
+      return;
+    }
 
     // set up subscriptions
     this._locationSubscription = this.locationService.location.subscribe(

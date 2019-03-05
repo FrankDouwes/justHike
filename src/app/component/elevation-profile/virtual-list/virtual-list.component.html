@@ -1,6 +1,8 @@
 <div id="wrap">
 
   <cdk-virtual-scroll-viewport
+    *ngIf="trailData"
+
     #scrollViewport
 
     itemSize="{{itemWidth}}"

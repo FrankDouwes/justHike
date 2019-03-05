@@ -1,4 +1,5 @@
 import {Component, isDevMode, OnInit} from '@angular/core';
+import { VirtualListComponent } from './virtual-list/virtual-list.component';
 import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
 import {Snow} from '../../type/snow';
@@ -19,8 +20,7 @@ export class ElevationProfileComponent implements OnInit {
 
   constructor(
     private _route: ActivatedRoute
-  ) {
-  }
+  ) {}
 
 
 

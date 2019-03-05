@@ -1,9 +1,8 @@
 import {Injectable, NgZone} from '@angular/core';
 import {Plugins, FilesystemDirectory, FilesystemEncoding, ReaddirResult} from '@capacitor/core';
 import {convertToIonicUrl} from '../_util/file';
-import {DirectoryEntry} from '@ionic-native/file';
-import {FileEntry, FileError, File} from '@ionic-native/file/ngx';
-const { Filesystem } = Plugins;
+import {FileEntry, FileError, File, DirectoryEntry} from '@ionic-native/file/ngx';
+// const { Filesystem } = Plugins;
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +15,7 @@ export class FilesystemService {
   public rootDir;
   public isStorageAvailable: boolean;
 
-  //private _file: File
-  constructor() {}
+  constructor(private _file: File) {}
 
   // set root
   public initializeStorage(): void {
@@ -131,7 +129,6 @@ export class FilesystemService {
 
       _self._createFile(directory, filename, function(fileEntry: FileEntry) {
 
-        console.log('data', data.toString());
         _self._writeFile(fileEntry, data, callback);
 
       });
@@ -158,6 +155,42 @@ export class FilesystemService {
   // write to a fileEntry
   private _writeFile(file: FileEntry, data: Blob, callback: Function) {
 
+    // this._file.writeExistingFile('test', 'tiles.zip', data).then(
+    //   function(result) {
+    //     console.log('AAAA', result);
+    //   }
+    // ).catch(function(error) {
+    //   console.log('BBBB', error);
+    // });
+
+    file.createWriter(function (fileWriter) {
+
+      fileWriter.onwriteend = function() {
+        callback('success');
+      };
+
+      fileWriter.onprogress = function(p) {
+        console.log('progress', p.toString());
+      };
+
+      fileWriter.onerror = function (e) {
+        callback('error');
+        console.log('Failed file write: ' + e);
+      };
+
+      fileWriter.write(data);
+    });
+
+
+    // Filesystem.appendFile({
+    //   path: file.toURL(),
+    //   data: data,
+    //   directory: FilesystemDirectory.Documents,
+    // }).then(function(result) {
+    //   console.log(result);
+    // }).catch(function(error) {
+    //   console.log(append)
+    // })
 
     // Filesystem.writeFile({
     //   data: data.toString(),
@@ -199,23 +232,23 @@ export class FilesystemService {
     // }
 
 
-    // file.createWriter(function (fileWriter) {
-    //
-    //   fileWriter.onwriteend = function() {
-    //     callback('success');
-    //   };
-    //
-    //   fileWriter.onprogress = function(p) {
-    //     console.log('progress', p.toString());
-    //   };
-    //
-    //   fileWriter.onerror = function (e) {
-    //     callback('error');
-    //     console.log('Failed file write: ' + e);
-    //   };
-    //
-    //   fileWriter.write(data);
-    // });
+    file.createWriter(function (fileWriter) {
+
+      fileWriter.onwriteend = function() {
+        callback('success');
+      };
+
+      fileWriter.onprogress = function(p) {
+        console.log('progress', p.toString());
+      };
+
+      fileWriter.onerror = function (e) {
+        callback('error');
+        console.log('Failed file write: ' + e);
+      };
+
+      fileWriter.write(data);
+    });
   }
 
   // returns the file entry

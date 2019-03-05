@@ -1,6 +1,5 @@
 import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'settings-dialog',
@@ -28,9 +27,12 @@ export class SettingsDialogComponent implements OnInit {
   ) {
 
     _dialogRef.disableClose = true; // disable default close operation
-    _dialogRef.backdropClick().subscribe(result => {
-      _dialogRef.close(this._settingsChanged);
-    });
+
+    if (_dialogRef.backdropClick) {
+        _dialogRef.backdropClick().subscribe(result => {
+        _dialogRef.close(this._settingsChanged);
+      });
+    }
   }
 
   ngOnInit(): void {}

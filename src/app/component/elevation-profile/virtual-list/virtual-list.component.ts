@@ -20,9 +20,7 @@ import {OHLC} from '../../../type/ohlc';
 import {Mile} from '../../../type/mile';
 import {Trail} from '../../../type/trail';
 import {LocationBasedComponent} from '../../../display/location-based/location-based.component';
-import {Poi} from '../../../type/poi';
 import {User} from '../../../type/user';
-import {Location} from '@angular/common';
 
 @Component({
   selector: 'virtual-list-component',
@@ -76,7 +74,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     super.ngOnInit();
 
-    this._initialIndex = Number(this._route.snapshot.queryParams['id']);
+    this._initialIndex = (this._route.snapshot) ? Number(this._route.snapshot.queryParams['id']) : 0;
     this._setupEventListeners();
   }
 
@@ -85,7 +83,9 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     const _self = this;
 
     const _delay = setTimeout(function() {
-      _self.scrollViewport.scrollToIndex(_self._initialIndex, 'auto');
+      if(_self._initialIndex) {
+        _self.scrollViewport.scrollToIndex(_self._initialIndex, 'auto');
+      }
     }, 1);
   }
 
@@ -93,7 +93,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     if (changes.scrollTo) {
       if (changes.scrollTo.currentValue) {
-        if (this.scrollViewport) {
+        if (this.scrollViewport && this._currentIndex) {
           this._currentIndex = Math.floor(this.scrollViewport.getDataLength() * changes.scrollTo.currentValue);
           this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
         }
@@ -112,7 +112,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   public onUserLocationChange(user: User): void {
 
     // if we're switching to tracking
-    if (user && this._status !== 'tracking' && this.status === 'tracking' && this.scrollViewport) {
+    if (user && this._status !== 'tracking' && this.status === 'tracking' && this.scrollViewport && user.nearestMileId) {
       this.scrollViewport.scrollToIndex(user.nearestMileId - 1, 'auto');
     }
 

@@ -31,7 +31,7 @@ export class MileDetailComponent implements OnInit {
   ngOnInit(): void {
 
     // get miles data based on route id
-    this.routedMile = Number(this._route.snapshot.paramMap.get('id'));
+    this.routedMile = (this._route.snapshot) ? Number(this._route.snapshot.paramMap.get('id')) : 0;
 
     this._route.data.subscribe(result => {
 

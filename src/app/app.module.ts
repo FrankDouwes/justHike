@@ -68,13 +68,13 @@ import { InstructionsComponent } from './component/dialog/settings-dialog/panels
 import { SettingsPanelComponent } from './display/settings-panel/settings-panel.component';
 import { DownloaderComponent } from './component/dialog/settings-dialog/panels/purchase-settings/downloader/downloader.component';
 import { LoaderOverlayComponent } from './component/loader-overlay/loader-overlay.component';
+import { FaSamplerComponent } from './component/fa-sampler/fa-sampler.component';
+import { FaIconComponent } from './component/fa-sampler/fa-icon/fa-icon.component';
+import { IconComponent } from './display/icon/icon.component';
 
 // dialog
 import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
 import { SettingsDialogComponent } from './component/dialog/settings-dialog/settings-dialog.component';
-import { FaSamplerComponent } from './component/fa-sampler/fa-sampler.component';
-import { FaIconComponent } from './component/fa-sampler/fa-icon/fa-icon.component';
-import { IconComponent } from './display/icon/icon.component';
 
 // pipes
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';

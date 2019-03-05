@@ -23,11 +23,11 @@ export class MarkerDialogComponent implements OnInit {
     let _self = this;
 
     // generate poiTypes (icons)
-    const _poiStrArr: Array<string> = this.data['type'].split(", ");
+    const _poiStrArr: Array<string> = this.data.type.split(", ");
 
     _poiStrArr.forEach(function(poi, index) {
 
-      let _poiData = getPoiTypeByType(poi);
+      const _poiData = getPoiTypeByType(poi);
 
       if (_poiData !== undefined) {
 

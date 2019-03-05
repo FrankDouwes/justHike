@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges } from '@angular/core';
+import {Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges, ElementRef, ViewChild} from '@angular/core';
 import { Mile } from '../../type/mile';
 import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
@@ -20,6 +20,8 @@ import { Snowpoint } from '../../type/snow';
   styleUrls: ['./leaflet-map.component.sass']
 })
 export class LeafletMapComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges {
+
+  @ViewChild('leaflet') leaflet: ElementRef;
 
   // data
   @Input() name: String;
@@ -61,11 +63,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     super.ngOnInit();
 
     let _mileIds: Array<number> = [];
-    this.milesData.forEach(function(mile: Mile) {
-      _mileIds.push(mile.id);
-    })
-
-    this._snowData = this._snowGenerator.getSnowForMile(_mileIds);
+    if (this.milesData) {
+      this.milesData.forEach(function (mile: Mile) {
+        _mileIds.push(mile.id);
+      })
+      this._snowData = this._snowGenerator.getSnowForMile(_mileIds);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -93,6 +96,11 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
 
   private _setupMap(): void {
+
+    // no data, no map
+    if (!this.trailGenerator.trailData) {
+      return;
+    }
 
     let _tileLayers: Array<any> = [];
 
