@@ -11,7 +11,8 @@ export class SettingsDialogComponent implements OnInit {
   @ViewChild('contentPanel') contentPanel: ElementRef;
 
   public listItems: Array<object> = [
-    {title: 'Trail Data', panel: 'purchase'},
+    {title: 'Purchase', panel: 'purchase'},
+    {title: 'Trail Data', panel: 'trail'},
     {title: 'General Settings', panel: 'general'},
     // {title: 'Elevation Profile', panel: 'elevation'},
     // {title: 'Mile Overview', panel: 'detail'},

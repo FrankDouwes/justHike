@@ -4,7 +4,7 @@ import { OHLC, calculateOHLC } from '../type/ohlc';
 import { Waypoint } from '../type/waypoint';
 import { Mile } from '../type/mile';
 import { Poi } from '../type/poi';
-import { Trail } from '../type/trail';
+import {Trail, TrailMeta} from '../type/trail';
 import { environment } from '../../environments/environment.prod';
 import { isDevMode } from '@angular/core';
 import { LoaderService } from './loader.service';
@@ -18,7 +18,7 @@ import PositionAsDecimal = geolib.PositionAsDecimal;
 })
 export class TrailGeneratorService {
 
-  public trailData: Trail;
+  private _trailData: Trail;
 
   private _tolerance = 0.0001;
   private _tree: Array<Array<Waypoint>>;
@@ -26,14 +26,27 @@ export class TrailGeneratorService {
   constructor(
     private _loaderService: LoaderService,
     private _localStorage: LocalStorageService
-  ) { }
+  ) {}
 
 
-  public generateMiles(trail: Trail, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number): Trail {
+  public setTrailData(data: Trail) {
+    this._trailData = data;
+  }
 
-    this.trailData = trail;
+  public getTrailData(): Trail {
+    return this._trailData;
+  }
 
-    trail.direction = direction;
+  public getTrailVersion(): string {
+    return this._trailData.version;
+  }
+
+  public generateMiles(trail: TrailMeta, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number): Trail {
+
+    let trailData = JSON.parse(JSON.stringify(trail));
+
+    trailData.direction = direction;
+
     // // sobo reversal
     if (direction === 1) {
       waypoints.reverse();
@@ -42,7 +55,7 @@ export class TrailGeneratorService {
 
     // 1. optimise waypoints
     const _optimisedWaypoints: Array<Waypoint> = this._simplify(waypoints, this._tolerance);
-    trail.waypoints = _optimisedWaypoints;
+    trailData.waypoints = _optimisedWaypoints;
 
     this._loaderService.showMessage('optimised waypoints');
 
@@ -54,19 +67,19 @@ export class TrailGeneratorService {
       flatPoints.push({latitude: _optimisedWaypoints[i].latitude, longitude: _optimisedWaypoints[i].longitude});
     }
 
-    trail.calcLength = geolib.getPathLength(flatPoints as Array<PositionAsDecimal>) / environment.MILE;
-    trail.scale = (trail.length / trail.calcLength);
-    trail.elevationRange = calculateOHLC(trail.waypoints, {start: 0, end: waypoints.length - 1});
+    trailData.calcLength = geolib.getPathLength(flatPoints as Array<PositionAsDecimal>) / environment.MILE;
+    trailData.scale = (trailData.length / trailData.calcLength);
+    trailData.elevationRange = calculateOHLC(trailData.waypoints, {start: 0, end: waypoints.length - 1});
 
     this._loaderService.showMessage('calculated trail properties');
 
     // 3. split waypoints into miles
-    trail.miles = this._createMiles(_optimisedWaypoints, pois, trail.scale);
+    trailData.miles = this._createMiles(_optimisedWaypoints, trailData.scale);
 
     this._loaderService.showMessage('created miles');
 
     // 4a. generate waypoint tree for easy lookups
-    const flatMileCoordinates: Array<Waypoint> = trail.miles.map(function(elem) {
+    const flatMileCoordinates: Array<Waypoint> = trailData.miles.map(function(elem) {
         return elem.centerpoint as Waypoint;
       }
     );
@@ -76,20 +89,23 @@ export class TrailGeneratorService {
     this._loaderService.showMessage('created mile tree');
 
     // 4b. link pois to trail waypoints
-    trail.waterSources = [];
-    this._linkPoisToMiles(pois, trail.miles);
-
-    this._loaderService.showMessage('linked pois to miles');
-
-    this.trailData = trail;
+    trailData.waterSources = [];
+    if (pois) {
+      this._linkPoisToMiles(pois, trailData.miles);
+      this._loaderService.showMessage('linked pois to miles');
+    } else {
+      this._loaderService.showMessage('no pois');
+    }
 
     if (isDevMode() && environment.dowloadParsedData) {
       const _direction: string = (direction === 0) ? 'nobo' : 'sobo';
-      saveFileAs(trail, this.trailData.abbr + '-trail-' + _direction + '.json');
+      saveFileAs(trail, trailData.abbr + '-trail-' + _direction + '.json');
       this._loaderService.showMessage('downloaded file');
     }
 
-    return trail;
+    this._trailData = trailData;
+
+    return trailData;
   }
 
   // create overlapping miles (first/last waypoint overlap, insert 2 new points at 0 & 100%
@@ -103,7 +119,7 @@ export class TrailGeneratorService {
   //                                            */------/*                    (mile)
   //                                                       x             (/arr)
 
-  private _createMiles(waypoints: Array<object>, pois: Array<Poi>, scale: number): Array<Mile> {
+  private _createMiles(waypoints: Array<object>, scale: number): Array<Mile> {
 
     this._loaderService.showMessage('create miles');
 
@@ -132,6 +148,10 @@ export class TrailGeneratorService {
     for (let i = 0; i < _wayPointsLength; i++) {
 
       const _waypoint: Waypoint = waypoints[i] as Waypoint;
+
+      if (!_waypoint.elevation) {
+        _waypoint.elevation = 0;
+      }
 
       _waypoint.elevation = _waypoint.elevation / environment.FOOT;
 
@@ -250,7 +270,7 @@ export class TrailGeneratorService {
       }
     }
 
-    return {id: Number(nearestMile['key']), distance: nearestMile['distance'], mile: this.trailData.miles[nearestMile['key']]};
+    return {id: Number(nearestMile['key']), distance: nearestMile['distance'], mile: this._trailData.miles[nearestMile['key']]};
   }
 
 
@@ -299,7 +319,7 @@ export class TrailGeneratorService {
       _nearestMile.hasWater = _nearestMile.hasEscape = _nearestMile.hasCamp = _nearestMile.hasOther = false;
 
       if (String(poi.type).includes('water')) {
-        this.trailData.waterSources.push(poi);
+        this._trailData.waterSources.push(poi);
         _nearestMile.hasWater = true;
       } else if (String(poi.type).includes('highway')) {
         _nearestMile.hasEscape = true;

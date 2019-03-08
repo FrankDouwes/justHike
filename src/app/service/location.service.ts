@@ -5,6 +5,8 @@ import { TrailGeneratorService } from './trail-generator.service';
 
 // ionic capacitor
 import { Plugins } from '@capacitor/core';
+import {Waypoint} from '../type/waypoint';
+import {environment} from '../../environments/environment.prod';
 const { Geolocation } = Plugins;
 
 @Injectable({
@@ -128,14 +130,25 @@ export class LocationService {
 
     if (typeof location === 'number') {
 
-      // get first waypoints of mile
-      const _firstWaypoint = this._trailGenerator.trailData.miles[location].waypoints[0];
+      const _waypoints: Array<Waypoint> = this._trailGenerator.getTrailData().miles[Math.floor(location)].waypoints;
+
+      let _nearestPoint: Waypoint = _waypoints[1];
+
+      const _mileInMeters: number = location * environment.MILE;
+
+      // find nearest 2 waypoints, find out which is closest
+      for (var i = 0; i < _waypoints.length; i ++) {
+        if (_waypoints[i].distanceTotal <= _mileInMeters && _waypoints[i + 1].distanceTotal >= _mileInMeters) {
+          _nearestPoint = (Math.abs(_waypoints[i].distanceTotal - _mileInMeters) < Math.abs(_waypoints[i + 1].distanceTotal - _mileInMeters)) ? _waypoints[i] : _waypoints[i + 1];
+          break;
+        }
+      }
 
       location = {
         coords: {
-          latitude: _firstWaypoint.latitude,
-          longitude: _firstWaypoint.longitude,
-          altitude: _firstWaypoint.elevation,
+          latitude: _nearestPoint.latitude,
+          longitude: _nearestPoint.longitude,
+          altitude: _nearestPoint.elevation,
         },
         timestamp: new Date().getTime()
       };

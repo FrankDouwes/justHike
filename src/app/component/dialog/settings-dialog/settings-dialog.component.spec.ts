@@ -23,7 +23,7 @@ import {MatCarouselModule} from '@ngmodule/material-carousel';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import {FormsModule} from '@angular/forms';
-import {DownloaderComponent} from './panels/purchase-settings/downloader/downloader.component';
+import {DownloaderComponent} from './panels/trail-settings/downloader/downloader.component';
 import {FilesizePipe} from '../../../pipe/filesize.pipe';
 
 describe('SettingsDialogComponent', () => {

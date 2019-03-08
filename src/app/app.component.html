@@ -1,5 +1,5 @@
 <fa-sampler></fa-sampler>
 <router-outlet>
   <loader-overlay [showLoader]="showLoader" #loader></loader-overlay>
-  <navigation-component [ngClass]="(navIsVisible) ? 'showNav' : 'hideNav'" (navEvent)="onNavEvent($event)"></navigation-component>
+  <navigation-component [ngClass]="(navIsVisible) ? 'showNav' : 'hideNav'" (navEvent)="onNavEvent($event)" [appInitialized]="initialized"></navigation-component>
 </router-outlet>

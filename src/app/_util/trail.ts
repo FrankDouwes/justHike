@@ -1,13 +1,33 @@
-import {environment} from '../../environments/environment.prod';
-import {Trail} from '../type/trail';
+import {Trail, TrailMeta} from '../type/trail';
 
-export function getTrailDataById(id: Number): Trail {
+let trails: Array<TrailMeta>;
 
-  for (const key in environment.TRAILS) {
-    if (environment.TRAILS[Number(key)].id === id) {
-      return environment.TRAILS[key] as Trail;
+export function setTrailMetaData(data: Array<TrailMeta>) {
+  trails = data;
+  console.log('trail data set');
+}
+
+export function getTrailMetaDataById(id: Number): TrailMeta {
+
+  if (!trails) {
+    throw new Error('no trails available!');
+  }
+
+  for (const key in trails) {
+    if (trails[key].id === id) {
+      return trails[key] as TrailMeta;
     }
   }
 
   throw new Error('Trail not found!');
+}
+
+// trail meta does not contain a name, it does contain abbr.
+export function getTrailMetaDataByAbbr(abbr: string): Trail {
+
+  if (!trails) {
+    throw new Error('no trails available!');
+  }
+
+  return trails[abbr] as Trail;
 }

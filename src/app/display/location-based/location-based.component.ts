@@ -120,7 +120,7 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
             detail: {
               distance: this._user.waypoint.distance,
               anchorPointDistance: (this._user.anchorPoint.distanceTotal / environment.MILE).toFixed(2),
-              trailLength: this.trailGenerator.trailData.miles.length
+              trailLength: this.trailGenerator.getTrailData().miles.length
             }
           });
 

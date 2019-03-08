@@ -1,13 +1,14 @@
 <div id="container">
+
   <display-button class="button back {{this.visibleClass}}" label="" icon="arrow-left" (click)="onBackClick()"></display-button>
 
   <mat-spinner *ngIf="isDownloading"></mat-spinner>
 
   <div class="right {{this.oppositeClass}}">
-    <locator></locator>
+    <locator-button></locator-button>
   </div>
 
   <div class="right {{this.oppositeClass}}">
-    <display-button class="button settings" label="" icon="cog" (click)="onSettingsClick()"></display-button>
+    <settings-button (click)="onSettingsClick()" [updateAvailable]="updateAvailable" [isDownloading]="isDownloading"></settings-button>
   </div>
 </div>

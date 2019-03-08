@@ -7,7 +7,7 @@ import {NavigationComponent} from './component/navigation/navigation.component';
 import {FaIconComponent} from './component/fa-sampler/fa-icon/fa-icon.component';
 import {ButtonComponent} from './display/button/button.component';
 import {MatDialog, MatDialogModule, MatProgressSpinnerModule} from '@angular/material';
-import {LocatorComponent} from './component/locator/locator.component';
+import {LocatorComponent} from './component/navigation/locator/locator.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {IconComponent} from './display/icon/icon.component';
 import {LeafletMapComponent} from './component/leaflet-map/leaflet-map.component';

@@ -3,5 +3,6 @@
   "appName": "just hike",
   "bundledWebRuntime": true,
   "webDir": "dist",
-  "allowMixedContent": true
+  "allowMixedContent": true,
+  "webContentsDebuggingEnabled": true
 }

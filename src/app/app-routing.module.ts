@@ -7,21 +7,21 @@ import { ElevationProfileComponent } from './component/elevation-profile/elevati
 import {PlaygroundComponent} from './component/playground/playground.component';
 
 // resolvers
-import { TrailResolverService } from './service/trail-resolver.service';
+import {SequentialResolverService} from './service/sequential-resolver.service';
 
 const routes: Routes = [
   {
     path: 'elevation-profile',
     component: ElevationProfileComponent,
     resolve: {
-      data: TrailResolverService
+      data: SequentialResolverService
     }
   },
   {
     path: 'detail/:id',
     component: MileDetailComponent,
     resolve: {
-      data: TrailResolverService
+      data: SequentialResolverService
     }
   },
   {

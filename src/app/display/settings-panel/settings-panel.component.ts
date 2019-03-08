@@ -3,7 +3,7 @@ import {Component, EventEmitter, OnChanges, OnDestroy, OnInit, Output, SimpleCha
 @Component({
   selector: 'settings-panel',
   templateUrl: './settings-panel.component.html',
-  styleUrls: ['./settings-panel.component.scss']
+  styleUrls: ['./settings-panel.component.sass']
 })
 export class SettingsPanelComponent implements OnInit, OnDestroy {
 

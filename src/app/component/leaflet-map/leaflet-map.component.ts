@@ -98,7 +98,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _setupMap(): void {
 
     // no data, no map
-    if (!this.trailGenerator.trailData) {
+    if (!this.trailGenerator.getTrailData()) {
       return;
     }
 
@@ -107,7 +107,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     if (this.showMapTiles === true) {
 
       // appends the ionic compatible root directory URL
-      const _url = this.fileSystem.rootPath + this.trailGenerator.trailData.abbr + '/{x}/{y}.png';
+      const _url = this.fileSystem.rootPath + this.trailGenerator.getTrailData().abbr + '/{x}/{y}.png';
 
       const tilesFallback = fallbackLayer(_url,
       {
@@ -307,10 +307,16 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       _markerGroup.addTo(this._map);
 
       this._map.fitBounds(L.latLngBounds(this._bounds).pad(0.1));
-    } else {
+
+    } else if (this.user) {
 
       // set map to center on centerpoint of selected mile
       this._map.setView([this.user.anchorPoint.latitude, this.user.anchorPoint.longitude], 16);
+
+    } else {
+
+      this._map.fitBounds(L.latLngBounds(this._bounds).pad(0.1));
+
     }
 
     // set the panning bounds

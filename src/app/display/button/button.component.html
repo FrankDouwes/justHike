@@ -1,5 +1,8 @@
 <button>
-  {{label}}
   <display-icon *ngIf="this.poiTypes" [data]="this.poiTypes"></display-icon>
-  <fa-icon *ngIf="this.icon" [icon]="icon" size="2x" color="#00F"></fa-icon>
+  <fa-layers [fixedWidth]="true">
+    <fa-icon *ngIf="this.icon" [icon]="icon" size="2x" [classes]="['icon']"></fa-icon>
+    <fa-icon *ngIf="this.badge && this.badge !== 'spinner'" [icon]="badge" size="2x" [classes]="['badge']"></fa-icon>
+    <fa-icon *ngIf="this.badge && this.badge === 'spinner'" icon="spinner" size="2x" [classes]="['spinner']" [pulse]="true"></fa-icon>
+  </fa-layers>
 </button>

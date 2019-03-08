@@ -1,5 +1,6 @@
 export class Snow {
   trailId: number;
+  version: string;
   abbr: string;
   direction: number;
   snowMiles: Array<Array<Snowpoint>>;

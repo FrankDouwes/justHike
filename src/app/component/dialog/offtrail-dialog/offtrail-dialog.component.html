@@ -1,18 +1,25 @@
 <div id="center-icon" >
-  <display-button class="button" label="" icon="map-marked-alt" routerLink=""></display-button>
 </div>
 
 <div id="panel">
   <div id="top">
-    <h2 fittext mat-dialog-title>You are currently</h2>
-    <h2>{{ data['distance'] | distance:'meters':'miles':true}}.</h2>
+    <display-button class="button" label="" icon="map-marked-alt" routerLink=""></display-button>
+    <div id="meta">
+      <h2>You are currently</h2>
+      <h3>{{ data['distance'] | distance:'meters':'miles':true}}.</h3>
+    </div>
   </div>
   <div id="bottom">
     <mat-card-content class="form-container">
       <mat-form-field>
         <input matInput placeholder="simulate mile" value="{{simulatedMile || 0}}" type="tel" min=0 max={{trailLength}} #simulate>
       </mat-form-field>
-      <button mat-button (click)="onClick($event)">OK</button>
+      <div id="button-group">
+        <span>
+          <button mat-stroked-button (click)="onCancel()">Cancel</button>
+          <button mat-stroked-button color="primary" (click)="onOk()">OK</button>
+        </span>
+      </div>
     </mat-card-content>
   </div>
 </div>

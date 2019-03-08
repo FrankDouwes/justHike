@@ -28,7 +28,7 @@ export function convertToIonicUrl(fileUrl: string): string {
   const _window: any = window;
 
   if (!_window.Ionic || !_window.Ionic.WebView.convertFileSrc) {
-    alert('ionic is being a pain, wait for deviceready');
+    // alert('ionic is being a pain, wait for deviceready');
     return;
   }
 

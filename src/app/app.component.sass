@@ -1,13 +1,15 @@
-.showNav
-  margin-top: 0
-  visibility: visible
-  transition: visibility 200ms linear, margin-top 100ms ease-out
+\:host
+  .showNav
+    margin-top: 0
+    visibility: visible
+    transform: scale(1)
+    transition: visibility 200ms linear, margin-top 100ms ease-out
 
-.hideNav
-  margin-top: -400px
-  visibility: hidden
-  transition: visibility 200ms linear, margin-top 100ms ease-in
+  .hideNav
+    margin-top: -400px
+    visibility: hidden
+    transition: visibility 200ms linear, margin-top 100ms ease-in
 
-.hidden
-  display: none
-  visibility: hidden
+  .hidden
+    display: none
+    visibility: hidden

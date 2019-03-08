@@ -3,7 +3,7 @@ import { environment } from '../../environments/environment.prod';
 import { saveFileAs } from './save';
 import {Snow, Snowpoint} from '../type/snow';
 
-export function parseSnow(snow: Array<any>, trailId: number, abbr: string): Snow {
+export function parseSnow(snow: Array<any>, trailId: number, abbr: string, version: string): Snow {
 
   if (!snow || snow.length === 0) {
     return;
@@ -12,6 +12,7 @@ export function parseSnow(snow: Array<any>, trailId: number, abbr: string): Snow
   const _returnObj = new Snow();
 
   _returnObj.trailId = trailId;
+  _returnObj.version = version;
   _returnObj.abbr = abbr;
 
   const _snowPivots: Array<any> = [];

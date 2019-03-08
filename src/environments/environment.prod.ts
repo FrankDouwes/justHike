@@ -8,7 +8,7 @@ export const environment = {
     simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
-  appDomain: 'https://hike.frankdouwes.com/',
+  appDomain: 'http://hike.frankdouwes.com/',
   fileBaseUrl: 'files/',
 
   updateCheckInterval: 86400000,      // the time between data update checks (maptiles/snow data)
@@ -36,6 +36,8 @@ export const environment = {
     showExtraDesign: true,          // show extra design features in elevation profile (trees)
     greyScale: false,               // map greyscale mode (UNUSED)
 
+    autoUpdate: true,               // auto update (only used for snow data)
+
     // internal
     maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app
     scrollbarSegmentSize: 26,       // scrollbar (elevation profile) renders 1 point for every X points)
@@ -43,62 +45,45 @@ export const environment = {
     userName: 'unknown',             // default username
   },
 
-  TRAILS: [
+
+  // Data set by DEVs before generating new trail data.
+  TRAILS_GENERATION: [
     {
       id: 0,
-      tileVersion: '1.0',
+      trailVersion: '1.0',
+      tilesVersion: '1.0',
       snowVersion: '1.0',
-      name: 'DEMO: Campo - Warner Springs',
       abbr: 'DEMO',
-      length: 109.5,      //estimated length (first section is 109.5)
+      length: 109.5,                  // estimated length (first section is 109.5)
       dataPath: 'DEMO/',
-      tileDataSize: 20971520,
-      lineDataSize: 20971520,
-      snowDataSize: 60000,
-      scrollbarSegmentSize: 1,      // one scrollbar segment for every X miles
-      availableForPurchase: false,
-      isFree: true                    // always free
-
+      scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles
     }, {
       id: 1,
-      tileVersion: '1.0',
+      trailVersion: '1.0',
+      tilesVersion: '1.0',
       snowVersion: '1.0',
-      name: 'Pacific Crest Trail',
       abbr: 'PCT',
-      length: 2661.4,      //estimated length (including 8mi into Canada) according to halfmile pct data
+      length: 2661.4,                 // estimated length (including 8mi into Canada) according to halfmile pct data
       dataPath: 'PCT/',
-      tileDataSize: 209715200,
-      lineDataSize: 209715200,
-      snowDataSize: 600000,
-      scrollbarSegmentSize: 1,      // one scrollbar segment for every X miles
-      availableForPurchase: true,
-      isFree: true                    // free in V1
+      scrollbarSegmentSize: 200,        // one scrollbar segment for every X miles
     }, {
       id: 2,
-      tileVersion: '1.0',
+      trailVersion: '1.0',
+      tilesVersion: '1.0',
       snowVersion: '1.0',
-      name: 'Continental Divide Trail',
       abbr: 'CDT',
-      length: 3100,      //estimated length
+      length: 3011,                   // estimated length
       dataPath: 'CDT/',
-      tileDataSize: 209715200,
-      lineDataSize: 209715200,
-      snowDataSize: 600000,
-      scrollbarSegmentSize: 1,      // one scrollbar segment for every X miles
-      availableForPurchase: false
+      scrollbarSegmentSize: 200,        // one scrollbar segment for every X miles
     }, {
       id: 3,
-      tileVersion: '1.0',
+      trailVersion: '1.0',
+      tilesVersion: '1.0',
       snowVersion: '1.0',
-      name: 'Appalachian Trail',
       abbr: 'AT',
-      length: 2199,      //estimated length
+      length: 2199,                   // estimated length
       dataPath: 'AT/',
-      tileDataSize: 209715200,
-      lineDataSize: 209715200,
-      snowDataSize: 600000,
-      scrollbarSegmentSize: 1,      // one scrollbar segment for every X miles
-      availableForPurchase: false
+      scrollbarSegmentSize: 200,        // one scrollbar segment for every X miles
     }
   ]
 };

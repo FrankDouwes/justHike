@@ -39,8 +39,6 @@ export class Downloader {
 
     const _type: string = (_extension === 'json') ? _extension : 'blob';
 
-    console.log(_type);
-
     this._setStatus('fetching', null, false);
 
     let _headers = new HttpHeaders();

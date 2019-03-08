@@ -23,8 +23,11 @@
     <!-- purchase / download panel -->
     <instructions *ngIf="!activePanel"></instructions>
 
-    <!-- purchase / download panel -->
+    <!-- purchase trails -->
     <purchase-settings *ngIf="activePanel === 'purchase'" (onSettingsChanged)="onSettingsChanged($event)"></purchase-settings>
+
+    <!-- trail data -->
+    <trail-settings *ngIf="activePanel === 'trail'" (onSettingsChanged)="onSettingsChanged($event)"></trail-settings>
 
     <!-- general settings panel -->
     <general-settings *ngIf="activePanel === 'general'" (onSettingsChanged)="onSettingsChanged($event)"></general-settings>

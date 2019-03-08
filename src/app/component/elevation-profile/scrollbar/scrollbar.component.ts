@@ -43,7 +43,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   private _svgWidth:        number;
   private _svgHeight:       number;
   private _segments:        number;
-  private _sectionLength = 100;       // miles per scroll map section
+  private _sectionLength = 100;       // miles per scroll map section TODO XXX (get from data)
 
 
   constructor() {}
@@ -77,7 +77,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
       .viewbox(0, 0, this._svgWidth, this._svgHeight);
 
     this._drawMap();
-    // this._drawGuides();
+    this._drawGuides();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -127,7 +127,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
       if (this.visibleRange) {
         this._drawMap();
-        // this._drawGuides();
+        this._drawGuides();
       }
     }
   }
@@ -191,8 +191,8 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   private _drawGuides(): void {
 
-    for (let i = 1; i < Math.ceil(this._segments); i++) {
-      const line = this._svgCanvas.line(this.main.nativeElement.clientWidth * i, 0, this.main.nativeElement.clientWidth * i, this._svgHeight).stroke({ width: 1, color: '#AAA', opacity: '0.85', dasharray: '2, 2'});
+    for (let i = 1; i < Math.ceil(this._segments) * 5; i++) {
+      const line = this._svgCanvas.line((this.main.nativeElement.clientWidth / 5) * i, 0, (this.main.nativeElement.clientWidth / 5) * i, this._svgHeight).stroke({ width: 1, color: '#AAA', opacity: '0.85', dasharray: '2, 2'});
     }
 
   }

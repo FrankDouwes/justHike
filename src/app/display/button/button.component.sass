@@ -9,9 +9,9 @@ button
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c7ffffff', endColorstr='#8cffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
   border-radius: 50%
-  font-size: 14px
-  min-width: 56px
-  min-height: 56px
+  font-size: 1.5vw
+  //min-width: 56px
+  //min-height: 56px
   width: 7vw
   height: 7vw
   margin: 10px 10px 0 0
@@ -21,7 +21,7 @@ button
   -moz-box-shadow: 0px 5px 10px -5px rgba(0,0,0,0.35);
   box-shadow: 0px 5px 10px -5px rgba(0,0,0,0.35);
   //backdrop-filter: blur(6px)    // safari/iOS only, need android polyfill TODO
-  color: #555
+
   outline: none !important
 
   -webkit-transition: opacity 3s ease-in-out
@@ -31,6 +31,9 @@ button
 
   fa-icon
     filter: drop-shadow(-1px -2px 1px rgba(0,0,0,0.1)) drop-shadow(2px 3px 2px white);
+    position: absolute
+    top: 50%
+    left: -25%
 
 button:focus, button:active
   outline: none !important

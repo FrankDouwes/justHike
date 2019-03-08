@@ -35,7 +35,6 @@
             ],
             "scripts": [
               "./node_modules/svg.js/dist/svg.js",
-              "./node_modules/svg.filter.js/dist/svg.filter.js",
               "./node_modules/geolib/dist/geolib.js",
               "./node_modules/geolib/dist/geolib.elevation.js",
               "./node_modules/seedrandom/seedrandom.js",
@@ -102,7 +101,6 @@
             ],
             "scripts": [
               "./node_modules/svg.js/dist/svg.js",
-              "./node_modules/svg.filter.js/dist/svg.filter.js",
               "./node_modules/geolib/dist/geolib.js",
               "./node_modules/geolib/dist/geolib.elevation.js",
               "./node_modules/seedrandom/seedrandom.js",

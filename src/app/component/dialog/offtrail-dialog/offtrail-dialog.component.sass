@@ -1,28 +1,45 @@
 \:host
 
-  #center-icon
-    position: absolute
-    left: 50%
-    margin: -3.5vw 0 0 -3.5vw
-    z-index: 1000
-
-    button
-      user-focus: none
+  #panel
+    background: url('../../../../assets/images/overlay.png') repeat-x
 
   #top
-    display: block
-    height: 50%
-    padding: 48px 20% 0 20% !important
 
-    h2
-      text-align: center
-      vertical-align: center
-      //line-height: 8vh
+    display: grid
+    height: 50%
+    padding: 5vh
+
+    grid-template-columns: 20% auto
+    grid-template-areas: 'button meta'
+
+    //padding: 48px 20% 0 20% !important
+
+    .button
+      user-focus: none
+      grid-area: button
+
+    #meta
+
+      grid-area: meta
+      padding-top: 1.5vh
+
+      h2, h3
+        grid-column:
+        //text-align: center
+        vertical-align: center
+        margin-block-start: 0 !important
+        margin-block-end: 0 !important
+        margin: 0
+
+      h2
+        font-size: 4vw
+      h3
+        font-size: 2vw
 
   #bottom
     display: block
     height: 50%
-    padding: 12px !important
+    padding: 12px 48px !important
     vert-align: bottom
     bottom: 0
 
@@ -32,3 +49,36 @@
 
     .form-container > *
       width: 100%
+
+  #button-group
+    width: 100%
+    text-align: center
+
+    span
+      button
+        margin: 0 6px
+        //padding: 4px 12px
+        //font-size: 2vw
+
+\:host /deep/
+
+  .mat-form-field-infix
+
+    .mat-input-element
+      background: rgba(255,255,255,0.5)
+      padding: 12px 0
+      border: 2px solid white
+      border-radius: 12px
+      text-align: center
+      font-size: 4.5vw
+      color: #555
+
+    .mat-input-element::selection
+      background: #88b2c7
+
+  .mat-form-field-underline
+    display: none
+    visibility: hidden
+
+  .mat-form-field-label
+    text-align: center

@@ -20,14 +20,14 @@ export class DownloadService {
   private _states = {};
   private _isDownloading: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  public isDownloadingSubscription: Observable<boolean>;
+  public isDownloadingObservable: Observable<boolean>;
 
   constructor(
     private _fileSystemService: FilesystemService,
     private _httpClient: HttpClient
   ) {
 
-    this.isDownloadingSubscription  = this._isDownloading.asObservable().pipe(share());
+    this.isDownloadingObservable  = this._isDownloading.asObservable().pipe(share());
   }
 
   // create a new downloader or return existing based on name

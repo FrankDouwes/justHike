@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Mile } from '../../type/mile';
+import {Trail} from '../../type/trail';
 
 @Component({
   selector: 'app-mile-detail',
@@ -13,8 +14,7 @@ export class MileDetailComponent implements OnInit {
   public visibleMilesList:        Array<Mile>;
   public visibleMilesLeaflet:     Array<Mile>;
   public routedMile:              number;
-
-  private _trail: object;
+  public trailData:               Trail;
 
   private _mapLineSegmentPadding = 1;
   private _milesBehindExtra: number = 0;
@@ -23,8 +23,9 @@ export class MileDetailComponent implements OnInit {
   private _milesAhead: number = 1;
 
   constructor(
-    private _route:               ActivatedRoute,
-  ) {}
+    private _route: ActivatedRoute,
+  ) {
+  }
 
   // LIFECYCLE HOOKS
 
@@ -35,25 +36,16 @@ export class MileDetailComponent implements OnInit {
 
     this._route.data.subscribe(result => {
 
-      // extra line segments to show, at start/end, since leaflet works with fixed zoom levels
-      // fitting map to markers/line segments using bounds isn't precise
-
-        this._trail = result.data['trail'];
+        this.trailData = result.data['trail'];
         this._isolateVisibleMiles();
       }
     );
-
-    const _self = this;
-
-    // setInterval(function() {
-    //   _self.loadAhead();
-    // }, 5000)
   }
 
   private _isolateVisibleMiles(): void {
 
-    this.visibleMilesList = this._getMilesSegmentData(this._trail, this._milesBehind + this._milesAheadExtra, this._milesAhead + this._milesAheadExtra);
-    this.visibleMilesLeaflet = this._getMilesSegmentData(this._trail, (this._milesBehind + this._milesAheadExtra + this._mapLineSegmentPadding), (this._milesAhead + this._milesAheadExtra + this._mapLineSegmentPadding));
+    this.visibleMilesList = this._getMilesSegmentData(this.trailData, this._milesBehind + this._milesAheadExtra, this._milesAhead + this._milesAheadExtra);
+    this.visibleMilesLeaflet = this._getMilesSegmentData(this.trailData, (this._milesBehind + this._milesAheadExtra + this._mapLineSegmentPadding), (this._milesAhead + this._milesAheadExtra + this._mapLineSegmentPadding));
   }
 
   // OTHER

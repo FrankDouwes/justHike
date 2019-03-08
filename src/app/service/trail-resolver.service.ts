@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Router, Resolve, RouterStateSnapshot, ActivatedRouteSnapshot} from '@angular/router';
-import { Observable, of } from 'rxjs';
+import {Router, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
+import {Observable, of} from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { TrailService }  from './trail.service';
 import { LoaderService } from './loader.service';
@@ -12,35 +12,46 @@ import { TrailGeneratorService } from './trail-generator.service';
 import { SnowGeneratorService } from './snow-generator.service';
 import { Snow } from '../type/snow';
 import { reverseSnow } from '../_util/snow';
+import {DownloadService} from './download.service';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class TrailResolverService implements Resolve<any> {
 
   private _cachedTrail: Trail;
   private _cachedSnow: Snow;
+  private _activeTrailId: number;
+
+  // makes sure trail data is available before navigating anywhere
 
   constructor(
     private _localStorage: LocalStorageService,
     private _trailService: TrailService,
     private _router: Router,
     private _loaderService: LoaderService,
-
+    private _downloadService: DownloadService,
     private _trailGenerator: TrailGeneratorService,
     private _snowGenerator: SnowGeneratorService
   ) {}
 
-  // makes sure trail data is available before navigating anywhere
+
+  /* there are 3 locations for trail data
+   * - assets: contains default trail data that shipped with the app
+   * - filesystem: contains downloaded versions of the trail data
+   * - raw data: for developers only, this data is used to generate traildata for users to download (or ship in assets) */
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<object> | Observable<never> {
 
-    const _activeTrailId: number = this._localStorage.retrieve('activeTrailId') | 0;
+    console.log('resolve trail data');
+
+    this._activeTrailId = this._localStorage.retrieve('activeTrailId') | 0;
     const _direction: number = this._localStorage.retrieve('direction') | 0;
 
-    // Dev mode, generate new trail data (slow)
+    // dev mode, generate new trail data (slow)
     if (environment.useRawData) {
 
-      return this._trailService.getRawTrailData(_activeTrailId).pipe(
+      return this._trailService.getRawTrailData(this._activeTrailId).pipe(
         take(1),
         switchMap(data => {
 
@@ -57,18 +68,16 @@ export class TrailResolverService implements Resolve<any> {
           }
         })
       );
-    }
+    } else {
 
-    // User mode, get pre-parsed data (fast)
-    else {
-
-      if (this._cachedTrail && this._cachedTrail.id === _activeTrailId && this._cachedTrail.direction === _direction) {
+      if (this._cachedTrail && this._cachedTrail.id === this._activeTrailId && this._cachedTrail.direction === _direction) {
 
         return of({trail: this._cachedTrail, snow: this._cachedSnow});
 
       } else {
 
-        return this._trailService.getPreParsedTrailData(_activeTrailId, _direction).pipe(
+        return this._trailService.getPreParsedTrailData(this._activeTrailId, _direction).pipe(
+
           take(1),
           switchMap(data => {
 
@@ -76,10 +85,10 @@ export class TrailResolverService implements Resolve<any> {
 
               // cache trail
               this._cachedTrail = data[0] as Trail;
-              this._trailGenerator.trailData = this._cachedTrail;
+              this._trailGenerator.setTrailData(this._cachedTrail);
 
               // parse snow data individually (as it's a seperate update/download)
-              this._cachedSnow = data[1];
+              this._cachedSnow = data[1] as Snow;
               this._snowGenerator.setSnowData(this._cachedSnow);
 
               // reverse if needed

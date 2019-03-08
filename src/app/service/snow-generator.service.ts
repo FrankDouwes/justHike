@@ -30,4 +30,9 @@ export class SnowGeneratorService {
 
     return (_partialData.length > 0) ? _partialData : undefined;
   }
+
+  // get the snow data version for the current trail
+  public getSnowVersion(): string {
+    return this._snowData.version;
+  }
 }

@@ -9,10 +9,9 @@ import {PoiType} from '../../type/poi';
 
 export class ButtonComponent implements OnInit {
 
-  @Input() icon:    string;
-  @Input() poiTypes: Array<PoiType>;
-
-  @Input() label:   string;
+  @Input() icon?:    string;
+  @Input() badge?:    string;
+  @Input() poiTypes?: Array<PoiType>;
 
   // simple button with label & font awesome icon
   constructor() { }

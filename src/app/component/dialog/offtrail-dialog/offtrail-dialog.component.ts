@@ -26,12 +26,17 @@ export class OfftrailDialogComponent implements OnInit {
     this.trailLength = this.data['trailLength'] - 1;
   }
 
-  public onClick(event): void {
-    const _value: number = (Math.floor(Number(this.simulateInput.nativeElement.value)) > this.trailLength) ? this.trailLength : Math.floor(Number(this.simulateInput.nativeElement.value));
+  public onOk(): void {
+    // const _value: number = (Math.floor(Number(this.simulateInput.nativeElement.value)) > this.trailLength) ? this.trailLength : Math.floor(Number(this.simulateInput.nativeElement.value));
+    const _value: number = (Number(this.simulateInput.nativeElement.value) <= this.trailLength) ? Number(this.simulateInput.nativeElement.value) : this.trailLength;
     this.simulateInput.nativeElement.value = _value;
     const _self = this;
     setTimeout(function() {
       _self._dialogRef.close({simulatedMile: _self.simulateInput.nativeElement.value});
     }, 200);
+  }
+
+  public onCancel(): void {
+    this._dialogRef.close();
   }
 }

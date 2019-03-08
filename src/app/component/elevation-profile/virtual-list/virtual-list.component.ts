@@ -9,7 +9,7 @@ import {
   SimpleChanges,
   ChangeDetectionStrategy,
   EventEmitter,
-  Output
+  Output, ElementRef
 } from '@angular/core';
 
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
@@ -30,6 +30,8 @@ import {User} from '../../../type/user';
 })
 export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
+  @ViewChild('background') background: ElementRef;
+  @ViewChild('backgroundFlat') backgroundFlat: ElementRef;
   @ViewChild('scrollViewport') scrollViewport: CdkVirtualScrollViewport;
 
   @Input() trailData: Trail;
@@ -73,7 +75,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   ngOnInit(): void {
 
     super.ngOnInit();
-
     this._initialIndex = (this._route.snapshot) ? Number(this._route.snapshot.queryParams['id']) : 0;
     this._setupEventListeners();
   }
@@ -128,6 +129,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     const _self = this;
 
+    const _milesLength = this.trailData.miles.length;
+
     // Listen for scroll events (angular "events" will not do!)
     window.addEventListener('scroll', function (event) {
 
@@ -140,9 +143,13 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
       // update background position
       const _wrapper = _self.scrollViewport.elementRef.nativeElement;
-      _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.8) + 'px;');
+      _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.005) + 'px;');
 
-    }, true);
+      const _verticalChange = (_self.visibleOHLC.high - _self.visibleOHLC.low) / 1500;
+
+      _self.background.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.6) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
+      _self.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
+      }, true);
   }
 
   public onClick(listItem: Mile): void {
@@ -150,7 +157,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   }
 
   // only executed once every 250ms as it's a redraw of all list items
-  private _onResize(event): void {
+  public onResize(event): void {
 
     const self = this;
 
@@ -235,6 +242,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     if (_oldRange !==  this._visibleRange) {
       this.scrollEvent.emit({visibleRange: this._visibleRange, scrollX: this.scrollViewport.getOffsetToRenderedContentStart()});
       this.visibleOHLC = this._calculateVisOHLC(this._visibleRange);
+      const _verticalChange = (this.visibleOHLC.high - this.visibleOHLC.low) / 1500;
+      this.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(this.scrollOffset * 0.015) + 'px;');
       this._calculateGuides();
     }
   }

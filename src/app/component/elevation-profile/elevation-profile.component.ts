@@ -1,5 +1,4 @@
-import {Component, isDevMode, OnInit} from '@angular/core';
-import { VirtualListComponent } from './virtual-list/virtual-list.component';
+import {Component, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
 import {Snow} from '../../type/snow';
@@ -11,37 +10,24 @@ import {Snow} from '../../type/snow';
 })
 export class ElevationProfileComponent implements OnInit {
 
-  public trailData:     Trail;
-  public snowData:      Snow;
-
   public visibleRange:  object;
   public resize:        object;
   public scrollTo:      number;
 
+  public trailData: Trail;
+  public snowData: Snow;
+
   constructor(
-    private _route: ActivatedRoute
-  ) {}
-
-
-
-  // LIFECYCLE HOOKS
+    private _route: ActivatedRoute)
+  {}
 
   ngOnInit(): void {
-
-    this._route.data
-      .subscribe(result => {
-
-        if (isDevMode()) {
-          console.log('data loaded: ', result.data);
-        }
-
-        this.trailData = result.data.trail;
-        this.snowData = result.data.snow;
-
-      });
+    this._route.data.subscribe(result => {
+        this.trailData = result.data['trail'];
+        this.snowData = result.data['snow'];
+      }
+    );
   }
-
-
 
 
   // EVENT HANDLERS

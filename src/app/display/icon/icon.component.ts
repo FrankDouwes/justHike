@@ -9,7 +9,6 @@ import {PoiType} from '../../type/poi';
 export class IconComponent implements OnInit {
 
   @Input() data: Array<PoiType>;
-
   @Input() showRating: boolean;
   @Input() showUpdates: boolean;
 
