@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Downloader } from '../_util/downloader';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { share } from 'rxjs/operators';
-import {FilesystemService} from './filesystem.service';
+import { FilesystemService } from './filesystem.service';
 
 @Injectable({
   providedIn: 'root'
@@ -90,6 +90,8 @@ export class DownloadService {
     for (const key in this._states) {
 
       const _statusSubject: BehaviorSubject<boolean> = this._states[key];
+
+      console.log(_statusSubject.getValue());
 
       if (_statusSubject.getValue() === true) {
         _newState = true;

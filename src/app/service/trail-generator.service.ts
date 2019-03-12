@@ -8,15 +8,17 @@ import {Trail, TrailMeta} from '../type/trail';
 import { environment } from '../../environments/environment.prod';
 import { isDevMode } from '@angular/core';
 import { LoaderService } from './loader.service';
-import { LocalStorageService } from 'ngx-webstorage';
 import { saveFileAs } from '../_util/save';
 
 import PositionAsDecimal = geolib.PositionAsDecimal;
+import {getPoiTypeByType} from '../_util/poi';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrailGeneratorService {
+
+  public flatTrailData: any;
 
   private _trailData: Trail;
 
@@ -25,7 +27,6 @@ export class TrailGeneratorService {
 
   constructor(
     private _loaderService: LoaderService,
-    private _localStorage: LocalStorageService
   ) {}
 
 
@@ -41,11 +42,34 @@ export class TrailGeneratorService {
     return this._trailData.version;
   }
 
+  public getPoiById(id: number): Poi {
+    return this._trailData.pois[id];
+  }
+
+  public getPoisByIds(ids: Array<number>): Array<Poi> {
+
+    const _self = this;
+    const _result: Array<Poi> = [];
+
+    ids.forEach(function(id) {
+      _result.push(_self.getPoiById(id));
+    });
+
+    return _result;
+  }
+
   public generateMiles(trail: TrailMeta, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number): Trail {
 
-    let trailData = JSON.parse(JSON.stringify(trail));
+    this._trailData = JSON.parse(JSON.stringify(trail));
+    this._trailData.version = trail.trailVersion;
 
-    trailData.direction = direction;
+    // remove unneeded trail meta
+    delete this._trailData['trailVersion'];
+    delete this._trailData['tilesVersion'];
+    delete this._trailData['snowVersion'];
+    delete this._trailData['dataPath'];
+
+    this._trailData.direction = direction;
 
     // // sobo reversal
     if (direction === 1) {
@@ -53,9 +77,11 @@ export class TrailGeneratorService {
       pois.reverse();
     }
 
+    this._trailData.pois = pois;
+
     // 1. optimise waypoints
-    const _optimisedWaypoints: Array<Waypoint> = this._simplify(waypoints, this._tolerance);
-    trailData.waypoints = _optimisedWaypoints;
+    const _optimisedWaypoints: Array<Waypoint> = this.simplify(waypoints, this._tolerance);
+    this.flatTrailData = _optimisedWaypoints;
 
     this._loaderService.showMessage('optimised waypoints');
 
@@ -67,31 +93,33 @@ export class TrailGeneratorService {
       flatPoints.push({latitude: _optimisedWaypoints[i].latitude, longitude: _optimisedWaypoints[i].longitude});
     }
 
-    trailData.calcLength = geolib.getPathLength(flatPoints as Array<PositionAsDecimal>) / environment.MILE;
-    trailData.scale = (trailData.length / trailData.calcLength);
-    trailData.elevationRange = calculateOHLC(trailData.waypoints, {start: 0, end: waypoints.length - 1});
+    this._trailData.calcLength = geolib.getPathLength(flatPoints as Array<PositionAsDecimal>) / environment.MILE;
+    this._trailData.scale = (this._trailData.length / this._trailData.calcLength);
+    this._trailData.elevationRange = calculateOHLC(_optimisedWaypoints, {start: 0, end: waypoints.length - 1});
 
     this._loaderService.showMessage('calculated trail properties');
 
     // 3. split waypoints into miles
-    trailData.miles = this._createMiles(_optimisedWaypoints, trailData.scale);
+    this._trailData.miles = this._createMiles(_optimisedWaypoints, this._trailData.scale);
 
     this._loaderService.showMessage('created miles');
 
     // 4a. generate waypoint tree for easy lookups
-    const flatMileCoordinates: Array<Waypoint> = trailData.miles.map(function(elem) {
+    const flatMileCoordinates: Array<Waypoint> = this._trailData.miles.map(function(elem) {
         return elem.centerpoint as Waypoint;
       }
     );
 
+    // create a tree structure to quickly find nearest mile (for Geolocating)
     this.createMileTree(flatMileCoordinates);
 
     this._loaderService.showMessage('created mile tree');
 
     // 4b. link pois to trail waypoints
-    trailData.waterSources = [];
+    this._trailData.sortedPoiIds = {};
+
     if (pois) {
-      this._linkPoisToMiles(pois, trailData.miles);
+      this._linkPoisToMiles(pois, this._trailData.miles);
       this._loaderService.showMessage('linked pois to miles');
     } else {
       this._loaderService.showMessage('no pois');
@@ -99,13 +127,13 @@ export class TrailGeneratorService {
 
     if (isDevMode() && environment.dowloadParsedData) {
       const _direction: string = (direction === 0) ? 'nobo' : 'sobo';
-      saveFileAs(trail, trailData.abbr + '-trail-' + _direction + '.json');
+      saveFileAs(trail, this._trailData.abbr + '-trail-' + _direction + '.json');
       this._loaderService.showMessage('downloaded file');
     }
 
-    this._trailData = trailData;
+    console.log(this._trailData);
 
-    return trailData;
+    return this._trailData;
   }
 
   // create overlapping miles (first/last waypoint overlap, insert 2 new points at 0 & 100%
@@ -142,8 +170,6 @@ export class TrailGeneratorService {
     let _poisWaypoints:   Array<Waypoint> = []; // for ohlc
 
     const _wayPointsLength: number          = waypoints.length;      // faster.
-
-    let _milePois: Array<Poi> = [];
 
     for (let i = 0; i < _wayPointsLength; i++) {
 
@@ -207,7 +233,6 @@ export class TrailGeneratorService {
         _bridgedDistance -= environment.MILE;
         _totalGain = _totalLoss = 0;
         _mileWaypoints.splice(0, _mileWaypoints.length - 2);    // keep last 2
-        _milePois = [];
         _poisWaypoints = [];
         // _hasEscape = _hasCamp = _hasOther = false;
 
@@ -273,7 +298,6 @@ export class TrailGeneratorService {
     return {id: Number(nearestMile['key']), distance: nearestMile['distance'], mile: this._trailData.miles[nearestMile['key']]};
   }
 
-
   public findNearestWaypointInMile(waypoint: Waypoint, nearestMile: Mile): object {
 
     return geolib.orderByDistance({latitude: waypoint.latitude, longitude: waypoint.longitude} as geolib.PositionAsDecimal,
@@ -282,23 +306,32 @@ export class TrailGeneratorService {
 
   private _linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
 
+    const _self = this;
+
     this._loaderService.showMessage('linking pois to miles');
 
-    for (const poi of pois) {
+    // console.log(pois);
+    // return;
 
-      this._loaderService.showMessage('linking pois to miles:' + poi.id);
+    // console.log(pois.length);
+    // return;
+    pois.forEach(function(poi, index) {
 
-      // update elevation to feet TODO
+      poi.id = index; // to prevent mismatching ids in raw data
+
+      _self._loaderService.showMessage('linking pois to miles:' + poi.id);
+
       poi.waypoint.elevation = poi.waypoint.elevation / environment.FOOT;
 
       // find nearest mile
-      const _nearestMile: Mile = miles[this.findNearestMileInTree({latitude: poi.waypoint.latitude, longitude: poi.waypoint.longitude} as Waypoint)['id']];
+      const _nearestMile: Mile = miles[_self.findNearestMileInTree({latitude: poi.waypoint.latitude, longitude: poi.waypoint.longitude} as Waypoint)['id']];
 
-      const _nearestWaypointRef: object = this.findNearestWaypointInMile(poi.waypoint, _nearestMile);
+      const _nearestWaypointRef: object = _self.findNearestWaypointInMile(poi.waypoint, _nearestMile);
 
-      const _anchorData = this._anchorDistanceCalculation(poi.waypoint, _nearestMile, _nearestWaypointRef);
+      const _anchorData = _self._anchorDistanceCalculation(poi.waypoint, _nearestMile, _nearestWaypointRef);
 
       poi.anchorPoint = _anchorData.anchorPoint;
+      poi.belongsTo = _nearestMile.id;
 
       // setup poi reference in waypoint
       if (!_anchorData.nearestWaypoint.nearestToPois) {
@@ -314,23 +347,44 @@ export class TrailGeneratorService {
         _nearestMile.pois = [];
       }
 
-      _nearestMile.pois.push(JSON.parse(JSON.stringify(poi)));
+      _nearestMile.pois.push(poi.id);
 
-      _nearestMile.hasWater = _nearestMile.hasEscape = _nearestMile.hasCamp = _nearestMile.hasOther = false;
+      const _curPoiTypes: Array<string> = String(poi.type).split(', ');
 
-      if (String(poi.type).includes('water')) {
-        this._trailData.waterSources.push(poi);
-        _nearestMile.hasWater = true;
-      } else if (String(poi.type).includes('highway')) {
-        _nearestMile.hasEscape = true;
-      } else if (String(poi.type).includes('camp')) {
-        _nearestMile.hasCamp = true;
-      } else {
-        _nearestMile.hasOther = true;
-      }
+      _curPoiTypes.forEach(function(type) {
 
+        // if array doesn't exist
+        if (!_self._trailData.sortedPoiIds.hasOwnProperty(type)) {
+          _self._trailData.sortedPoiIds[type] = [];
+        }
+        _self._trailData.sortedPoiIds[type].push(poi.id);
+      });
 
-      if (_nearestMile.hasWater || _nearestMile.hasCamp) {
+      // set poi types for current mile, so it's clear what kind of poi a mile has in it
+      // differentiates between major and minor poi (major are the ones possibly shown on elevation profile
+      // sets a flag for each poi type in 'poiTypes' property
+
+      const _poiTypes: Array<string> = poi.type.split(', ');
+
+      _nearestMile.hasMajorPoi = _nearestMile.hasMinorPoi = false;
+      _nearestMile.poiTypes = [];
+
+      console.log(_poiTypes);
+
+      _poiTypes.forEach(function(type) {
+        _nearestMile.poiTypes[type + ''] = true;
+
+        console.log(getPoiTypeByType(type));
+        console.log(type);
+
+        if (getPoiTypeByType(type) && getPoiTypeByType(type).isMajor) {
+          _nearestMile.hasMajorPoi = true;
+        } else {
+          _nearestMile.hasMinorPoi = true;
+        }
+      });
+
+      if (_nearestMile.hasMajorPoi) {
         // refactor ohlc if needed
         if (_nearestMile.elevationRange.high < poi.waypoint.elevation) {
           _nearestMile.elevationRange.high = poi.waypoint.elevation;
@@ -338,7 +392,8 @@ export class TrailGeneratorService {
           _nearestMile.elevationRange.low = poi.waypoint.elevation;
         }
       }
-    }
+
+    });
   }
 
   private _anchorDistanceCalculation(location: Waypoint, nearestMile: Mile, nearestWaypoints: object) {
@@ -366,7 +421,7 @@ export class TrailGeneratorService {
   }
 
   // simplify an array of data points using 2 methods (radial distance and the douglas peucker alg.)
-  private _simplify(points: Array<any>, tolerance: number, highestQuality: boolean = true): Array<any> {
+  public simplify(points: Array<any>, tolerance: number, highestQuality: boolean = true): Array<any> {
 
     const originalPointCount: number = points.length;
     const sqTolerance: number = tolerance !== undefined ? tolerance * tolerance : 1;

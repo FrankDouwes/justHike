@@ -4,10 +4,8 @@ import { LocalStorageService } from 'ngx-webstorage';
 import { TrailGeneratorService } from './trail-generator.service';
 
 // ionic capacitor
-import { Plugins } from '@capacitor/core';
 import {Waypoint} from '../type/waypoint';
 import {environment} from '../../environments/environment.prod';
-const { Geolocation } = Plugins;
 
 @Injectable({
   providedIn: 'root'
@@ -83,47 +81,29 @@ export class LocationService {
       requireAltitude: true
     };
 
-    this._locationWatcher  = Geolocation.watchPosition(_watchOptions, (position, error) => {
-      if (error) {
-        _self._showTrackingErrors(error);
-      } else {
-        _self._parseLocation(position);
-      }
-    });
+    if (navigator.geolocation) {
 
-    // web version
-    // if (navigator.geolocation) {
-    //   this._locationWatcher = navigator.geolocation.watchPosition(
-    //     this.parseLocation.bind(this),
-    //     this.showTrackingErrors.bind(this)
-    //   );
-    // } else {
-    //   this.showTrackingErrors(null);
-    // }
+      this._locationWatcher  = navigator.geolocation.watchPosition(
+        this._parseLocation.bind(this),
+        this._showTrackingErrors.bind(this),
+        _watchOptions);
+    } else {
+      this._showTrackingErrors(null);
+    }
   }
 
   private _stopTracking(simulate: boolean = false): void {
 
-    Geolocation.clearWatch({id:this._locationWatcher});
+    if (navigator.geolocation) {
+      navigator.geolocation.clearWatch(this._locationWatcher)
 
-    if (!simulate) {
-      this._location.next(undefined);
-      this._localStorage.store('simulatedMile', -1);
-      this._previousLocation = null;
-      this._updateStatusLabel('idle');
+      if (!simulate) {
+        this._location.next(undefined);
+        this._localStorage.store('simulatedMile', -1);
+        this._previousLocation = null;
+        this._updateStatusLabel('idle');
+      }
     }
-
-    // web version
-    // if (navigator.geolocation) {
-    //   navigator.geolocation.clearWatch(this._locationWatcher);
-    //
-    //   if (!simulate) {
-    //     this._location.next(undefined);
-    //     this._localStorage.store('simulatedMile', -1);
-    //     this._previousLocation = null;
-    //     this._updateStatusLabel('idle');
-    //   }
-    // }
   }
 
   private _parseLocation(location: any): void {

@@ -1,6 +1,11 @@
 import { saveAs } from 'file-saver';
 
 export function saveFileAs(data:any, filename:string, ): void {
-  const blob = new Blob([JSON.stringify(data)], {type: 'text/plain;charset=utf-8'});
+
+  if (typeof data !== 'string') {
+    data = JSON.stringify(data)
+  }
+
+  const blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
   saveAs(blob, filename);
 }

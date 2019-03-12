@@ -1,11 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import {isDevMode, NgModule, OnInit} from '@angular/core';
+import {isDevMode, NgModule, OnDestroy} from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { environment } from '../environments/environment.prod';
 import { AppComponent } from './app.component';
-import { AngularFittextModule } from 'angular-fittext';
 
 // font awesome
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -13,8 +12,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
   faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt,
   faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen,
-  faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle
-  , faSnowflake, faAtlas, faMountain, faSpinner, faTrash
+  faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle,
+  faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle
   } from '@fortawesome/free-solid-svg-icons';
 import { faCompass, faDotCircle, faArrowAltCircleDown} from '@fortawesome/free-regular-svg-icons';
 
@@ -34,16 +33,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCarouselModule } from '@ngmodule/material-carousel';
 import { MatIconModule } from '@angular/material/icon';
-import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {MatProgressBarModule} from '@angular/material/progress-bar';
-
-
-// ionic capacitor
-// import '@ionic/pwa-elements';
-import { File } from '@ionic-native/file/ngx';
-
-// display component
-import { ButtonComponent } from './display/button/button.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 // component
 import { LocationBasedComponent } from './display/location-based/location-based.component';
@@ -74,6 +65,7 @@ import { LoaderOverlayComponent } from './component/loader-overlay/loader-overla
 import { FaSamplerComponent } from './component/fa-sampler/fa-sampler.component';
 import { FaIconComponent } from './component/fa-sampler/fa-icon/fa-icon.component';
 import { IconComponent } from './display/icon/icon.component';
+import { ButtonComponent } from './display/button/button.component';
 
 // dialog
 import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
@@ -87,21 +79,34 @@ import { FilesizePipe } from './pipe/filesize.pipe';
 // services
 import { LoaderService } from './service/loader.service';
 import { LocalStorageService, NgxWebstorageModule } from 'ngx-webstorage';
-import { PlaygroundComponent } from './component/playground/playground.component';
-import {FilesystemService} from './service/filesystem.service';
+import { FilesystemService } from './service/filesystem.service';
 import { SettingsComponent } from './component/navigation/settings/settings.component';
 import { TrailSettingsComponent } from './component/dialog/settings-dialog/panels/trail-settings/trail-settings.component';
-import { DownloadDialogComponent } from './component/dialog/settings-dialog/panels/trail-settings/download-dialog/download-dialog.component';
+import {setConnection, setCordova, setScreen, setZip} from './_util/cordova';
+import { ConnectionService } from './service/connection.service';
+import { AdminComponent } from './component/admin/admin.component';
+import {getMajorPoiTypes} from './_util/poi';
+
+// cordova plugins
+declare let cordova: any;
+declare let screen: any;
+declare let download: any;
+declare let Connection: any;
+declare let zip: any;
 
 @NgModule({
   declarations: [
     AppComponent,
     LocationBasedComponent,
-    ElevationProfileComponent,
-    MileDetailComponent,
+    ButtonComponent,
+    FaIconComponent,
+    IconComponent,
+    LoaderOverlayComponent,
+    FaSamplerComponent,
     NavigationComponent,
     LocatorComponent,
-    ButtonComponent,
+    ElevationProfileComponent,
+    MileDetailComponent,
     ListItemComponent,
     VirtualListComponent,
     ScrollbarComponent,
@@ -112,9 +117,6 @@ import { DownloadDialogComponent } from './component/dialog/settings-dialog/pane
     OfftrailDialogComponent,
     PoiListComponent,
     LeafletMapComponent,
-    FaSamplerComponent,
-    FaIconComponent,
-    IconComponent,
     PoiSortingPipe,
     DistancePipe,
     FilesizePipe,
@@ -129,19 +131,16 @@ import { DownloadDialogComponent } from './component/dialog/settings-dialog/pane
     InstructionsComponent,
     SettingsPanelComponent,
     DownloaderComponent,
-    LoaderOverlayComponent,
-    PlaygroundComponent,
     SettingsComponent,
     TrailSettingsComponent,
-    DownloadDialogComponent
+    AdminComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
     MarkerDialogComponent,
     OfftrailDialogComponent,
     PoiUserItemComponent,
-    PoiListItemComponent,
-    DownloadDialogComponent
+    PoiListItemComponent
   ],
   imports: [
     BrowserModule,
@@ -150,9 +149,9 @@ import { DownloadDialogComponent } from './component/dialog/settings-dialog/pane
     HttpClientModule,
     ScrollingModule,
     BrowserAnimationsModule,
-    MatProgressSpinnerModule,
     AppRoutingModule,
     FontAwesomeModule,
+    MatProgressSpinnerModule,
     MatDialogModule,
     MatSelectModule,
     MatRadioModule,
@@ -160,7 +159,6 @@ import { DownloadDialogComponent } from './component/dialog/settings-dialog/pane
     MatCardModule,
     MatButtonModule,
     MatListModule,
-    AngularFittextModule,
     MatRippleModule,
     MatIconModule,
     MatFormFieldModule,
@@ -169,32 +167,78 @@ import { DownloadDialogComponent } from './component/dialog/settings-dialog/pane
     MatSnackBarModule,
     MatProgressBarModule
   ],
-  providers: [File],
   bootstrap: [AppComponent]
 })
-export class AppModule {
+export class AppModule implements OnDestroy {
 
   constructor(
     private _localStorage: LocalStorageService,
     private _loaderService: LoaderService,
     private _fileSystemService: FilesystemService,
-    private _http: HttpClient,
+    private _connectionService: ConnectionService
   ) {
 
-    // activate filesystem
-    this._fileSystemService.initializeStorage();
+    if (isDevMode()) {
+      console.log('\n');
+      console.log('***** ***** ***** ***** ***** ***** ***** *****');
+      console.log('RUNNING IN DEV MODE, CHECK ENVIRONMENT SETTINGS');
+      console.log('***** ***** ***** ***** ***** ***** ***** *****');
+      console.log('\n');
+    }
 
-    this._firstRun();
+    // cordova enabled or not
+    if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/)) {
 
-    // always clear simulatedMile
-    this._localStorage.store('simulatedMile', -1);
+      document.addEventListener('deviceready', this._onDeviceReady.bind(this), false);
+
+    } else {
+
+      // activate filesystem
+      this._fileSystemService.initializeStorage();
+      this._firstRun();
+    }
 
     // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt,
       faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar,
       faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake,
-      faAtlas, faMountain, faSpinner, faTrash);
+      faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle);
+  }
+
+  ngOnDestroy(): void {
+    this._connectionService.stopTracking();
+  }
+
+  private _onDeviceReady(): void {
+
+    if (cordova) {
+      setCordova(cordova);
+      setScreen(screen);
+      setConnection(Connection);
+      setZip(zip);
+    }
+
+    // const _isOnlineSubscription = this._connectionService.connectionObserver.subscribe(function (isOnline) {
+    //
+    //   const _bodyElement = document.getElementsByTagName('BODY')[0];
+    //
+    //   if (isOnline) {
+    //     _bodyElement.classList.remove('offline');
+    //   } else {
+    //     _bodyElement.classList.add('offline');
+    //   }
+    //
+    // }, function (error) {
+    //   alert('something went wrong with the connection');
+    //   _isOnlineSubscription.unsubscribe();
+    // });
+
+    this._connectionService.startTracking();
+
+    // activate filesystem
+    this._fileSystemService.initializeStorage();
+    this._firstRun();
   }
 
   // set default user settings (unless they already exist)
@@ -202,15 +246,11 @@ export class AppModule {
   private _firstRun() {
 
     const _self = this;
-    // this._localStorage.clear();
-    // this._localStorage.clear('firstRun');
+
+    // always clear simulatedMile
+    this._localStorage.store('simulatedMile', -1);
 
     const _firstRun = this._localStorage.retrieve('firstRun');
-
-    // console.log('dev params in app.module!!!');
-    // // this._localStorage.store('activeTrailId', 0);   // set trail to DEMO
-    // this._localStorage.clear('versionData');
-    // this._localStorage.clear('lastVersionCheck');
 
     if (_firstRun !== false) {
 
@@ -218,6 +258,15 @@ export class AppModule {
 
       this._loaderService.showMessage('initializing first run');
       this._localStorage.store('firstRun', true);
+
+      // by default show all major pois
+      const _majorPoiTypes: Array<string> = getMajorPoiTypes();
+
+      // dynamic subscriptions based on PoiTypes that are set as being major (important)
+      _majorPoiTypes.forEach(function(type: string) {
+        const _camelName =  'show' +  type.charAt(0).toUpperCase() + type.slice(1);
+        _self._localStorage.store(_camelName, true);
+      });
 
       // set default user settings
       for (const key in environment.DEFAULT_USER_SETTINGS) {

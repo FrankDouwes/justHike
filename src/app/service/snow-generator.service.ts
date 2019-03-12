@@ -24,6 +24,7 @@ export class SnowGeneratorService {
     const _partialData: Array<Array<Snowpoint>> = [];
 
     const _self = this;
+
     mileId.forEach(function(id) {
       _partialData.push(_self._snowData.snowMiles[id]);
     });

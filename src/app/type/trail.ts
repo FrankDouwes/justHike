@@ -14,12 +14,12 @@ export class Trail {
 
   // CALCULATED
   direction?:         number;             // 0 for NOBO, 1 for SOBO
-  waypoints?:         Array<Waypoint>;    // the parsed waypoint data for this trail (just trail waypoints, no pois)
   calcLength?:        number;             // the calculated length based on waypoints
   elevationRange?:    OHLC;               // the elevation range of the entire trail
   scale?:             number;             // scale, calculated length vs. length
   miles?:             Array<Mile>;        // the calculated miles
-  waterSources?:      Array<Poi>;         // all water sources (including multi-pois that also have water)
+  pois:               Array<Poi>;         // all points of interest
+  sortedPoiIds?:      any;
   poiTypes?:          Array<object>;      // the poiTypes available for this trail (used for icons / labels)
 }
 

@@ -91,16 +91,20 @@ function parsePois(pois: Array<object>): Array<Poi> {
     WRCS: 'water, camp',
   };
 
+  let _count: number = 0;
+
   for (let i = 0; i < _poisLength; i++) {
 
     const _poi: object = pois[i];
 
-    _poi['id'] = i;
 
     // delete if poi is mile marker
     if (_poi['icon'] === 'Triangle, Red') {
       delete pois[i];
     } else {
+
+      _poi['id'] = _count;
+      _count ++;
 
       // create waypoint
       _poi['waypoint'] = {latitude: _poi['latitude'], longitude: _poi['longitude'], elevation: _poi['elevation']} as Waypoint;

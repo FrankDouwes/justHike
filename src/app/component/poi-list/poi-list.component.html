@@ -1,25 +1,27 @@
 <!-- just to use its classes -->
 <mat-action-list class="hidden"></mat-action-list>
 
+
 <cdk-virtual-scroll-viewport
   class="mat-list mat-list-base"
   id="poi-list"
 
   orientation="vertical"
-  itemSize="72px"
+  itemSize="72"
   templateCacheSize="10"
+
+  (scrolledIndexChange)="onScroll($event)"
 
   #poiList>
 
-  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedData"
+  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedData; trackBy: trackElementBy"
 
-                    class="mat-list-item mat-2-line mat-list-item-avatar mat-list-item-with-avatar"
+                    class = "mat-list-item mat-2-line mat-list-item-avatar mat-list-item-with-avatar"
 
-                    [data]="poi"
-                    [status]="status"
+                    [data] = "poi"
+                    [status] = "status"
                     [timestamp] = "timestamp"
-
-                    (click)="onListItemClick(poi)"
+                    (click) = "onListItemClick(poi)"
 
                     matRipple>
   </poi-dynamic-item>

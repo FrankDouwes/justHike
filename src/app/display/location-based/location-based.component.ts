@@ -7,8 +7,8 @@ import {Mile} from '../../type/mile';
 import {environment} from '../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
-// import {FsService} from '../../service/fs.service';
 import {FilesystemService} from '../../service/filesystem.service';
+import {OrientationService} from '../../service/orientation.service';
 
 @Component({
   selector: 'app-location-based',
@@ -157,6 +157,7 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
       anchorPoint: undefined,
       distance: 0,
       nearestMileId: 0,
+      id: -1
     } as User;
   }
 

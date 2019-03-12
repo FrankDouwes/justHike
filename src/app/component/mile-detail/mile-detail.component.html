@@ -7,17 +7,17 @@
       name="detail-map"
 
       [allowPanning]=true
+      [allowZooming]=true
       [showPois]=true
       [showMapTiles]=true
-      [showElevationTiles]=true
-
-      [milesData]="this.visibleMilesLeaflet"
-      [activeMileId]="this.routedMile"
+      [activeMileId]="routedMile"
+      [centerPoint]="centerPoint"
+      [range]="{behind: 4, ahead: 4}"
     >
     </leaflet-map>
     <div id="overlay"></div>
   </div>
   <div id="list">
-    <poi-list [milesData]="this.visibleMilesList"></poi-list>
+    <poi-list [milesData]="trailData.miles" [showUser]="true" [activeMileId]="routedMile" (scrollToEvent)="onScrollTo($event)"></poi-list>
   </div>
 </div>

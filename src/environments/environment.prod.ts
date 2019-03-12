@@ -2,7 +2,7 @@ import {Trail} from '../app/type/trail';
 
 export const environment = {
 
-  production: true,               //  parsing raw data will trigger file download if set to false
+  production: false,               //  parsing raw data will trigger file download if set to false
     useRawData: false,              //  use raw data (create json), production must be set to false
       dowloadParsedData: false,       //  use raw data must be set to true in order for this to work
     simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
@@ -26,8 +26,7 @@ export const environment = {
     useMiles: true,                 // miles (true), km (false) (UNUSED)
     useFeet: true,                  // feet (true), meters (false) for elevation gain/loss (UNUSED)
     direction: 0,                   // northbound (0) or southbound (1)
-    showSnowPack: true,             // draw the snowpack
-    showCampSites: true,            // show campsites in elevation profile
+    showSnow: true,                 // draw the snowpack
     showMiniMap: true,              // show mini map in elevation profile
 
     poiDistanceOffTrail: 250,       // distance (in feet?) that a water source has to be off trail to be rendered as such
@@ -42,7 +41,7 @@ export const environment = {
     maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app
     scrollbarSegmentSize: 26,       // scrollbar (elevation profile) renders 1 point for every X points)
     simulatedMile: -1,              // the simulated mile number
-    userName: 'unknown',             // default username
+    userName: 'unknown'             // default username
   },
 
 

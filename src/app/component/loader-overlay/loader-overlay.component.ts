@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, isDevMode } from '@angular/core';
+import {Component, Input, OnInit, OnChanges, SimpleChanges, isDevMode, ChangeDetectorRef} from '@angular/core';
 import { LoaderService } from '../../service/loader.service';
 
 @Component({
@@ -20,6 +20,7 @@ export class LoaderOverlayComponent implements OnInit, OnChanges {
 
   // simple loader animation component, uses the loader service
   constructor(
+    private _changeDetector: ChangeDetectorRef,
     private _loaderService: LoaderService
   ) {}
 
@@ -30,6 +31,7 @@ export class LoaderOverlayComponent implements OnInit, OnChanges {
       if (isDevMode()) {
         console.log(obj['action'], obj['type'], obj['data']);
       }
+
       if (obj['action'] === 'show' && obj['type'] !== 'self') {
 
         if (obj['type'] === 'spinner') {
@@ -46,6 +48,9 @@ export class LoaderOverlayComponent implements OnInit, OnChanges {
            this[obj['type']] = null;
          }
       }
+
+      this._changeDetector.detectChanges();
+
     });
   }
 

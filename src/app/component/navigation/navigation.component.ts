@@ -20,6 +20,7 @@ export class NavigationComponent implements OnInit, OnChanges {
   public oppositeClass:               string = 'show';
   public isDownloading:               boolean = false;
   public updateAvailable:             boolean = false;
+  public isAdmin:                     boolean;
 
   private _backIndex:                 object;
 
@@ -41,9 +42,11 @@ export class NavigationComponent implements OnInit, OnChanges {
 
         this._backIndex = this._route.snapshot.queryParams['back'];
 
-        if (event['url'].includes('detail') || event['url'].includes('settings')) {
+        if (event['url'].includes('detail')) {
           this.visibleClass = 'show';
           this.oppositeClass = 'hide';
+        } else if (event['url'].includes('admin')) {
+          this.visibleClass = this.oppositeClass = 'show';
         } else {
           this.visibleClass = 'hide';
           this.oppositeClass = 'show';
@@ -63,6 +66,11 @@ export class NavigationComponent implements OnInit, OnChanges {
 
     this._updateSubscription = this._versionResolverService.updateAvailableObservable.subscribe( updateAvailable => {
       this.updateAvailable = updateAvailable;
+    });
+
+    this.isAdmin = this._localStorage.retrieve('isAdmin');
+    this._localStorage.observe('isAdmin').subscribe( value => {
+      this.isAdmin = value;
     });
 
   }
@@ -88,6 +96,11 @@ export class NavigationComponent implements OnInit, OnChanges {
     this.oppositeClass = 'show';
     this._router.navigate(['elevation-profile/'], {queryParams: {id: this._backIndex}});
     this.navEvent.emit('elevation-profile');
+  }
+
+  public onAdminClick(): void {
+    this._router.navigate(['admin'], {queryParams: {id: this._backIndex}});
+    this.navEvent.emit('admin');
   }
 
   public notifyUser(message: string): void {

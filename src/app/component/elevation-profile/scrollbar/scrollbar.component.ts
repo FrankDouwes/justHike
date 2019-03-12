@@ -15,6 +15,7 @@ import {Waypoint} from '../../../type/waypoint';
 import {normalizeElevation} from '../../../_util/math';
 import {environment} from '../../../../environments/environment.prod';
 import * as Hammer from 'hammerjs/hammer.min';
+import {Mile} from '../../../type/mile';
 declare const SVG: any;    // fixed SVG installation bug
 
 @Component({
@@ -43,7 +44,9 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   private _svgWidth:        number;
   private _svgHeight:       number;
   private _segments:        number;
-  private _sectionLength = 100;       // miles per scroll map section TODO XXX (get from data)
+  private _sectionLength:   number;
+
+  private _flatWaypoints:   Array<Waypoint>;
 
 
   constructor() {}
@@ -54,7 +57,6 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   // LIFECYCLE HOOKS
 
   ngOnInit(): void {
-
     let sliderManager = new Hammer.Manager(this.main.nativeElement);
     sliderManager.add(new Hammer.Pan({threshold: 0, pointers: 0, direction: Hammer.DIRECTION_HORIZONTAL}));
     sliderManager.on('pan', this._onSlide.bind(this));
@@ -62,11 +64,28 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
   ngAfterViewInit(): void {
 
+    const _self = this;
+
     if (!this.trailData) {
       return;
     }
 
+    // convert mile data to flat waypoints
+    this._flatWaypoints = [];
+    const _milesCount: number = this.trailData.miles.length;
+    this.trailData.miles.forEach(function(mile: Mile, index) {
+
+      // remove overlapping first and last point
+      if (index !== 0 || index !== _milesCount - 1) {
+        const _waypointsSection = mile.waypoints.slice(1, mile.waypoints.length - 1);
+        _self._flatWaypoints = _self._flatWaypoints.concat(_waypointsSection);
+      } else {
+        _self._flatWaypoints = _self._flatWaypoints.concat(mile.waypoints);
+      }
+    });
+
     // show 100 miles
+    this._sectionLength = this.trailData.scrollbarSegmentSize;
     this._segments = (Math.ceil(this.trailData.length) / this._sectionLength < 1) ? 1 : Math.ceil(this.trailData.length) / this._sectionLength;
 
     this._svgWidth =  this._segments * this.main.nativeElement.clientWidth;
@@ -149,21 +168,21 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
     const range = (max - min);
 
-    const l = (this._svgWidth / this.trailData.waypoints.length);
+    const l = (this._svgWidth / this._flatWaypoints.length);
 
     // start points
     drawPoints.push([0, max]);
     elevation = this._invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
-      , this.trailData.waypoints[0]['elevation'], min, range, this._verticalPadding));
+      , this._flatWaypoints[0]['elevation'], min, range, this._verticalPadding));
 
     drawPoints.push([0, elevation]);
 
     let prevPoint: object;
     let totalDistancePerc = 0;
 
-    for (let i = 0; i < this.trailData.waypoints.length; i += this.trailData.scrollbarSegmentSize) {
+    for (let i = 0; i < this._flatWaypoints.length; i += this.trailData.scrollbarSegmentSize) {
 
-      const waypoint: Waypoint = this.trailData.waypoints[i];
+      const waypoint: Waypoint = this._flatWaypoints[i];
 
       // calculate distance, starting at 2nd point
       if (counter > 0) {

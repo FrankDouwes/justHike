@@ -50,8 +50,6 @@ export class TrailService {
   // this generates the preparsed data files to be used by regular users (stored online for download + default version in assets)
   public getRawTrailData(trailId: number): Observable<object> {
 
-    this._loaderService.showMessage('fetching raw trail data');
-
     let _trailMeta: TrailMeta;
 
     for (const key in environment.TRAILS_GENERATION) {
@@ -59,8 +57,6 @@ export class TrailService {
         _trailMeta = environment.TRAILS_GENERATION[key] as TrailMeta;
       }
     }
-
-    alert('make sure to update environment trail generation settings');
 
     const _metaAsObservable = of(_trailMeta);     // so it can be passed into the forkjoin
 
@@ -70,9 +66,10 @@ export class TrailService {
     // snow data ripped from postholer (not very nice, I know)
 
     // .dat is an xml structured file (so .gpx or .kml)
-    const _trail = this._http.get('assets/data/' + _trailMeta.dataPath + 'trail.dat', {responseType: 'text'});
-    const _poi = this._http.get('assets/data/' + _trailMeta.dataPath + 'poi.dat', {responseType: 'text'});
-    const _snow = this._http.get('assets/data/' + _trailMeta.dataPath + 'snow.json', {responseType: 'json'});
+    const _assetsDir: string = 'assets/data/';
+    const _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', {responseType: 'text'});
+    const _poi = this._http.get(_assetsDir + _trailMeta.dataPath + 'poi.dat', {responseType: 'text'});
+    const _snow = this._http.get(_assetsDir + _trailMeta.dataPath + 'snow.json', {responseType: 'json'});
 
     return forkJoin([_metaAsObservable, _trail, _poi, _snow]);
   }
@@ -110,7 +107,7 @@ export class TrailService {
   }
 
   // Parse the raw data (routines for each trail), returns a promise
-  public parseTrailData(trail: Trail, waypoints: string, pois: string, snow: object, direction: number): object {
+  public parseTrailData(trail: TrailMeta, waypoints: string, pois: string, snow: object, direction: number): object {
 
     this._loaderService.showMessage('parsing trail data');
 
@@ -124,10 +121,10 @@ export class TrailService {
       direction
     );
 
-    let _snow = parseSnow(_parsed[3], _trail.id, _trail.abbr, _trail.version);
+    let _snow = parseSnow(_parsed[3], _trail.id, _trail.abbr, trail.snowVersion);
 
     if (direction === 1) {
-      _snow = reverseSnow(_snow, trail.miles.length)
+      _snow = reverseSnow(_snow, _trail.miles.length);
     }
 
     this._snowGenerator.setSnowData(_snow);

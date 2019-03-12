@@ -6,7 +6,6 @@ import { TrailService }  from './trail.service';
 import { LoaderService } from './loader.service';
 import { LocalStorageService } from 'ngx-webstorage';
 import { Trail } from '../type/trail';
-import { environment } from '../../environments/environment.prod';
 import { Waypoint } from '../type/waypoint';
 import { TrailGeneratorService } from './trail-generator.service';
 import { SnowGeneratorService } from './snow-generator.service';
@@ -25,7 +24,6 @@ export class TrailResolverService implements Resolve<any> {
   private _activeTrailId: number;
 
   // makes sure trail data is available before navigating anywhere
-
   constructor(
     private _localStorage: LocalStorageService,
     private _trailService: TrailService,
@@ -39,36 +37,11 @@ export class TrailResolverService implements Resolve<any> {
 
   /* there are 3 locations for trail data
    * - assets: contains default trail data that shipped with the app
-   * - filesystem: contains downloaded versions of the trail data
-   * - raw data: for developers only, this data is used to generate traildata for users to download (or ship in assets) */
+   * - filesystem: contains downloaded versions of the trail data */
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<object> | Observable<never> {
-
-    console.log('resolve trail data');
 
     this._activeTrailId = this._localStorage.retrieve('activeTrailId') | 0;
     const _direction: number = this._localStorage.retrieve('direction') | 0;
-
-    // dev mode, generate new trail data (slow)
-    if (environment.useRawData) {
-
-      return this._trailService.getRawTrailData(this._activeTrailId).pipe(
-        take(1),
-        switchMap(data => {
-
-          this._loaderService.hideOverlay();
-
-          if (data) {
-
-            // return parsed trail
-            return of(this._trailService.parseTrailData(data[0], data[1], data[2], data[3], _direction));
-
-          } else {
-            this._router.navigate(['/error']);
-            return;
-          }
-        })
-      );
-    } else {
 
       if (this._cachedTrail && this._cachedTrail.id === this._activeTrailId && this._cachedTrail.direction === _direction) {
 
@@ -117,6 +90,6 @@ export class TrailResolverService implements Resolve<any> {
           })
         );
       }
-    }
+    //}
   }
 }

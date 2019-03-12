@@ -7,6 +7,10 @@ export function setTrailMetaData(data: Array<TrailMeta>) {
   console.log('trail data set');
 }
 
+export function getTrailsMetaData(): Array<TrailMeta> {
+  return trails;
+}
+
 export function getTrailMetaDataById(id: Number): TrailMeta {
 
   if (!trails) {

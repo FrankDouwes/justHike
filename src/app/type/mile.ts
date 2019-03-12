@@ -15,10 +15,11 @@ export class Mile {
 
   // OPTIONAL
   snowData?:          Array<Snowpoint>;   // snow data, can be empty
-  pois?:              Array<Poi>;         // points of interest that belong to this mile (triangulation)
-  hasWater?:          boolean;            // contains water
-  hasCamp?:           boolean;            // contains campsite
-  hasEscape?:         boolean;            // has a road crossing
-  hasOther?:          boolean;            // has other
+
+  pois?:              Array<number>;      // points of interest that belong to this mile (triangulation)
+  poiTypes?:          Array<any>;         // contains water: true, camp: true etc.
+  hasMajorPoi?:       boolean;            // major are water/camp/road
+  hasMinorPoi?:       boolean;            // minor is everything else
+
   isCurrent:          boolean;            // holds user location
 }

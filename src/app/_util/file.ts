@@ -27,10 +27,12 @@ export function getExtensionFromString(filename: string): string {
 export function convertToIonicUrl(fileUrl: string): string {
   const _window: any = window;
 
-  if (!_window.Ionic || !_window.Ionic.WebView.convertFileSrc) {
-    // alert('ionic is being a pain, wait for deviceready');
-    return;
-  }
+  //window.Ionic.normalizeURL
 
-  return _window.Ionic.WebView.convertFileSrc(fileUrl);
+  if (!_window.Ionic || !_window.Ionic.WebView.convertFileSrc) {
+    alert('Unsupported filesystem.');
+    return;
+  } else {
+    return _window.Ionic.WebView.convertFileSrc(fileUrl);
+  }
 }

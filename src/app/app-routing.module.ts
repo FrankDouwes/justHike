@@ -4,10 +4,10 @@ import { Routes, RouterModule } from '@angular/router';
 // component
 import { MileDetailComponent } from './component/mile-detail/mile-detail.component';
 import { ElevationProfileComponent } from './component/elevation-profile/elevation-profile.component';
-import {PlaygroundComponent} from './component/playground/playground.component';
 
 // resolvers
 import {SequentialResolverService} from './service/sequential-resolver.service';
+import {AdminComponent} from './component/admin/admin.component';
 
 const routes: Routes = [
   {
@@ -28,15 +28,14 @@ const routes: Routes = [
     path: '',
     redirectTo: 'elevation-profile',
     pathMatch: 'full'
+  },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    resolve: {
+      data: SequentialResolverService
+    }
   }
-  // todo: temp playground component
-  // {
-  //   path: '',
-  //   component: PlaygroundComponent,
-  //   resolve: {
-  //     data: TrailResolverService
-  //   }
-  // }
 ];
 
 @NgModule({

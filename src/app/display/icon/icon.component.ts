@@ -11,6 +11,7 @@ export class IconComponent implements OnInit {
   @Input() data: Array<PoiType>;
   @Input() showRating: boolean;
   @Input() showUpdates: boolean;
+  @Input() name ?: string;
 
   public rateable: boolean;
 

@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import { Mile } from '../../type/mile';
 import {Trail} from '../../type/trail';
+import {Waypoint} from '../../type/waypoint';
 
 @Component({
   selector: 'app-mile-detail',
@@ -11,19 +12,14 @@ import {Trail} from '../../type/trail';
 
 export class MileDetailComponent implements OnInit {
 
-  public visibleMilesList:        Array<Mile>;
-  public visibleMilesLeaflet:     Array<Mile>;
+  public visibleMiles:            Array<Mile>;
   public routedMile:              number;
   public trailData:               Trail;
-
-  private _mapLineSegmentPadding = 1;
-  private _milesBehindExtra: number = 0;
-  private _milesAheadExtra: number = 0;
-  private _milesBehind: number = 2;
-  private _milesAhead: number = 1;
+  public centerPoint:             Waypoint;
 
   constructor(
     private _route: ActivatedRoute,
+    private _router: Router
   ) {
   }
 
@@ -35,37 +31,21 @@ export class MileDetailComponent implements OnInit {
     this.routedMile = (this._route.snapshot) ? Number(this._route.snapshot.paramMap.get('id')) : 0;
 
     this._route.data.subscribe(result => {
-
         this.trailData = result.data['trail'];
-        this._isolateVisibleMiles();
+        this._setCenterpoint(this.routedMile);
       }
     );
   }
 
-  private _isolateVisibleMiles(): void {
 
-    this.visibleMilesList = this._getMilesSegmentData(this.trailData, this._milesBehind + this._milesAheadExtra, this._milesAhead + this._milesAheadExtra);
-    this.visibleMilesLeaflet = this._getMilesSegmentData(this.trailData, (this._milesBehind + this._milesAheadExtra + this._mapLineSegmentPadding), (this._milesAhead + this._milesAheadExtra + this._mapLineSegmentPadding));
+  // EVENTS
+  public onScrollTo(data: any): void {
+    this._setCenterpoint(data.mileId);
+    this.routedMile = data.mileId;
+    this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
   }
 
-  // OTHER
-  // the mile (line) segments data to show using leaflet
-  // there's some overlap so you can look ahead/behind.
-  private _getMilesSegmentData(data: any, milesBehind: number, milesAhead: number): Array<Mile> {
-
-    const _startIndex: number = (this.routedMile >= milesBehind) ? this.routedMile - milesBehind : 0;
-    const _endIndex: number = (this.routedMile + milesAhead <= data.miles.length) ? this.routedMile + milesAhead : data.miles.length;
-
-    return data.miles.slice(_startIndex, _endIndex);
-  }
-
-  public loadAhead(): void {
-    this._milesAheadExtra += 3;
-    this._isolateVisibleMiles();
-  }
-
-  public loadBehind(): void {
-    this._milesBehindExtra += 3;
-    this._isolateVisibleMiles();
+  private _setCenterpoint(mileId: number): void {
+    this.centerPoint = this.trailData.miles[mileId].centerpoint as Waypoint;
   }
 }

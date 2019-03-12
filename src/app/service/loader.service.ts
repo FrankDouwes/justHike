@@ -30,6 +30,8 @@ export class LoaderService {
 
   public showMessage(message: string): void {
 
+    console.log(message);
+
     this._overlaySubject.next({action: 'show', type: 'message', data: message});
   }
 

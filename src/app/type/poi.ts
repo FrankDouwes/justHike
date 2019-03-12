@@ -9,13 +9,16 @@ export class Poi {
   anchorPoint:        Waypoint;           // calculated nearest trail location (between 2 waypoints in a mile)
   distance:           number;             // distance from trail (from nearest line segment (2 waypoints) within mile, in meters
 
+  belongsTo?:         number;             // mileId
   description?:       string;             // optional description
   distanceFromUser?:  number;             // distance from user in meters
+  isBehind?:          boolean;            // is this poi behind the current poi (or user)
 }
 
 export class PoiType {
   type:       string;           // string
   label:      string;           // default label
+  isMajor?:   boolean;          // crucial are 'water', 'camp', 'road'
   color?:     string;           // color (must be hex!, no "white" "red" etc.)
   iconType:   string;           // Font Awesome has prefixes for different icons styles (fa, fas)
   icon:       string;           // the Font Awesome icon name

@@ -2,8 +2,6 @@
 
   <display-button class="button back {{this.visibleClass}}" label="" icon="arrow-left" (click)="onBackClick()"></display-button>
 
-  <mat-spinner *ngIf="isDownloading"></mat-spinner>
-
   <div class="right {{this.oppositeClass}}">
     <locator-button></locator-button>
   </div>
@@ -11,4 +9,9 @@
   <div class="right {{this.oppositeClass}}">
     <settings-button (click)="onSettingsClick()" [updateAvailable]="updateAvailable" [isDownloading]="isDownloading"></settings-button>
   </div>
+
+  <div class="right {{this.oppositeClass}}" *ngIf="isAdmin">
+    <display-button class="button" label="" icon="skull" (click)="onAdminClick()"></display-button>
+  </div>
+
 </div>

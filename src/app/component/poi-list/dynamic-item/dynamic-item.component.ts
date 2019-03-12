@@ -1,4 +1,16 @@
-import { Component, OnInit, OnDestroy, ViewChild, ViewContainerRef, Input, ComponentRef, ComponentFactoryResolver, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ViewContainerRef,
+  Input,
+  ComponentRef,
+  ComponentFactoryResolver,
+  OnChanges,
+  SimpleChanges,
+  HostBinding, ChangeDetectorRef
+} from '@angular/core';
 import { PoiListItemComponent } from '../poi-list-item/poi-list-item.component';
 import { PoiUserItemComponent } from '../poi-user-item/poi-user-item.component';
 
@@ -9,10 +21,11 @@ import { PoiUserItemComponent } from '../poi-user-item/poi-user-item.component';
 })
 export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
+  @HostBinding('class.spacer') isSpacer: boolean = false;
   @ViewChild('container', { read: ViewContainerRef }) container: ViewContainerRef;
 
   @Input() data: object;
-  @Input() status: string = "idle";
+  @Input() status: string = 'idle';
   @Input() timestamp: number;
 
   private _componentRef: ComponentRef<{}>;
@@ -22,22 +35,13 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
   // if type === user, use user-item, else use poi-item
 
   constructor(
+    private _changeDetector: ChangeDetectorRef,
     private _componentFactoryResolver: ComponentFactoryResolver) {
   }
 
   ngOnInit(): void {
 
-    const componentType: any = (this.data['type'] === 'user') ? PoiUserItemComponent : PoiListItemComponent;
-
-    const factory = this._componentFactoryResolver.resolveComponentFactory(componentType);
-    this._componentRef = this.container.createComponent(factory);
-
-    // set dynamic component data
-    this._instance = <any> this._componentRef.instance;
-
-    // inject data
-    this._instance.data = this.data;
-    this._instance.status = this.status;
+    this._setup();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -46,17 +50,34 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
+
+
+    if (changes.data) {
+
+      if (changes.data.currentValue.type !== this._instance.data.type) {
+
+        // item type mismatch, render new instance of correct item
+        if (this._instance instanceof PoiListItemComponent && this.data['type'] === 'user'
+          || this._instance instanceof PoiUserItemComponent && this.data['type'] !== 'user') {
+          this.ngOnDestroy();
+          this._setup();
+          return;
+        }
+      }
+    }
+
     if (changes.status) {
       this._instance.status = changes.status.currentValue;
     }
 
-    if (changes.timestamp) {
-      console.log('stamp changed');
-    }
-
     if (changes.data) {
       this._instance.data = changes.data.currentValue;
+      if (this._instance.setupIcons) {
+        this._instance.setupIcons();
+      }
     }
+
+    this._instance.timeStamp = new Date().getTime();
   }
 
   ngOnDestroy(): void {
@@ -64,6 +85,24 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
       this._componentRef.destroy();
       this._componentRef = null;
     }
+  }
+
+  private _setup(): void {
+    const componentType: any = (this.data['type'] === 'user') ? PoiUserItemComponent : PoiListItemComponent;
+
+    const factory = this._componentFactoryResolver.resolveComponentFactory(componentType);
+
+    this._componentRef = this.container.createComponent(factory);
+
+    // set dynamic component data
+    this._instance = <any> this._componentRef.instance;
+
+    // inject data
+    this._instance.data = this.data;
+    this._instance.status = this.status;
+    this._instance.timeStamp = new Date().getTime();
+
+    this._changeDetector.markForCheck();
   }
 
 }

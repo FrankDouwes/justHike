@@ -13,6 +13,7 @@ export class Settings {
     }, {
       type: 'water',
       label: 'water',
+      isMajor: true,
       color: '#58aed9',
       iconType: 'fa',
       icon: 'tint',
@@ -20,12 +21,14 @@ export class Settings {
     }, {
       type: 'camp',
       label: 'campspot',
+      isMajor: true,
       color: '#d9a758',
       iconType: 'fa',
       icon: 'campground'
     }, {
       type: 'road',
       label: 'road',
+      isMajor: true,
       color: '#989898',
       iconType: 'fa',
       icon: 'road'
@@ -96,6 +99,7 @@ export class Settings {
     {
       type: 'end',
       label: 'sign',
+      isMajor: true,
       color: '#d9c558',
       iconType: 'fa',
       icon: 'flag'

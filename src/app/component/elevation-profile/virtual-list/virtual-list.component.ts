@@ -131,29 +131,32 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     const _milesLength = this.trailData.miles.length;
 
-    // Listen for scroll events (angular "events" will not do!)
+    // Listen for scroll events (angular "events" will not do!), needs to run on window for ios
     window.addEventListener('scroll', function (event) {
 
-      event.preventDefault();
-      event.stopPropagation();
+      if (event.target === _self.scrollViewport.elementRef.nativeElement) {
 
-      _self.scrollViewport.checkViewportSize();  // magically fixes everything! somehow...
+        // event.preventDefault();
+        // event.stopPropagation();
 
-      _self.scrollOffset = _self.scrollViewport.measureScrollOffset();
+        _self.scrollViewport.checkViewportSize();  // magically fixes everything! somehow...
 
-      // update background position
-      const _wrapper = _self.scrollViewport.elementRef.nativeElement;
-      _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.005) + 'px;');
+        _self.scrollOffset = _self.scrollViewport.measureScrollOffset();
 
-      const _verticalChange = (_self.visibleOHLC.high - _self.visibleOHLC.low) / 1500;
+        // update background position
+        const _wrapper = _self.scrollViewport.elementRef.nativeElement;
+        _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.1) + 'px;');
 
-      _self.background.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.6) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
-      _self.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
+        // const _verticalChange = (_self.visibleOHLC.high - _self.visibleOHLC.low) / 1500;
+
+        // _self.background.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.6) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
+        // _self.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
+      }
       }, true);
   }
 
   public onClick(listItem: Mile): void {
-    this._router.navigate(['detail/', listItem.id], {queryParams: {back: this._currentIndex}});
+    this._router.navigate(['detail/', listItem.id - 1], {queryParams: {back: this._currentIndex}});
   }
 
   // only executed once every 250ms as it's a redraw of all list items
@@ -242,8 +245,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     if (_oldRange !==  this._visibleRange) {
       this.scrollEvent.emit({visibleRange: this._visibleRange, scrollX: this.scrollViewport.getOffsetToRenderedContentStart()});
       this.visibleOHLC = this._calculateVisOHLC(this._visibleRange);
-      const _verticalChange = (this.visibleOHLC.high - this.visibleOHLC.low) / 1500;
-      this.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(this.scrollOffset * 0.015) + 'px;');
+      // const _verticalChange = (this.visibleOHLC.high - this.visibleOHLC.low) / 1500;
+      // this.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(this.scrollOffset * 0.015) + 'px;');
       this._calculateGuides();
     }
   }

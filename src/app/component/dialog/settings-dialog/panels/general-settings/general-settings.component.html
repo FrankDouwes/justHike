@@ -1,11 +1,11 @@
-<mat-card>
+<mat-card #panel>
 
   <mat-card-header>
     <mat-card-title>User:</mat-card-title>
   </mat-card-header>
 
   <section>
-    <input type="string" value="" placeholder="user name">
+    <input type="string" value="" (input)="onUserNameChange($event.target.value)" placeholder="user name">
   </section>
 
 
@@ -45,7 +45,7 @@
   </mat-card-header>
 
   <section>
-    <mat-checkbox class="example-margin" name="showCampSites" [(ngModel)]="showCampSites" (change)="onCheckboxChange($event)">show campsites</mat-checkbox>
+    <mat-checkbox *ngFor="let poiType of majorPoiTypes" class="example-margin" [name]="createCamelCaseName(poiType, 'show')" [(ngModel)]="this[createCamelCaseName(poiType, 'show')]" (change)="onCheckboxChange($event)">show {{poiType}}</mat-checkbox>
     <br/>
     <mat-checkbox class="example-margin" name="showMiniMap" [(ngModel)]="showMiniMap" (change)="onCheckboxChange($event)">show mini-map</mat-checkbox>
   </section>
@@ -59,5 +59,4 @@
       <div>something</div>
     </section>
   </mat-card-content>
-
 </mat-card>

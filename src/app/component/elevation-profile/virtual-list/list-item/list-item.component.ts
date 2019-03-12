@@ -21,13 +21,13 @@ declare const SVG: any;    // fixes SVGjs bug
 import { svgPath } from '../../../../_util/smoothLine';
 import { isPrime, normalizeElevation } from '../../../../_util/math';
 import { createSvgCircleMarker, createSvgFaElement, createSvgPointMarker, sampleFaIcon } from '../../../../_util/markers';
-import { getPoiTypeByType } from '../../../../_util/poi';
+import {getMajorPoiTypes, getPoiTypeByType} from '../../../../_util/poi';
 import { environment } from '../../../../../environments/environment.prod';
 import { LocalStorageService } from 'ngx-webstorage';
 import { Subscription } from 'rxjs';
 import { TrailGeneratorService } from '../../../../service/trail-generator.service';
 import { SnowGeneratorService } from '../../../../service/snow-generator.service';
-import {Snowpoint} from '../../../../type/snow';
+import { Snowpoint } from '../../../../type/snow';
 
 
 
@@ -55,10 +55,10 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   @Input() triggerUserUpdate?:  number;           // timestamp, set when user location is updated.
   @Input() userStatus?:         string;           // idle/fetching/tracking
 
-  public showCampsites:         boolean;
-  private _showSnowPack:        boolean;
-
   private _snowData:            Array<Array<Snowpoint>>;
+  private _dynamicSubscriptions: object           = {};
+  private _settings:              object          = {};
+  private _initialized:         boolean;          // can only draw after initialization
 
   // SVG MAP
   private _lineCanvas;                            // line (trail/snow) canvas
@@ -69,10 +69,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   // USER
   private _userMarker;
 
-  // OTHER
-  private _initialized:         boolean;          // can only draw after initialization
-  private _campSubscription:    Subscription;
-  private _snowSubscription:    Subscription;
 
   constructor(
     private _localStorage: LocalStorageService,
@@ -84,17 +80,49 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   ngOnInit(): void {
 
-    this.showCampsites = this._localStorage.retrieve('showCampSites');
-    this._campSubscription = this._localStorage.observe('showCampSites').subscribe(result => {
-      this.showCampsites = result;
+    const _self = this;
+    const _majorPoiTypes: Array<string> = getMajorPoiTypes();
+
+    // dynamic subscriptions based on PoiTypes that are set as being major (important)
+    _majorPoiTypes.forEach(function(type: string) {
+      _self._getSettingFromStorage(type);
+      _self._addSubscription(type);
+    });
+
+    // add snowPack subscription (not really a poi
+    _self._getSettingFromStorage('showSnow');
+    _self._addSubscription('showSnow');
+
+  }
+
+
+  // add a poi type subscription to the subscriptionsObject
+  private _addSubscription(name: string): void {
+
+    const _camelName =  'show' +  name.charAt(0).toUpperCase() + name.slice(1);
+
+    const _subscription = this._localStorage.observe(_camelName).subscribe(result => {
+      this._settings[_camelName] = result;
       this._drawMap();
     });
 
-    this._showSnowPack = this._localStorage.retrieve('showSnowPack');
-    this._snowSubscription = this._localStorage.observe('showSnowPack').subscribe(result => {
-      this._showSnowPack = result;
-      this._drawMap();
-    });
+    this._dynamicSubscriptions[name] = _subscription;
+  }
+
+  // get initial poi type saved values, as subscriptions only listen to updates
+  private _getSettingFromStorage(name: string): void {
+
+    const _camelName =  'show' +  name.charAt(0).toUpperCase() + name.slice(1);
+    this._settings[_camelName] = this._localStorage.retrieve(_camelName);
+  }
+
+  private _removeSubscription(name: string): void {
+
+    const _subscription: Subscription = this._dynamicSubscriptions[name];
+
+    if (_subscription) {
+      _subscription.unsubscribe();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -153,8 +181,9 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   }
 
   ngOnDestroy(): void {
-    this._campSubscription.unsubscribe();
-    this._snowSubscription.unsubscribe();
+    for (const key in this._dynamicSubscriptions) {
+      this._removeSubscription(key);
+    }
   }
 
   private _drawMap(): void {
@@ -164,7 +193,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // line
     this._drawLine();
 
-    if (this._showSnowPack) {
+    if (this._settings['showSnowPack']) {
       this._drawSnow();
     }
 
@@ -310,19 +339,32 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
       _poisArray.forEach((poi, index) => {
 
-        const _poi = poi as Poi;
+        const _poi: Poi = this._trailGenerator.getPoiById(poi);
 
-        const _visibleTypes = ['water', 'end'];
+        if (!_poi) {
+          console.log('bug at poi with id:' + poi);
+        }
+
 
         // if user setting is true
-        if (this.showCampsites) {
-          _visibleTypes.push('camp');
-        }
 
         const _poiTypes = _poi['type'].split(', ');
 
         // if poi is of visible type
-        if (_visibleTypes.some(function(v) { return _poiTypes.indexOf(v) >= 0; })) {
+        let _isVisible: boolean;
+        let _visibleTypes: string = '';
+
+        _poiTypes.forEach(function (type) {
+
+          const _setting: boolean = _self._settings[_self._createCamelCaseName(type, 'show')];
+
+          if (_setting === true) {
+            _isVisible = true;
+            _visibleTypes += type;
+          }
+        });
+
+        if (_isVisible) {
 
           let _marker;
           let _markerColor: string;
@@ -347,7 +389,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
               if (_visibleTypes.indexOf(type) !== -1 && index <= 1) {
 
                 // max of 2 icons in marker, if more types show plus symbol
-                if (index === 1 && _poiTypes.length > 2 || index === 1 && !_self.showCampsites) {
+                if (index === 1 && _poiTypes.length > 2 || index === 1 && !_self._settings['showCamp']) {
                   type = 'multiple';
                 }
 
@@ -366,7 +408,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
               if (_visibleTypes.indexOf(type) !== -1 && index <= 1) {
 
                 // max of 2 icons in marker, if more types show plus symbol
-                if (index === 1 && _poiTypes.length > 2 || index === 1 && !_self.showCampsites) {
+                if (index === 1 && _poiTypes.length > 2 || index === 1 && !_self._settings['showCamp']) {
                   type = 'multiple';
                 }
 
@@ -499,4 +541,12 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / environment.MILE), _userElevation);
     }
   }
+
+  private _createCamelCaseName(name: string, prepend?: string, append?: string): string {
+
+    prepend = (prepend) ? prepend : '';
+    append = (append) ? prepend : '';
+
+    return prepend + name.charAt(0).toUpperCase() + name.slice(1) + append;
+  };
 }

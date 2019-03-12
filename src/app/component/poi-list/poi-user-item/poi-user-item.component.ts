@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, HostBinding } from '@angular/core';
+import {Component, Input, OnInit, HostBinding, ChangeDetectorRef} from '@angular/core';
 import { Poi } from '../../../type/poi';
 
 @Component({
@@ -41,7 +41,9 @@ export class PoiUserItemComponent implements OnInit {
     }
   }
 
-  constructor() {}
+  constructor(
+    public changeDetector: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {}
 }

@@ -85,10 +85,6 @@ export function parseSnow(snow: Array<any>, trailId: number, abbr: string, versi
 
   _returnObj.snowMiles = _snowMiles;
 
-  if (isDevMode() && environment.dowloadParsedData) {
-    saveFileAs(_returnObj, abbr + '-snow.json');
-  }
-
   return _returnObj;
 }
 
@@ -96,7 +92,6 @@ export function reverseSnow(snow: Snow, trailLength: number): Snow {
 
   // sobo reverse snow
   // snow.snowMiles.reverse();
-  console.log(snow);
   const _newSnowArray: Array<any> = [];
 
   snow.snowMiles.forEach(function (snowMile, index) {

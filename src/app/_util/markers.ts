@@ -1,4 +1,5 @@
 import * as L from 'leaflet';
+declare const SVG: any;    // fixes SVGjs bug
 
 // UTILS for markers (leaflet & elevation profile markers)
 
@@ -73,6 +74,53 @@ export function createFaLeafletMarker(icon: string, iconPrefix: string, color:st
   return _marker;
 }
 
+export function createUserMarker(icon: string, iconPrefix: string, color:string) {
+
+  let ele = document.createElement("div");
+  let draw = SVG(ele).size(1, 1).style('overflow', 'visible');
+  let marker = createSvgCircleMarker(draw, '#00FF00', 0.5);
+
+  let _marker = L.divIcon({className: 'user', html: ele.innerHTML});
+  return _marker;
+}
+
+// L.CustomMarker = function (options) {
+//   return new customMarker(options);
+// };
+//
+// const customMarker = L.Icon.extend({
+//
+//   options: {
+//     shadowUrl: 'leaf-shadow.png'
+//   },
+//
+//   initialize: function(options) {
+//     return options = L.Util.setOptions(this, options);
+//   },
+//
+//   createIcon: function(oldIcon) {
+//     let ele = document.createElement("div");
+//     let draw = SVG(ele).size(300, 300);
+//     var rect = draw.rect(100, 100).attr({ fill: '#f06' });
+//   },
+//
+//   _createInner: function() {
+//     return;
+//   },
+//   _setIconStyles: function(img, name) {
+//   },
+//   createShadow: function() {
+//     var div;
+//     div = document.createElement("div");
+//     this._setIconStyles(div, "shadow");
+//     return div;
+//   }
+// });
+
+
+
+
+
 // modified version of https://github.com/hiasinho/Leaflet.vector-markers
 (function() {
   (function(window, document, undefined_) {
@@ -109,7 +157,7 @@ export function createFaLeafletMarker(icon: string, iconPrefix: string, color:st
           icon = this._createInner();
         }
         pin_path = L.VectorMarkers.MAP_PIN;
-        div.innerHTML = '<svg viewBox="0 0 33 50" width="33" height="50" stroke="' +options.markerBorderColor + '">' + '<path d="' + pin_path + '" fill="' + options.markerColor + '" stroke-width="' + options.markerStrokeWidth+ '"></path>' + icon + '</svg>';
+        div.innerHTML = '<svg viewBox="0 0 33 50" width="33" height="50" stroke="' + options.markerBorderColor + '">' + '<path d="' + pin_path + '" fill="' + options.markerColor + '" stroke-width="' + options.markerStrokeWidth + '"></path>' + icon + '</svg>';
         this._setIconStyles(div, "icon");
         this._setIconStyles(div, "icon-" + options.markerColor);
         return div;

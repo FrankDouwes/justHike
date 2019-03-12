@@ -6,12 +6,10 @@ import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-d
 import { LocationService } from './service/location.service';
 import { OfftrailDialogComponent } from './component/dialog/offtrail-dialog/offtrail-dialog.component';
 import { LocalStorageService } from 'ngx-webstorage';
-import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 
 // capacitor
-import { Plugins } from '@capacitor/core';
 import {FilesystemService} from './service/filesystem.service';
-const { SplashScreen } = Plugins;
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -32,13 +30,13 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   private _offtrailDialog: any;
 
   constructor(
+    private _route: ActivatedRoute,
     private _fileSystemService: FilesystemService,
     private _dialog: MatDialog,
     private _loaderService: LoaderService,
     private _element: ElementRef,
     private _injector: Injector,
     private _localStorage: LocalStorageService,
-    private _screenOrientation: ScreenOrientation
   ) {
     // makes constructor props accessible through LocationService, needed for inheritance
     LocationService.injector = this._injector;
@@ -52,7 +50,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
       console.log('running on mobile device:', navigator.userAgent);
       document.addEventListener('deviceready', function() {
-        _self._screenOrientation.lock(_self._screenOrientation.ORIENTATIONS.LANDSCAPE);
         _self._onReady();
       });
     } else {
@@ -69,6 +66,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this._loaderService.observe.subscribe((obj: object) => {
       this.showLoader = (obj['type'] === 'self') ? (obj['action'] === 'show') : this.showLoader;
       if (obj['action'] === 'hide') {
+        console.log('spinner hide');
         this.initialized = true;
       }
     });
@@ -90,7 +88,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
-    // this._downloadSubscription.unsubscribe();
     this._element.nativeElement.removeEventListener('markerClick', this._onCustomEvent.bind(this));
     this._element.nativeElement.removeEventListener('offtrail', this._onCustomEvent.bind(this), false);
   }
@@ -98,11 +95,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   // STARTUP
 
   private _onReady(): void {
-
-    SplashScreen.hide();
-
-    // activate filesystem TODO (for future file downoader)
-    // this._fileSystemService.initializeStorage();
 
     // reload on storage timestamp change (user settings changed that require a reload)
     this._localStorage.observe('timestamp').subscribe((value) => {

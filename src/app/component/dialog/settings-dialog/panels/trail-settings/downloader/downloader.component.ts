@@ -1,9 +1,15 @@
-import {Component, ElementRef, Input, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, Input, isDevMode, OnDestroy, OnInit} from '@angular/core';
+import {DownloadService} from '../../../../../../service/download.service';
+import {Subscription} from 'rxjs';
+import {Downloader, DownloaderStatus} from '../../../../../../_util/downloader';
 import {environment} from '../../../../../../../environments/environment.prod';
-import * as D from 'node_modules/cordova-plugin-file-downloader/src/downloader';
-import {MatDialog} from '@angular/material';
-import {DownloadDialogComponent} from '../download-dialog/download-dialog.component';
+import {FilesystemService} from '../../../../../../service/filesystem.service';
+import {getExtensionFromString} from '../../../../../../_util/file';
 
+export class DownloadStatus {
+  label: string;
+  data: any;
+}
 
 @Component({
   selector: 'downloader',
@@ -11,110 +17,145 @@ import {DownloadDialogComponent} from '../download-dialog/download-dialog.compon
   styleUrls: ['./downloader.component.sass']
 })
 
-/* downloader component using a package (bunch of cordova plugins mixed together, not the way I want it to be, waiting for a capacitor update to allow blobs,
-there's a 2nd XYZdownloader.component that will eventually work, which works with the downloader service allowing multiple downloads, background downloads etc.*/
 export class DownloaderComponent implements OnInit, OnDestroy {
 
-  @Input() trailAbbr:       string;
-  @Input() name:            string;
-  @Input() label:           string;
-  @Input() downloadPath:    string;
-  @Input() type:            string;
-  @Input() fileSize?:       number;
+  @Input() trailAbbr: string;
+  @Input() name: string;
+  @Input() label: string;
+  @Input() downloadPath: string;
+  @Input() fileSize?: number;
+  @Input() callback?: Function;
 
-  public isActive: boolean = false;      // downloader is doing stuff
-  public progress: number = 0;    // 0 - 100;
-  public state: string = 'idle';
-  public hasFiles: boolean = false;
+  public hasFile: boolean;
+  public isActive: boolean;
+  public status: DownloadStatus;
+  public storageAvailable: boolean;
+  public progress: number;
 
-  private _initialized: boolean;
-  private _downloader: D;
+
+  private progressLabel: string;
+
+  private _fileExtension: string;
+
+  private _buttonState: string;
+
+  private _downloadSubscription: Subscription;
+  private _downloader: Downloader;
 
   constructor(
-    private _elementRef: ElementRef,
-    private _dialog: MatDialog,
-) {}
-
-  ngOnInit(): void {
-    this._initializeDownloader();
+    private _changeDetector: ChangeDetectorRef,
+    private _downloadService: DownloadService,
+    private _fileSystemService: FilesystemService
+  ) {
   }
 
-  // download keeps running in the background as it runs separate from the component
-  // TODO: the parsing should also run seperately...
-  ngOnDestroy(): void {}
-
-
-  // DOWNLOADER
-  // re initialize after abort/clear
-  private _initializeDownloader():void {
+  ngOnInit(): void {
 
     const _self = this;
 
-    if (!this._downloader) {
-      this._downloader = D;     // "There can be only one! =(" ~ Highlander
+    // check if storage is accessible
+    this.storageAvailable = this._fileSystemService.isStorageAvailable;
+
+    // set extension for parsing
+    this._fileExtension = getExtensionFromString(this.downloadPath);
+
+    // name based downloader, managed by downloader service
+    this._downloader = this._downloadService.createDownloader(this.name);
+
+    // observe download status
+    this._downloadSubscription = this._downloader.meta.subscribe(
+      function (status: DownloaderStatus) {
+
+        if (status.type === 'http') {
+          _self.progressLabel = 'downloading';
+        } else if (status.type === 'filesystem') {
+          _self.progressLabel = 'processing';
+        }
+
+        _self.status = status;
+
+        if (status.type === 'http' && status.label && status.label === 'complete') {
+
+          if (!_self.downloadPath) {
+            _self.isActive = false;
+          }
+
+          if (_self._fileExtension === 'zip') {
+
+            console.log('zip downloaded');
+
+          } else if (_self._fileExtension === 'json') {
+
+            console.log('json downloaded');
+
+          } else {
+
+            _self._clear();
+            _self.hasFile = _self.isActive = false;
+            throw new Error('downloaded an unsupported file');
+          }
+
+        } else if (status['label'] && status['label'] === 'progress') {
+
+          _self.isActive = true;
+          const _newProgress = status.data.percentage.toFixed(0);
+          if (_newProgress !== _self.progress) {
+            _self.progress = status.data.percentage.toFixed(0);
+            _self._changeDetector.detectChanges();
+          }
+
+        } else if (status['label'] && status['label'] === 'error') {
+
+          alert('Downloader error');
+          _self.hasFile = _self.isActive = false;
+
+        } else if (status.type === 'downloader' && status.label === 'complete') {
+          _self.progress = 100;
+          _self.hasFile = true;
+          _self.isActive = false;
+          _self.callback();
+        }
+
+
+        }, function (error) {
+
+        alert('Download error');
+        _self.hasFile = _self.isActive = false;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this._downloadSubscription.unsubscribe();
+  }
+
+
+  // EVENT HANDLERS
+
+  public onButtonClick(newState: string) {
+
+    // prevent repetitive actions
+    if (this._buttonState !== newState) {
+      this['_' + newState]();     // dynamic function call
     }
-
-    this._elementRef.nativeElement.addEventListener('DOWNLOADER_initialized', function(event) {
-      console.log('downloader initialized');
-      _self._initialized = true;
-    }, false);
-
-    this._downloader.init({folder: this.trailAbbr, unzip: true, delete: true, nativeElement: this._elementRef.nativeElement});
-
   }
 
 
   // BUTTON ACTIONS (dynanically called from button click)
 
   private _download(): void {
-
-    if (this._initialized) {
-
-      const _url = environment.appDomain + environment.fileBaseUrl + this.downloadPath;
-      const _downloadDialog = this._dialog.open(DownloadDialogComponent, {
-        autoFocus: true,
-        closeOnNavigation: false,
-        disableClose: true,
-        width: '50%',
-        height: '50%',
-        data: { nativeElement: this._elementRef.nativeElement }
-      });
-
-      this._downloader.get(_url);
-
-    } else {
-      alert('The (mobile only) downloader failed to initialize!');
-    }
+    const _url = environment.appDomain + environment.fileBaseUrl + this.downloadPath;
+    this._downloader.downloadFile(_url, !isDevMode(), this.downloadPath);
   }
 
   // clear all data
   private _clear(): void {
 
-    // const _self = this;
-    //
-    // this._fileSystemService.removeDirectory(this.trailAbbr).then(function() {
-    //   _self.state = 'idle';
-    // });
+    this._downloader.cancelDownload();
+    this._downloader.clearFile();
   }
 
   // cancel current download/unzip process
   private _cancel(): void {
-
-    this._downloader.abort();
-
-    this._clear();
-    this._initializeDownloader();
-  }
-
-  // EVENT HANDLERS
-
-  public onButtonClick(newState: string) {
-
-    console.log(this.state);
-
-    if (this.state !== newState) {
-
-      this['_' + newState]();     // dynamic function call based on state
-    }
+    this._downloader.cancelDownload();
   }
 }

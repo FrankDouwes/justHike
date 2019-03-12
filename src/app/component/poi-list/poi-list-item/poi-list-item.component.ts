@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import {ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import { Poi, PoiType } from '../../../type/poi';
 import { getPoiTypeByType } from '../../../_util/poi';
 
@@ -11,12 +11,21 @@ export class PoiListItemComponent implements OnInit {
 
   @Input() data: Poi;
   @Input('status') status: string = "idle";
+  @Input() timeStamp: number;
 
   public poiTypes: Array<PoiType> = [];
 
-  constructor() { }
+  constructor(
+    public changeDetector: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
+    this.setupIcons();
+  }
+
+  public setupIcons(): void {
+
+    this.poiTypes = [];
 
     const _self = this;
 

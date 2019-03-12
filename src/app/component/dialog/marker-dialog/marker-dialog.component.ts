@@ -1,18 +1,22 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Poi, PoiType } from '../../../type/poi';
 import { getPoiTypeByType } from '../../../_util/poi';
+import {TrailGeneratorService} from '../../../service/trail-generator.service';
 
 @Component({
   selector: 'marker-dialog',
   templateUrl: './marker-dialog.component.html',
   styleUrls: ['./marker-dialog.component.sass']
 })
-export class MarkerDialogComponent implements OnInit {
+export class MarkerDialogComponent implements OnInit, OnDestroy {
 
   public poiTypes:  Array<PoiType> = [];
+  public poiCollection: Array<object> = [];
+  public showRelated: boolean;
 
   constructor(
+    private _trailGeneratorService: TrailGeneratorService,
     public dialogRef: MatDialogRef<MarkerDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: Poi
@@ -20,7 +24,7 @@ export class MarkerDialogComponent implements OnInit {
 
   ngOnInit() {
 
-    let _self = this;
+    const _self = this;
 
     // generate poiTypes (icons)
     const _poiStrArr: Array<string> = this.data.type.split(", ");
@@ -44,6 +48,29 @@ export class MarkerDialogComponent implements OnInit {
     if (this.poiTypes.length === 0) {
       this.poiTypes.push(getPoiTypeByType('unknown'));
     }
+
+    if (this.data.type.includes('water')) {
+      this.showRelated = true;
+      this._getRelatedPois('water');
+    }
+
+    if (this.data.type.includes('camp')) {
+      this.showRelated = true;
+      this._getRelatedPois('camp');
+    }
+  }
+
+  ngOnDestroy(): void {
+
+  }
+
+  private _getRelatedPois(poiType: string): void {
+    const _relatedPois: Array<number> = this._trailGeneratorService.getTrailData().sortedPoiIds[poiType];
+    const _poiIndex: number = _relatedPois.indexOf(this.data.id);
+    const _selfIndex = (_poiIndex === 0) ? 1 : _poiIndex - 1;
+    const _poiIds: Array<number> = _relatedPois.slice(_selfIndex, _poiIndex + 3);
+
+    this.poiCollection.push({label: poiType, data: _poiIds});
   }
 
 

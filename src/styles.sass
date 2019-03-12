@@ -20,6 +20,9 @@ body
   margin: 0px 0px 0px 0.4px     // margin left keeps cdk scroll smooth on mobile (android)
   font-family: Roboto, "Helvetica Neue", sans-serif;
 
+.offline
+  border: 5px solid red
+
 h1, h2, h3, h4, h5, h6
   font-family: 'NationalPark', Roboto, sans-serif
   font-weight: normal
@@ -105,7 +108,6 @@ h1, h2, h3, h4, h5, h6
   left: 0
   width: 33px
   height: 50px
-  color: #333
   margin: auto
   display: block
   font-size: 14px
@@ -117,7 +119,6 @@ h1, h2, h3, h4, h5, h6
     top: 9px
     left: 1px
     width: 32px
-    color: #333
     margin: auto
     display: inline-block
     font-size: 14px
@@ -173,3 +174,8 @@ fa-icon
 // dialog backdrop (cdk)
 .cdk-overlay-dark-backdrop
   background-color: rgba(86,104,114, 0.45)
+
+
+.leaflet-control-scale
+  padding: 0 0 10px 10px !important
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left) !important
