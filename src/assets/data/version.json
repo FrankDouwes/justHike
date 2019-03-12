@@ -1,0 +1,61 @@
+{
+  "DEMO": {
+    "id": 0,
+    "name": "DEMO: Campo - Warner Springs",
+    "abbr": "DEMO",
+    "trailVersion": "1.0",
+    "tilesVersion": "1.0",
+    "snowVersion": "1.0",
+    "trailFileSize": 1,
+    "tilesFileSize": 1,
+    "snowFileSize": 1,
+    "length": 109.5,
+    "availableForPurchase": false,
+    "isFree": true
+  },
+
+  "PCT": {
+    "id": 1,
+    "name": "Pacific Crest Trail",
+    "abbr": "PCT",
+    "trailVersion": "1.0",
+    "tilesVersion": "1.0",
+    "snowVersion": "1.0",
+    "trailFileSize": 1,
+    "tileFileSize": 1,
+    "snowFileSize": 1,
+    "length": 2661.4,
+    "availableForPurchase": true,
+    "isFree": true
+  },
+
+  "CDT": {
+    "id": 2,
+    "name": "Continental Divide Trail",
+    "abbr": "CDT",
+    "trailVersion": "1.0",
+    "tilesVersion": "1.0",
+    "snowVersion": "1.0",
+    "trailFileSize": 1,
+    "tileFileSize": 1,
+    "snowFileSize": 1,
+    "length": 3011,
+    "availableForPurchase": true,
+    "isFree": true
+  },
+
+  "AT": {
+    "id": 3,
+    "name": "Appalachian Trail",
+    "abbr": "AT",
+    "trailVersion": "1.0",
+    "tilesVersion": "1.0",
+    "snowVersion": "1.0",
+    "trailFileSize": 1,
+    "tileFileSize": 1,
+    "snowFileSize": 1,
+    "length": 2199,
+    "availableForPurchase": true,
+    "isFree": true
+  }
+}

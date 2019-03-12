@@ -1,0 +1,46 @@
+<div id="container">
+
+  <div>direction: {{compass}}</div>
+
+  <h2>Generate data</h2>
+
+  <span>
+    <select [(ngModel)]="selectedTrail">
+      <option *ngFor="let trail of trailMeta" [value]="trail.id">
+        {{trail.abbr}}
+      </option>
+    </select>
+
+    <span> : </span>
+
+    <select  [(ngModel)]="selectedDirection">
+       <option *ngFor="let dir of directions" [value]="dir.id">
+        {{dir.name}}
+      </option>
+    </select>
+
+    <span> : </span>
+
+    <button class="{{trailDataStateClassName}}" (click)="generateTrailData()">Generate Trail Data</button>
+
+  </span>
+  <hr/>
+
+  <div *ngIf="trailDataStateClassName !== ''">
+
+    <h2>Download files</h2>
+
+    <button (click)="downloadData('trail')">Download Trail Data</button>
+    <button (click)="downloadData('snow')">Download Snow Data</button>
+    <button (click)="genGpxData()">Download (clean) GPX file</button>
+    <hr/>
+
+  </div>
+
+  <h2>App data helpers</h2>
+
+  <button (click)="defaultUserData()">default user data</button>
+  <button (click)="clearStorage()">clear storage</button>
+  <button (click)="reset()">RESET ALL</button>
+
+</div>
