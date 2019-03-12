@@ -51,9 +51,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _trailLength: number;
 
   private _centerpoint: object;
-  private _bounds: Array<object> = [];
-  private _allElementsBounds: Array<object> = [];
-  private _markers: Array<any> = [];
   private _userMarker;
   private _visibleMiles: Array<number> = [];
 
@@ -100,6 +97,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       if (changes.activeMileId) {
         this._dataManager();
+        this.onUserLocationChange(this.user);
+        // this._centerMap(this.centerUser);
       }
 
     //
@@ -116,9 +115,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   ngAfterViewInit(): void {
 
     this._setupMap();
-    this._centerOnPoint();
-
     this._dataManager();
+    this.onUserLocationChange(this.user);
 
     // // only draw if there's data
     // if (this.milesData && this.milesData.length > 0) {
@@ -128,7 +126,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // }
 
     this._initialized = true;
-
     this._centerOnPoint();
   }
 
@@ -191,8 +188,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // get visible miles
     const _relativeRange = {start: this.activeMileId - this.range['behind'], end: this.activeMileId + this.range['ahead']}
-    const _oldmMilesToDelete: Array<number> = [];
-    const _newVisibleMiles: Array<number> =[];
+    let _oldmMilesToDelete: Array<number> = [];
+    let _newVisibleMiles: Array<number> =[];
 
     // create range array (check for trail ends)
     for (let i = _relativeRange.start; i <= _relativeRange.end; i++) {
@@ -211,9 +208,15 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       }
     });
 
+    // prevent duplicates
+    _oldmMilesToDelete = Array.from(new Set(_oldmMilesToDelete));
+    _newVisibleMiles = Array.from(new Set(_newVisibleMiles));
+
     this._drawMiles(_newVisibleMiles);
     this._removeMiles(_oldmMilesToDelete);
+
     this._visibleMiles = this._visibleMiles.concat(_newVisibleMiles);
+    this._visibleMiles = Array.from(new Set(this._visibleMiles));
   }
 
 
@@ -226,6 +229,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
 
     mileIds.forEach(function(mileId: number, index: number){
+
+      if (_self._visibleMiles.indexOf(mileId) !== -1) {
+        return;
+      }
 
       const _mile = _self._trailGenerator.getTrailData().miles[mileId];
 
@@ -254,6 +261,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       return;
     }
 
+    console.log(_self.renderedData);
+
     mileIds.forEach(function(mileId: number, index: number){
 
       if (_self.renderedData[mileId]) {
@@ -271,12 +280,17 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         }
 
         if (_self.renderedData[mileId].markers) {
+          // _self.renderedData[mileId].markers.eachLayer(function (layer) {
+          //   console.log(layer);
+          // });
           _self._map.removeLayer(_self.renderedData[mileId].markers);
+          _self.renderedData[mileId].markers.clearLayers();
           _self.renderedData[mileId].markers = null;
           delete _self.renderedData[mileId].markers;
         }
 
         _self.renderedData[mileId] = null;
+        delete _self.renderedData[mileId];
 
         _self._visibleMiles.splice(_self._visibleMiles.indexOf(mileId), 1);
       }
@@ -293,12 +307,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       let _wp: L.latLng = new L.latLng(waypoint.latitude, waypoint.longitude, waypoint.elevation);
 
       _waypoints.push(_wp);
-
-      if (mile.id === this.activeMileId) {
-        this._bounds.push(_wp);
-      }
-
-      this._allElementsBounds.push(_wp);
     }
 
     // draw waypoints
@@ -364,13 +372,15 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _drawPois(mile: Mile, index: number): void {
 
+    let _markerArray: Array<any> = [];
+
     // startMile marker
-    this._createLabelMarker((mile.id - 1) + '', mile.waypoints[0]);
+    _markerArray.push(this._createLabelMarker((mile.id - 1) + '', mile.waypoints[0]));
 
     // endMile marker
     if (index === this._trailLength - 1) {
       const _wps: Array<Waypoint> = mile.waypoints;
-      this._createLabelMarker(mile.id + '', _wps[_wps.length - 1]);
+      _markerArray.push(this._createLabelMarker(mile.id + '', _wps[_wps.length - 1]));
     }
 
     // pois sit on top of label markers
@@ -386,24 +396,16 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
         if (_poi.waypoint.distance >= environment.MILE / 8) {
 
-          this._createPoiGuideLine(_poi);
+          _markerArray = _markerArray.concat(this._createPoiGuideLine(_poi));
         }
 
-        this._markers.push(_poiMarker);
-
-        if (mile.id === this.activeMileId && _poi.waypoint.distance <= _maxPoiDistanceOffTrail * 2) {
-          this._bounds.push(_poiMarker._latlng);
-        }
-
-        this._allElementsBounds.push(_poiMarker._latlng);
+        _markerArray.push(_poiMarker);
       }
-
-      const _markerGroup = L.featureGroup(this._markers);
-
-      this.renderedData[index].markers = _markerGroup;
-
-      _markerGroup.addTo(this._map);
     }
+
+    const _markerGroup = L.featureGroup(_markerArray);
+    this.renderedData[index].markers = _markerGroup;
+    _markerGroup.addTo(this._map);
   }
 
   private _drawUser(): void {
@@ -423,33 +425,33 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
   }
 
-  private _centerMap(forceCenter:boolean = false): void {
-
-    if (this._markers.length > 0 && !forceCenter) {
-
-      // if there are markers, show all of them
-      const _markerGroup = L.featureGroup(this._markers);
-      _markerGroup.addTo(this._map);
-
-      this._map.fitBounds(L.latLngBounds(this._bounds).pad(0.1));
-
-    } else if (this.user) {
-
-      // set map to center on centerpoint of selected mile
-      this._map.setView([this.user.anchorPoint.latitude, this.user.anchorPoint.longitude], 16);
-
-    } else {
-
-      this._map.fitBounds(L.latLngBounds(this._bounds).pad(0.1));
-
-    }
-
-    // set the panning bounds
-    this._map.setMaxBounds(L.latLngBounds(this._allElementsBounds).pad(0.1));
-  }
+  // private _centerMap(forceCenter:boolean = false): void {
+  //
+  //   if (this._markers.length > 0 && !forceCenter) {
+  //
+  //     // if there are markers, show all of them
+  //     const _markerGroup = L.featureGroup(this._markers);
+  //     _markerGroup.addTo(this._map);
+  //
+  //     this._map.fitBounds(L.latLngBounds(this._bounds).pad(0.1));
+  //
+  //   } else if (this.user) {
+  //
+  //     // set map to center on centerpoint of selected mile
+  //     this._map.setView([this.user.anchorPoint.latitude, this.user.anchorPoint.longitude], 16);
+  //
+  //   } else {
+  //
+  //     this._map.fitBounds(L.latLngBounds(this._bounds).pad(0.1));
+  //
+  //   }
+  //
+  //   // set the panning bounds
+  //   this._map.setMaxBounds(L.latLngBounds(this._allElementsBounds).pad(0.1));
+  // }
 
   private _setBounds(): void {
-    this._map.setMaxBounds(L.latLngBounds(this._allElementsBounds).pad(0.1));
+    // this._map.setMaxBounds(L.latLngBounds(this._allElementsBounds).pad(0.1));
   }
 
   private _centerOnPoint(): void {
@@ -498,7 +500,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _createLabelMarker(label: string, waypoint: Waypoint) {
 
     let _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + label + '</div>'});
-    let _marker = L.marker([waypoint.latitude, waypoint.longitude], {icon: _labelIcon}).addTo(this._map);
+    let _marker = L.marker([waypoint.latitude, waypoint.longitude], {icon: _labelIcon});
+
+    return _marker;
   }
 
   private _createUserMarker(user: User): any {
@@ -524,12 +528,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     return _poi;
   }
 
-  private _createPoiGuideLine(poi: Poi): void {
+  private _createPoiGuideLine(poi: Poi): Array<any> {
 
-    let poiLoc = new L.latLng(poi.waypoint.latitude, poi.waypoint.longitude, poi.waypoint.elevation);
-    let anchorLoc = new L.latLng(poi.anchorPoint.latitude, poi.anchorPoint.longitude, poi.anchorPoint.elevation);
+    const poiLoc = new L.latLng(poi.waypoint.latitude, poi.waypoint.longitude, poi.waypoint.elevation);
+    const anchorLoc = new L.latLng(poi.anchorPoint.latitude, poi.anchorPoint.longitude, poi.anchorPoint.elevation);
 
-    let _guideLine = new L.Polyline([poiLoc, anchorLoc], {
+    const _guideLine = new L.Polyline([poiLoc, anchorLoc], {
       color: 'rgb(187, 97, 0)',
       dashArray: "5 7",
       weight: 2,
@@ -560,8 +564,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
           })
         }
       ]
-    }).addTo(this._map);
+    });
 
-    _guideLine.addTo(this._map);
+    return [_guideLine, _arrowHead];
   }
 }

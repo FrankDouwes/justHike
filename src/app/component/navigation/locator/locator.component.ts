@@ -11,7 +11,6 @@ import { LocationBasedComponent } from '../../../display/location-based/location
 })
 export class LocatorComponent extends LocationBasedComponent implements OnInit, OnDestroy {
 
-  public visibleMiles:            Array<Mile>;
   public nearestMileId:           number;
   public showMiniMap:             boolean;
 
@@ -28,7 +27,6 @@ export class LocatorComponent extends LocationBasedComponent implements OnInit, 
 
     this.showMiniMap = this.localStorage.retrieve('showMiniMap');
     this._mapObserver = this.localStorage.observe('showMiniMap').subscribe(result => {
-      console.log(result);
       this.showMiniMap = result;
     });
   }
@@ -55,10 +53,9 @@ export class LocatorComponent extends LocationBasedComponent implements OnInit, 
   }
 
   public onUserLocationChange(user: User): void {
+
     if (this.user && this.status === 'tracking') {
       this.nearestMileId = user.nearestMileId;
-      // get the nearest 3 miles
-      this.visibleMiles = this.trailGenerator.getTrailData().miles.slice(user.nearestMileId - 2, user.nearestMileId + 1);
     }
   }
 }

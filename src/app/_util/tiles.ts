@@ -183,8 +183,6 @@ const FallbackTileLayer = L.TileLayer.extend({
     const _tileState = tile.getAttribute('state');
     const _tileCoords = JSON.parse(tile.getAttribute('coords'));
 
-    console.log(tile.src);
-
     if (_tileState === 'default') {
       tile.setAttribute('state', 'fallback');
       tile.src = this.updateTileUrl(_tileCoords, this.options.fallbackTileUrl);
