@@ -78,7 +78,7 @@ export function createUserMarker(icon: string, iconPrefix: string, color:string)
 
   let ele = document.createElement("div");
   let draw = SVG(ele).size(1, 1).style('overflow', 'visible');
-  let marker = createSvgCircleMarker(draw, '#00FF00', 0.5);
+  let marker = createSvgCircleMarker(draw, '#00FF00', 0.85);
 
   let _marker = L.divIcon({className: 'user', html: ele.innerHTML});
   return _marker;

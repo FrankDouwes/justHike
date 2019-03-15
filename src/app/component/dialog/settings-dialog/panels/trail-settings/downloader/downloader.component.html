@@ -1,24 +1,25 @@
 <div id="main">
+  <!--idle-->
+  <button *ngIf="hasUpdate && !isActive" mat-fab class="download" (click)="onButtonClick('download')">
+    <fa-icon icon="download" size="lg"></fa-icon>
+  </button>
 
-    <button *ngIf="!isActive && !hasFiles" mat-fab class="idle" (click)="onButtonClick('download')">
-      <fa-icon icon="atlas" size="lg"></fa-icon>
+  <!--downloading-->
+  <button *ngIf="isActive && !hasFile" mat-fab class="cancel" (click)="onButtonClick('cancel')">
+      <fa-icon icon="times" size="lg"></fa-icon>
     </button>
 
-    <button *ngIf="isActive && !hasFiles" mat-fab class="downloading" (click)="onButtonClick('cancel')">
-      <fa-icon icon="spinner" [pulse]="true" size="lg"></fa-icon>
-    </button>
-
-    <button *ngIf="hasFiles && !isActive" mat-fab class="delete" (click)="onButtonClick('clear')">
-      <fa-icon icon="trash" size="lg"></fa-icon>
-    </button>
-
-    <div id="meta">
-      <h3>{{label}}</h3>
-      <div>
-        <p *ngIf="!isActive && !hasFiles">{{fileSize | filesize}}</p>
-        <p *ngIf="!isActive && hasFiles">Downloaded</p>
-        <p *ngIf="isActive">{{progressLabel}}</p>
-        <mat-progress-bar *ngIf="isActive" mode="determinate" [value]="progress"></mat-progress-bar>
-      </div>
-    </div>
+  <!-- download complete / has file-->
+  <button *ngIf="!hasUpdate && hasFile && !isActive" mat-fab class="delete" (click)="onButtonClick('clear')">
+    <fa-icon icon="trash" size="lg"></fa-icon>
+  </button>
+</div>
+<div id="meta">
+  <h3>{{type + ' data '}}<small>{{'v' + version}}</small></h3>
+  <div>
+    <p *ngIf="!isActive && !hasFile">{{trailMeta[type + 'FileSize'] | filesize}}</p>
+    <p *ngIf="!isActive && hasFile">Downloaded</p>
+    <!--<p *ngIf="isActive">{{progressLabel}}</p>-->
+    <mat-progress-bar *ngIf="isActive" mode="determinate" [value]="progress" class="progress"></mat-progress-bar>
+  </div>
 </div>

@@ -13,11 +13,22 @@
       [activeMileId]="routedMile"
       [centerPoint]="centerPoint"
       [range]="{behind: 4, ahead: 4}"
+      [trigger]="centerUserTrigger"
     >
     </leaflet-map>
-    <div id="overlay"></div>
+    <div id="overlay"></div>    <!-- inner shadow -->
+    <button *ngIf="isTracking" id="center-user-btn" (click)="centerOnUser()">center user</button>
   </div>
   <div id="list">
-    <poi-list [milesData]="trailData.miles" [showUser]="true" [activeMileId]="routedMile" (scrollToEvent)="onScrollTo($event)"></poi-list>
+    <poi-list
+      [directionReversal]="isNobo"
+      [milesData]="trailData.miles"
+      [showUser]="true"
+      [activeMileId]="routedMile"
+      [trigger]="centerUserTrigger"
+
+      (scrollToEvent)="onScrollTo($event)">
+
+    </poi-list>
   </div>
 </div>

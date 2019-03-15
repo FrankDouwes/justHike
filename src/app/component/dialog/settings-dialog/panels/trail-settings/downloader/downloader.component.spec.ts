@@ -5,7 +5,6 @@ import {IconComponent} from '../../../../../../display/icon/icon.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {FilesizePipe} from '../../../../../../pipe/filesize.pipe';
 import {HttpClientModule} from '@angular/common/http';
-import {Input} from '@angular/core';
 
 describe('DownloaderComponent', () => {
   let component: DownloaderComponent;

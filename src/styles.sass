@@ -10,13 +10,16 @@
 
 html, body
   display: block
+  height: 100%
   min-height: 100%
   max-height: 100%
+  width: 100%
+  max-width: 100%
   overflow: hidden
   background-color: #EEE
 
 body
-  overscroll-behavior: contain
+  overscroll-behavior: none
   margin: 0px 0px 0px 0.4px     // margin left keeps cdk scroll smooth on mobile (android)
   font-family: Roboto, "Helvetica Neue", sans-serif;
 
@@ -132,6 +135,7 @@ h1, h2, h3, h4, h5, h6
 
 // icon button
 fa-icon
+  text-rendering: optimizeLegibility
 
   .icon
     color: #555

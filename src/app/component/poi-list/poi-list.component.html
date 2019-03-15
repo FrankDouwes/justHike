@@ -1,14 +1,13 @@
 <!-- just to use its classes -->
 <mat-action-list class="hidden"></mat-action-list>
 
-
 <cdk-virtual-scroll-viewport
   class="mat-list mat-list-base"
   id="poi-list"
 
   orientation="vertical"
-  itemSize="72"
-  templateCacheSize="10"
+  [itemSize]="itemSize"
+  templateCacheSize="7"
 
   (scrolledIndexChange)="onScroll($event)"
 
@@ -28,4 +27,4 @@
 
 </cdk-virtual-scroll-viewport>
 
-<!--poisorting-->
+<user-indicator [userPosition]="userPosition" [status]="status" (click)="scrollToUser()"></user-indicator>

@@ -226,6 +226,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   // EVENT HANDLERS
 
   public onClick(event: MouseEvent): void {
+
     const percent = (event.clientX + this.mapOffset) / this._svgWidth;
     this.scrollToEvent.emit(percent);
   }

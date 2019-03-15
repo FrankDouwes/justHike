@@ -24,7 +24,6 @@ export class ElevationProfileComponent implements OnInit {
   ngOnInit(): void {
     this._route.data.subscribe(result => {
         this.trailData = result.data['trail'];
-        console.log(this.trailData);
         this.snowData = result.data['snow'];
       }
     );

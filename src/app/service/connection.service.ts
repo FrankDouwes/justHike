@@ -6,6 +6,7 @@ import {getConnection, hasConnection} from '../_util/cordova';
   providedIn: 'root'
 })
 
+// TODO: online / offline doesn't seem to work reliably (and is slow), consider using another method/package
 export class ConnectionService {
 
   private _connection: BehaviorSubject<boolean> = new BehaviorSubject(false);
@@ -21,15 +22,11 @@ export class ConnectionService {
     if (hasConnection()) {
       document.addEventListener('online', this._isOnline.bind(this), true);
       document.addEventListener('offline', this._isOffline.bind(this), true);
-      window.addEventListener('online', this._isOnline.bind(this), true);
-      window.addEventListener('offline', this._isOffline.bind(this), true);
     }
   }
 
   public stopTracking(): void {
     if (hasConnection()) {
-      window.removeEventListener('online', this._isOnline.bind(this), true);
-      window.removeEventListener('offline', this._isOffline.bind(this), true);
       document.removeEventListener('online', this._isOnline.bind(this), true);
       document.removeEventListener('offline', this._isOffline.bind(this), true);
       this._connection.next(null);

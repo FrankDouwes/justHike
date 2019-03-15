@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild, OnChanges, SimpleChanges, Output, EventEmitter} from '@angular/core';
+import {Component, Input, OnInit, ViewChild, OnChanges, SimpleChanges, Output, EventEmitter, ChangeDetectionStrategy} from '@angular/core';
 import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 
 import { BehaviorSubject } from 'rxjs';
@@ -7,13 +7,12 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { Mile } from '../../type/mile';
 import { Poi } from '../../type/poi';
 import { User } from '../../type/user';
-import {Waypoint} from '../../type/waypoint';
-import elevation = geolib.elevation;
 
 @Component({
   selector: 'poi-list',
   templateUrl: './poi-list.component.html',
-  styleUrls: ['./poi-list.component.sass']
+  styleUrls: ['./poi-list.component.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class PoiListComponent extends LocationBasedComponent implements OnInit, OnChanges {
@@ -26,10 +25,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   @Input() poisData?: Array<Mile>;
   @Input() showUser: boolean;
   @Input() activeMileId: number;
+  @Input() directionReversal?: boolean;     // reverse list
+  @Input() trigger: number;     // center user without the need for a service
 
   // user and pois combined in a single array
   public combinedData: BehaviorSubject<Array<any>> = new BehaviorSubject([]);
   public timestamp: number;       // used to trigger reload
+  public userPosition: string;
+  public itemSize: number;
 
   private _staticPoisArray:     Array<any>  = [];
   private _userIndex:           number;
@@ -45,10 +48,12 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     super.ngOnInit();
 
+    this.itemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / 7);
+
     this.combinedData.subscribe(
       data => {
         if (this.showUser) {
-          this._scrollToUser();
+          this.scrollToUser();
         }
       });
 
@@ -57,9 +62,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   }
 
   ngOnChanges(changes: SimpleChanges) {
+
     if (changes.milesData) {
       console.log('setup');
       this.setup();
+    }
+
+    if (changes.trigger) {
+      this.scrollToUser();
     }
   }
 
@@ -152,12 +162,20 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     this.container['elementRef'].nativeElement.dispatchEvent(_event);
   }
 
-  private _scrollToUser(): void {
+  public scrollToUser(): void {
 
     const _self = this;
     if (this.container) {
       setTimeout(function () {
-        _self.container.scrollToOffset(72 * _self._userIndex, 'auto');
+
+        const _padding = _self.itemSize / 2;    // this makes sure the user list item is fully on screen, therefor the poi/mile index is correct
+        let _verticalOffset = _padding;
+
+        if (_self.directionReversal) {
+          _verticalOffset = _self.container.elementRef.nativeElement.clientHeight - _self.itemSize - _padding;
+        }
+
+        _self.container.scrollToOffset((_self.itemSize * _self._userIndex) - _verticalOffset, 'smooth');
       }, 1);
     }
   }
@@ -182,56 +200,64 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       return;
     }
 
-    const _middlePoi: number = _activeMile.pois[Math.floor(_activeMile.pois.length - 1)];
+    let _middlePoi: number = _activeMile.pois[Math.floor(_activeMile.pois.length - 1)];
 
     setTimeout(function () {
 
-      // const _vertOffset = (_self.container.elementRef.nativeElement.clientHeight - 72) / 2;
+      let _maxIndex = _self.combinedData.getValue().length;
 
-      // let _offset = (_middlePoi * 72) - _vertOffset;
-      // _offset = (_offset > 0) ? _offset : 0;
+      if (_self.directionReversal) {
+        _middlePoi = _maxIndex - _middlePoi - 7;
+        if (_middlePoi < 0) {
+          _middlePoi = 0;
+        }else if ( _middlePoi > _maxIndex) {
+          _middlePoi = _maxIndex;
+        }
+      }
 
-      _self.container.scrollToOffset(_middlePoi * 72, 'auto');
+      // scrolling to 0 somehow scrolls to the end of the list (cdk bug)
+      const _total = (_middlePoi === 0) ? 1 : _middlePoi * _self.itemSize;
+
+      _self.container.scrollToOffset(_total, 'auto');
       _self.onScroll(_middlePoi)
     }, 10);
   }
 
   public onScroll(event): void {
 
-    console.log('change');
+    let _currentIndex: number = event;
 
-    let _currentIndex: number;
-
-    if (typeof event === 'number') {
-
-      _currentIndex = event;
-
-    } else {
-
-      // the indexes arent correctly ordered while scrolling up, so a calculation is needed
-      const _calc = this.container.measureScrollOffset('top');
-      _currentIndex = Math.floor(_calc / 72);
-      const _percentage = Math.abs((_calc - (_currentIndex * 72)) / 72);
+    if (this.directionReversal) {
+      _currentIndex = event + 7;
     }
-
 
     // convert the scrollIndex to a poi id
-    const _currentCenterPoi: Poi | User = this.combinedData.getValue()[_currentIndex];
-    // const _nextPoint: Poi | User = this.combinedData.getValue()[_currentIndex + 1];
+    let _currentPoi: Poi | User = this.combinedData.getValue()[_currentIndex];
 
-    if (_currentCenterPoi['belongsTo']) {
-      this.scrollToEvent.emit({mileId: _currentCenterPoi['belongsTo']});
+    if (!_currentPoi['belongsTo']) {
+      const _maxIndex = this.combinedData.getValue().length - 1;
+      // current poi is the user location indicator, get next/prev poi
+      if (_currentIndex === _maxIndex || this.directionReversal) {
+        _currentPoi = this.combinedData.getValue()[_currentIndex - 1];
+      } else if (_currentIndex === 0 || !this.directionReversal) {
+        _currentPoi = this.combinedData.getValue()[_currentIndex + 1];
+      }
     }
 
-    // if (_currentCenterPoi['belongsTo']) {
-    //   const _mile = this.trailGenerator.getTrailData().miles[_currentCenterPoi['belongsTo'] - 1];
-    //
-    //   const _waypointId = Math.round((_mile.waypoints.length - 1) * _percentage);
-    //   console.log(_waypointId);
-    //   this.scrollToEvent.emit({mileId: _mile.id, waypoint: _mile.waypoints[_waypointId]});
-    // }
-  }
+    // check user position (to show indecator to scroll up/down
+    const _renderedRange = this.container.getRenderedRange();
+    if (this._userIndex < _renderedRange.start) {
+      this.userPosition = 'above';
+    } else if (this._userIndex > _renderedRange.end) {
+      this.userPosition = 'below';
+    } else if (this._userIndex >= _renderedRange.start && this._userIndex <= _renderedRange.end) {
+      this.userPosition = 'visible';
+    }
 
+    // get the mile that the poi belongs to
+    const _mile = this.trailGenerator.getTrailData().miles[_currentPoi['belongsTo']];
+    this.scrollToEvent.emit({mileId: _mile.id});
+  }
 
 
   // OTHER
@@ -251,6 +277,10 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
         return _aDist - _bDist;
       });
+
+    if (this.directionReversal) {
+      data.reverse();
+    }
 
     this._userIndex = data.findIndex(poi => poi.type === 'user');
     this.combinedData.next(data);

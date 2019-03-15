@@ -40,6 +40,8 @@ export class TrailResolverService implements Resolve<any> {
    * - filesystem: contains downloaded versions of the trail data */
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<object> | Observable<never> {
 
+    console.log('resolving trail/snow');
+
     this._activeTrailId = this._localStorage.retrieve('activeTrailId') | 0;
     const _direction: number = this._localStorage.retrieve('direction') | 0;
 

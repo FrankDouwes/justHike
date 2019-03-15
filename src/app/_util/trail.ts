@@ -1,6 +1,6 @@
 import {Trail, TrailMeta} from '../type/trail';
 
-let trails: Array<TrailMeta>;
+let trails: any;
 
 export function setTrailMetaData(data: Array<TrailMeta>) {
   trails = data;
@@ -27,11 +27,11 @@ export function getTrailMetaDataById(id: Number): TrailMeta {
 }
 
 // trail meta does not contain a name, it does contain abbr.
-export function getTrailMetaDataByAbbr(abbr: string): Trail {
+export function getTrailMetaDataByAbbr(abbr: string): TrailMeta {
 
   if (!trails) {
     throw new Error('no trails available!');
   }
 
-  return trails[abbr] as Trail;
+  return trails[abbr] as TrailMeta;
 }

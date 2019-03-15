@@ -1,6 +1,5 @@
 import { Waypoint } from './waypoint';
 import { OHLC } from './ohlc';
-import { Poi } from './poi';
 import { Snowpoint } from './snow';
 
 export class Mile {

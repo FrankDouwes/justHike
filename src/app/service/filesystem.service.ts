@@ -2,13 +2,13 @@ import {Injectable} from '@angular/core';
 import {convertToIonicUrl} from '../_util/file';
 import {cordovaEnabled, getCordova, getZip, hasZip} from '../_util/cordova';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {DownloaderStatus} from '../_util/downloader';
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class FilesystemService {
+// TODO: needs better error handling? a retry dialog/function?
+export class FilesystemService  {
 
   public rootPath: string;
   public root;
@@ -17,63 +17,80 @@ export class FilesystemService {
 
   constructor() {}
 
+
   // set root
-  public initializeStorage(): void {
+  public async initializeStorage() {
+
+    return await this._setupStorage();
+  }
+
+
+  private _setupStorage() {
 
     const _self = this;
     const _window: any = window;
 
-    if (cordovaEnabled()) {
+    return new Promise(function (resolve, reject) {
 
-      // cordova file plugin storage
+      if (cordovaEnabled()) {
 
-      _window.resolveLocalFileSystemURL(getCordova().file.dataDirectory, function (filesystem) {
+        // cordova file plugin storage
 
-        _self.root = filesystem;
-        _self.rootDir = filesystem;   // no root!
-        _self.rootPath = convertToIonicUrl(filesystem.toURL());
-        _self.isStorageAvailable = true;
+        _window.resolveLocalFileSystemURL(getCordova().file.dataDirectory, function (filesystem) {
 
-      }, function (error) {
-        alert('Filesystem error: ' + error);
-      });
-
-    } else {
-
-      // chrome (browser storage)
-      const _requestFileSystem = window['requestFileSystem'] || window['webkitRequestFileSystem'];
-
-      if (_requestFileSystem) {
-
-        // first prop: 0 = temp, 1 = persistent (errors)
-        _requestFileSystem(0, 0, function (fileSystem) {
-
-          _self.root = fileSystem;
-          _self.rootDir = fileSystem.root;
-          _self.rootPath = fileSystem.root.toURL();
-          _self.isStorageAvailable = true;
+          _self.root = filesystem;
+          _self.rootDir = filesystem;   // no root!
+          _self.rootPath = convertToIonicUrl(filesystem.toURL());
+          resolve(_self.isStorageAvailable = true);
 
         }, function (error) {
+          reject(false);
           alert('Filesystem error: ' + error);
         });
+
       } else {
-        alert('No filesystem available.');
+
+        // chrome (browser storage)
+        const _requestFileSystem = window['requestFileSystem'] || window['webkitRequestFileSystem'];
+
+        if (_requestFileSystem) {
+
+          // first prop: 0 = temp, 1 = persistent (errors)
+          _requestFileSystem(0, 0, function (fileSystem) {
+
+            console.log('filesystem set', fileSystem);
+
+            _self.root = fileSystem;
+            _self.rootDir = fileSystem.root;
+            _self.rootPath = fileSystem.root.toURL();
+
+            resolve(_self.isStorageAvailable = true);
+
+          }, function (error) {
+            reject(false);
+            alert('Filesystem error: ' + error);
+          });
+        } else {
+          reject(false);
+          alert('No filesystem available.');
+        }
       }
-    }
+    });
   }
+
 
 
   // DIRECTORY
 
   // loops through directories within pathName and creates missing directories, callback gets DirectoryEntry of final subDir
-  public setupDirectory(pathName: string, within, callback: Function): void {
+  public setupDirectory(pathName: string, within, callback: Function, createMissing:boolean = true): void {
 
     const _self = this;
     const _urlSegments: Array<string> = pathName.split('/');
 
     const _loop = function (directorySegments: Array<string>, wi, cb: Function) {
 
-      _self._getDirectory(directorySegments[0], wi, true, function(directory) {
+      _self._getDirectory(directorySegments[0], wi, createMissing, function(directory) {
 
         directorySegments.shift();
 
@@ -102,6 +119,10 @@ export class FilesystemService {
 
       if (error && createMissing) {
         _self._createDirectory(dirName, within, callback);
+      } else {
+
+        console.log('directory ' + dirName + ' does not exist.');
+        callback('error');
       }
 
     });
@@ -184,6 +205,7 @@ export class FilesystemService {
   // TODO: abort write
   public abort(): void {
 
+    console.warn('abort function (filesystem) is blank');
     // writer.abort();
   }
 
@@ -192,25 +214,51 @@ export class FilesystemService {
 
     const _self = this;
 
-    console.log(typeof directory);
     if (typeof directory === 'string') {
-      this.setupDirectory(directory, null, function (directoryEntry) {
-        _self._getFile(directoryEntry, fileName, callback);
-      });
+      this.setupDirectory(directory, null, function (result) {
+
+        if (result !== 'error') {
+          _self._getFile(result, fileName, callback);
+        } else {
+          callback(result);
+        }
+      }, false);
     }
   }
 
   // will return null if file cant be found
   private _getFile(dirEntry, fileName: string, callback: Function): void {
+
+    const _self = this;
+
     // Creates a new file or returns the file if it already exists.
     dirEntry.getFile(fileName, {create: false}, function(fileEntry) {
 
-      callback(fileEntry);
+      _self._readFileData(fileEntry, callback);
 
     }, function(error) {
 
       console.log('file ' + fileName + ' does not exist.');
-      callback(null);
+      callback('error');
+    });
+  }
+
+  // read the data from a fileEntry
+  private _readFileData(fileEntry, callback: Function): void {
+
+    fileEntry.file(function (file) {
+
+      var reader = new FileReader();
+
+      reader.onloadend = function() {
+        console.log("Successful file read: " + this.result);
+      };
+
+      reader.readAsText(file);
+
+    }, function(error) {
+      callback('error');
+      alert('error reading file' + error);
     });
   }
 
@@ -222,9 +270,6 @@ export class FilesystemService {
 
       const url = this._joinPaths([getCordova().file.dataDirectory, filePath]);
       const destination = this._joinPaths([getCordova().file.dataDirectory, 'DEMO/1.0/']);
-
-      console.log('from: ', url);
-      console.log('to: ', destination);
 
       getZip().unzip(url, destination, function(x) {
         _unzipState.next({state: 'progress', percentage: 100});
@@ -301,13 +346,9 @@ export class FilesystemService {
 
     this.setupDirectory(directoryPath, null, function(dirEntry) {
       dirEntry.removeRecursively(function (dir) {
-
         callback(dir);
-
       }, function (err) {
-
         console.log(err);
-
       });
     })
   }

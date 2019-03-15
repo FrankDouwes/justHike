@@ -2,17 +2,18 @@ import {Component, Input, OnInit, HostBinding, ChangeDetectorRef} from '@angular
 import { Poi } from '../../../type/poi';
 
 @Component({
-  selector: 'poi-user-item[class=mat-list-item-content]',
+  selector: 'poi-user-item',
   templateUrl: './poi-user-item.component.html',
   styleUrls: ['./poi-user-item.component.sass']
 })
 export class PoiUserItemComponent implements OnInit {
 
-  // there has to be a an easier way to add classes to the host... TODO
+  // TODO: there has to be a an easier way to add dynamic classes to the host...
   @HostBinding('class.idle') isIdle = true;
   @HostBinding('class.fetching') isFetching = false;
   @HostBinding('class.tracking') isTracking = false;
   @HostBinding('class.error') isError = false;
+  @HostBinding('class.mat-list-item-content') isActive = true;
 
   public userStatus: string;
 
@@ -35,7 +36,6 @@ export class PoiUserItemComponent implements OnInit {
       this.isError = true;
       this.isIdle = this.isFetching = this.isTracking = false;
     } else {
-      console.log('undefined so idle?');
       this.isIdle = true;
       this.isFetching = this.isTracking = this.isError = false;
     }

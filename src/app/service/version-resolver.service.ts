@@ -1,19 +1,18 @@
 import {Injectable} from '@angular/core';
-import {ActivatedRoute, Resolve, Router} from '@angular/router';
-import { LocalStorageService } from 'ngx-webstorage';
-import { environment } from '../../environments/environment.prod';
-import {getTrailMetaDataById, setTrailMetaData} from '../_util/trail';
+import {Resolve, Router} from '@angular/router';
+import {LocalStorageService} from 'ngx-webstorage';
+import {environment} from '../../environments/environment.prod';
+import {getTrailMetaDataById, getTrailsMetaData, setTrailMetaData} from '../_util/trail';
 import {BehaviorSubject, forkJoin, Observable, of} from 'rxjs';
 import {share, switchMap, take} from 'rxjs/operators';
-import {Trail} from '../type/trail';
-import {Snow} from '../type/snow';
 import {TrailGeneratorService} from './trail-generator.service';
 import {SnowGeneratorService} from './snow-generator.service';
 import {ConnectionService} from './connection.service';
 import {hasConnection} from '../_util/cordova';
 import {DownloadService} from './download.service';
-import {Downloader, DownloaderStatus} from '../_util/downloader';
+import {Downloader} from '../_util/downloader';
 import {HttpResponse} from '@angular/common/http';
+import {TrailMeta} from '../type/trail';
 
 @Injectable({
   providedIn: 'root'
@@ -21,24 +20,13 @@ import {HttpResponse} from '@angular/common/http';
 
 export class VersionResolverService implements Resolve<any> {
 
-  private _updateTimer;
-
-  private _route: ActivatedRoute;
-  private _trailData: Trail;
-  private _snowData: Snow;
-
   private _internalDownloader: Downloader;     // downloads file from assets
   private _externalDownloader: Downloader;     // downloads online file
 
-  private _update: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private _trail: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private _snow: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private _tile: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  public observables: any = {};     // object containing all observables
+  private _subjects: any = {};        // object containing all behaviorSubjects
 
-  public updateAvailableObservable: Observable<boolean>;
-  public trailUpdateAvailable: Observable<boolean>;
-  public snowUpdateAvailable: Observable<boolean>;
-  public tileUpdateAvailable: Observable<boolean>;
+  private _dataTypes: Array<string> = ['trail', 'snow', 'tiles'];
 
   constructor(
     private _router: Router,
@@ -48,17 +36,18 @@ export class VersionResolverService implements Resolve<any> {
     private _connectionService: ConnectionService,
     private _downloadService: DownloadService
   ) {
-    this.updateAvailableObservable      = this._update.asObservable().pipe(share());
-    this.trailUpdateAvailable           = this._trail.asObservable().pipe(share());
-    this.snowUpdateAvailable            = this._snow.asObservable().pipe(share());
-    this.tileUpdateAvailable            = this._tile.asObservable().pipe(share());
+
+    // create the update available observer
+    const _sub = this._subjects['updateAvailable'] = new BehaviorSubject(false);
+    this.observables['updateAvailable'] = _sub.asObservable().pipe(share());
 
     this._internalDownloader = this._downloadService.createDownloader('DATA_version_internal');
     this._externalDownloader = this._downloadService.createDownloader('DATA_version_external');
-
   }
 
   resolve(): Observable<string> | Observable<never> {
+
+    console.log('resolving versioning');
 
     return this.collectVersionData().pipe(
       take(1),
@@ -69,34 +58,52 @@ export class VersionResolverService implements Resolve<any> {
             const _parseHttpResponce = function(input): any {
               if (input && input instanceof HttpResponse) {
                 if (input.status === 200) {
-                  return input.body;      // return just the datas
+                  return input.body;      // return just the data
                 } else {
                   return null;            // failed http request
                 }
               } else {
                 return input;             // not an http response
               }
-            }
+            };
 
+            const _self = this;
             const _internal = _parseHttpResponce(data[0]);
             const _external = _parseHttpResponce(data[1]);
+
+            /* check if this is the first run
+            if so, write all the internal version to local storage, so we can later check against those versions) */
+            for (const key in _internal) {
+
+              const _trail: TrailMeta = _internal[key];
+
+              this._dataTypes.forEach(function(type) {
+
+                const _storedKeyName: string = _trail.abbr + '_' + type + 'Version';
+
+                if (type !== 'tiles' && !_self._localStorage.retrieve(_storedKeyName)) {
+                  _self._localStorage.store(_storedKeyName, _trail[type + 'Version']);
+                }
+              });
+            }
 
             // if we have newly downloaded data
             if (_external) {
 
-              console.log('using external' + _external);
-
               this._localStorage.store('lastVersionCheck', new Date().getTime());
-              this._localStorage.store('versionData', _external);
+              this._localStorage.store('availableUpdates', _external);
               setTrailMetaData(_external);
+
             } else {
 
-              console.log('using internal' + _internal);
-
-              if (!this._localStorage.retrieve('versionData')) {
-                this._localStorage.store('versionData', _internal);
+              /* we're using internal data, so the last version data is what we saved to local storage
+              the last time internet was available, if nothing was ever downloaded use internal data */
+              const _updateData: any = this._localStorage.retrieve('availableUpdates');
+              if (_updateData) {
+                setTrailMetaData(_updateData);
+              } else {
+                setTrailMetaData(_internal);
               }
-              setTrailMetaData(_internal);
             }
             return of('success');
           } else {
@@ -109,8 +116,7 @@ export class VersionResolverService implements Resolve<any> {
   }
 
   /* collect version data, from assets/local storage and external,
-  this function is also executed from app.component
-   */
+  this function is also executed from app.component */
   public collectVersionData(): Observable<object> {
 
     let _hasInternetConnection = true;
@@ -121,7 +127,7 @@ export class VersionResolverService implements Resolve<any> {
 
     // INTERNAL
     // if there is no stored data available (first run) get data from assets
-    const _storageVersion = this._localStorage.retrieve('versionData');
+    const _storageVersion = this._localStorage.retrieve('availableUpdates');
     let _internal: Observable<any>;
 
     if (_storageVersion) {
@@ -158,45 +164,61 @@ export class VersionResolverService implements Resolve<any> {
    * check if the version of currently loaded trail data === the latest available trail data
    * show version mismatch warning (update data dialog) on mismatch
    * trigger auto snow data download if user setting is enabled. */
-  public versionCheck(): void {
+  public versionCheck(currentTrailOnly: boolean = false): void {
 
     const _self = this;
 
     this.resolve().subscribe(function (result) {
 
+      _self._subjects['updateAvailable'].next(false);
+
       const _activeTrailId = _self._localStorage.retrieve('activeTrailId');
-      const _currentTrailMeta = getTrailMetaDataById(_activeTrailId);
-      const _tilesVersion = _self._localStorage.retrieve('tilesVersion');
 
-      const _snowVersion = _self._snowGeneratorService.getSnowVersion();
-      const _trailVersion = _self._trailGeneratorService.getTrailVersion();
+      let _trails = _self._localStorage.retrieve('availableUpdates');
 
-      console.log('comparing versions', _trailVersion, _snowVersion);
-
-      console.log(_snowVersion, _currentTrailMeta.snowVersion);
-      console.log(_tilesVersion, _currentTrailMeta.tilesVersion);
-      console.log(_trailVersion, _currentTrailMeta.trailVersion);
-
-      if (_snowVersion !== _currentTrailMeta.snowVersion) {
-
-        _self._update.next(true);
-        _self._snow.next(true);
+      if (currentTrailOnly) {
+        _trails = { activeTrail: getTrailMetaDataById(_activeTrailId) };
       }
 
-      if (_tilesVersion !== _currentTrailMeta.tilesVersion) {
+      // for each trail
+      for (const key in _trails) {
 
-        if (!_tilesVersion) {
-          console.log('no tiles downloaded');
-        }
+        const _trailMeta: TrailMeta = _trails[key];
+        let _updateAvailable: boolean = false;
 
-        _self._update.next(true);
-        _self._tile.next(true);
-      }
+        // compare versions for each data type
+        _self._dataTypes.forEach(function(type: string) {
 
-      if (_trailVersion !== _currentTrailMeta.trailVersion) {
+          if (!_self.observables[_trailMeta.abbr + '_' + type + 'Available']) {
 
-        _self._update.next(true);
-        _self._trail.next(true);
+            // dynamically create behavior subjects / observables for each type
+            const _sub = _self._subjects[_trailMeta.abbr + '_' + type] = new BehaviorSubject(false);
+            _self.observables[_trailMeta.abbr + '_' + type + 'Available'] = _sub.asObservable().pipe(share());
+
+            // subscribe to localstorage
+            _self._localStorage.observe(_trailMeta.abbr + '_' + type + 'Version').subscribe(function () {
+              _self.versionCheck(true);  // as soon as the local storage version changes we re-resolve
+            });
+          }
+
+          // the actual comparison
+          const _storedVersion = _self._localStorage.retrieve(_trailMeta.abbr + '_' + type + 'Version');
+
+          if (_storedVersion !== _trailMeta[type + 'Version']) {
+
+            _self._subjects[_trailMeta.abbr + '_' + type].next(true);
+
+            if (_activeTrailId === _trailMeta.id) {
+              _updateAvailable = true;
+            }
+          } else {
+            _self._subjects[_trailMeta.abbr + '_' + type].next(false);
+          }
+        });
+
+        // set the general update available flag
+        _self._subjects['updateAvailable'].next(_updateAvailable);
+
       }
     });
   }

@@ -9,11 +9,10 @@ import { FilesystemService } from './filesystem.service';
   providedIn: 'root'
 })
 
+// Downloader manager
+// creates separate downloaders for files that continue when components are removed
+// has a global state (isDownloading), to see if there are still active processes
 export class DownloadService {
-
-  // Downloader manager
-  // creates separate downloaders for files that continue when components are removed
-  // has a global state (isDownloading), to see if there are still active processes
 
   private _downloaders = {};
   private _observers = {};
@@ -44,17 +43,35 @@ export class DownloadService {
     return _dl;
   }
 
-  public clearDownloaders(force: boolean = false): void {
+  public clearDownloaders(trailAbbr?: string, force: boolean = false): void {
 
     this._updateGlobalStatus();
 
     if (this._isDownloading.getValue() && !force) {
 
-      throw new Error('Still Downloading!!!');
+      alert('Trying to cancel actively running downloads, use force!');
+      return;
 
     } else {
 
-      for (const key in this._downloaders) {
+      let _downloadersToClear = {};
+
+      if (trailAbbr) {
+
+        // only cancel/clear downloaders for trail
+        for (const key in this._downloaders) {
+
+          if (key.includes(trailAbbr)) {
+            _downloadersToClear[key] = this._downloaders[key];
+          }
+        }
+
+      } else {
+        // clear all
+        _downloadersToClear = this._downloaders;
+      }
+
+      for (const key in _downloadersToClear) {
 
         let _dl: Downloader = this._downloaders[key];
         _dl.cancelDownload();
@@ -65,9 +82,11 @@ export class DownloadService {
         _ob = null;
       }
 
-      this._downloaders = {};
-      this._observers = {};
-      this._states = {};
+      if (!trailAbbr) {
+        this._downloaders = {};
+        this._observers = {};
+        this._states = {};
+      }
     }
   }
 
@@ -90,8 +109,6 @@ export class DownloadService {
     for (const key in this._states) {
 
       const _statusSubject: BehaviorSubject<boolean> = this._states[key];
-
-      console.log(_statusSubject.getValue());
 
       if (_statusSubject.getValue() === true) {
         _newState = true;

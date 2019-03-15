@@ -5,7 +5,7 @@
   <mat-card-content>
     <section>
       <mat-form-field class="select-form-field">
-        <mat-select [value]="activeTrail.id" (selectionChange)="onTrailSelect($event)">
+        <mat-select [value]="activeTrail.id" (selectionChange)="onTrailSelect($event)" #trailSelector>
           <mat-option *ngFor="let trail of purchasedTrailList" [value]="trail.id">
             {{trail.name}}
           </mat-option>
@@ -17,9 +17,19 @@
 
       <div *ngIf="hasInternet">{{(!hasWifi) ? 'Cellular network detected, consider locating wifi before downloading large files!' : ''}}</div>
 
-      <downloader [trailAbbr]="activeTrail.abbr" [label]="'Trail data'" [fileSize]="activeTrail.tileDataSize" [downloadPath]="basePath + version + '/trail.zip'"  [name]="activeTrail.abbr + '_trail'"></downloader>
-      <downloader [trailAbbr]="activeTrail.abbr" [label]="'Snow data'" [fileSize]="activeTrail.tileDataSize" [downloadPath]="basePath + version + '/snow.zip'"  [name]="activeTrail.abbr + '_snow'"></downloader>
-      <downloader [trailAbbr]="activeTrail.abbr" [label]="'Map tiles'" [fileSize]="activeTrail.tileDataSize" [downloadPath]="basePath + version + '/tiles.zip'"  [name]="activeTrail.abbr + '_tiles'" [callback]="onTilesDownloaded.bind(this)"></downloader>
+      <downloader
+        *ngFor="let downloader of downloaders"
+
+        [hasFile]="hasFile(downloader)"
+        [version]="displayVersion(downloader)"
+        [hasUpdate]="updateAvailable(downloader)"
+        [type]="downloader"
+        [trailId]="activeTrail.id"
+        [file]="downloader + '.zip'"
+        [onComplete]="onDownloadComplete.bind(this)"
+        [onClear]="onDownloadCleared.bind(this)"
+      >
+      </downloader>
 
     </section>
 

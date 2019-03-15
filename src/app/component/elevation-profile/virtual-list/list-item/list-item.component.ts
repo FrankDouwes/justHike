@@ -21,7 +21,7 @@ declare const SVG: any;    // fixes SVGjs bug
 import { svgPath } from '../../../../_util/smoothLine';
 import { isPrime, normalizeElevation } from '../../../../_util/math';
 import { createSvgCircleMarker, createSvgFaElement, createSvgPointMarker, sampleFaIcon } from '../../../../_util/markers';
-import {getMajorPoiTypes, getPoiTypeByType} from '../../../../_util/poi';
+import { getMajorPoiTypes, getPoiTypeByType } from '../../../../_util/poi';
 import { environment } from '../../../../../environments/environment.prod';
 import { LocalStorageService } from 'ngx-webstorage';
 import { Subscription } from 'rxjs';
@@ -57,7 +57,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   private _snowData:            Array<Array<Snowpoint>>;
   private _dynamicSubscriptions: object           = {};
-  private _settings:              object          = {};
+  private _settings:            object            = {};
   private _initialized:         boolean;          // can only draw after initialization
 
   // SVG MAP
@@ -89,9 +89,9 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       _self._addSubscription(type);
     });
 
-    // add snowPack subscription (not really a poi
-    _self._getSettingFromStorage('showSnow');
-    _self._addSubscription('showSnow');
+    // add snowPack subscription
+    _self._getSettingFromStorage('snow');
+    _self._addSubscription('snow');
 
   }
 
@@ -193,7 +193,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // line
     this._drawLine();
 
-    if (this._settings['showSnowPack']) {
+    if (this._settings['showSnow']) {
       this._drawSnow();
     }
 
@@ -270,6 +270,8 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   }
 
   private _drawSnow(): void {
+
+    console.log('draw snow');
 
     if (!this._snowData[0] || this._snowData[0].length < 0) {
       return;

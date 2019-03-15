@@ -1,8 +1,8 @@
-import { Waypoint} from './waypoint';
 import { Mile } from './mile';
 import { OHLC } from './ohlc';
 import { Poi } from './poi';
 
+// the current trail data
 export class Trail {
   // STATIC
   id:             number;
@@ -23,7 +23,13 @@ export class Trail {
   poiTypes?:          Array<object>;      // the poiTypes available for this trail (used for icons / labels)
 }
 
+
+
+/* the data that is always available regardless of the currently selected trail. (provided by version.json)
+TrailMeta represents the most recent available data for a given trail, meaning the version data is what is available online,
+not what it downloaded. TrailMeta is used for Trail generation as well as version checking */
 export class TrailMeta {
+
   id: number;
   name?: string;
   abbr: string;

@@ -1,8 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import { Mile } from '../../type/mile';
 import {Trail} from '../../type/trail';
 import {Waypoint} from '../../type/waypoint';
+import {LocalStorageService} from 'ngx-webstorage';
+import {LocationService} from '../../service/location.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-mile-detail',
@@ -10,14 +13,21 @@ import {Waypoint} from '../../type/waypoint';
   styleUrls: ['./mile-detail.component.sass']
 })
 
-export class MileDetailComponent implements OnInit {
+export class MileDetailComponent implements OnInit, OnDestroy {
 
   public visibleMiles:            Array<Mile>;
   public routedMile:              number;
   public trailData:               Trail;
   public centerPoint:             Waypoint;
+  public isNobo:                  boolean;
+  public centerUserTrigger:       number;
+  public isTracking:              boolean;
+
+  private _locationSubscription:  Subscription;
 
   constructor(
+    private _localStorage: LocalStorageService,
+    private _locationService: LocationService,
     private _route: ActivatedRoute,
     private _router: Router
   ) {
@@ -27,6 +37,8 @@ export class MileDetailComponent implements OnInit {
 
   ngOnInit(): void {
 
+    const _self = this;
+
     // get miles data based on route id
     this.routedMile = (this._route.snapshot) ? Number(this._route.snapshot.paramMap.get('id')) : 0;
 
@@ -35,6 +47,18 @@ export class MileDetailComponent implements OnInit {
         this._setCenterpoint(this.routedMile);
       }
     );
+
+    this._locationSubscription = this._locationService.locationStatus.subscribe(function(result) {
+      _self.isTracking = (result === 'tracking');
+    })
+
+    this.isNobo = (this._localStorage.retrieve('direction') === 0);
+  }
+
+  ngOnDestroy(): void {
+    if (this._locationSubscription) {
+      this._locationSubscription.unsubscribe();
+    }
   }
 
 
@@ -42,10 +66,17 @@ export class MileDetailComponent implements OnInit {
   public onScrollTo(data: any): void {
     this._setCenterpoint(data.mileId);
     this.routedMile = data.mileId;
+
+    console.log('ON SCROLL TO', this.routedMile);
+
     this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
   }
 
   private _setCenterpoint(mileId: number): void {
     this.centerPoint = this.trailData.miles[mileId].centerpoint as Waypoint;
+  }
+
+  public centerOnUser():void {
+    this.centerUserTrigger = new Date().getTime();
   }
 }

@@ -1,6 +1,12 @@
+/* just some helper functions to make sure everything is available,
+ * useful for debugging in browser (when cordova isn't available) and simple guarding */
+
 /* cordova for native stuff (that tends to be buggy) */
 let _cordova: any;
 
+
+
+/* cordova */
 export function getCordova(): any {
   return _cordova;
 }
@@ -12,6 +18,7 @@ export function setCordova(c): void {
 export function cordovaEnabled(): boolean {
   return !!(_cordova);
 }
+
 
 
 /* screen is used to lock orientation using cordova-plugin-screen-orientation */
@@ -26,7 +33,9 @@ export function setScreen(s): void {
 }
 
 
-/* connection is used to test connection using cordova-plugin-network-information */
+
+/* used to test connection using cordova-plugin-network-information */
+/* TODO plugin not working as advertised, what else is new! */
 let _connection: any;
 
 export function getConnection(): any {
@@ -40,6 +49,8 @@ export function setConnection(c): void {
 export function hasConnection(): boolean {
   return !!(_connection);
 }
+
+
 
 /* zip plugin cordova */
 let _zip: any;
@@ -55,4 +66,21 @@ export function getZip(): any {
 export function hasZip(): boolean {
   return !!(_zip);
 }
+
+
+/* cordova dialogs plugin, to use native dialogs for warnings etc. */
+let _dialogs: any;
+
+export function setDialogs(d): void {
+  _dialogs = d;
+}
+
+export function getDialogs(): any {
+  return _dialogs;
+}
+
+export function hasDialogs(): boolean {
+  return !!(_dialogs);
+}
+
 

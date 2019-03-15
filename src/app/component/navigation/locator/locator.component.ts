@@ -3,6 +3,7 @@ import { Mile } from '../../../type/mile';
 import { User } from '../../../type/user';
 import { Subscription } from 'rxjs';
 import { LocationBasedComponent } from '../../../display/location-based/location-based.component';
+import {Waypoint} from '../../../type/waypoint';
 
 @Component({
   selector: 'locator-button',

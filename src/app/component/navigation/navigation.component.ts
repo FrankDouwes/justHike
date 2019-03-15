@@ -64,7 +64,8 @@ export class NavigationComponent implements OnInit, OnChanges {
        this.isDownloading = isDownloading;
     });
 
-    this._updateSubscription = this._versionResolverService.updateAvailableObservable.subscribe( updateAvailable => {
+    console.log(this._versionResolverService.observables);
+    this._updateSubscription = this._versionResolverService.observables['updateAvailable'].subscribe( updateAvailable => {
       this.updateAvailable = updateAvailable;
     });
 

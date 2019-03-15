@@ -1,9 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import {isDevMode, NgModule, OnDestroy} from '@angular/core';
+import {isDevMode, NgModule} from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
-import { environment } from '../environments/environment.prod';
 import { AppComponent } from './app.component';
 
 // font awesome
@@ -11,9 +10,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
   faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt,
-  faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen,
+  faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle,
-  faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle
+  faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp
   } from '@fortawesome/free-solid-svg-icons';
 import { faCompass, faDotCircle, faArrowAltCircleDown} from '@fortawesome/free-regular-svg-icons';
 
@@ -77,22 +76,12 @@ import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
 
 // services
-import { LoaderService } from './service/loader.service';
-import { LocalStorageService, NgxWebstorageModule } from 'ngx-webstorage';
-import { FilesystemService } from './service/filesystem.service';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 import { SettingsComponent } from './component/navigation/settings/settings.component';
 import { TrailSettingsComponent } from './component/dialog/settings-dialog/panels/trail-settings/trail-settings.component';
-import {setConnection, setCordova, setScreen, setZip} from './_util/cordova';
-import { ConnectionService } from './service/connection.service';
 import { AdminComponent } from './component/admin/admin.component';
-import {getMajorPoiTypes} from './_util/poi';
+import { UserIndicatorComponent } from './component/poi-list/user-indicator/user-indicator.component';
 
-// cordova plugins
-declare let cordova: any;
-declare let screen: any;
-declare let download: any;
-declare let Connection: any;
-declare let zip: any;
 
 @NgModule({
   declarations: [
@@ -133,7 +122,8 @@ declare let zip: any;
     DownloaderComponent,
     SettingsComponent,
     TrailSettingsComponent,
-    AdminComponent
+    AdminComponent,
+    UserIndicatorComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -169,14 +159,9 @@ declare let zip: any;
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule implements OnDestroy {
+export class AppModule {
 
-  constructor(
-    private _localStorage: LocalStorageService,
-    private _loaderService: LoaderService,
-    private _fileSystemService: FilesystemService,
-    private _connectionService: ConnectionService
-  ) {
+  constructor() {
 
     if (isDevMode()) {
       console.log('\n');
@@ -186,97 +171,11 @@ export class AppModule implements OnDestroy {
       console.log('\n');
     }
 
-    // cordova enabled or not
-    if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/)) {
-
-      document.addEventListener('deviceready', this._onDeviceReady.bind(this), false);
-
-    } else {
-
-      // activate filesystem
-      this._fileSystemService.initializeStorage();
-      this._firstRun();
-    }
-
     // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt,
-      faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar,
+      faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload,
       faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake,
-      faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle);
-  }
-
-  ngOnDestroy(): void {
-    this._connectionService.stopTracking();
-  }
-
-  private _onDeviceReady(): void {
-
-    if (cordova) {
-      setCordova(cordova);
-      setScreen(screen);
-      setConnection(Connection);
-      setZip(zip);
-    }
-
-    // const _isOnlineSubscription = this._connectionService.connectionObserver.subscribe(function (isOnline) {
-    //
-    //   const _bodyElement = document.getElementsByTagName('BODY')[0];
-    //
-    //   if (isOnline) {
-    //     _bodyElement.classList.remove('offline');
-    //   } else {
-    //     _bodyElement.classList.add('offline');
-    //   }
-    //
-    // }, function (error) {
-    //   alert('something went wrong with the connection');
-    //   _isOnlineSubscription.unsubscribe();
-    // });
-
-    this._connectionService.startTracking();
-
-    // activate filesystem
-    this._fileSystemService.initializeStorage();
-    this._firstRun();
-  }
-
-  // set default user settings (unless they already exist)
-  // good place to force user settings during development/debugging
-  private _firstRun() {
-
-    const _self = this;
-
-    // always clear simulatedMile
-    this._localStorage.store('simulatedMile', -1);
-
-    const _firstRun = this._localStorage.retrieve('firstRun');
-
-    if (_firstRun !== false) {
-
-      console.log('first run');
-
-      this._loaderService.showMessage('initializing first run');
-      this._localStorage.store('firstRun', true);
-
-      // by default show all major pois
-      const _majorPoiTypes: Array<string> = getMajorPoiTypes();
-
-      // dynamic subscriptions based on PoiTypes that are set as being major (important)
-      _majorPoiTypes.forEach(function(type: string) {
-        const _camelName =  'show' +  type.charAt(0).toUpperCase() + type.slice(1);
-        _self._localStorage.store(_camelName, true);
-      });
-
-      // set default user settings
-      for (const key in environment.DEFAULT_USER_SETTINGS) {
-
-        const _value = environment.DEFAULT_USER_SETTINGS[key];
-
-        if (this._localStorage.retrieve(key) === null) {
-          this._localStorage.store(key, _value);
-        }
-      }
-    }
+      faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faTimes);
   }
 }

@@ -94,7 +94,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     if (changes.scrollTo) {
       if (changes.scrollTo.currentValue) {
-        if (this.scrollViewport && this._currentIndex) {
+        if (this.scrollViewport) {
           this._currentIndex = Math.floor(this.scrollViewport.getDataLength() * changes.scrollTo.currentValue);
           this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
         }

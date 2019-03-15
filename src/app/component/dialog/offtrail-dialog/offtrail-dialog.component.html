@@ -12,7 +12,7 @@
   <div id="bottom">
     <mat-card-content class="form-container">
       <mat-form-field>
-        <input matInput placeholder="simulate mile" value="{{simulatedMile || 0}}" type="tel" min=0 max={{trailLength}} #simulate>
+        <input matInput placeholder="simulate mile" value="{{simulatedMile || 0}}" type="tel" min=0 max={{trailLength}} (keyup)="onKey($event)" #simulate>
       </mat-form-field>
       <div id="button-group">
         <span>

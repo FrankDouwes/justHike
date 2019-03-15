@@ -14,7 +14,6 @@
   </mat-card-header>
 
   <section>
-
     <mat-form-field class="direction">
       <mat-select [value]="direction" (selectionChange)="onDirectionSelect($event)">
         <mat-option *ngFor="let direction of directionList" [value]="direction.id">
@@ -22,33 +21,40 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-
-
-    <mat-checkbox class="example-margin" name="showSnowPack" [(ngModel)]="showSnowPack" (change)="onCheckboxChange($event)">show snowpack</mat-checkbox>
-
-    <section class="example-section">
-      <h5>Point of interest</h5>
-      max poi distance off trail
-      <input type="number" value="250">
-    </section>
-
-    <section class="example-section">
-      <h5>User</h5>
-      user off trail
-      <input type="number" value="250">
-    </section>
-
+    <br/>
+    <mat-checkbox class="example-margin" name="showSnow" [(ngModel)]="showSnow" (change)="onCheckboxChange($event)">show snowpack</mat-checkbox>
   </section>
+
+  <mat-card-header>
+    <mat-card-title>Point of interest:</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <section>
+      <div>
+        distance (in ft.) before a point of interest is considered 'off trail'
+        <input type="number" value="250">
+      </div>
+      <div>
+        distance (in ft.) before a user is considered 'off trail'
+        <input type="number" value="250">
+      </div>
+    </section>
+  </mat-card-content>
+
 
   <mat-card-header>
     <mat-card-title>Elevation Profile:</mat-card-title>
   </mat-card-header>
-
-  <section>
-    <mat-checkbox *ngFor="let poiType of majorPoiTypes" class="example-margin" [name]="createCamelCaseName(poiType, 'show')" [(ngModel)]="this[createCamelCaseName(poiType, 'show')]" (change)="onCheckboxChange($event)">show {{poiType}}</mat-checkbox>
-    <br/>
-    <mat-checkbox class="example-margin" name="showMiniMap" [(ngModel)]="showMiniMap" (change)="onCheckboxChange($event)">show mini-map</mat-checkbox>
-  </section>
+  <mat-card-content>
+    <section>
+      <div *ngFor="let poiType of majorPoiTypes">
+        <mat-checkbox [name]="createCamelCaseName(poiType, 'show')" [(ngModel)]="this[createCamelCaseName(poiType, 'show')]" (change)="onCheckboxChange($event)">show {{poiType}}</mat-checkbox>
+        <br/>
+      </div>
+      <hr/>
+      <mat-checkbox name="showMiniMap" [(ngModel)]="showMiniMap" (change)="onCheckboxChange($event)">show mini-map</mat-checkbox>
+    </section>
+  </mat-card-content>
 
   <mat-card-header>
     <mat-card-title>Details Page:</mat-card-title>
@@ -56,7 +62,8 @@
 
   <mat-card-content>
     <section class="example-section">
-      <div>something</div>
+      <div>no settings available</div>
     </section>
   </mat-card-content>
+
 </mat-card>

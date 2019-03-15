@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TrailMeta } from '../../../../../type/trail';
 import { LocalStorageService } from 'ngx-webstorage';
 import { SettingsPanelComponent } from '../../../../../display/settings-panel/settings-panel.component';
+import {getTrailsMetaData} from '../../../../../_util/trail';
 
 @Component({
   selector: 'purchase-settings',
@@ -31,7 +32,7 @@ export class PurchaseSettingsComponent extends SettingsPanelComponent implements
 
     this.availableTrailList = [];
 
-    const _trailData = this._localStorage.retrieve('versionData');  //all meta data
+    const _trailData = getTrailsMetaData();
 
     for (const key in _trailData) {
       if (_self._purchasedTrails && _self._purchasedTrails.indexOf(_trailData[key].id) === -1 && _trailData[key].abbr !== 'DEMO') {

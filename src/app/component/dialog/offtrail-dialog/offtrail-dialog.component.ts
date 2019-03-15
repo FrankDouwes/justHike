@@ -36,6 +36,15 @@ export class OfftrailDialogComponent implements OnInit {
     }, 200);
   }
 
+  public onKey(event): void {
+
+    console.log('key', event.key);
+    // if enter pressed
+    if (event.key === 'Enter') {
+      this.onOk();
+    }
+  }
+
   public onCancel(): void {
     this._dialogRef.close();
   }

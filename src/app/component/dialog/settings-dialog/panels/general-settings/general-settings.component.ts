@@ -3,7 +3,6 @@ import {SettingsPanelComponent} from '../../../../../display/settings-panel/sett
 import {LocalStorageService} from 'ngx-webstorage';
 import {MatCheckboxChange, MatSelectChange} from '@angular/material';
 import {VersionResolverService} from '../../../../../service/version-resolver.service';
-import {environment} from '../../../../../../environments/environment.prod';
 import {getMajorPoiTypes} from '../../../../../_util/poi';
 
 @Component({
@@ -15,7 +14,7 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
 
   @ViewChild('panel') panel: ElementRef;
 
-  public showSnowPack: boolean;
+  public showSnow: boolean;
   public showCampSites: boolean;
   public showMiniMap: boolean;
   public direction: number;       // 0: NOBO, 1: SOBO
@@ -34,7 +33,7 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
 
     const _self = this;
 
-    this.showSnowPack = this._localStorage.retrieve('showSnowPack');
+    this.showSnow = this._localStorage.retrieve('showSnow');
 
     // dynamic poi type properties
     this.majorPoiTypes = getMajorPoiTypes();

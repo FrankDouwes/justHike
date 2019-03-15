@@ -3,15 +3,13 @@ import {Trail} from '../app/type/trail';
 export const environment = {
 
   production: false,               //  parsing raw data will trigger file download if set to false
-    useRawData: false,              //  use raw data (create json), production must be set to false
-      dowloadParsedData: false,       //  use raw data must be set to true in order for this to work
-    simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
+  simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
   appDomain: 'http://hike.frankdouwes.com/',
   fileBaseUrl: 'files/',
 
-  updateCheckInterval: 86400000,      // the time between data update checks (maptiles/snow data)
+  updateCheckInterval: 86400000,      // the time between (online) data update checks
 
   MILE: 1609.344,    // mile in meters
   FOOT: 0.3048,      // foot in meters
@@ -37,11 +35,16 @@ export const environment = {
 
     autoUpdate: true,               // auto update (only used for snow data)
 
+    // major markers visibility (elevation profile)
+    showWater: true,
+    showCamp: true,
+    showRoad: true,                // not showing roads by default
+
     // internal
     maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app
     scrollbarSegmentSize: 26,       // scrollbar (elevation profile) renders 1 point for every X points)
     simulatedMile: -1,              // the simulated mile number
-    userName: 'unknown'             // default username
+    userName: 'Hiker'               // default username
   },
 
 

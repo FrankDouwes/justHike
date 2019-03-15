@@ -125,14 +125,6 @@ export class TrailGeneratorService {
       this._loaderService.showMessage('no pois');
     }
 
-    if (isDevMode() && environment.dowloadParsedData) {
-      const _direction: string = (direction === 0) ? 'nobo' : 'sobo';
-      saveFileAs(trail, this._trailData.abbr + '-trail-' + _direction + '.json');
-      this._loaderService.showMessage('downloaded file');
-    }
-
-    console.log(this._trailData);
-
     return this._trailData;
   }
 
