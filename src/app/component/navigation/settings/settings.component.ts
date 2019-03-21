@@ -10,8 +10,7 @@ export class SettingsComponent implements OnInit {
   @Input() isDownloading: boolean;
   @Input() updateAvailable: boolean;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

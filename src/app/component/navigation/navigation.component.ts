@@ -29,12 +29,12 @@ export class NavigationComponent implements OnInit, OnChanges {
 
   constructor(
 
-    private _location:      Location,
-    private _versionResolverService: VersionResolverService,
-    private _localStorage: LocalStorageService,
-    private _route:         ActivatedRoute,
-    private _router:        Router,
-    private _downloadService:     DownloadService,
+    private _location:                Location,
+    private _versionResolverService:  VersionResolverService,
+    private _localStorage:            LocalStorageService,
+    private _route:                   ActivatedRoute,
+    private _router:                  Router,
+    private _downloadService:         DownloadService,
   ) {
     _router.events.forEach((event) => {
 
@@ -60,11 +60,13 @@ export class NavigationComponent implements OnInit, OnChanges {
   // LIFECYCLE HOOKS
 
   ngOnInit(): void {
+
+    const _self = this;
+
     this._downloadSubScription = this._downloadService.isDownloadingObservable.subscribe(isDownloading => {
        this.isDownloading = isDownloading;
     });
 
-    console.log(this._versionResolverService.observables);
     this._updateSubscription = this._versionResolverService.observables['updateAvailable'].subscribe( updateAvailable => {
       this.updateAvailable = updateAvailable;
     });
@@ -73,7 +75,6 @@ export class NavigationComponent implements OnInit, OnChanges {
     this._localStorage.observe('isAdmin').subscribe( value => {
       this.isAdmin = value;
     });
-
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -84,6 +85,7 @@ export class NavigationComponent implements OnInit, OnChanges {
       this._versionResolverService.versionCheck();
     }
   }
+
 
 
   // EVENT HANDLERS

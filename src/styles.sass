@@ -11,7 +11,6 @@
 html, body
   display: block
   height: 100%
-  min-height: 100%
   max-height: 100%
   width: 100%
   max-width: 100%
@@ -21,10 +20,15 @@ html, body
 body
   overscroll-behavior: none
   margin: 0px 0px 0px 0.4px     // margin left keeps cdk scroll smooth on mobile (android)
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, "Helvetica Neue", sans-serif
 
 .offline
   border: 5px solid red
+
+.grey-scale
+  -webkit-filter: grayscale(100%)
+  -moz-filter: grayscale(100%)
+  filter: grayscale(100%)
 
 h1, h2, h3, h4, h5, h6
   font-family: 'NationalPark', Roboto, sans-serif
@@ -39,101 +43,22 @@ h1, h2, h3, h4, h5, h6
   display: none
 
 // make text unable to select
-.noselect
-  pointer-events: none
-  -webkit-touch-callout: none
-    -webkit-user-select: none
-     -khtml-user-select: none
-       -moz-user-select: none
-        -ms-user-select: none
-            user-select: none
+*
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
 
-// cant be accessed from within component structure?
+// ...except for inputs
+input
+  -webkit-user-select: auto !important
+  -khtml-user-select: auto !important
+  -moz-user-select: auto !important
+  -ms-user-select: auto !important
+  user-select: auto !important
 
-#elevation-profile-list
-  .cdk-virtual-scroll-viewport
-    background: url('./assets/images/overlay.png') repeat-x
-    background-size: auto 100%;
-    -webkit-transform: translate3d(0, 0, 0)     // smoother animation
-    transform: translate3d(0, 0, 0)             // smoother animation
-
-  .fa-marker
-    color: white
-
-  .tree-marker
-    color: rgba(224,223,213,0.65);
-
-  #wrap
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#c7e2ed+0,eeeeee+50,eeeeee+77,e9e1d2+78,b8cbb5+100&1+0,1+77,0.65+78,1+100 */
-    background: -moz-linear-gradient(top, rgba(199,226,237,1) 0%, rgba(238,238,238,1) 50%, rgba(238,238,238,1) 77%, rgba(233,225,210,0.65) 78%, rgba(184,203,181,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top, rgba(199,226,237,1) 0%,rgba(238,238,238,1) 50%,rgba(238,238,238,1) 77%,rgba(233,225,210,0.65) 78%,rgba(184,203,181,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom, rgba(199,226,237,1) 0%,rgba(238,238,238,1) 50%,rgba(238,238,238,1) 77%,rgba(233,225,210,0.65) 78%,rgba(184,203,181,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c7e2ed', endColorstr='#b8cbb5',GradientType=0 ); /* IE6-9 */
-
-  .marker-container
-    overflow: visible !important
-
-// dialog
-.mat-dialog-container
-  padding: 0 !important
-
-
-// leaflet-map, scoping issues
-.mile-marker
-
-  .label
-
-    background-color: rgba(243,243,243,0.75);
-
-    display: block
-    position: absolute
-    box-sizing: border-box
-
-    padding: 0 3px
-
-    width: auto
-    min-width: 20px
-
-    bottom: 0
-    right: -50%
-
-    border: 1px solid #777
-    border-radius: 3px
-
-    font-size: 12px
-    text-align: center
-
-
-// mile detail markers (scoping issues)
-.vector-marker
-  position: absolute
-  top: 0
-  left: 0
-  width: 33px
-  height: 50px
-  margin: auto
-  display: block
-  font-size: 14px
-  color: white
-  text-align: center
-
-  i
-    position: absolute
-    top: 9px
-    left: 1px
-    width: 32px
-    margin: auto
-    display: inline-block
-    font-size: 14px
-    color: white
-
-.vector-marker-shadow
-  background: url("assets/icons/marker-shadow.png") no-repeat -4px 4px
-  width: 36px
-  height: 16px
-
-
-// icon button
+// icon button (font awesome for angular)
 fa-icon
   text-rendering: optimizeLegibility
 
@@ -151,9 +76,9 @@ fa-icon
     top: -3.5vw !important
 
   .spinner
-    -webkit-box-shadow: -2px -2px 10px rgba(0,0,0,.1) inset, 2px 2px 10px white inset;
-    -moz-box-shadow: -2px -2px 10px rgba(0,0,0,.1) inset, 2px 2px 10px white inset;
-    box-shadow: -2px -2px 10px rgba(0,0,0,.1) inset, 2px 2px 10px white inset;
+    -webkit-box-shadow: -2px -2px 10px rgba(0,0,0,.1) inset, 2px 2px 10px white inset
+    -moz-box-shadow: -2px -2px 10px rgba(0,0,0,.1) inset, 2px 2px 10px white inset
+    box-shadow: -2px -2px 10px rgba(0,0,0,.1) inset, 2px 2px 10px white inset
     background: rgba(190,230,250,0.75)
     color: #555
 
@@ -163,23 +88,21 @@ fa-icon
     color: white
 
 
+// dialog
+.mat-dialog-container
+  padding: 0 !important
 
 // the offtrail dialog container background (cdk)
 .offtrail-dialog .mat-dialog-container
     background-color: transparent !important
     /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+30,ffffff+100&0+0,1+30,1+100 */
-    background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 30%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 30%,rgba(255,255,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 30%,rgba(255,255,255,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+    background: -moz-linear-gradient(top, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 30%, rgba(255,255,255,1) 100%) /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 30%,rgba(255,255,255,1) 100%) /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(255,255,255,0) 0%,rgba(255,255,255,1) 30%,rgba(255,255,255,1) 100%) /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=0 ) /* IE6-9 */
 
     border-radius: 3vw 10vw 0 0
 
 // dialog backdrop (cdk)
 .cdk-overlay-dark-backdrop
   background-color: rgba(86,104,114, 0.45)
-
-
-.leaflet-control-scale
-  padding: 0 0 10px 10px !important
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left) !important

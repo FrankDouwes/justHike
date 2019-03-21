@@ -1,4 +1,4 @@
-import {Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges, ElementRef, ViewChild} from '@angular/core';
+import {Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges, ElementRef, ViewChild, OnDestroy} from '@angular/core';
 import { Mile } from '../../type/mile';
 import { ActivatedRoute } from '@angular/router';
 import * as L from 'leaflet';
@@ -15,13 +15,17 @@ import { SnowGeneratorService } from '../../service/snow-generator.service';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {OrientationService} from '../../service/orientation.service';
 import {Subscription} from 'rxjs';
+import {LocalStorageService} from 'ngx-webstorage';
 
 @Component({
   selector: 'leaflet-map',
   templateUrl: './leaflet-map.component.html',
   styleUrls: ['./leaflet-map.component.sass']
 })
-export class LeafletMapComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges {
+
+// uses basic for loops for performance
+/* TODO: needs cleanup, needs to use simular marker generation methods as the elevation profile */
+export class LeafletMapComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('leaflet') leaflet: ElementRef;
 
@@ -61,7 +65,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     private _route:             ActivatedRoute,
     private _snowGenerator:     SnowGeneratorService,
     private _trailGenerator:    TrailGeneratorService,
-    private _orientationService: OrientationService
+    private _orientationService: OrientationService,
+    private _localStorageService: LocalStorageService,
   ) {
     super();
   }
@@ -69,22 +74,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   ngOnInit(): void {
 
     super.ngOnInit();
-
-    const _self = this;
-
     this._trailLength = this._trailGenerator.getTrailData().miles.length;
-
-    // let _mileIds: Array<number> = [];
-    // if (this.milesData) {
-    //   this.milesData.forEach(function (mile: Mile) {
-    //     _mileIds.push(mile.id);
-    //   })
-    //   this._snowData = this._snowGenerator.getSnowForMile(_mileIds);
-    // }
-    //
-    // this._orientationSubscription = this._orientationService.orientationObserver.subscribe(function(result) {
-    //   _self._orientation = result;
-    // })
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -104,15 +94,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       if (changes.trigger) {
         this.centerOnUser();
       }
-
-    //
-    //   if (changes.centerPoint) {
-    //     this._centerOnPoint(changes.centerPoint.currentValue);
-    //   } else {
-    //     // this._drawMap();
-    //     this.onUserLocationChange(this.user);
-    //     this._centerMap(this.centerUser);
-    //   }
     }
   }
 
@@ -122,21 +103,31 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._dataManager();
     this.onUserLocationChange(this.user);
 
-    // // only draw if there's data
-    // if (this.milesData && this.milesData.length > 0) {
-    //   this._drawMap();
-    //   this.onUserLocationChange(this.user);
-    //   this._centerMap(this.centerUser);
-    // }
-
     this._initialized = true;
     if (!this.centerUser) {
       this._centerOnPoint(this.centerPoint);
     }
   }
 
+  ngOnDestroy() {
+
+    super.ngOnDestroy();
+
+    this._removeMiles(this._visibleMiles);
+
+    if (this._map){
+      this._map.eachLayer(function(layer){
+        layer.remove();
+      });
+      this._map.remove();
+      this._map = null;
+    }
+  }
+
 
   private _setupMap(): void {
+
+    const _self = this;
 
     // no data, no map
     if (!this.trailGenerator.getTrailData()) {
@@ -148,22 +139,33 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (this.showMapTiles === true) {
 
-      // appends the ionic compatible root directory URL
-      // TODO dynamic version number (set after tile download complete...
-      const _url = this.fileSystem.rootPath + this.trailGenerator.getTrailData().abbr + '/1.0/{x}/{y}.png';
+      // appends the ionic webview compatible root directory URL
+      const _version = this._localStorageService.retrieve(this.trailGenerator.getTrailData().abbr + '_tilesVersion');
+
+      let _url: string;
+      if (_version) {
+        _url = this.fileSystem.rootPath + this.trailGenerator.getTrailData().abbr + '/' + _version + '/{x}/{y}.png';
+      } else {
+        _url  = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}';
+      }
 
       const tilesFallback = fallbackLayer(_url,
       {
 
+        //http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png
         // min & max zoom prp causes flickering
           minNativeZoom: 15,
           maxNativeZoom: 15,
-          fallbackTileUrl: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+          fallbackTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
           errorTileUrl: './assets/images/missing.png',
-        });
+
+          keepBuffer: 1,    // small buffer means faster scrolling
+          updateWhenIdle: false
+      });
 
       _tileLayers = _tileLayers.concat(tilesFallback);
     }
+
 
     this._map = new L.map('leaflet_' + this.name, {
       minZoom: 14,
@@ -184,6 +186,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
 
     this._map.setView([0, 0], 15);
+
+    // add scale indicator
+    L.control.scale().addTo(this._map);
   }
 
 
@@ -204,17 +209,18 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       }
     }
 
-    console.log(_newVisibleMiles);
-
     // compare drawn miles array to new visibleMiles
-    this._visibleMiles.forEach(function(mileId, index) {
+    const _visibleMilesLength = this._visibleMiles.length;
+    for (let i = 0; i < _visibleMilesLength; i++) {
 
-      if (_newVisibleMiles.indexOf(mileId) < 0) {
-        _oldmMilesToDelete.push(mileId);
+      const _mileId = this._visibleMiles[i]
+
+      if (_newVisibleMiles.indexOf(_mileId) < 0) {
+        _oldmMilesToDelete.push(_mileId);
       } else {
-        _newVisibleMiles.splice(_newVisibleMiles.indexOf(mileId), 1);
+        _newVisibleMiles.splice(_newVisibleMiles.indexOf(_mileId), 1);
       }
-    });
+    }
 
     // // prevent duplicates, shouldn't be necessary
     // _oldmMilesToDelete = Array.from(new Set(_oldmMilesToDelete));
@@ -236,13 +242,16 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       return;
     }
 
-    mileIds.forEach(function(mileId: number, index: number) {
+    const _mileIdsLength = mileIds.length;
+    for (let i = 0; i < _mileIdsLength; i++) {
 
-      if (_self._visibleMiles.indexOf(mileId) !== -1) {
+      const _mileId = mileIds[i];
+
+      if (_self._visibleMiles.indexOf(_mileId) !== -1) {
         return;
       }
 
-      const _mile = _self._trailGenerator.getTrailData().miles[mileId];
+      const _mile = _self._trailGenerator.getTrailData().miles[_mileId];
 
       if (!_mile) {
         return;
@@ -252,13 +261,13 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         _self._centerpoint = _mile.centerpoint;
       }
 
-      _self.renderedData[mileId] = {};
+      _self.renderedData[_mileId] = {};
 
-      _self._drawTrail(_mile, mileId);
-      _self._drawSnow(_mile, mileId);
-      _self._drawPois(_mile, mileId);
+      _self._drawTrail(_mile, _mileId);
+      _self._drawSnow(_mile, _mileId);
+      _self._drawPois(_mile, _mileId);
       _self._setBounds();
-    });
+    }
   }
 
   // removes miles (trail/snow/pois/labels/lines that are no longer visible
@@ -270,48 +279,57 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       return;
     }
 
-    mileIds.forEach(function(mileId: number, index: number) {
+    const _mileIdsLength = mileIds.length;
+    for (let i = 0; i < _mileIdsLength; i++) {
 
-      if (_self.renderedData[mileId]) {
+      const _mileId = mileIds[i];
 
-        if (_self.renderedData[mileId].trail) {
-          _self._map.removeLayer(_self.renderedData[mileId].trail);
-          _self.renderedData[mileId].trail = null;
-          delete _self.renderedData[mileId].trail;
+      try {
+        if (_self.renderedData[_mileId] && _self._map) {
+
+          if (_self.renderedData[_mileId].trail) {
+            _self._map.removeLayer(_self.renderedData[_mileId].trail);
+            _self.renderedData[_mileId].trail = null;
+            delete _self.renderedData[_mileId].trail;
+          }
+
+          if (_self.renderedData[_mileId].snow) {
+            _self._map.removeLayer(_self.renderedData[_mileId].snow);
+            _self.renderedData[_mileId].snow = null;
+            delete _self.renderedData[_mileId].snow;
+          }
+
+          if (_self.renderedData[_mileId].markers) {
+            // _self.renderedData[mileId].markers.eachLayer(function (layer) {
+            //   console.log(layer);
+            // });
+            _self._map.removeLayer(_self.renderedData[_mileId].markers);
+            _self.renderedData[_mileId].markers.clearLayers();
+            _self.renderedData[_mileId].markers = null;
+            delete _self.renderedData[_mileId].markers;
+          }
+
+          _self.renderedData[_mileId] = null;
+          delete _self.renderedData[_mileId];
+
+          _self._visibleMiles.splice(_self._visibleMiles.indexOf(_mileId), 1);
         }
-
-        if (_self.renderedData[mileId].snow) {
-          _self._map.removeLayer(_self.renderedData[mileId].snow);
-          _self.renderedData[mileId].snow = null;
-          delete _self.renderedData[mileId].snow;
-        }
-
-        if (_self.renderedData[mileId].markers) {
-          // _self.renderedData[mileId].markers.eachLayer(function (layer) {
-          //   console.log(layer);
-          // });
-          _self._map.removeLayer(_self.renderedData[mileId].markers);
-          _self.renderedData[mileId].markers.clearLayers();
-          _self.renderedData[mileId].markers = null;
-          delete _self.renderedData[mileId].markers;
-        }
-
-        _self.renderedData[mileId] = null;
-        delete _self.renderedData[mileId];
-
-        _self._visibleMiles.splice(_self._visibleMiles.indexOf(mileId), 1);
+      } catch (e) {
+        console.log(e);
       }
 
-    });
+    }
   }
 
   private _drawTrail(mile: Mile, index: number): void {
 
     const _waypoints: Array<any> = [];
 
-    for (const waypoint of mile.waypoints) {
+    const _waypointsLength = mile.waypoints.length;
 
-      const _wp: L.latLng = new L.latLng(waypoint.latitude, waypoint.longitude, waypoint.elevation);
+    for (let i = 0; i < _waypointsLength; i++) {
+
+      const _wp: L.latLng = new L.latLng(mile.waypoints[i].latitude, mile.waypoints[i].longitude, mile.waypoints[i].elevation);
 
       _waypoints.push(_wp);
     }
@@ -395,18 +413,28 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       const _maxPoiDistanceOffTrail = this.localStorage.retrieve('poiDistanceOffTrail');
 
-      for (const poi of mile.pois) {
+      const _poiLength = mile.pois.length;
 
-        const _poi: Poi = this._trailGenerator.getPoiById(poi);
+      for (let i = 0; i < _poiLength; i++) {
 
-        const _poiMarker = this._createmarker(_poi);
+        const _poi: Poi = this._trailGenerator.getPoiById(mile.pois[i]);
+        let _marker;
+
+        if (_poi.waypoint.distance > _maxPoiDistanceOffTrail) {
+          // TODO: render circle marker, just creates the same now
+          _marker = this._createmarker(_poi);
+        } else {
+
+          // render point marker
+          _marker = this._createmarker(_poi);
+        }
 
         if (_poi.waypoint.distance >= environment.MILE / 8) {
 
           _markerArray = _markerArray.concat(this._createPoiGuideLine(_poi));
         }
 
-        _markerArray.push(_poiMarker);
+        _markerArray.push(_marker);
       }
     }
 

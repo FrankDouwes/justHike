@@ -8,7 +8,7 @@ import { environment } from '../../../../../environments/environment.prod';
   selector: 'guides',
   templateUrl: './guides.component.html',
   styleUrls: ['./guides.component.sass'],
-  // changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class GuidesComponent implements OnInit, OnChanges {
@@ -43,28 +43,33 @@ export class GuidesComponent implements OnInit, OnChanges {
 
       const _self = this;
 
-      this.guides.forEach(function(guide, index) {
+      const _guidesLength = this.guides.length;
+
+      // loop, optimal
+      for (let i = 0; i < _guidesLength; i++) {
+
+        const _guide = this.guides[i];
 
         const elevation: number = normalizeElevation(_self._container.nativeElement.clientHeight
-          , guide['elevation'], min, range, environment.LINEHEIGHT);
+          , _guide['elevation'], min, range, environment.LINEHEIGHT);
 
         // if item already exists, update
-        if (_self.processedGuides[index]) {
+        if (_self.processedGuides[i]) {
 
-          _self.processedGuides[index]['offset'] = elevation;
-          _self.processedGuides[index]['range'] = guide['range'];
-          _self.processedGuides[index]['color'] = 'rgba(' + String(_colors[index]) + ',0.5)';
+          _self.processedGuides[i]['offset'] = elevation;
+          _self.processedGuides[i]['range'] = _guide['range'];
+          _self.processedGuides[i]['color'] = 'rgba(' + String(_colors[i]) + ',0.5)';
         } else {
 
           _self.processedGuides.push(
             {
               offset: elevation,
-              range: guide['range'],
-              color: 'rgba(' + String(_colors[index]) + ',0.5)'
+              range: _guide['range'],
+              color: 'rgba(' + String(_colors[i]) + ',0.5)'
 
             });
         }
-      });
+      }
     }
   }
 }

@@ -34,6 +34,7 @@ import { MatCarouselModule } from '@ngmodule/material-carousel';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { NgxWebstorageModule } from 'ngx-webstorage';
 
 // component
 import { LocationBasedComponent } from './display/location-based/location-based.component';
@@ -52,9 +53,7 @@ import { PoiUserItemComponent } from './component/poi-list/poi-user-item/poi-use
 import { LeafletMapComponent } from './component/leaflet-map/leaflet-map.component';
 import { DynamicItemComponent } from './component/poi-list/dynamic-item/dynamic-item.component';
 import { OfftrailDialogComponent } from './component/dialog/offtrail-dialog/offtrail-dialog.component';
-import { ElevationSettingsComponent } from './component/dialog/settings-dialog/panels/elevation-settings/elevation-settings.component';
 import { PurchaseSettingsComponent } from './component/dialog/settings-dialog/panels/purchase-settings/purchase-settings.component';
-import { DetailSettingsComponent } from './component/dialog/settings-dialog/panels/detail-settings/detail-settings.component';
 import { GeneralSettingsComponent } from './component/dialog/settings-dialog/panels/general-settings/general-settings.component';
 import { AboutComponent } from './component/dialog/settings-dialog/panels/about/about.component';
 import { InstructionsComponent } from './component/dialog/settings-dialog/panels/instructions/instructions.component';
@@ -65,6 +64,10 @@ import { FaSamplerComponent } from './component/fa-sampler/fa-sampler.component'
 import { FaIconComponent } from './component/fa-sampler/fa-icon/fa-icon.component';
 import { IconComponent } from './display/icon/icon.component';
 import { ButtonComponent } from './display/button/button.component';
+import { SettingsComponent } from './component/navigation/settings/settings.component';
+import { TrailSettingsComponent } from './component/dialog/settings-dialog/panels/trail-settings/trail-settings.component';
+import { AdminComponent } from './component/admin/admin.component';
+import { UserIndicatorComponent } from './component/poi-list/user-indicator/user-indicator.component';
 
 // dialog
 import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
@@ -74,13 +77,6 @@ import { SettingsDialogComponent } from './component/dialog/settings-dialog/sett
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
-
-// services
-import { NgxWebstorageModule } from 'ngx-webstorage';
-import { SettingsComponent } from './component/navigation/settings/settings.component';
-import { TrailSettingsComponent } from './component/dialog/settings-dialog/panels/trail-settings/trail-settings.component';
-import { AdminComponent } from './component/admin/admin.component';
-import { UserIndicatorComponent } from './component/poi-list/user-indicator/user-indicator.component';
 
 
 @NgModule({
@@ -112,9 +108,7 @@ import { UserIndicatorComponent } from './component/poi-list/user-indicator/user
     PoiUserItemComponent,
     PoiListItemComponent,
     DynamicItemComponent,
-    ElevationSettingsComponent,
     PurchaseSettingsComponent,
-    DetailSettingsComponent,
     GeneralSettingsComponent,
     AboutComponent,
     InstructionsComponent,

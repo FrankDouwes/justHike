@@ -1,97 +1,101 @@
-\:host /deep/ .mat-list-item-content
-  padding: 0 12px !important
-  margin: 0 !important
+\:host /deep/
 
-#center-icon
-  position: absolute
-  left: 38.2%
-  margin: -3.5vw 0 0 -3.5vw
-  z-index: 1000
+  .mat-list-item-content
+    padding: 0 12px !important
+    margin: 0 !important
 
-  button
-    user-focus: none
+\:host
 
-#left-panel, #right-panel
-  display: inline-block
-  height: 100%
-
-#left-panel
-  height: 98%
-  width: 38.2%
-  vertical-align: bottom
-  overflow-y: hidden
-
-  h1, h2
-    display: block
-    text-align: left
-    width: 90%
-    white-space: nowrap
-    text-overflow: ellipsis
-    overflow: hidden
-
-  h1
-    font-size: 4.2vh
-    padding: 0 12px
-
-  h2
-    font-size: 3.4vh
-    font-weight: 300
-
-  #setings-meta
-    background-color: white
-    box-sizing: border-box
-    height: 38.2%
-    border-bottom: 1px solid #DDD
-    overflow: hidden
-    text-overflow: ellipsis
-    font-size: 3vh
-
-    .mat-dialog-title
-      margin-bottom: 0
-      padding-bottom: 0
-
-    .mat-dialog-content
-      display: block
-
-      p
-        display: block
-        margin: 6px 12px 12px 12px
-
-  #settings-menu
-    height: 61.8%
-    overflow-y: scroll
-    padding: 0
-
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f7f7f7+0,f9f9f9+7 */
-    background: rgb(247,247,247); /* Old browsers */
-    background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(249,249,249,1) 7%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%,rgba(249,249,249,1) 7%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(249,249,249,1) 7%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f9f9f9',GradientType=0 ); /* IE6-9 */
+  #center-icon
+    position: absolute
+    left: 38.2%
+    margin: -3.5vw 0 0 -3.5vw
+    z-index: 1000
 
     button
-      border-bottom: 1px solid #EEE
-      //height: 22.22%
+      user-focus: none
 
-    span
+  #left-panel, #right-panel
+    display: inline-block
+    height: 100%
+
+  #left-panel
+    height: 98%
+    width: 38.2%
+    vertical-align: bottom
+    overflow-y: hidden
+
+    h1, h2
       display: block
-      position: absolute
-      right: 0
-      padding: 0 12px 0 12px
-      vertical-align: center
-      color: #CCC
+      text-align: left
+      width: 90%
+      white-space: nowrap
+      text-overflow: ellipsis
+      overflow: hidden
 
-#right-panel
-  box-sizing: border-box
-  width: 61.8%
-  background-color: #EEE
-  vertical-align: top
-  //padding: 12px
-  overflow-y: scroll
+    h1
+      font-size: 4.2vh
+      padding: 0 12px
 
-  mat-card
+    h2
+      font-size: 3.4vh
+      font-weight: 300
+
+    #setings-meta
+      background-color: white
+      box-sizing: border-box
+      height: 38.2%
+      border-bottom: 1px solid #DDD
+      overflow: hidden
+      text-overflow: ellipsis
+      font-size: 3vh
+
+      .mat-dialog-title
+        margin-bottom: 0
+        padding-bottom: 0
+
+      .mat-dialog-content
+        display: block
+
+        p
+          display: block
+          margin: 6px 12px 12px 12px
+
+    #settings-menu
+      height: 61.8%
+      overflow-y: scroll
+      padding: 0
+
+      /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f7f7f7+0,f9f9f9+7 */
+      background: rgb(247,247,247) /* Old browsers */
+      background: -moz-linear-gradient(top, rgba(247,247,247,1) 0%, rgba(249,249,249,1) 7%) /* FF3.6-15 */
+      background: -webkit-linear-gradient(top, rgba(247,247,247,1) 0%,rgba(249,249,249,1) 7%) /* Chrome10-25,Safari5.1-6 */
+      background: linear-gradient(to bottom, rgba(247,247,247,1) 0%,rgba(249,249,249,1) 7%) /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+      filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f9f9f9',GradientType=0 ) /* IE6-9 */
+
+      button
+        border-bottom: 1px solid #EEE
+        //height: 22.22%
+
+      span
+        display: block
+        position: absolute
+        right: 0
+        padding: 0 12px 0 12px
+        vertical-align: center
+        color: #CCC
+
+  #right-panel
     box-sizing: border-box
-    background-color: #97a895
-    min-height: 100%
-    border: unset
-    border-radius: unset
+    width: 61.8%
+    background-color: #EEE
+    vertical-align: top
+    //padding: 12px
+    overflow-y: scroll
+
+    mat-card
+      box-sizing: border-box
+      background-color: #97a895
+      min-height: 100%
+      border: unset
+      border-radius: unset

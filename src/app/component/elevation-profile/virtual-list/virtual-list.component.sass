@@ -3,37 +3,32 @@
   .background-layer
     position: fixed
     width: 100vw
-    height: 50vh
-    top: 20%
-    background: url("../../../../assets/images/backdrop.jpg") repeat-x
-    transition: opacity 0.3s linear
-
-  .background-layer-flat
-    position: fixed
-    width: 100vw
-    height: 50vh
-    top: 20%
-    background: url("../../../../assets/images/backdrop.jpg") repeat-x
-    transition: opacity 0.3s linear
+    height: 90vh
+    top: 0
+    background: url('../../../../assets/images/overlay.png') repeat-x
+    background-size: auto 100%
+    -webkit-transform: translate3d(0, 0, 0)     // smoother animation
+    transform: translate3d(0, 0, 0)             // smoother animation
 
   .virtual-list
     position: unset !important
     display: block
     width: 100vw
     height: 90vh
-    overflow-y: hidden;
-    white-space: nowrap;
+    overflow-y: hidden
+    white-space: nowrap
 
-  .cdk-virtual-scroll-content-wrapper
-    position: unset !important
-
-::ng-deep
-
-  .cdk-virtual-scroll-content-wrapper
-    //padding: 0 16px
+\:host /deep/
 
   .cdk-virtual-scroll-orientation-horizontal::-webkit-scrollbar-thumb
-    background-color: red
+    background-color: transparent
 
-  .cdk-virtual-scroll-content-wrapper::-webkit-scrollbar-thumb
-    background-color: red
+  .cdk-virtual-scroll-orientation-horizontal::-webkit-scrollbar-track
+    background-color: transparent
+
+  .cdk-virtual-scroll-orientation-horizontal::-webkit-scrollbar
+    background-color: transparent
+
+  .cdk-virtual-scroll-orientation-horizontal::-webkit-scrollbar-thumb
+    background-color: transparent
+

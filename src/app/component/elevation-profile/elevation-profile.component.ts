@@ -29,7 +29,6 @@ export class ElevationProfileComponent implements OnInit {
     );
   }
 
-
   // EVENT HANDLERS
 
   public onScroll(response: object): void {

@@ -15,7 +15,6 @@ import {Subscription} from 'rxjs';
 
 export class MileDetailComponent implements OnInit, OnDestroy {
 
-  public visibleMiles:            Array<Mile>;
   public routedMile:              number;
   public trailData:               Trail;
   public centerPoint:             Waypoint;
@@ -32,6 +31,8 @@ export class MileDetailComponent implements OnInit, OnDestroy {
     private _router: Router
   ) {
   }
+
+
 
   // LIFECYCLE HOOKS
 
@@ -66,9 +67,6 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   public onScrollTo(data: any): void {
     this._setCenterpoint(data.mileId);
     this.routedMile = data.mileId;
-
-    console.log('ON SCROLL TO', this.routedMile);
-
     this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
   }
 

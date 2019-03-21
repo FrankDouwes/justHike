@@ -14,8 +14,6 @@ export class SettingsDialogComponent implements OnInit {
     {title: 'Purchase', panel: 'purchase'},
     {title: 'Trail Data', panel: 'trail'},
     {title: 'General Settings', panel: 'general'},
-    // {title: 'Elevation Profile', panel: 'elevation'},
-    // {title: 'Mile Overview', panel: 'detail'},
     {title: 'About', panel: 'about'}
   ];
 

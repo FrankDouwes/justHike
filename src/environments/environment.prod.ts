@@ -21,30 +21,31 @@ export const environment = {
     activeTrailId: 0,               // the ID of the current trail
     purchasedTrails: [],            // IDs of purchased trails
 
-    useMiles: true,                 // miles (true), km (false) (UNUSED)
-    useFeet: true,                  // feet (true), meters (false) for elevation gain/loss (UNUSED)
+    useMiles: true,                 // miles (true), km (false) (TODO UNUSED)
+    useFeet: true,                  // feet (true), meters (false) for elevation gain/loss (TODO UNUSED)
     direction: 0,                   // northbound (0) or southbound (1)
     showSnow: true,                 // draw the snowpack
     showMiniMap: true,              // show mini map in elevation profile
 
     poiDistanceOffTrail: 250,       // distance (in feet?) that a water source has to be off trail to be rendered as such
     userDistanceOffTrail: 10,       // the distance (in feet?) that a user has to be off trail for marker to change
-
-    showExtraDesign: true,          // show extra design features in elevation profile (trees)
-    greyScale: false,               // map greyscale mode (UNUSED)
-
-    autoUpdate: true,               // auto update (only used for snow data)
+    autoUpdate: true,               // auto update (only used for snow data) (TODO UNUSED)
 
     // major markers visibility (elevation profile)
     showWater: true,
     showCamp: true,
-    showRoad: true,                // not showing roads by default
+    showRoad: false,                // not showing roads by default
 
     // internal
     maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app
     scrollbarSegmentSize: 26,       // scrollbar (elevation profile) renders 1 point for every X points)
     simulatedMile: -1,              // the simulated mile number
-    userName: 'Hiker'               // default username
+    userName: "Hiker",              // default username
+
+    // elevationProfile
+    parallaxEnabled: false,         // parallax effect in elevation profile
+    screenMode: "default",          // 'default', 'highContrast' or 'nighHike'
+    showExtraDesign: true,          // show extra design features in elevation profile (trees)
   },
 
 

@@ -32,12 +32,6 @@
     <!-- general settings panel -->
     <general-settings *ngIf="activePanel === 'general'" (onSettingsChanged)="onSettingsChanged($event)"></general-settings>
 
-    <!-- elevation profile settings panel -->
-    <!--<elevation-settings *ngIf="activePanel === 'elevation'" (onSettingsChanged)="onSettingsChanged($event)"></elevation-settings>-->
-
-    <!-- mile detail profile settings panel -->
-    <!--<detail-settings *ngIf="activePanel === 'detail'" (onSettingsChanged)="onSettingsChanged($event)"></detail-settings>-->
-
     <!-- about panel-->
     <about *ngIf="activePanel === 'about'"></about>
 

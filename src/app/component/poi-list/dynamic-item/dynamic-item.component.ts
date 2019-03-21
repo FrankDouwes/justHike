@@ -19,9 +19,12 @@ import { PoiUserItemComponent } from '../poi-user-item/poi-user-item.component';
   templateUrl: './dynamic-item.component.html',
   styleUrls: ['./dynamic-item.component.sass']
 })
+
+/* renders dynamic list item types based on type
+use multiple components as list items in a CDK virtual scroll
+if type === user, use user-item, else use poi-item */
 export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
-  @HostBinding('class.spacer') isSpacer: boolean = false;
   @ViewChild('container', { read: ViewContainerRef }) container: ViewContainerRef;
 
   @Input() data: object;
@@ -30,9 +33,6 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
   private _componentRef: ComponentRef<{}>;
   private _instance: any;             // the dynamic list item instance (user or poi)
-
-  // use multiple components as list items in a CDK virtual scroll
-  // if type === user, use user-item, else use poi-item
 
   constructor(
     private _changeDetector: ChangeDetectorRef,

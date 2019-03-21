@@ -28,8 +28,7 @@ import { Subscription } from 'rxjs';
 import { TrailGeneratorService } from '../../../../service/trail-generator.service';
 import { SnowGeneratorService } from '../../../../service/snow-generator.service';
 import { Snowpoint } from '../../../../type/snow';
-
-
+import {Waypoint} from '../../../../type/waypoint';
 
 @Component({
   selector: 'display-list-item',
@@ -38,6 +37,8 @@ import { Snowpoint } from '../../../../type/snow';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
+// uses basic for loops for performance
+// TODO: iOS scroll performance issues (jumps backwards during scroll event)
 export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('map') map: ElementRef;
@@ -49,16 +50,21 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   @Input() guides:              Array<object>;
   @Input() isLast:              boolean;
   @Input() resize:              number;
+  @Input() update:              number;           // triggers a redraw
 
   // user inputs only set if this mile is closest to user (else null)
   @Input() user?:               User;
   @Input() triggerUserUpdate?:  number;           // timestamp, set when user location is updated.
   @Input() userStatus?:         string;           // idle/fetching/tracking
 
+  public showCampsites:         boolean;
+
   private _snowData:            Array<Array<Snowpoint>>;
   private _dynamicSubscriptions: object           = {};
   private _settings:            object            = {};
   private _initialized:         boolean;          // can only draw after initialization
+
+  private _screenMode:          string;
 
   // SVG MAP
   private _lineCanvas;                            // line (trail/snow) canvas
@@ -73,7 +79,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   constructor(
     private _localStorage: LocalStorageService,
     private _trailGenerator: TrailGeneratorService,
-    private _snowGenerator: SnowGeneratorService
+    private _snowGenerator: SnowGeneratorService,
   ) {}
 
 // LIFECYCLE HOOKS
@@ -82,6 +88,9 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     const _self = this;
     const _majorPoiTypes: Array<string> = getMajorPoiTypes();
+
+    this.showCampsites = this._localStorage.retrieve('showCamp');
+    this._screenMode = this._localStorage.retrieve('screenMode');
 
     // dynamic subscriptions based on PoiTypes that are set as being major (important)
     _majorPoiTypes.forEach(function(type: string) {
@@ -92,7 +101,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // add snowPack subscription
     _self._getSettingFromStorage('snow');
     _self._addSubscription('snow');
-
   }
 
 
@@ -154,6 +162,13 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     if (changes.data || changes.visibleOHLC) {
       this._snowData = this._snowGenerator.getSnowForMile(this.data.id);
+      this._drawMap();
+    }
+
+    if (changes.update) {
+
+      this._screenMode = this._localStorage.retrieve('screenMode');
+
       this._drawMap();
     }
 
@@ -240,15 +255,18 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     let _waypointDistPerc: number;
 
-    _waypointsArr.forEach((waypoint, index) => {
+    const _totalWaypoints: number = _waypointsArr.length;
+    for (let i = 0; i < _totalWaypoints; i++) {
+
+      const _waypoint: Waypoint = _waypointsArr[i];
 
       // calculate distance, starting at 2nd point
-      _waypointDistPerc = waypoint.distance / environment.MILE;
+      _waypointDistPerc = _waypoint.distance / environment.MILE;
 
-      const _elevation: number = normalizeElevation(this._svgHeight, waypoint.elevation, min, range, environment.LINEHEIGHT);
+      const _elevation: number = normalizeElevation(this._svgHeight, _waypoint.elevation, min, range, environment.LINEHEIGHT);
 
       // set startpoints
-      if (index === 0) {
+      if (i === 0) {
         drawPoints.push([-environment.LINEHEIGHT, this._svgHeight]);
         drawPoints.push([-environment.LINEHEIGHT, _elevation]);
       }
@@ -257,21 +275,28 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       drawPoints.push([Math.round(this._svgWidth * _waypointDistPerc), _elevation]);
 
       // set endpoints
-      if (index === _waypointsArr.length - 1) {
+      if (i === _waypointsArr.length - 1) {
         drawPoints.push([this._svgWidth + environment.LINEHEIGHT, _elevation]);
         drawPoints.push([this._svgWidth + environment.LINEHEIGHT, this._svgHeight]);
       }
 
-    });
+    }
 
     // draw line
-    const _polyline = this._lineCanvas.path(svgPath(drawPoints)).fill('rgba(233,225,210, 0.5)')
+
+    let _fill: string = 'rgba(233,225,210, 0.5)';
+
+    if (this._screenMode == 'highContrast') {
+      _fill = 'rgba(255,255,255, 0.65)';
+    } else if (this._screenMode === 'nightHike') {
+      _fill = 'rgba(89,89,89, 0.65)';
+    }
+
+    const _polyline = this._lineCanvas.path(svgPath(drawPoints)).fill(_fill)
       .stroke({ color: 'red', width: environment.LINEHEIGHT});
   }
 
   private _drawSnow(): void {
-
-    console.log('draw snow');
 
     if (!this._snowData[0] || this._snowData[0].length < 0) {
       return;
@@ -289,38 +314,43 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
       let drawPoints: Array<any> = [];
 
-      _waypointsArr.forEach((waypoint, index) => {
+      const _stroke: string = (this._screenMode === 'highContrast') ? '#97ffff' : 'rgba(255,255,255,0.9)';
+
+      const _totalWaypoints: number = _waypointsArr.length;
+      for (let i = 0; i < _totalWaypoints; i++) {
+
+        const _waypoint: Waypoint = _waypointsArr[i];
 
         let _elevation = 0;
 
-        function elevationRange(): number {
+        const elevationRange = function(): number {
           // waypoint distance (%) on snowarray elevation range
-          return _snowArray[0].elevation + ((waypoint.distance / environment.MILE) * ((_snowArray[1].elevation - _snowArray[0].elevation)));
-        }
+          return _snowArray[0].elevation + ((_waypoint.distance / environment.MILE) * ((_snowArray[1].elevation - _snowArray[0].elevation)));
+        };
 
-        // if waypoint is above showline
-        if (waypoint.elevation >= elevationRange()) {
+        // if waypoint is above snowline
+        if (_waypoint.elevation >= elevationRange()) {
 
           // add point
-          _elevation = normalizeElevation(this._svgHeight, waypoint.elevation, min, range, environment.LINEHEIGHT);
-          drawPoints.push([Math.round(this._svgWidth * (waypoint.distance / environment.MILE)), _elevation]);
+          _elevation = normalizeElevation(this._svgHeight, _waypoint.elevation, min, range, environment.LINEHEIGHT);
+          drawPoints.push([Math.round(this._svgWidth * (_waypoint.distance / environment.MILE)), _elevation]);
 
-        } else if (waypoint.elevation < elevationRange()) {
+        } else if (_waypoint.elevation < elevationRange()) {
 
-          // if trail drops below snowlevel
+          // if trail drops below snowline
+
           const snowLine = this._lineCanvas.path(svgPath(drawPoints)).fill('rgba(255,255,255,0)')
-            .stroke({ color: 'rgba(255,255,255,0.9)', width: environment.LINEHEIGHT * 2, linecap: 'round'});
+            .stroke({ color: _stroke, width: environment.LINEHEIGHT * 2, linecap: 'round'});
 
           drawPoints = [];
         }
-
-      });
+      }
 
       // if there is still snow to be drawn at the end of loop
       if (drawPoints.length >= 1) {
 
         const snowLine = this._lineCanvas.path(svgPath(drawPoints)).fill('rgba(255,255,255,0)')
-          .stroke({ color: 'rgba(255,255,255,0.9)', width: environment.LINEHEIGHT * 2, linecap: 'round'});
+          .stroke({ color: _stroke, width: environment.LINEHEIGHT * 2, linecap: 'round'});
       }
     }
   }
@@ -339,32 +369,35 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       const _self = this;
       const _maxPoiDistanceOfTrail = this._localStorage.retrieve('poiDistanceOffTrail');
 
-      _poisArray.forEach((poi, index) => {
+      const _totalPois: number = _poisArray.length;
+      for (let i = 0; i < _totalPois; i++) {
 
-        const _poi: Poi = this._trailGenerator.getPoiById(poi);
+        const _poi: Poi = this._trailGenerator.getPoiById(_poisArray[i]);
 
         if (!_poi) {
-          console.log('bug at poi with id:' + poi);
+          console.log('bug at poi with id:' + _poi);
         }
 
 
         // if user setting is true
-
         const _poiTypes = _poi['type'].split(', ');
 
         // if poi is of visible type
         let _isVisible: boolean;
         let _visibleTypes: string = '';
 
-        _poiTypes.forEach(function (type) {
+        const _poiTypesLength = _poiTypes.length;
+        for (let p = 0; p < _poiTypesLength; p++) {
 
-          const _setting: boolean = _self._settings[_self._createCamelCaseName(type, 'show')];
+          const _type: string = _poiTypes[p];
+
+          const _setting: boolean = _self._settings[_self._createCamelCaseName(_type, 'show')];
 
           if (_setting === true) {
             _isVisible = true;
-            _visibleTypes += type;
+            _visibleTypes += _type;
           }
-        });
+        }
 
         if (_isVisible) {
 
@@ -375,7 +408,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
           const _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, environment.LINEHEIGHT / 2);
 
-          if (_poiTypes.length > 1 && _visibleTypes.length > 2) {
+          if (_poiTypesLength > 1 && _visibleTypes.length > 2) {
             _markerColor = getPoiTypeByType('multiple').color;
             _iconSize = 13;
             _extraOffset = (_iconSize / 2);
@@ -387,46 +420,51 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
             _marker = createSvgPointMarker(this._markerSvgCanvas, _markerColor);
 
-            _poiTypes.forEach(function(type, index) {
-              if (_visibleTypes.indexOf(type) !== -1 && index <= 1) {
+            for (let t = 0; t < _poiTypesLength; t++) {
+
+              let _type = _poiTypes[t];
+
+              if (_visibleTypes.indexOf(_type) !== -1 && t <= 1) {
 
                 // max of 2 icons in marker, if more types show plus symbol
-                if (index === 1 && _poiTypes.length > 2 || index === 1 && !_self._settings['showCamp']) {
-                  type = 'multiple';
+                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self._settings['showCamp']) {
+                  _type = 'multiple';
                 }
 
-                _marker.use(sampleFaIcon(type)).width(_iconSize).height(_iconSize).move(
-                  -(_iconSize / 2) + ((index * 1.5) * (_iconSize / 2)) - _extraOffset,
-                  -39 + ((index * 1.5) * (_iconSize / 2)) - _extraOffset + (_poiTypes.length - 1)
+                _marker.use(sampleFaIcon(_type)).width(_iconSize).height(_iconSize).move(
+                  -(_iconSize / 2) + ((t * 1.5) * (_iconSize / 2)) - _extraOffset,
+                  -39 + ((t * 1.5) * (_iconSize / 2)) - _extraOffset + (_poiTypes.length - 1)
                 );
               }
-            });
+            }
 
           } else {
 
             _marker = createSvgCircleMarker(this._markerSvgCanvas, _markerColor);
 
-            _poiTypes.forEach(function(type, index) {
-              if (_visibleTypes.indexOf(type) !== -1 && index <= 1) {
+            for (let t = 0; t < _poiTypesLength; t++) {
+              let _type = _poiTypes[t];
+
+              if (_visibleTypes.indexOf(_type) !== -1 && t <= 1) {
 
                 // max of 2 icons in marker, if more types show plus symbol
-                if (index === 1 && _poiTypes.length > 2 || index === 1 && !_self._settings['showCamp']) {
-                  type = 'multiple';
+                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self._settings['showCamp']) {
+                  _type = 'multiple';
                 }
 
-                _marker.use(sampleFaIcon(type)).width(_iconSize).height(_iconSize).move(
-                  -(_iconSize / 2) + ((index * 1.5) * (_iconSize / 2)) - _extraOffset,
-                  -(_iconSize / 2) + ((index * 1.5) * (_iconSize / 2)) - _extraOffset + (_poiTypes.length - 1)
+                _marker.use(sampleFaIcon(_type)).width(_iconSize).height(_iconSize).move(
+                  -(_iconSize / 2) + ((t * 1.5) * (_iconSize / 2)) - _extraOffset,
+                  -(_iconSize / 2) + ((t * 1.5) * (_iconSize / 2)) - _extraOffset + (_poiTypes.length - 1)
                 );
               }
-            });
+            }
           }
 
           _marker.click(this._onMarkerClick.bind({data:_poi, self:this}));
           _marker.move(this._svgWidth * (_poi.anchorPoint.distance / environment.MILE), _markerElevation);
         }
 
-      });
+      }
     }
 
   }

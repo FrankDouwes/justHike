@@ -1,25 +1,22 @@
-<!--<div class="background-layer-flat" #backgroundFlat></div>-->
-<!--<div class="background-layer" #background></div>-->
+<div class="background-layer" #background></div>
 <div id="wrap">
 
   <cdk-virtual-scroll-viewport
-    *ngIf="trailData"
-
     #scrollViewport
+
+    *ngIf="trailData"
 
     itemSize="{{itemWidth}}"
     orientation="horizontal"
     class="virtual-list"
-    templateCacheSize="14"
 
     (window:resize)="onResize($event)"
     (scrolledIndexChange)="onScroll(scrollViewport, $event)">
 
-    <!-- the virtual list item trackBy: trackElementBy -->
     <display-list-item
       class="list-item"
 
-      *cdkVirtualFor="let li of trailData.miles; let last = last; templateCacheSize: trailData.miles.length / 10; trackBy: trackElementBy"
+      *cdkVirtualFor="let li of trailData.miles; let last = last; templateCacheSize: cacheSize; trackBy: trackElementBy"
       [resize]="resize"
       [data]="li"
       [isLast]="last"
@@ -30,6 +27,7 @@
 
       [visibleOHLC]="visibleOHLC"
       [guides]="guides"
+      [update]="update"
 
       (click)="onClick(li)">
       matRipple
@@ -43,4 +41,4 @@
 </div>
 
 <!-- runs above marker layer (in list item) -->
-<axis id="axis" [visibleOHLC]="visibleOHLC" [guides]="guides"></axis>
+<labels id="axis" [visibleOHLC]="visibleOHLC" [guides]="guides"></labels>

@@ -15,16 +15,22 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
   @ViewChild('panel') panel: ElementRef;
 
   public showSnow: boolean;
-  public showCampSites: boolean;
+  public parallaxEnabled: boolean;
+  public highContrast: boolean;
   public showMiniMap: boolean;
   public direction: number;       // 0: NOBO, 1: SOBO
   public majorPoiTypes: Array<string>;
 
   public directionList: Array<object> = [{id: 0, label: 'Northbound (NOBO)'}, {id: 1, label: 'Southbound (SOBO)'}];
+  public screenModes: Array<any> = [
+    {value: 'default', label: 'Default'},
+    {value: 'highContrast', label: 'High Contrast'},
+    {value: 'nightHike', label: 'Night Hiking'}
+  ];
+  public screenMode;
 
   constructor(
     private _localStorage: LocalStorageService,
-    private _versionResolver: VersionResolverService
   ) {
     super();
   }
@@ -34,6 +40,10 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
     const _self = this;
 
     this.showSnow = this._localStorage.retrieve('showSnow');
+    this.parallaxEnabled = this._localStorage.retrieve('parallaxEnabled');
+    this.screenMode = this._localStorage.retrieve('screenMode');
+    this.showMiniMap = this._localStorage.retrieve('showMiniMap');
+    this.direction = this._localStorage.retrieve('direction');
 
     // dynamic poi type properties
     this.majorPoiTypes = getMajorPoiTypes();
@@ -42,17 +52,17 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
       const _camelName = _self.createCamelCaseName(name, 'show');
       _self[_camelName] = _self._localStorage.retrieve(_camelName);
     });
-
-    this.showMiniMap = this._localStorage.retrieve('showMiniMap');
-    this.direction = this._localStorage.retrieve('direction');
   }
 
   // EVENTS
 
   // checkboxes are named after their data property
   public onCheckboxChange(event: MatCheckboxChange): void {
-
     this._localStorage.store(event.source.name, event.checked);
+  }
+
+  public onRadioClick(radioValue): void {
+    this._localStorage.store('screenMode', radioValue);
   }
 
   public onDirectionSelect(event: MatSelectChange): void {

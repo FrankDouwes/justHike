@@ -7,7 +7,6 @@ import {
   Input,
   ViewChild,
   SimpleChanges,
-  ChangeDetectionStrategy,
   EventEmitter,
   Output, ElementRef
 } from '@angular/core';
@@ -21,13 +20,16 @@ import {Mile} from '../../../type/mile';
 import {Trail} from '../../../type/trail';
 import {LocationBasedComponent} from '../../../display/location-based/location-based.component';
 import {User} from '../../../type/user';
+import {LocalStorageService} from 'ngx-webstorage';
+import {Subscription} from 'rxjs';
+import {ScreenModeService} from '../../../service/screen-mode.service';
 
 @Component({
   selector: 'virtual-list-component',
   templateUrl: './virtual-list.component.html',
   styleUrls: ['./virtual-list.component.sass'],
-  // changeDetection: ChangeDetectionStrategy.OnPush       // needs testing, especially with iOS/Safaris weird scroll event.
 })
+
 export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('background') background: ElementRef;
@@ -41,13 +43,14 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   @Output() resizeEvent: EventEmitter<object> = new EventEmitter<object>();
 
   // public
-  public userLocation:  Object;
   public visibleOHLC:   OHLC;
   public resize:        number;
   public itemWidth:     number;
 
   public guides:        Array<object>     = [];
-  public scrollOffset       = 0;
+  public scrollOffset:  number            = 0;
+  public cacheSize:     number;
+  public update:        number;
 
   // private
   private _visibleRange:      object;
@@ -57,10 +60,16 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   private _initialIndex       = 0;
   private _status             = 'idle';
 
+  private _parallaxSubscription: Subscription;
+  private _parallaxEnabled: boolean;
+
+  private _screenModeSubscription: Subscription;
 
   constructor(
-    private _router:            Router,
-    private _route:             ActivatedRoute,
+    private _router:                    Router,
+    private _route:                     ActivatedRoute,
+    private _localStorageService:       LocalStorageService,
+    private _screenMode:                ScreenModeService,
   ) {
 
     super();
@@ -75,7 +84,11 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   ngOnInit(): void {
 
     super.ngOnInit();
+
     this._initialIndex = (this._route.snapshot) ? Number(this._route.snapshot.queryParams['id']) : 0;
+
+    this.cacheSize = Math.floor(this.trailData.miles.length / 10);
+
     this._setupEventListeners();
   }
 
@@ -83,11 +96,11 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     const _self = this;
 
-    const _delay = setTimeout(function() {
+    window.requestAnimationFrame(function() {
       if(_self._initialIndex) {
         _self.scrollViewport.scrollToIndex(_self._initialIndex, 'auto');
       }
-    }, 1);
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -102,6 +115,23 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     }
   }
 
+  ngOnDestroy() {
+    super.ngOnDestroy();
+
+    if (this._parallaxEnabled) {
+      window.removeEventListener('scroll', this._onScrollEvent.bind(this), true);
+    }
+
+    if (this._parallaxSubscription) {
+      this._parallaxSubscription.unsubscribe();
+      this._parallaxSubscription = null;
+    }
+
+    if (this._screenModeSubscription) {
+      this._screenModeSubscription.unsubscribe();
+      this._screenModeSubscription = null;
+    }
+  }
 
 
 // OVERRIDES
@@ -122,37 +152,49 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
 
 
-
 // EVENTS & HANDLERS
 
   private _setupEventListeners(): void {
 
     const _self = this;
+    this.toggleParallax(this._localStorageService.retrieve('parallaxEnabled'));
+    this._parallaxSubscription = this._localStorageService.observe('parallaxEnabled').subscribe(function(result) {
+      _self.toggleParallax(result);
+    });
 
-    const _milesLength = this.trailData.miles.length;
+    // redraw on highContrast or nightHike mode
+    this._screenModeSubscription = this._screenMode.screenModeChangeObserver.subscribe(function(result) {
+      if (_self.scrollViewport) {
+        _self.update = new Date().getTime();
+      }
+    });
+  }
 
-    // Listen for scroll events (angular "events" will not do!), needs to run on window for ios
-    window.addEventListener('scroll', function (event) {
+  // parralax effect seems to slow down iOS a lot, optional,
+  private _onScrollEvent(event: Event): void {
+
+      const _self = this;
+
+      const _milesLength = this.trailData.miles.length;
 
       if (event.target === _self.scrollViewport.elementRef.nativeElement) {
 
-        // event.preventDefault();
-        // event.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
 
         _self.scrollViewport.checkViewportSize();  // magically fixes everything! somehow...
 
-        _self.scrollOffset = _self.scrollViewport.measureScrollOffset();
-
+        _self.scrollOffset = Math.floor(_self.scrollViewport.measureScrollOffset());
         // update background position
-        const _wrapper = _self.scrollViewport.elementRef.nativeElement;
-        _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.1) + 'px;');
+        // const _wrapper = _self.scrollViewport.elementRef.nativeElement;
+        // _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.1) + 'px;');
 
         // const _verticalChange = (_self.visibleOHLC.high - _self.visibleOHLC.low) / 1500;
 
-        // _self.background.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.6) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
+        _self.background.nativeElement.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
         // _self.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
       }
-      }, true);
+
   }
 
   public onClick(listItem: Mile): void {
@@ -249,6 +291,19 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
       // this.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(this.scrollOffset * 0.015) + 'px;');
       this._calculateGuides();
     }
+  }
+
+  // toggle parallax based on settings
+  private toggleParallax(enable:boolean): void {
+
+    // Listen for scroll events (angular "events" will not do!), needs to run on window for ios
+    if (this._parallaxEnabled && !enable) {
+      window.removeEventListener('scroll', this._onScrollEvent.bind(this), true);
+    } else if (!this._parallaxEnabled && enable) {
+      window.addEventListener('scroll', this._onScrollEvent.bind(this), true);
+    }
+
+    this._parallaxEnabled = enable;
   }
 
 

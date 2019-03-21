@@ -7,13 +7,12 @@
 
   orientation="vertical"
   [itemSize]="itemSize"
-  templateCacheSize="7"
 
   (scrolledIndexChange)="onScroll($event)"
 
   #poiList>
 
-  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedData; trackBy: trackElementBy"
+  <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedData; templateCacheSize: cacheSize; trackBy: trackElementBy"
 
                     class = "mat-list-item mat-2-line mat-list-item-avatar mat-list-item-with-avatar"
 

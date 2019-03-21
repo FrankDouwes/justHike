@@ -4,10 +4,10 @@ import { normalizeElevation } from '../../../../_util/math';
 import { environment } from '../../../../../environments/environment.prod';
 
 @Component({
-  selector: 'axis',
+  selector: 'labels',
   templateUrl: './labels.component.html',
   styleUrls: ['./labels.component.sass'],
-  // changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class LabelsComponent implements OnInit, OnChanges {
@@ -42,17 +42,22 @@ export class LabelsComponent implements OnInit, OnChanges {
 
       var _self = this;
 
-      this.guides.forEach(function (guide, index) {
+      const _guidesLength = this.guides.length;
 
-        let elevation: number = normalizeElevation(_self._container.nativeElement.clientHeight
-          , guide['elevation'], min, range, environment.LINEHEIGHT);
+      // loop, optimal
+      for (let i = 0; i < _guidesLength; i++) {
+
+        const _guide = this.guides[i];
+
+        const elevation: number = normalizeElevation(_self._container.nativeElement.clientHeight
+          , _guide['elevation'], min, range, environment.LINEHEIGHT);
 
         // if item already exists, update
-        if (_self.processedGuides[index]) {
+        if (_self.processedGuides[i]) {
 
-          _self.processedGuides[index]['label'] = guide['label'];
-          _self.processedGuides[index]['offset'] = elevation + 1;
-          _self.processedGuides[index]['range'] = guide['range'];
+          _self.processedGuides[i]['label'] = _guide['label'];
+          _self.processedGuides[i]['offset'] = elevation + 1;
+          _self.processedGuides[i]['range'] = _guide['range'];
         }
 
         // else add
@@ -60,13 +65,13 @@ export class LabelsComponent implements OnInit, OnChanges {
 
           _self.processedGuides.push(
             {
-              label: guide['label'],
+              label: _guide['label'],
               offset: elevation + 1,      // +1 for guide line height
-              range: guide['range']
+              range: _guide['range']
             });
         }
 
-      });
+      }
     }
   }
 }

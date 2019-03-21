@@ -22,7 +22,14 @@
       </mat-select>
     </mat-form-field>
     <br/>
-    <mat-checkbox class="example-margin" name="showSnow" [(ngModel)]="showSnow" (change)="onCheckboxChange($event)">show snowpack</mat-checkbox>
+    <mat-checkbox name="showSnow" [(ngModel)]="showSnow" (change)="onCheckboxChange($event)">show snowpack</mat-checkbox>
+    <br/>
+
+    <mat-radio-group [(ngModel)]="screenMode">
+      <mat-radio-button *ngFor="let mode of screenModes" [value]="mode.value" (click)="onRadioClick(mode.value)">
+        {{mode.label}}
+      </mat-radio-button>
+    </mat-radio-group>
   </section>
 
   <mat-card-header>
@@ -48,11 +55,13 @@
   <mat-card-content>
     <section>
       <div *ngFor="let poiType of majorPoiTypes">
-        <mat-checkbox [name]="createCamelCaseName(poiType, 'show')" [(ngModel)]="this[createCamelCaseName(poiType, 'show')]" (change)="onCheckboxChange($event)">show {{poiType}}</mat-checkbox>
+        <mat-checkbox [name]="createCamelCaseName(poiType, 'show')" [(ngModel)]="this[createCamelCaseName(poiType, 'show')]" (change)="onCheckboxChange($event)">Show {{poiType}}</mat-checkbox>
         <br/>
       </div>
       <hr/>
-      <mat-checkbox name="showMiniMap" [(ngModel)]="showMiniMap" (change)="onCheckboxChange($event)">show mini-map</mat-checkbox>
+      <mat-checkbox name="showMiniMap" [(ngModel)]="showMiniMap" (change)="onCheckboxChange($event)">Show mini-map</mat-checkbox>
+      <br/>
+      <mat-checkbox name="parallaxEnabled" [(ngModel)]="parallaxEnabled" (change)="onCheckboxChange($event)">Enable parallax</mat-checkbox>
     </section>
   </mat-card-content>
 

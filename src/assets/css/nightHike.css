@@ -1,0 +1,85 @@
+html, body, poi-list cdk-virtual-scroll-viewport {
+  background-color: #111;
+}
+
+app-elevation-profile .background-layer {
+  filter: grayscale(100%) contrast(10%) !important;
+}
+
+leaflet-map .leaflet-tile-pane {
+  filter: invert(100%) grayscale(100%) brightness(75%) !important;
+}
+
+poi-list cdk-virtual-scroll-viewport poi-dynamic-item poi-list-item {
+  filter: invert(100%) grayscale(100%) !important;
+}
+
+poi-list cdk-virtual-scroll-viewport poi-dynamic-item {
+  border-bottom: 1px solid #555 !important;
+}
+
+poi-list cdk-virtual-scroll-viewport poi-dynamic-item poi-list-item {
+  background-color: #CCC !important;
+}
+
+app-mile-detail #list {
+  border-left: 1px solid #555 !important;
+}
+
+app-elevation-profile virtual-list-component .meta {
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f6f6f6+0,f6f6f6+100&1+0,0+70 */
+  background: -moz-linear-gradient(top, rgba(246,246,246,0.15) 0%, rgba(246,246,246,0) 70%, rgba(246,246,246,0) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(246,246,246,0.15) 0%,rgba(246,246,246,0) 70%,rgba(246,246,246,0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(246,246,246,0.15) 0%,rgba(246,246,246,0) 70%,rgba(246,246,246,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f6f6', endColorstr='#00f6f6f6',GradientType=0 ); /* IE6-9 */
+}
+
+app-elevation-profile virtual-list-component .meta .elevation-change {
+  color: #CCC !important;
+}
+
+
+/*leaflet-map .label, app-elevation-profile virtual-list-component .label,*/
+/*app-elevation-profile virtual-list-component .guide-label, navigation-component display-button button,*/
+/*navigation-component locator-button button {*/
+  /*background-color: #AAA !important;*/
+  /*border: 1px solid #555 !important;*/
+/*}*/
+
+/*app-elevation-profile virtual-list-component .tree-marker {*/
+  /*color: rgba(0,0,0,0.15) !important;*/
+/*}*/
+
+/*app-elevation-profile scrollbar-component {*/
+  /*filter: invert(100%);*/
+/*}*/
+
+
+app-elevation-profile .background-layer, app-elevation-profile virtual-list-component #guides,
+app-elevation-profile virtual-list-component #axis {
+  filter: grayscale(100%) invert(100%);
+}
+
+app-elevation-profile #wrap {
+  background: unset !important;
+}
+
+navigation-component display-button button,
+navigation-component locator-button button, app-elevation-profile virtual-list-component .meta .label,
+app-elevation-profile virtual-list-component .meta .icons
+{
+  filter: invert(100%) grayscale(100%) !important;
+}
+
+app-elevation-profile virtual-list-component .tree-marker {
+  color: rgba(15,15,15,0.15) !important;
+}
+
+
+app-elevation-profile scrollbar-component {
+  filter: invert(100%);
+}
+
+app-elevation-profile guides .guide {
+  filter: invert(100%);
+}

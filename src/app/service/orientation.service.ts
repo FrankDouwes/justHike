@@ -18,18 +18,18 @@ export class OrientationService {
   }
 
   public startTracking(): void {
-    if (navigator['compass']) {
-      this._orientationListener = navigator['compass'].watchHeading(this._handleOrientation.bind(this), function (e) {
-        console.log('ERROR', e);
-      });
-    }
+    // if (navigator['compass']) {
+    //   this._orientationListener = navigator['compass'].watchHeading(this._handleOrientation.bind(this), function (e) {
+    //     console.log('ERROR', e);
+    //   });
+    // }
   }
 
   public stopTracking(): void {
-    if (navigator['compass']) {
-      navigator['compass'].clearWatch(this._orientationListener);
-      this._orientation.next(null);
-    }
+    // if (navigator['compass']) {
+    //   navigator['compass'].clearWatch(this._orientationListener);
+    //   this._orientation.next(null);
+    // }
   }
 
   private _handleOrientation(event): void {

@@ -32,6 +32,11 @@ export class FilesystemService  {
 
     return new Promise(function (resolve, reject) {
 
+      if (_self.root) {
+        resolve(true);
+        return;
+      }
+
       if (cordovaEnabled()) {
 
         // cordova file plugin storage

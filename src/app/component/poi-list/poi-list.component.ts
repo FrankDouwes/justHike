@@ -15,6 +15,7 @@ import { User } from '../../type/user';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
+// using basic for loops, nothing fancy for performance.
 export class PoiListComponent extends LocationBasedComponent implements OnInit, OnChanges {
 
   @ViewChild('poiList') container: CdkVirtualScrollViewport;
@@ -33,6 +34,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   public timestamp: number;       // used to trigger reload
   public userPosition: string;
   public itemSize: number;
+  public cacheSize: number = 10;
 
   private _staticPoisArray:     Array<any>  = [];
   private _userIndex:           number;
@@ -52,6 +54,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     this.combinedData.subscribe(
       data => {
+
         if (this.showUser) {
           this.scrollToUser();
         }
@@ -72,10 +75,6 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       this.scrollToUser();
     }
   }
-
-
-
-  // SUBSCRIPTION HANDLERS
 
   private setup(): void {
 
@@ -110,6 +109,10 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     this._scrollToCenterMile();
   }
 
+
+
+  // SUBSCRIPTION HANDLERS
+
   public onStatusChange(status: string): void {
 
     // if we're switching to tracking
@@ -128,11 +131,13 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       this._sortListData(this._staticPoisArray.concat(user));
 
       // figure out where the pois are in relation to the user
-      this._staticPoisArray.forEach(function(poi: Poi) {
+      const staticPoisLength = this._staticPoisArray.length;
+      for (let i = 0; i < staticPoisLength; i++) {
+        const _poi = this._staticPoisArray[i];
         if (user.anchorPoint) {
-          poi.distanceFromUser = poi.anchorPoint.distanceTotal - user.anchorPoint.distanceTotal;
+          _poi.distanceFromUser = _poi.anchorPoint.distanceTotal - user.anchorPoint.distanceTotal;
         }
-      });
+      }
 
     } else {
 
@@ -140,6 +145,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       this._sortListData(this._staticPoisArray.concat(user));
     }
   }
+
+
 
 
   // EVENT HANDLERS
@@ -166,8 +173,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     const _self = this;
     if (this.container) {
-      setTimeout(function () {
 
+      window.requestAnimationFrame(function() {
         const _padding = _self.itemSize / 2;    // this makes sure the user list item is fully on screen, therefor the poi/mile index is correct
         let _verticalOffset = _padding;
 
@@ -175,8 +182,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
           _verticalOffset = _self.container.elementRef.nativeElement.clientHeight - _self.itemSize - _padding;
         }
 
-        _self.container.scrollToOffset((_self.itemSize * _self._userIndex) - _verticalOffset, 'smooth');
-      }, 1);
+        _self.container.scrollToOffset((_self.itemSize * _self._userIndex) - _verticalOffset, 'auto');
+      });
     }
   }
 
@@ -204,7 +211,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     setTimeout(function () {
 
-      let _maxIndex = _self.combinedData.getValue().length;
+      const _maxIndex = _self.combinedData.getValue().length;
 
       if (_self.directionReversal) {
         _middlePoi = _maxIndex - _middlePoi - 7;
@@ -231,10 +238,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       _currentIndex = event + 7;
     }
 
+    // TODO: not perfect, sometimes _currentPoi is blank, BUG: cant reach start/end.
     // convert the scrollIndex to a poi id
     let _currentPoi: Poi | User = this.combinedData.getValue()[_currentIndex];
 
-    if (!_currentPoi['belongsTo']) {
+    if (!_currentPoi || !_currentPoi['belongsTo']) {
       const _maxIndex = this.combinedData.getValue().length - 1;
       // current poi is the user location indicator, get next/prev poi
       if (_currentIndex === _maxIndex || this.directionReversal) {
@@ -242,6 +250,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       } else if (_currentIndex === 0 || !this.directionReversal) {
         _currentPoi = this.combinedData.getValue()[_currentIndex + 1];
       }
+    }
+
+    // shouldn't be needed BUG
+    if (!_currentPoi || !_currentPoi['belongsTo']) {
+      return;
     }
 
     // check user position (to show indecator to scroll up/down
@@ -258,6 +271,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     const _mile = this.trailGenerator.getTrailData().miles[_currentPoi['belongsTo']];
     this.scrollToEvent.emit({mileId: _mile.id});
   }
+
+
 
 
   // OTHER
@@ -281,6 +296,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     if (this.directionReversal) {
       data.reverse();
     }
+
+    this.cacheSize = Math.floor(data.length / 10);
+    this.cacheSize = (this.cacheSize < 7 ) ? 7 : this.cacheSize;
 
     this._userIndex = data.findIndex(poi => poi.type === 'user');
     this.combinedData.next(data);

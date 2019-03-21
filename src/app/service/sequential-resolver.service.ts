@@ -6,7 +6,7 @@ import {FilesystemService} from './filesystem.service';
 import {environment} from '../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
 import {getMajorPoiTypes} from '../_util/poi';
-import {setConnection, setCordova, setDialogs, setScreen, setZip} from '../_util/cordova';
+import {getCordova, setConnection, setCordova, setDialogs, setScreen, setZip} from '../_util/cordova';
 
 // cordova plugins
 declare let cordova: any;
@@ -37,7 +37,7 @@ export class SequentialResolverService implements Resolve<any> {
     this._route = route;
     this._state = state;
 
-    this._firstRun();
+    this.firstRun();
 
     //cordova enabled or not
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/)) {
@@ -57,7 +57,7 @@ export class SequentialResolverService implements Resolve<any> {
 
   // set default user settings (unless they already exist)
   // good place to force user settings during development/debugging
-  private _firstRun() {
+  public firstRun() {
 
     const _self = this;
 
@@ -98,7 +98,7 @@ export class SequentialResolverService implements Resolve<any> {
       console.log('device');
 
       // setup cordova helpers
-      if (cordova) {
+      if (cordova && !getCordova()) {
         setCordova(cordova);
         setScreen(screen);
         setConnection(Connection);

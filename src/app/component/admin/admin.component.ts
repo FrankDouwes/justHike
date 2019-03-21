@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, isDevMode, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {LoaderService} from '../../service/loader.service';
 import {TrailMeta} from '../../type/trail';
 import {getTrailMetaDataById, getTrailsMetaData} from '../../_util/trail';
@@ -11,6 +11,7 @@ import {FilesystemService} from '../../service/filesystem.service';
 import {createGPX} from '../../parser/gpx-tools';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {OrientationService} from '../../service/orientation.service';
+import {SequentialResolverService} from '../../service/sequential-resolver.service';
 
 @Component({
   selector: 'app-admin',
@@ -39,7 +40,8 @@ export class AdminComponent implements OnInit {
     private _trailGeneratorService: TrailGeneratorService,
     private _localStorageService: LocalStorageService,
     private _loaderService: LoaderService,
-    private _orientationService: OrientationService
+    private _orientationService: OrientationService,
+    private _sequentialResolver: SequentialResolverService
   ) { }
 
   ngOnInit() {
@@ -66,7 +68,7 @@ export class AdminComponent implements OnInit {
     // simplify the track for app: Mobile Atlas Creator
     let _clone: Array<any> = JSON.parse(JSON.stringify(this._trailGeneratorService.flatTrailData));
 
-    // 55 gives roughly 3 points per mile
+    // 55 gives roughly 3 points per mile (PCT)
     _clone = this._trailGeneratorService.simplify(_clone, 80, true);
 
     alert(this._trailGeneratorService.flatTrailData.length + ' to ' + _clone.length + ' waypoints');
@@ -74,16 +76,6 @@ export class AdminComponent implements OnInit {
     const _gpx = createGPX(_trailMeta, _clone);
 
     saveFileAs(_gpx, _trailMeta.abbr + '.gpx');
-  }
-
-  public restore(): void {
-
-    // clear the first run paramater, which triggers
-    this._localStorageService.clear('firstRun');
-    // this._localStorageService.clear();
-    // should also delete local storage
-
-    alert('Please restart the application');
   }
 
   public generateTrailData(): void {
@@ -150,5 +142,15 @@ export class AdminComponent implements OnInit {
         console.log(meta.abbr + ' directory deleted');
       });
     });
+  }
+
+  public defaultUserData(): void {
+    this._localStorageService.clear();
+    this._sequentialResolver.firstRun();
+  }
+
+  public reset(): void {
+    this.clearStorage();
+    this.defaultUserData();
   }
 }
