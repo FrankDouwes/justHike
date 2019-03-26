@@ -9,9 +9,7 @@
   </div>
 
   <div class="icons">
-    <span *ngIf="data.poiTypes && data.poiTypes['camp'] && data.poiTypes['camp'].length > 0 && !showCampsites"><fa-icon [icon]="['fas', 'campground']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
-    <span *ngIf="data.poiTypes && data.poiTypes['road'] && data.poiTypes['road'].length > 0"><fa-icon [icon]="['fas', 'road']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
-    <span *ngIf="data.pois && data.pois.length > 0"><fa-icon [icon]="['fas', 'map-marker-alt']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
+    <span class="icon-wrap" *ngIf="hasInvisiblePoi"><fa-icon [icon]="['fas', 'map-marker-alt']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
   </div>
 
   <div class="label" *ngIf="!isLast">{{data.id}}</div>

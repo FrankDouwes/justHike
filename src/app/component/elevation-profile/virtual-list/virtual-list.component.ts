@@ -48,7 +48,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   public itemWidth:     number;
 
   public guides:        Array<object>     = [];
-  public scrollOffset:  number            = 0;
   public cacheSize:     number;
   public update:        number;
 
@@ -184,14 +183,19 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
         _self.scrollViewport.checkViewportSize();  // magically fixes everything! somehow...
 
-        _self.scrollOffset = Math.floor(_self.scrollViewport.measureScrollOffset());
+        const _scrollOffset: number = - (_self.scrollViewport.measureScrollOffset() * 0.015);
+        const _width: number = _self.scrollViewport.elementRef.nativeElement.clientWidth;
+        const _repeated: number = Math.ceil(_scrollOffset / _width);
+        const _finalOffset: number = _scrollOffset - (_repeated * _width);
+
         // update background position
         // const _wrapper = _self.scrollViewport.elementRef.nativeElement;
         // _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.1) + 'px;');
 
         // const _verticalChange = (_self.visibleOHLC.high - _self.visibleOHLC.low) / 1500;
-
-        _self.background.nativeElement.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
+        // _self.background.nativeElement.style.transform = 'translate(' + -(_self.scrollOffset * 0.015) + 'px,y)';
+        _self.background.nativeElement.style.transform = 'translateX(' + _finalOffset + 'px)';
+        // _self.background.nativeElement.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
         // _self.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
       }
 
@@ -256,7 +260,9 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     this.guides = [];
 
-    const _stepSize = 200;
+    const _range = this.visibleOHLC.high - this.visibleOHLC.low;
+
+    const _stepSize = (_range > 1000 ) ? _range / 5 : 200;
 
     const _startSize = Math.ceil(this.visibleOHLC.low / _stepSize) * _stepSize;
     const _maxSize = Math.ceil(this.visibleOHLC.high / _stepSize) * _stepSize;

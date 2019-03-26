@@ -1,14 +1,22 @@
 \:host
 
-  .background-layer
-    position: fixed
+  // android doesn't respect overflow hidden, so it needs an absolute wrap
+  .background-wrap
+    position: absolute
     width: 100vw
-    height: 90vh
-    top: 0
-    background: url('../../../../assets/images/overlay.png') repeat-x
-    background-size: auto 100%
-    -webkit-transform: translate3d(0, 0, 0)     // smoother animation
-    transform: translate3d(0, 0, 0)             // smoother animation
+    height: 100vh
+    overflow: hidden
+
+    .background-layer
+      width: 200vw
+      height: 90vh
+      background: url('../../../../assets/images/overlay.png') repeat-x
+      background-size: auto 100%
+      position: absolute
+      left: 0
+      right: 100vw
+      top: 0
+      -webkit-animation-timing-function: linear
 
   .virtual-list
     position: unset !important

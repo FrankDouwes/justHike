@@ -40,8 +40,8 @@
     "tilesFileSize": 1,
     "snowFileSize": 1,
     "length": 3011,
-    "availableForPurchase": true,
-    "isFree": true
+    "availableForPurchase": false,
+    "isFree": false
   },
 
   "AT": {
@@ -55,7 +55,7 @@
     "tilesFileSize": 1,
     "snowFileSize": 1,
     "length": 2199,
-    "availableForPurchase": true,
-    "isFree": true
+    "availableForPurchase": false,
+    "isFree": false
   }
 }

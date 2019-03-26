@@ -34,7 +34,8 @@ export const environment = {
     // major markers visibility (elevation profile)
     showWater: true,
     showCamp: true,
-    showRoad: false,                // not showing roads by default
+    showHighway: false,                // not showing roads by default
+    showEnd: true,
 
     // internal
     maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app

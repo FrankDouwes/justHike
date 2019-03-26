@@ -77,7 +77,7 @@ export function createFaLeafletMarker(icon: string, iconPrefix: string, color:st
 export function createUserMarker(icon: string, iconPrefix: string, color:string) {
 
   let ele = document.createElement("div");
-  let draw = SVG(ele).size(1, 1).style('overflow', 'visible');
+  let draw = SVG(ele).size(50, 50).style('overflow', 'visible');
   let marker = createSvgCircleMarker(draw, '#00FF00', 0.85);
 
   let _marker = L.divIcon({className: 'user', html: ele.innerHTML});

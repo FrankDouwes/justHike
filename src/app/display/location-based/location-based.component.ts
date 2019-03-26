@@ -8,7 +8,6 @@ import {environment} from '../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {FilesystemService} from '../../service/filesystem.service';
-import {OrientationService} from '../../service/orientation.service';
 
 @Component({
   selector: 'app-location-based',
@@ -26,12 +25,11 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
 
   public status:                            string;
   public user:                              User;
-  private _user:                            User;
   public timestamp:                         number;
 
   private _locationSubscription:            Subscription;
   private _locationStatusSubscription:      Subscription;
-
+  private _user:                            User;
 
   constructor() {
 

@@ -36,7 +36,9 @@ export class PurchaseSettingsComponent extends SettingsPanelComponent implements
 
     for (const key in _trailData) {
       if (_self._purchasedTrails && _self._purchasedTrails.indexOf(_trailData[key].id) === -1 && _trailData[key].abbr !== 'DEMO') {
-        _self.availableTrailList.push(_trailData[key]);
+        if (_trailData[key].availableForPurchase === true) {
+          _self.availableTrailList.push(_trailData[key]);
+        }
       }
     }
   }

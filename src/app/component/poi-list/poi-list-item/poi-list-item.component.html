@@ -4,6 +4,7 @@
   <p matLine *ngIf="data.anchorPoint">
     <span *ngIf="status !== 'tracking'"> {{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} </span>
     <span *ngIf="status === 'tracking' && data.distanceFromUser"> {{data.distanceFromUser | distance:'meters':'miles':false:2:true:true}} </span>
+    <span *ngIf="data.distanceFromPoi"> {{data.distanceFromPoi | distance:'meters':'miles':false:2:true:true}} </span>
     <span> ({{data.waypoint.distance | distance:'meters':'miles':true}}) </span>
   </p>
 </div>

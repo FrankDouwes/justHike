@@ -28,13 +28,13 @@ export class Settings {
     }, {
       type: 'road',
       label: 'road',
-      isMajor: true,
       color: '#989898',
       iconType: 'fa',
       icon: 'road'
     }, {
       type: 'highway',
       label: 'highway',
+      isMajor: true,
       color: '#8c8c8c',
       iconType: 'fa',
       icon: 'car'

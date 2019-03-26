@@ -12,6 +12,7 @@ export class Poi {
   belongsTo?:         number;             // mileId
   description?:       string;             // optional description
   distanceFromUser?:  number;             // distance from user in meters
+  distanceFromPoi?:  number;              // distance from another poi in meters
   isBehind?:          boolean;            // is this poi behind the current poi (or user)
 }
 

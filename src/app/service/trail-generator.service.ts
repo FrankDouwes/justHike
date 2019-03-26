@@ -125,6 +125,8 @@ export class TrailGeneratorService {
       this._loaderService.showMessage('no pois');
     }
 
+    console.log(this._trailData);
+
     return this._trailData;
   }
 
@@ -198,7 +200,7 @@ export class TrailGeneratorService {
       }
 
       _waypoint.distance = _totalDistance - (_miles.length * environment.MILE);     // the mile distance
-      _waypoint.distanceTotal = _totalDistance;                                       // the total distance = NOBO
+      _waypoint.distanceTotal = _totalDistance;                                     // the total distance = NOBO
 
       _mileWaypoints.push(_waypoint);
 
@@ -219,6 +221,9 @@ export class TrailGeneratorService {
           scale:            scale,
           centerpoint:      geolib.getCenter(_mileWaypoints),
           isCurrent:        false,
+          hasMajorPoi:      false,
+          hasMinorPoi:      false,
+          poiTypes:         {}
         });
 
         // clear data
@@ -302,11 +307,6 @@ export class TrailGeneratorService {
 
     this._loaderService.showMessage('linking pois to miles');
 
-    // console.log(pois);
-    // return;
-
-    // console.log(pois.length);
-    // return;
     pois.forEach(function(poi, index) {
 
       poi.id = index; // to prevent mismatching ids in raw data
@@ -358,16 +358,8 @@ export class TrailGeneratorService {
 
       const _poiTypes: Array<string> = poi.type.split(', ');
 
-      _nearestMile.hasMajorPoi = _nearestMile.hasMinorPoi = false;
-      _nearestMile.poiTypes = [];
-
-      console.log(_poiTypes);
-
       _poiTypes.forEach(function(type) {
         _nearestMile.poiTypes[type + ''] = true;
-
-        console.log(getPoiTypeByType(type));
-        console.log(type);
 
         if (getPoiTypeByType(type) && getPoiTypeByType(type).isMajor) {
           _nearestMile.hasMajorPoi = true;

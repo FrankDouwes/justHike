@@ -64,8 +64,7 @@ app-elevation-profile #wrap {
   background: unset !important;
 }
 
-navigation-component display-button button,
-navigation-component locator-button button, app-elevation-profile virtual-list-component .meta .label,
+navigation-component display-button button, app-elevation-profile virtual-list-component .meta .label,
 app-elevation-profile virtual-list-component .meta .icons
 {
   filter: invert(100%) grayscale(100%) !important;

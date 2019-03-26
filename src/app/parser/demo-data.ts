@@ -2,6 +2,7 @@ import * as X2JS from 'x2js';
 import { Waypoint } from '../type/waypoint';
 import { Poi } from '../type/poi';
 import { Trail } from '../type/trail';
+import {environment} from '../../environments/environment.prod';
 
 const _x2js = new X2JS({
   attributePrefix : ''    // no attribute prefix
@@ -50,6 +51,14 @@ export function parseDEMOData (trail: Trail, trailData: string, poiData: string,
 
   // 3. adjust poi data
   const _pois: Array<Poi> = parsePois(poiAsJson['gpx']['wpt']);
+
+  // adjust individual pois
+
+  // Highway 78 elevation fix (mi 77), elevation seems to be in feet, while rest of the waypoints is in meters
+  _pois[80].waypoint.elevation = _pois[80].waypoint.elevation * environment.FOOT;
+
+  // add 'end' type to the last POI (highway 79)
+  _pois[126].type += ', end';
 
   // SNOW (the current snow pack, from postholer.com
 

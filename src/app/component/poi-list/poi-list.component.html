@@ -26,4 +26,4 @@
 
 </cdk-virtual-scroll-viewport>
 
-<user-indicator [userPosition]="userPosition" [status]="status" (click)="scrollToUser()"></user-indicator>
+<user-indicator *ngIf="showUser" [userPosition]="userPosition" [status]="status" (click)="scrollToUser()"></user-indicator>

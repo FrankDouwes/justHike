@@ -1,7 +1,7 @@
 import {Component, Input, OnInit, ViewChild, OnChanges, SimpleChanges, Output, EventEmitter, ChangeDetectionStrategy} from '@angular/core';
 import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 
-import { BehaviorSubject } from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 import { Mile } from '../../type/mile';
@@ -24,6 +24,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   @Input() milesData?: Array<Mile>;
   @Input() poisData?: Array<Mile>;
+  @Input() masterPoi?: Poi;
   @Input() showUser: boolean;
   @Input() activeMileId: number;
   @Input() directionReversal?: boolean;     // reverse list
@@ -31,13 +32,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   // user and pois combined in a single array
   public combinedData: BehaviorSubject<Array<any>> = new BehaviorSubject([]);
+  private _dataLength: number;    // the length of the combined data (pois + user), speed optimisation
   public timestamp: number;       // used to trigger reload
   public userPosition: string;
   public itemSize: number;
   public cacheSize: number = 10;
 
-  private _staticPoisArray:     Array<any>  = [];
-  private _userIndex:           number;
+  private _staticPoisArray:           Array<any>  = [];
+  private _userIndex:                 number;
 
   constructor() {
 
@@ -50,10 +52,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     super.ngOnInit();
 
+    const _self = this;
+
     this.itemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / 7);
 
     this.combinedData.subscribe(
       data => {
+
+        this._dataLength = data.length;
 
         if (this.showUser) {
           this.scrollToUser();
@@ -66,8 +72,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   ngOnChanges(changes: SimpleChanges) {
 
-    if (changes.milesData) {
-      console.log('setup');
+    if (changes.milesData || changes.poisData) {
       this.setup();
     }
 
@@ -85,18 +90,23 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     // get all pois within miles
     if (this.milesData) {
 
-      this.milesData.forEach(function (mile: Mile, index: number) {
-        if (mile.pois && mile.pois.length > 0) {
-          _self._staticPoisArray = _self._staticPoisArray.concat(mile.pois);
+      const _length = this.milesData.length;
+      for (let i = 0; i < _length; i++) {
+        const _mile: Mile = this.milesData[i];
+        if (_mile.pois && _mile.pois.length > 0) {
+          this._staticPoisArray = this._staticPoisArray.concat(_mile.pois);
         }
-      });
+      }
     } else if (this.poisData) {
-      console.log('NOT IMPLEMENTED');
+      this._staticPoisArray = this.poisData;
     }
 
-    this._staticPoisArray.forEach(function(poiId, index) {
-      _self._staticPoisArray[index] = _self.trailGenerator.getPoiById(poiId);
-    });
+    const _poiLength = this._staticPoisArray.length;
+    for (let p = 0; p < _poiLength; p++) {
+      const _poiId = this._staticPoisArray[p];
+      _self._staticPoisArray[p] = _self.trailGenerator.getPoiById(_poiId);
+    }
+
 
     if (this.showUser) {
       const _userRef: User = (this.user !== undefined) ? this.user : super.createBlankUser();
@@ -104,6 +114,10 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       this.onUserLocationChange(_userRef);
     } else {
       this._sortListData(this._staticPoisArray);
+
+      if (this.masterPoi) {
+        this._calculateDistance(this.masterPoi);
+      }
     }
 
     this._scrollToCenterMile();
@@ -123,29 +137,43 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   public onUserLocationChange(user: User): void {
 
-    const _self = this;
-
     // // if tracking
     if (location && this.status !== 'idle') {
 
-      this._sortListData(this._staticPoisArray.concat(user));
-
-      // figure out where the pois are in relation to the user
-      const staticPoisLength = this._staticPoisArray.length;
-      for (let i = 0; i < staticPoisLength; i++) {
-        const _poi = this._staticPoisArray[i];
-        if (user.anchorPoint) {
-          _poi.distanceFromUser = _poi.anchorPoint.distanceTotal - user.anchorPoint.distanceTotal;
-        }
+      if (this.showUser) {
+        this._sortListData(this._staticPoisArray.concat(user));
       }
 
-    } else {
+      if (this.milesData) {
+        this._calculateDistance(user);
+      }
+
+    } else if (this.showUser) {
 
       user.waypoint = user.anchorPoint = undefined;
       this._sortListData(this._staticPoisArray.concat(user));
     }
   }
 
+  private _calculateDistance(master: Poi | User): void {
+
+    if (master) {
+      const staticPoisLength = this._staticPoisArray.length;
+
+      // figure out where pois are in relation to the master poi
+      for (let i = 0; i < staticPoisLength; i++) {
+        const _poi = this._staticPoisArray[i];
+
+        if (master.anchorPoint) {
+          if (!this.showUser) {
+            _poi.distanceFromPoi = _poi.anchorPoint.distanceTotal - master.anchorPoint.distanceTotal;
+          } else {
+            _poi.distanceFromUser = _poi.anchorPoint.distanceTotal - master.anchorPoint.distanceTotal;
+          }
+        }
+      }
+    }
+  }
 
 
 
@@ -170,6 +198,10 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   }
 
   public scrollToUser(): void {
+
+    if (!this.showUser) {
+      return;
+    }
 
     const _self = this;
     if (this.container) {
@@ -232,32 +264,42 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   public onScroll(event): void {
 
-    let _currentIndex: number = event;
+    this._updateUserListIndicator();
 
-    if (this.directionReversal) {
-      _currentIndex = event + 7;
-    }
 
-    // TODO: not perfect, sometimes _currentPoi is blank, BUG: cant reach start/end.
-    // convert the scrollIndex to a poi id
-    let _currentPoi: Poi | User = this.combinedData.getValue()[_currentIndex];
+    // get the rendered range
+    const _renderedRange = this.container.getRenderedRange();
 
-    if (!_currentPoi || !_currentPoi['belongsTo']) {
-      const _maxIndex = this.combinedData.getValue().length - 1;
-      // current poi is the user location indicator, get next/prev poi
-      if (_currentIndex === _maxIndex || this.directionReversal) {
-        _currentPoi = this.combinedData.getValue()[_currentIndex - 1];
-      } else if (_currentIndex === 0 || !this.directionReversal) {
-        _currentPoi = this.combinedData.getValue()[_currentIndex + 1];
+    const _renderedIndexes: Array<number> = [];
+    const _renderedPois: Array<number> = [];
+
+    for (let i = _renderedRange.start; i < _renderedRange.end; i++) {
+
+      const _poi: Poi | User = this.combinedData.getValue()[i];
+
+      // filter out the user
+      if (_poi.type !== 'user') {
+        _renderedIndexes.push(i);
+        _renderedPois.push(_poi.id);
       }
     }
 
-    // shouldn't be needed BUG
-    if (!_currentPoi || !_currentPoi['belongsTo']) {
-      return;
-    }
+    const _firstPoiId: number = (this.directionReversal) ? _renderedIndexes[_renderedIndexes.length - 1] : _renderedIndexes[0];
+    const _firstPoi = this.combinedData.getValue()[_firstPoiId];
 
-    // check user position (to show indecator to scroll up/down
+
+    // the mile id is based on the center of the list
+    const _middlePoiIndex: number = _renderedIndexes[Math.floor(_renderedIndexes.length / 2)];
+    const _middlePoi: Poi = this.combinedData.getValue()[_middlePoiIndex];
+
+    const _mile = this.trailGenerator.getTrailData().miles[_firstPoi['belongsTo'] - 1];
+
+    this.scrollToEvent.emit({mileId: _mile.id, renderedRange: _renderedPois});
+  }
+
+
+
+  private _updateUserListIndicator(): void {
     const _renderedRange = this.container.getRenderedRange();
     if (this._userIndex < _renderedRange.start) {
       this.userPosition = 'above';
@@ -266,13 +308,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     } else if (this._userIndex >= _renderedRange.start && this._userIndex <= _renderedRange.end) {
       this.userPosition = 'visible';
     }
-
-    // get the mile that the poi belongs to
-    const _mile = this.trailGenerator.getTrailData().miles[_currentPoi['belongsTo']];
-    this.scrollToEvent.emit({mileId: _mile.id});
   }
-
-
 
 
   // OTHER

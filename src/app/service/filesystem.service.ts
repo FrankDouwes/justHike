@@ -72,12 +72,12 @@ export class FilesystemService  {
             resolve(_self.isStorageAvailable = true);
 
           }, function (error) {
-            reject(false);
+            resolve(false);
             alert('Filesystem error: ' + error);
           });
         } else {
-          reject(false);
-          alert('No filesystem available.');
+          resolve(false);
+          alert('No filesystem available, use chrome or do a cordova build (iOS/Android)');
         }
       }
     });
@@ -283,6 +283,9 @@ export class FilesystemService  {
         _unzipState.next({state: 'progress', percentage: (progressEvent.loaded / progressEvent.total) * 100});
       });
     } else {
+
+      alert('Chrome unzipping currently not implemented.')
+
       _unzipState.next({state: 'error'});
     }
 

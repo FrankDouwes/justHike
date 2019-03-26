@@ -67,8 +67,7 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
   private _getRelatedPois(poiType: string): void {
     const _relatedPois: Array<number> = this._trailGeneratorService.getTrailData().sortedPoiIds[poiType];
     const _poiIndex: number = _relatedPois.indexOf(this.data.id);
-    const _selfIndex = (_poiIndex === 0) ? 1 : _poiIndex - 1;
-    const _poiIds: Array<number> = _relatedPois.slice(_selfIndex, _poiIndex + 3);
+    const _poiIds: Array<number> = _relatedPois.slice(_poiIndex + 1, _poiIndex + 4);
 
     this.poiCollection.push({label: poiType, data: _poiIds});
   }

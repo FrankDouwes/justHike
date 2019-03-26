@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core';
 
 @Component({
   selector: 'settings-panel',

@@ -1,11 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import { Mile } from '../../type/mile';
 import {Trail} from '../../type/trail';
 import {Waypoint} from '../../type/waypoint';
 import {LocalStorageService} from 'ngx-webstorage';
 import {LocationService} from '../../service/location.service';
 import {Subscription} from 'rxjs';
+import {ScreenModeService} from '../../service/screen-mode.service';
 
 @Component({
   selector: 'app-mile-detail',
@@ -21,14 +21,19 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   public isNobo:                  boolean;
   public centerUserTrigger:       number;
   public isTracking:              boolean;
+  public visiblePoi:              any;
 
   private _locationSubscription:  Subscription;
+  private _screenModeSubscription: Subscription;
+  private _screenMode: string;
 
   constructor(
     private _localStorage: LocalStorageService,
     private _locationService: LocationService,
     private _route: ActivatedRoute,
-    private _router: Router
+    private _router: Router,
+    private _screenModeService: ScreenModeService,
+    private _changeDetector: ChangeDetectorRef
   ) {
   }
 
@@ -45,7 +50,7 @@ export class MileDetailComponent implements OnInit, OnDestroy {
 
     this._route.data.subscribe(result => {
         this.trailData = result.data['trail'];
-        this._setCenterpoint(this.routedMile);
+        this._setMapData(this.routedMile);
       }
     );
 
@@ -54,6 +59,15 @@ export class MileDetailComponent implements OnInit, OnDestroy {
     })
 
     this.isNobo = (this._localStorage.retrieve('direction') === 0);
+
+    this._screenModeSubscription = this._screenModeService.screenModeChangeObserver.subscribe(function(screenMode) {
+
+      if (_self._screenMode !== screenMode) {
+        console.log('screenmode changed');
+        _self._screenMode = screenMode;
+        _self._changeDetector.detectChanges();
+      }
+    })
   }
 
   ngOnDestroy(): void {
@@ -65,12 +79,13 @@ export class MileDetailComponent implements OnInit, OnDestroy {
 
   // EVENTS
   public onScrollTo(data: any): void {
-    this._setCenterpoint(data.mileId);
+    this._setMapData(data.mileId, data.renderedRange);
     this.routedMile = data.mileId;
     this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
   }
 
-  private _setCenterpoint(mileId: number): void {
+  private _setMapData(mileId: number, range?: any): void {
+    this.visiblePoi = range;
     this.centerPoint = this.trailData.miles[mileId].centerpoint as Waypoint;
   }
 

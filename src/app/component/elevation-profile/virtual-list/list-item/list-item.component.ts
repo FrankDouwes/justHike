@@ -1,6 +1,6 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ElementRef, EventEmitter,
   Input, OnChanges, OnDestroy,
@@ -57,11 +57,12 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   @Input() triggerUserUpdate?:  number;           // timestamp, set when user location is updated.
   @Input() userStatus?:         string;           // idle/fetching/tracking
 
-  public showCampsites:         boolean;
+  private _majorPoiTypes:         Array<string>;
+  public hasInvisiblePoi:     boolean;
 
   private _snowData:            Array<Array<Snowpoint>>;
   private _dynamicSubscriptions: object           = {};
-  private _settings:            object            = {};
+  public settings:              object            = {};
   private _initialized:         boolean;          // can only draw after initialization
 
   private _screenMode:          string;
@@ -80,6 +81,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     private _localStorage: LocalStorageService,
     private _trailGenerator: TrailGeneratorService,
     private _snowGenerator: SnowGeneratorService,
+    private _changeDetectorRef: ChangeDetectorRef,
   ) {}
 
 // LIFECYCLE HOOKS
@@ -87,19 +89,19 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   ngOnInit(): void {
 
     const _self = this;
-    const _majorPoiTypes: Array<string> = getMajorPoiTypes();
+    this._majorPoiTypes = getMajorPoiTypes();
 
-    this.showCampsites = this._localStorage.retrieve('showCamp');
     this._screenMode = this._localStorage.retrieve('screenMode');
 
     // dynamic subscriptions based on PoiTypes that are set as being major (important)
-    _majorPoiTypes.forEach(function(type: string) {
-      _self._getSettingFromStorage(type);
-      _self._addSubscription(type);
+    this._majorPoiTypes.forEach(function(type: string) {
+        _self._getSettingFromStorage(type);
+        _self._addSubscription(type);
     });
 
     // add snowPack subscription
     _self._getSettingFromStorage('snow');
+    this._hasInvisiblePoi();
     _self._addSubscription('snow');
   }
 
@@ -107,10 +109,14 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   // add a poi type subscription to the subscriptionsObject
   private _addSubscription(name: string): void {
 
-    const _camelName =  'show' +  name.charAt(0).toUpperCase() + name.slice(1);
+    const _camelName =  this.createCamelCaseName(name, 'show');
 
     const _subscription = this._localStorage.observe(_camelName).subscribe(result => {
-      this._settings[_camelName] = result;
+      this.settings[_camelName] = result;
+      if (this._majorPoiTypes.indexOf(name) !== -1) {
+        console.log(name, ' changed');
+        this._hasInvisiblePoi();
+      }
       this._drawMap();
     });
 
@@ -120,8 +126,8 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   // get initial poi type saved values, as subscriptions only listen to updates
   private _getSettingFromStorage(name: string): void {
 
-    const _camelName =  'show' +  name.charAt(0).toUpperCase() + name.slice(1);
-    this._settings[_camelName] = this._localStorage.retrieve(_camelName);
+    const _camelName =  this.createCamelCaseName(name, 'show');
+    this.settings[_camelName] = this._localStorage.retrieve(_camelName);
   }
 
   private _removeSubscription(name: string): void {
@@ -162,13 +168,13 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     if (changes.data || changes.visibleOHLC) {
       this._snowData = this._snowGenerator.getSnowForMile(this.data.id);
+      this._hasInvisiblePoi();
       this._drawMap();
     }
 
     if (changes.update) {
 
       this._screenMode = this._localStorage.retrieve('screenMode');
-
       this._drawMap();
     }
 
@@ -195,6 +201,35 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
+  // used to indicate that this mile has more pois than are being shown in elevation profile
+  private _hasInvisiblePoi(): void {
+
+    let _newValue;
+
+    const _self = this;
+
+    if (this.data.hasMinorPoi) {
+      _newValue = true;
+    } else if (this.data.hasMajorPoi) {
+      const _length = this._majorPoiTypes.length;
+      for (let i = 0; i < _length; i++) {
+        const _type = this._majorPoiTypes[i];
+        if (_self.data.poiTypes[_type] !== undefined && !_self.settings[_self.createCamelCaseName(_type, 'show')]) {
+          _newValue = true;
+          break;
+        }
+      }
+    } else {
+      _newValue = false;
+    }
+
+    // only redraw if needed
+    if (this.hasInvisiblePoi !== _newValue) {
+      this.hasInvisiblePoi = _newValue;
+      this._changeDetectorRef.detectChanges();
+    }
+  }
+
   ngOnDestroy(): void {
     for (const key in this._dynamicSubscriptions) {
       this._removeSubscription(key);
@@ -208,7 +243,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // line
     this._drawLine();
 
-    if (this._settings['showSnow']) {
+    if (this.settings['showSnow']) {
       this._drawSnow();
     }
 
@@ -391,7 +426,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
           const _type: string = _poiTypes[p];
 
-          const _setting: boolean = _self._settings[_self._createCamelCaseName(_type, 'show')];
+          const _setting: boolean = _self.settings[_self.createCamelCaseName(_type, 'show')];
 
           if (_setting === true) {
             _isVisible = true;
@@ -406,7 +441,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
           let _extraOffset: number = 0;
           let _iconSize: number = 16;
 
-          const _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, environment.LINEHEIGHT / 2);
+          let _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, environment.LINEHEIGHT / 2);
 
           if (_poiTypesLength > 1 && _visibleTypes.length > 2) {
             _markerColor = getPoiTypeByType('multiple').color;
@@ -427,7 +462,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
               if (_visibleTypes.indexOf(_type) !== -1 && t <= 1) {
 
                 // max of 2 icons in marker, if more types show plus symbol
-                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self._settings['showCamp']) {
+                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self.settings['showCamp']) {
                   _type = 'multiple';
                 }
 
@@ -448,7 +483,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
               if (_visibleTypes.indexOf(_type) !== -1 && t <= 1) {
 
                 // max of 2 icons in marker, if more types show plus symbol
-                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self._settings['showCamp']) {
+                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self.settings['showCamp']) {
                   _type = 'multiple';
                 }
 
@@ -582,7 +617,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
-  private _createCamelCaseName(name: string, prepend?: string, append?: string): string {
+  public createCamelCaseName(name: string, prepend?: string, append?: string): string {
 
     prepend = (prepend) ? prepend : '';
     append = (append) ? prepend : '';
