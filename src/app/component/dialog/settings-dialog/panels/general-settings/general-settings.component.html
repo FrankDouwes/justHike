@@ -1,78 +1,77 @@
 <mat-card #panel>
 
-  <mat-card-header>
-    <mat-card-title>User:</mat-card-title>
-  </mat-card-header>
+  <h2>Settings</h2>
 
-  <section>
-    <input type="string" value="" (input)="onUserNameChange($event.target.value)" placeholder="user name">
-  </section>
-
-
-  <mat-card-header>
-    <mat-card-title>General:</mat-card-title>
-  </mat-card-header>
-
-  <section>
-    <mat-form-field class="direction">
-      <mat-select [value]="direction" (selectionChange)="onDirectionSelect($event)">
-        <mat-option *ngFor="let direction of directionList" [value]="direction.id">
-          {{direction.label}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <br/>
-    <mat-checkbox name="showSnow" [(ngModel)]="showSnow" (change)="onCheckboxChange($event)">show snowpack</mat-checkbox>
-    <br/>
-
-    <mat-radio-group [(ngModel)]="screenMode">
-      <mat-radio-button *ngFor="let mode of screenModes" [value]="mode.value" (click)="onRadioClick(mode.value)">
-        {{mode.label}}
-      </mat-radio-button>
-    </mat-radio-group>
-  </section>
-
-  <mat-card-header>
-    <mat-card-title>Point of interest:</mat-card-title>
-  </mat-card-header>
   <mat-card-content>
+
+    <h3>User</h3>
+
     <section>
-      <div>
-        distance (in ft.) before a point of interest is considered 'off trail'
-        <input type="number" value="250">
-      </div>
-      <div>
-        distance (in ft.) before a user is considered 'off trail'
-        <input type="number" value="250">
-      </div>
+
+      <mat-form-field>
+        <input type="text" matInput placeholder="username" (input)="onUserNameChange($event.target.value)">
+      </mat-form-field>
+
+      <mat-form-field class="direction">
+        <mat-select [value]="direction" (selectionChange)="onDirectionSelect($event)">
+          <mat-option *ngFor="let direction of directionList" [value]="direction.id">
+            {{direction.label}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
     </section>
-  </mat-card-content>
 
+    <h3>Display Mode</h3>
 
-  <mat-card-header>
-    <mat-card-title>Elevation Profile:</mat-card-title>
-  </mat-card-header>
-  <mat-card-content>
+    <section>
+      <mat-radio-group [(ngModel)]="screenMode">
+        <mat-radio-button *ngFor="let mode of screenModes" [value]="mode.value" (click)="onRadioClick(mode.value)">
+          {{mode.label}}
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <br/>
+    </section>
+
+    <h3>Elements</h3>
+
+    <mat-checkbox name="showSnow" [(ngModel)]="showSnow" (change)="onCheckboxChange($event)">show snowpack</mat-checkbox>
+
+    <section>
+
+      <!--<mat-form-field>-->
+        <!--<input type="number" value="250" input="" placeholder="Poi offtrail distance (ft.)">-->
+      <!--</mat-form-field>-->
+
+      <!--<mat-form-field>-->
+        <!--<input type="number" value="250" input="" placeholder="User offtrail distance (ft.)">-->
+      <!--</mat-form-field>-->
+
+      <!--<hr/>-->
+
+      <!--<mat-form-field>-->
+        <!--<input type="number" value="1000" input="" placeholder="Poi render radius (ft.)">-->
+      <!--</mat-form-field>-->
+    </section>
+
+    <h3>Elevation Profile</h3>
+
     <section>
       <div *ngFor="let poiType of majorPoiTypes">
         <mat-checkbox [name]="createCamelCaseName(poiType, 'show')" [(ngModel)]="this[createCamelCaseName(poiType, 'show')]" (change)="onCheckboxChange($event)">Show {{poiType}}</mat-checkbox>
-        <br/>
       </div>
       <hr/>
       <mat-checkbox name="showMiniMap" [(ngModel)]="showMiniMap" (change)="onCheckboxChange($event)">Show mini-map</mat-checkbox>
-      <br/>
       <mat-checkbox name="parallaxEnabled" [(ngModel)]="parallaxEnabled" (change)="onCheckboxChange($event)">Enable parallax</mat-checkbox>
     </section>
-  </mat-card-content>
 
-  <mat-card-header>
-    <mat-card-title>Details Page:</mat-card-title>
-  </mat-card-header>
+    <h3>Scroll Map</h3>
 
-  <mat-card-content>
-    <section class="example-section">
-      <div>no settings available</div>
+    <section>
+      <mat-checkbox name="animateMap" [(ngModel)]="animateMap" (change)="onCheckboxChange($event)">Animate Map (slow/buggy)</mat-checkbox>
+      <mat-checkbox name="showMileGrid" [(ngModel)]="showMileGrid" (change)="onCheckboxChange($event)">Show Mile Grid (slow)</mat-checkbox>
     </section>
-  </mat-card-content>
 
+  </mat-card-content>
 </mat-card>

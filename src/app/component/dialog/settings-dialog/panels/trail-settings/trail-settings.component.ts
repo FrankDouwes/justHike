@@ -1,9 +1,9 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import { TrailMeta } from '../../../../../type/trail';
-import { LocalStorageService } from 'ngx-webstorage';
-import { MatSelectChange } from '@angular/material';
-import { SettingsPanelComponent } from '../../../../../display/settings-panel/settings-panel.component';
-import { DownloadService } from '../../../../../service/download.service';
+import {TrailMeta} from '../../../../../type/trail';
+import {LocalStorageService} from 'ngx-webstorage';
+import {MatSelectChange} from '@angular/material';
+import {SettingsPanelComponent} from '../../../../../display/settings-panel/settings-panel.component';
+import {DownloadService} from '../../../../../service/download.service';
 import {getTrailMetaDataById, getTrailsMetaData} from '../../../../../_util/trail';
 import {ConnectionService} from '../../../../../service/connection.service';
 import {getConnection, getDialogs, hasDialogs} from '../../../../../_util/cordova';
@@ -40,7 +40,6 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   private _updateSubscriptions: object = {};       // local storage subscriptions
 
   constructor(
-
     private _versionResolverService:  VersionResolverService,
     private _changeDetector:        ChangeDetectorRef,
     private _localStorage:          LocalStorageService,
@@ -116,7 +115,7 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
 
       _self._setupVersionSubscription(name);
       _self._updateSubscriptions[name] = _self._versionResolverService.observables[_self.activeTrail.abbr + '_' + name + 'Available'].subscribe(function(result) {
-        console.log('VERSION CHANGED UPDATE', name, result);
+        // console.log('VERSION CHANGED UPDATE', name, result);
         _self.updates[name] = result;
         _self._changeDetector.detectChanges();
       });
@@ -126,7 +125,7 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   private _setupVersionSubscription(name: string):void {
 
     this._versionSubscriptions[name] = this._localStorage.observe(this.activeTrail.abbr + '_' + name + 'Version').subscribe(result => {
-      console.log('VERSION CHANGED', name, result);
+      // console.log('VERSION CHANGED', name, result);
       this.currentVersions[name + 'Version'] = result;
       this._changeDetector.detectChanges();
     });
@@ -157,13 +156,13 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
 
   // triggered from template
   public displayVersion(name: string): string {
-    console.log('display version', name);
+    // console.log('display version', name);
 
     if (this.updates[name]) {
-      console.log('- from updates', this.activeTrail[name + 'Version']);
+      // console.log('- from updates', this.activeTrail[name + 'Version']);
       return this.activeTrail[name + 'Version'];    // the online version
     } else {
-      console.log('- from current', this.currentVersions[name + 'Version']);
+      // console.log('- from current', this.currentVersions[name + 'Version']);
       return this.currentVersions[name + 'Version'];      // the installed version
     }
   }
@@ -171,14 +170,14 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   // triggered from template
   public updateAvailable(name: string): boolean {
 
-    console.log('updates available', name, this.updates[name]);
+    // console.log('updates available', name, this.updates[name]);
 
     return this.updates[name];
   }
 
   // triggered from template
   public hasFile(name: string): boolean {
-    console.log('has file', this.currentVersions[name + 'Version']);
+    // console.log('has file', this.currentVersions[name + 'Version']);
 
     return !!(this.currentVersions[name + 'Version']);
   }
@@ -243,12 +242,12 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   }
 
   public onDownloadComplete(type: string): void {
-    console.log(type + 'data downloaded');
+    // console.log(type + 'data downloaded');
     this._localStorage.store(this.activeTrail.abbr + '_' + type + 'Version', this.activeTrail[type + 'Version']);
   }
 
   public onDownloadCleared(type: string): void {
-    console.log('CLEAR');
+    // console.log('CLEAR');
     this._localStorage.clear(this.activeTrail.abbr + '_' + type + 'Version');
   }
 }

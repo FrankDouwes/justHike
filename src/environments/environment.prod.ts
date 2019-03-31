@@ -26,8 +26,11 @@ export const environment = {
     direction: 0,                   // northbound (0) or southbound (1)
     showSnow: true,                 // draw the snowpack
     showMiniMap: true,              // show mini map in elevation profile
+    showMileGrid: false,            // show square mile grid
+    animateMap: false,              // animate the map transitions (panning)
 
     poiDistanceOffTrail: 250,       // distance (in feet?) that a water source has to be off trail to be rendered as such
+    poiMaxDistance: 1000,           // the maximum distance before a poi is ignored (and not rendered), eliminates side trail poi
     userDistanceOffTrail: 10,       // the distance (in feet?) that a user has to be off trail for marker to change
     autoUpdate: true,               // auto update (only used for snow data) (TODO UNUSED)
 

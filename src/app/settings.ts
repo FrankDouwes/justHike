@@ -109,7 +109,7 @@ export class Settings {
     {
       type: 'multiple',
       label: 'plus',
-      color: '#989898',
+      color: '#3f3f3f',
       iconType: 'fa',
       icon: 'plus'
     },

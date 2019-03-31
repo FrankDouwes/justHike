@@ -41,6 +41,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     private _connectionService: ConnectionService,
     private _screenModeService: ScreenModeService
   ) {
+
     // makes constructor props accessible through LocationService, needed for inheritance
     LocationService.injector = this._injector;
   }

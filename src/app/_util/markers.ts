@@ -3,11 +3,65 @@ declare const SVG: any;    // fixes SVGjs bug
 
 // UTILS for markers (leaflet & elevation profile markers)
 
-// ELEVATION PROFILE (SVG, font-awesome based markers)
-
 // clone a FA svg element.
 // font awesome webfont doesn't seem to render to svg elements, therefor we're cloning svg data from generated (hidden) elements at start-up.
 import {shadeColor} from './color';
+import {Poi} from '../type/poi';
+import {getPoiTypeByType} from './poi';
+
+
+export function setupMarker(canvasElement: any, poi: Poi, poiTypes?: Array<string>, maxPoiDistanceOffTrail?: number): any {
+
+  // if there are no explicit poi types set, use all poi types
+  if (!poiTypes) {
+    poiTypes = poi.type.split(', ');
+  }
+
+  const _poiTypesLength = poiTypes.length;
+
+  let _marker;
+  let _markerColor: string;
+  let _extraOffset: number = 0;
+  let _iconSize: number = 16;
+
+  let poiMeta = getPoiTypeByType(poiTypes[0]);
+
+  if (!poiMeta || _poiTypesLength > 1) {
+    _markerColor = getPoiTypeByType('multiple').color;
+  } else {
+    _markerColor = poiMeta.color;
+  }
+
+  if ( _poiTypesLength > 1) {
+    _iconSize = 14;
+    _extraOffset = (_iconSize / 2);
+  }
+
+  if (poi.waypoint.distance <= maxPoiDistanceOffTrail || !maxPoiDistanceOffTrail) {
+    _marker = createSvgPinMarker(canvasElement, _markerColor);
+  } else {
+    _marker = createSvgCircleMarker(canvasElement, _markerColor);
+
+  }
+
+  for (let t = 0; t < 2; t++) {
+
+    let _type = poiTypes[t];
+
+    if (_type) {
+
+      // max of 2 icons in marker, if more types show plus symbol
+      if (t === 1) {
+        _type = 'multiple';
+      }
+
+      _marker.use(sampleFaIcon(_type)).width(_iconSize).height(_iconSize).move(
+        -(_iconSize / 2) + ((t * 1.5) * (_iconSize / 2)) - _extraOffset,
+        Number(_marker.node.attributes.vOffset.value) + (_iconSize / 2) + (t * _extraOffset));
+    }
+  }
+  return _marker;
+}
 
 const markerData: string = 'm16.75,0.75c-8.28366,0 -15,6.71484 -15,15c0,2.32031 0.52734,4.52053 1.46925,6.48047c0.05269,0.11137 13.53075,26.51953 13.53075,26.51953l13.36819,-26.19141c1.04297,-2.04197 1.63181,-4.35647 1.63181,-6.80859c0,-8.28516 -6.71484,-15 -15,-15z';
 // const markerData: string = 'm256,0c-88.359,0 -160,71.625 -160,160c0,24.75 5.625,48.219 15.672,69.125c0.562,1.188 144.328,282.875 144.328,282.875l142.594,-279.375c11.125,-21.781 17.406,-46.469 17.406,-72.625c0,-88.375 -71.625,-160 -160,-160z';
@@ -21,11 +75,11 @@ export function createSvgFaElement (canvas: any, id: string, scale: number = 1, 
 }
 
 // by default a point marker is 30 x 45px, and the border color is 10% darker than the fill color
-export function createSvgPointMarker (canvas: any, color: string, scale: number = 1) {
+export function createSvgPinMarker (canvas: any, color: string, scale: number = 1) {
 
-  let _marker = canvas.group();
+  const _marker = canvas.group();
+  _marker.attr('vOffset', -(48 * scale));
   _marker.addClass('fa-marker');
-
   _marker.path(markerData).fill(color).width(33 * scale).height(50 * scale).stroke({color: shadeColor(color, -10), width: 2 * scale}).move(-(16.5 * scale), -(48 * scale));
 
   return _marker;
@@ -34,9 +88,9 @@ export function createSvgPointMarker (canvas: any, color: string, scale: number 
 // by default a round marker is 30 x 30px, and the border color is 10% darker than the fill color
 export function createSvgCircleMarker (canvas: any, color: string, scale: number = 1) {
 
-  let _marker = canvas.group();
+  const _marker = canvas.group();
+  _marker.attr('vOffset', -(16.5 * scale));
   _marker.addClass('fa-marker');
-
   _marker.circle(33 * scale, 33 * scale).fill(color).stroke({color: shadeColor(color, -10), width: 2 * scale}).move(-(16.5 * scale), -(16.5 * scale));
 
   return _marker;
@@ -62,27 +116,47 @@ export function sampleFaIcon(iconId:string) {
 // LEAFLET MARKERS
 
 // create leaflet poi marker (using font-awesome 5 webfont)
-export function createFaLeafletMarker(icon: string, iconPrefix: string, color:string) {
-
-  const _marker = L.VectorMarkers.icon({
-    icon: icon,
-    markerColor: color,
-    prefix: iconPrefix,
-    markerBorderColor: shadeColor(color, -10)
-  });
-
-  return _marker;
-}
+// export function createFaLeafletMarker(icon: string, iconPrefix: string, color:string) {
+//
+//   const _marker = L.VectorMarkers.icon({
+//     icon: icon,
+//     markerColor: color,
+//     prefix: iconPrefix,
+//     markerBorderColor: shadeColor(color, -10)
+//   });
+//
+//   return _marker;
+// }
 
 export function createUserMarker(icon: string, iconPrefix: string, color:string) {
 
   let ele = document.createElement("div");
   let draw = SVG(ele).size(50, 50).style('overflow', 'visible');
-  let marker = createSvgCircleMarker(draw, '#00FF00', 0.85);
-
-  let _marker = L.divIcon({className: 'user', html: ele.innerHTML});
-  return _marker;
+  createSvgCircleMarker(draw, '#00FF00', 1);
+  return L.divIcon({className: 'user', html: ele.innerHTML});
 }
+
+// export function createLeafletPinMarker(icon: string, iconPrefix: string, color:string): any {
+//
+//   let ele = document.createElement("div");
+//   let draw = SVG(ele).size(50, 50).style('overflow', 'visible');
+//
+//   const _marker = createSvgPinMarker(draw, color, 1);
+//   _marker.use(sampleFaIcon(icon)).width(16).height(16).move(-8, -39);
+//
+//   return L.divIcon({className: 'pin-marker', html: ele.innerHTML});
+// }
+//
+// export function createLeafletCircleMarker(icon: string, iconPrefix: string, color:string): any {
+//
+//   let ele = document.createElement("div");
+//   let draw = SVG(ele).size(50, 50).style('overflow', 'visible');
+//
+//   const _marker = createSvgCircleMarker(draw, color, 1);
+//   _marker.use(sampleFaIcon(icon)).width(16).height(16).move(-8, -39);
+//
+//   return L.divIcon({className: 'circle-marker', html: ele.innerHTML});
+// }
 
 // L.CustomMarker = function (options) {
 //   return new customMarker(options);

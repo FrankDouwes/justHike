@@ -1,6 +1,6 @@
 <mat-card id="trail-selector">
 
-  <h2>Select Trail</h2>
+  <h2>Trail Downloads</h2>
 
   <mat-card-content>
     <section>
@@ -25,7 +25,9 @@
         [hasUpdate]="updateAvailable(downloader)"
         [type]="downloader"
         [trailId]="activeTrail.id"
-        [file]="downloader + '.zip'"
+        [file]="downloader"
+        extension="zip"
+        [parts]="(downloader === 'tiles') ? activeTrail.tilesFileCount : 1"
         [onComplete]="onDownloadComplete.bind(this)"
         [onClear]="onDownloadCleared.bind(this)"
       >

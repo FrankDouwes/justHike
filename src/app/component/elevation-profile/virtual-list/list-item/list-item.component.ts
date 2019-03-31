@@ -20,7 +20,7 @@ declare const SVG: any;    // fixes SVGjs bug
 
 import { svgPath } from '../../../../_util/smoothLine';
 import { isPrime, normalizeElevation } from '../../../../_util/math';
-import { createSvgCircleMarker, createSvgFaElement, createSvgPointMarker, sampleFaIcon } from '../../../../_util/markers';
+import {createSvgCircleMarker, createSvgFaElement, createSvgPinMarker, sampleFaIcon, setupMarker} from '../../../../_util/markers';
 import { getMajorPoiTypes, getPoiTypeByType } from '../../../../_util/poi';
 import { environment } from '../../../../../environments/environment.prod';
 import { LocalStorageService } from 'ngx-webstorage';
@@ -402,98 +402,47 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     if (_poisArray) {
 
       const _self = this;
-      const _maxPoiDistanceOfTrail = this._localStorage.retrieve('poiDistanceOffTrail');
+      const _maxPoiDistance = this._localStorage.retrieve('poiMaxDistance');
 
       const _totalPois: number = _poisArray.length;
       for (let i = 0; i < _totalPois; i++) {
 
         const _poi: Poi = this._trailGenerator.getPoiById(_poisArray[i]);
 
-        if (!_poi) {
-          console.log('bug at poi with id:' + _poi);
+        // filter out of range pois
+        if (_poi.waypoint.distance >= _maxPoiDistance) {
+          return;
         }
 
+        if (!_poi) {
+          console.log('bug at poi with id: ' + _poi.id);
+        }
 
-        // if user setting is true
         const _poiTypes = _poi['type'].split(', ');
 
         // if poi is of visible type
-        let _isVisible: boolean;
-        let _visibleTypes: string = '';
+        let _visibleTypes: Array<string> = [];
 
         const _poiTypesLength = _poiTypes.length;
         for (let p = 0; p < _poiTypesLength; p++) {
 
           const _type: string = _poiTypes[p];
 
+          // check if poi type is of visible type based on user settings (only camp/water/highway/end
           const _setting: boolean = _self.settings[_self.createCamelCaseName(_type, 'show')];
 
           if (_setting === true) {
-            _isVisible = true;
-            _visibleTypes += _type;
+            _visibleTypes.push(_type);
           }
         }
 
-        if (_isVisible) {
+        if (_visibleTypes.length > 0) {
 
-          let _marker;
-          let _markerColor: string;
-          let _extraOffset: number = 0;
-          let _iconSize: number = 16;
+          const _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, environment.LINEHEIGHT / 2);
 
-          let _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, environment.LINEHEIGHT / 2);
+          const _maxPoiDistanceOffTrail = this._localStorage.retrieve('poiDistanceOffTrail');
 
-          if (_poiTypesLength > 1 && _visibleTypes.length > 2) {
-            _markerColor = getPoiTypeByType('multiple').color;
-            _iconSize = 13;
-            _extraOffset = (_iconSize / 2);
-          } else {
-            _markerColor = getPoiTypeByType(_poiTypes[0]).color;
-          }
-
-          if (_poi.waypoint.distance <= _maxPoiDistanceOfTrail) {
-
-            _marker = createSvgPointMarker(this._markerSvgCanvas, _markerColor);
-
-            for (let t = 0; t < _poiTypesLength; t++) {
-
-              let _type = _poiTypes[t];
-
-              if (_visibleTypes.indexOf(_type) !== -1 && t <= 1) {
-
-                // max of 2 icons in marker, if more types show plus symbol
-                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self.settings['showCamp']) {
-                  _type = 'multiple';
-                }
-
-                _marker.use(sampleFaIcon(_type)).width(_iconSize).height(_iconSize).move(
-                  -(_iconSize / 2) + ((t * 1.5) * (_iconSize / 2)) - _extraOffset,
-                  -39 + ((t * 1.5) * (_iconSize / 2)) - _extraOffset + (_poiTypes.length - 1)
-                );
-              }
-            }
-
-          } else {
-
-            _marker = createSvgCircleMarker(this._markerSvgCanvas, _markerColor);
-
-            for (let t = 0; t < _poiTypesLength; t++) {
-              let _type = _poiTypes[t];
-
-              if (_visibleTypes.indexOf(_type) !== -1 && t <= 1) {
-
-                // max of 2 icons in marker, if more types show plus symbol
-                if (t === 1 && _poiTypes.length > 2 || t === 1 && !_self.settings['showCamp']) {
-                  _type = 'multiple';
-                }
-
-                _marker.use(sampleFaIcon(_type)).width(_iconSize).height(_iconSize).move(
-                  -(_iconSize / 2) + ((t * 1.5) * (_iconSize / 2)) - _extraOffset,
-                  -(_iconSize / 2) + ((t * 1.5) * (_iconSize / 2)) - _extraOffset + (_poiTypes.length - 1)
-                );
-              }
-            }
-          }
+          const _marker = setupMarker(this._markerSvgCanvas, _poi, _visibleTypes, _maxPoiDistanceOffTrail);
 
           _marker.click(this._onMarkerClick.bind({data:_poi, self:this}));
           _marker.move(this._svgWidth * (_poi.anchorPoint.distance / environment.MILE), _markerElevation);
@@ -501,7 +450,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
       }
     }
-
   }
 
   // draw "random" trees below line
@@ -550,7 +498,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     if (_onTrail) {
 
-      this._userMarker = createSvgPointMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker = createSvgPinMarker(this._markerSvgCanvas, _color, 1);
       this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -39);
 
     } else {

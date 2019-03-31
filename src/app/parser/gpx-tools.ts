@@ -26,5 +26,22 @@ export function createGPX(trailMeta: TrailMeta, flatTrailData: any): any {
     waypoint['time'] = null;
   })
 
-  return createGpx(flatTrailData, _gpxOptions);
+  // split in 3
+  const _fileLength = Math.ceil(flatTrailData.length / 3);
+  const _arrays = _splitArray(flatTrailData, _fileLength);
+  const _files: Array<any> = [];
+
+  _arrays.forEach(function(fileData) {
+    _files.push(createGpx(fileData, _gpxOptions));
+  });
+
+  return _files;
+}
+
+function _splitArray(array: Array<any>, count: number) {
+  const _res: Array<any> = [];
+  while (array.length) {
+    _res.push(array.splice(0, count));
+  }
+  return _res;
 }

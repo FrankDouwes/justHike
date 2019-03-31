@@ -39,7 +39,8 @@
               "./node_modules/geolib/dist/geolib.elevation.js",
               "./node_modules/seedrandom/seedrandom.js",
               "./node_modules/hammerjs/hammer.min.js",
-              "./node_modules/hammer-touchemulator/touch-emulator.js"
+              "./node_modules/hammer-touchemulator/touch-emulator.js",
+              "./node_modules/proj4/dist/proj4.js"
             ]
           },
           "configurations": {
@@ -105,7 +106,8 @@
               "./node_modules/geolib/dist/geolib.elevation.js",
               "./node_modules/seedrandom/seedrandom.js",
               "./node_modules/hammerjs/hammer.min.js",
-              "./node_modules/hammer-touchemulator/touch-emulator.js"
+              "./node_modules/hammer-touchemulator/touch-emulator.js",
+              "./node_modules/proj4/dist/proj4.js"
             ],
             "assets": [
               "src/favicon.ico",

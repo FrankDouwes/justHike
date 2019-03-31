@@ -2,9 +2,9 @@ html, body, poi-list cdk-virtual-scroll-viewport {
   background-color: #111;
 }
 
-app-elevation-profile .background-layer {
-  filter: grayscale(100%) contrast(10%) !important;
-}
+/*app-elevation-profile .background-layer {*/
+  /*filter: grayscale(100%) contrast(10%) !important;*/
+/*}*/
 
 leaflet-map .leaflet-tile-pane {
   filter: invert(100%) grayscale(100%) brightness(75%) !important;
@@ -56,7 +56,7 @@ app-elevation-profile virtual-list-component .meta .elevation-change {
 
 
 app-elevation-profile .background-layer, app-elevation-profile virtual-list-component #guides,
-app-elevation-profile virtual-list-component #axis {
+app-elevation-profile virtual-list-component #axis, .cdk-overlay-container {
   filter: grayscale(100%) invert(100%);
 }
 
@@ -74,11 +74,14 @@ app-elevation-profile virtual-list-component .tree-marker {
   color: rgba(15,15,15,0.15) !important;
 }
 
-
 app-elevation-profile scrollbar-component {
   filter: invert(100%);
 }
 
 app-elevation-profile guides .guide {
   filter: invert(100%);
+}
+
+app-elevation-profile .background-layer {
+  background-image: url('../images/overlay_night.png') !important;
 }

@@ -37,22 +37,24 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   @Input() label ?:                 string;     // if not provided, label will be generated
   @Input() onComplete?:             Function;
   @Input() onClear?:                Function;
-  @Input() file:                    string;     // the filename (with extension)
   @Input() hasFile?:                boolean;    // is there a file available locally (in local storage/assets/filesystem)
   @Input() hasUpdate?:              boolean;    // is there an update available for this files
   @Input() version:                 string;
+
+  @Input() file:                    string;     // the filename (without extension)
+  @Input() extension:               string;     // just the extension, no .)
+  @Input() parts?:                  number;     // support for multi part (sequential downloading, as there is a max filesize)
 
   public trailMeta:                 TrailMeta;
   public isActive:                  boolean;
   public storageAvailable:          boolean;
   public progress:                  number;
+  public progressState:             string = 'determinate';
 
-  private progressLabel:            string;
-  private _fileExtension:           string;
   private _buttonState:             string;
   private _downloadSubscription:    Subscription;
   private _downloader:              Downloader;
-  private _url:                     string;
+  private _url:                     string | Array<string>;
 
   constructor(
     private _changeDetector:        ChangeDetectorRef,
@@ -74,17 +76,11 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
     this._downloadSubscription = this._downloader.meta.subscribe(
       function (status: DownloaderStatus) {
 
-        // if (status.type === 'http') {
-        //   _self.progressLabel = 'downloading';
-        // } else if (status.type === 'filesystem') {
-        //   _self.progressLabel = 'processing';
-        // }
-
         _self.isActive = _self._downloader.isActiveSubject.getValue();
 
         if (status.type === 'http' && status.label && status.label === 'complete') {
 
-          if (_self._fileExtension !== 'zip' && _self._fileExtension !== 'json') {
+          if (_self.extension !== 'zip' && _self.extension !== 'json') {
 
             _self._clear();
             _self.hasFile = false;
@@ -93,9 +89,21 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
         } else if (status['label'] && status['label'] === 'progress') {
 
-          const _newProgress = status.data.percentage.toFixed(0);
-          if (_newProgress !== _self.progress) {
-            _self.progress = status.data.percentage.toFixed(0);
+
+
+          // TODO: currently not showing saving/unzipping as part of the progress bar
+
+          if (status.type === 'http') {
+
+            // only updates on full % difference, to save redraws
+            const _newProgress = Math.floor(status.data.percentage);
+            if (_newProgress !== _self.progress) {
+              _self.progressState = 'determinate';
+              _self.progress = status.data.percentage;
+              _self._changeDetector.detectChanges();
+            }
+          } else {
+            _self.progressState = 'buffer';
             _self._changeDetector.detectChanges();
           }
 
@@ -159,8 +167,22 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
     this.trailMeta = getTrailMetaDataById(this.trailId);
 
-    this._fileExtension = getExtensionFromString(this.file);
-    this._url = this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file;
+    console.log(this.parts);
+
+    if (this.parts > 1) {
+
+      // multipart download
+      this._url = [];
+
+      for (let i = 0; i < this.parts; i++) {
+        this._url.push(this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '_' + i + '.' + this.extension);
+      }
+
+    } else {
+
+      // single file
+      this._url = this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '.' + this.extension;
+    }
 
     // since object changes won't trigger a redraw
     this._changeDetector.detectChanges();
@@ -183,7 +205,20 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   // BUTTON ACTIONS (dynanically called from button click)
 
   private _download(): void {
-    const _url = environment.appDomain + environment.fileBaseUrl + this._url;
+
+    let _url;
+
+    if (typeof this._url === 'string') {
+      _url = environment.appDomain + environment.fileBaseUrl + this._url;
+    } else {
+
+      _url = [];
+
+      this._url.forEach(function(file) {
+        _url.push(environment.appDomain + environment.fileBaseUrl + file);
+      });
+    }
+
     this._downloader.downloadFile(_url, !isDevMode(), this._url);
   }
 

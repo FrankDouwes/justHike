@@ -1,8 +1,66 @@
-\:host /deep/
+::ng-deep
 
-  .mat-list-item-content
+  hr
+    border: unset
+    border-top: 1px solid #CCC
+
+  mat-card
+
+    h2
+      text-align: center
+      margin-bottom: 0 !important
+
+  .input
+    display: flex
+    flex-direction: column
+
+  .input > *
+    width: 100% !important
+
+
+  mat-form-field, input
+    width: 100% !important
+
+  .mat-select, input
+    box-sizing: border-box !important
     padding: 0 12px !important
-    margin: 0 !important
+    background-color: #EEE !important
+    border-radius: 6px !important
+    height: 48px !important
+    border: none !important
+
+    .mat-select-trigger
+      height: 48px
+
+      .mat-select-value
+        vertical-align: middle // uses table-cell
+
+  input
+    background-color: transparent !important
+    border: 2px solid #EEE !important
+
+
+  .mat-form-field-underline
+    display: none
+
+    .mat-list-item-content
+      padding: 0 12px !important
+      margin: 0 !important
+
+  // radio button & checkbox
+  mat-radio-button, mat-checkbox
+    display: block
+    padding: 3px 0 !important
+    height: 28px !important
+
+  .mat-radio-container, .mat-radio-outer-circle, .mat-radio-inner-circle, .mat-checkbox-inner-container
+    width: 28px !important
+    height: 28px !important
+
+  .mat-checkbox-frame, .mat-checkbox-background
+    width: 24px !important
+    height: 24px !important
+    border-radius: 4px !important
 
 \:host
 
@@ -90,7 +148,6 @@
     width: 61.8%
     background-color: #EEE
     vertical-align: top
-    //padding: 12px
     overflow-y: scroll
 
     mat-card

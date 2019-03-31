@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {VersionResolverService} from './version-resolver.service';
 import {TrailResolverService} from './trail-resolver.service';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
@@ -11,9 +11,8 @@ import {getCordova, setConnection, setCordova, setDialogs, setScreen, setZip} fr
 // cordova plugins
 declare let cordova: any;
 declare let screen: any;
-declare let download: any;
-declare let Connection: any;
 declare let zip: any;
+declare let Connection: any;
 
 @Injectable({
   providedIn: 'root'

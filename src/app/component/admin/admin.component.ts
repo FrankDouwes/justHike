@@ -73,9 +73,12 @@ export class AdminComponent implements OnInit {
 
     alert(this._trailGeneratorService.flatTrailData.length + ' to ' + _clone.length + ' waypoints');
 
-    const _gpx = createGPX(_trailMeta, _clone);
+    const _gpx:Array<any> = createGPX(_trailMeta, _clone);
 
-    saveFileAs(_gpx, _trailMeta.abbr + '.gpx');
+    _gpx.forEach(function(file, index) {
+      saveFileAs(file, _trailMeta.abbr + '_' + index + '.gpx');
+    })
+
   }
 
   public generateTrailData(): void {

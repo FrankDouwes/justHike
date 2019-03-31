@@ -1,0 +1,73 @@
+{
+  "_from": "cordova-plugin-downloader",
+  "_id": "cordova-plugin-downloader@0.0.4",
+  "_inBundle": false,
+  "_integrity": "sha512-rvMFMTBkU2C538F9TTbKx86X3EFZq0PUQhXTuaj5qX4uMrnbqgN76p/sUXBqwN9WkrBiVxoAnR382iLs3x2Lqw==",
+  "_location": "/cordova-plugin-downloader",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-downloader",
+    "name": "cordova-plugin-downloader",
+    "escapedName": "cordova-plugin-downloader",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-downloader/-/cordova-plugin-downloader-0.0.4.tgz",
+  "_shasum": "a165d894be3c8467f3a53937677063caab3b9c24",
+  "_spec": "cordova-plugin-downloader",
+  "_where": "/Users/frankdouwes/work/just-save/mobile",
+  "author": {
+    "name": "Ben Wilson"
+  },
+  "bugs": {
+    "url": "https://github.com/benjaminmwilson/cordova-plugin-downloader/issues"
+  },
+  "bundleDependencies": false,
+  "config": {
+    "lintdirs": "www/**.js lib/**.js"
+  },
+  "cordova": {
+    "id": "cordova-plugin-downloader",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "deprecated": false,
+  "description": "Cordova Downloader Plugin with no cordova-file-transfer dependency",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-spies": "^1.0.0",
+    "jshint": "^2.9.3",
+    "mocha": "^4.1.0"
+  },
+  "homepage": "https://github.com/benjaminmwilson/cordova-plugin-downloader#readme",
+  "keywords": [
+    "cordova",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "file",
+    "download",
+    "downloader",
+    "unzip"
+  ],
+  "license": "Apache 2.0",
+  "name": "cordova-plugin-downloader",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benjaminmwilson/cordova-plugin-downloader.git"
+  },
+  "scripts": {
+    "lint": "rm -f npm-debug.log && jshint $npm_package_config_lintdirs",
+    "test": "mocha lib/**/**.spec.js"
+  },
+  "version": "0.0.4"
+}

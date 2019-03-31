@@ -20,6 +20,9 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
   public showMiniMap: boolean;
   public direction: number;       // 0: NOBO, 1: SOBO
   public majorPoiTypes: Array<string>;
+  public userName: string = 'test';
+  public showMileGrid: boolean;
+  public animateMap: boolean;
 
   public directionList: Array<object> = [{id: 0, label: 'Northbound (NOBO)'}, {id: 1, label: 'Southbound (SOBO)'}];
   public screenModes: Array<any> = [
@@ -44,6 +47,8 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
     this.screenMode = this._localStorage.retrieve('screenMode');
     this.showMiniMap = this._localStorage.retrieve('showMiniMap');
     this.direction = this._localStorage.retrieve('direction');
+    this.showMileGrid = this._localStorage.retrieve('showMileGrid');
+    this.animateMap = this._localStorage.retrieve('animateMap');
 
     // dynamic poi type properties
     this.majorPoiTypes = getMajorPoiTypes();
@@ -80,8 +85,6 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
     if (username.toLowerCase() === 'iddqd') {
 
       const _isAdmin = this._localStorage.retrieve('isAdmin');
-
-      console.log(_isAdmin);
 
       if (!_isAdmin) {
         this._localStorage.store('isAdmin', true);

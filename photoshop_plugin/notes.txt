@@ -1,0 +1,12 @@
+TODO: Photoshop cant copy/paste empty layers (and layer 4 might be empty for flat terrain)
+needs a try/catch, catch = create an empty layer in the main file.
+
+I manually fixed 2 tiles to bypass this for the first beta.
+
+PCT (13035 map tiles):
+5588/13000.png		> layer 4 is blank (can’t copy/paste, manually added 1px top/left)
+5276/11967.png		> layer 4 is blank (can’t copy/paste, manually added 1px top/left)
+
+TODO: nice to have: images with lots of elevation change have a lot of contrast
+create a single average colored layer based on layer 4, use this layer as an inverted alpha on layer 4
+this should smooth out contrast.

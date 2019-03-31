@@ -12,8 +12,8 @@ export class SettingsDialogComponent implements OnInit {
 
   public listItems: Array<object> = [
     {title: 'Purchase', panel: 'purchase'},
-    {title: 'Trail Data', panel: 'trail'},
-    {title: 'General Settings', panel: 'general'},
+    {title: 'Download', panel: 'trail'},
+    {title: 'Settings', panel: 'general'},
     {title: 'About', panel: 'about'}
   ];
 

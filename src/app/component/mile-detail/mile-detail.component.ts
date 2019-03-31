@@ -21,7 +21,10 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   public isNobo:                  boolean;
   public centerUserTrigger:       number;
   public isTracking:              boolean;
-  public visiblePoi:              any;
+
+  public visiblePoiRange:         any;          // the visible poi range (in the poi list)
+  public visibleMileRange:        any;          // the visible mile range (in the poi list)
+  public drawRange:               any;          // the range thats actually rendered
 
   private _locationSubscription:  Subscription;
   private _screenModeSubscription: Subscription;
@@ -79,13 +82,31 @@ export class MileDetailComponent implements OnInit, OnDestroy {
 
   // EVENTS
   public onScrollTo(data: any): void {
-    this._setMapData(data.mileId, data.renderedRange);
+    this._setMapData(data.mileId, data.renderedPoiRange, data.renderedMileRange);
     this.routedMile = data.mileId;
     this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
   }
 
-  private _setMapData(mileId: number, range?: any): void {
-    this.visiblePoi = range;
+  private _setMapData(mileId: number, poiRange?: any, mileRange?: any): void {
+
+    if (mileRange && mileRange.length > 0) {
+
+      mileRange.sort((a, b) => a - b);
+
+      this.drawRange = {
+        behind: Math.abs(mileId - mileRange[0]) + 3,
+        ahead: Math.abs(  mileRange[mileRange.length - 1] - mileId)
+      };
+
+      this.visibleMileRange = mileRange;
+    }
+
+    if (poiRange && poiRange.length > 0) {
+      this.visiblePoiRange = poiRange;
+    }
+
+    mileId = (mileId === 0) ? 0 : mileId - 1;
+
     this.centerPoint = this.trailData.miles[mileId].centerpoint as Waypoint;
   }
 

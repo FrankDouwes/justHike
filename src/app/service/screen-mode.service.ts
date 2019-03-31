@@ -59,7 +59,7 @@ export class ScreenModeService implements OnDestroy {
   // inject a stylesheet into the head of the
   private _injectStylesheet(name: string): void {
 
-    if (name === 'default') {
+    if (name === 'default' || !name) {
       return;
     }
 

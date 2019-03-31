@@ -116,6 +116,11 @@ export class FilesystemService  {
     const _self = this;
     within = (!within) ? this.rootDir : within;
 
+    if (within === 'error') {
+      callback(within);
+      return;
+    }
+
     within.getDirectory(dirName, {create: false, exclusive: true}, function(directory) {
 
       callback(directory);
@@ -267,17 +272,30 @@ export class FilesystemService  {
     });
   }
 
-  public _unzip(filePath: string): Observable<object> {
+  public unzip(filePath: string, parts: boolean = false): Observable<object> {
+
+    const _self = this;
 
     const _unzipState: BehaviorSubject<object> = new BehaviorSubject<object>({state:'initialize'});
 
     if (hasZip()) {
 
+      let _seperator = (parts) ? '_' : '.';     // multipart files are _0, _1, _2, else just remove the extension
+
+      const _directoryArr: Array<string> = filePath.split(_seperator);
+      _directoryArr.pop();
+      const _directoryStr = _directoryArr.join(_seperator) + '/';
+
       const url = this._joinPaths([getCordova().file.dataDirectory, filePath]);
-      const destination = this._joinPaths([getCordova().file.dataDirectory, 'DEMO/1.0/']);
+      const destination = this._joinPaths([getCordova().file.dataDirectory, _directoryStr]);
+
+      console.log(url, destination);
 
       getZip().unzip(url, destination, function(x) {
         _unzipState.next({state: 'progress', percentage: 100});
+
+        _self.deleteFile(filePath);
+
         _unzipState.next({state: 'complete'});
       }, function(progressEvent) {
         _unzipState.next({state: 'progress', percentage: (progressEvent.loaded / progressEvent.total) * 100});
@@ -304,29 +322,6 @@ export class FilesystemService  {
     return path;
   }
 
-  //   function RemoveZipFile(zipFilePath) {
-  //
-  //     /** @namespace resolveLocalFileSystemURL **/
-  //
-  //     var fszipFilePath = Join([that.Settings.fileSystem, zipFilePath]);
-  //
-  //     window.resolveLocalFileSystemURL(fszipFilePath,
-  //       function(entry) {
-  //         if(entry.is3File) {
-  //           entry.remove(that.Settings.success, function() { that.Settings.error(10); /* Delete error #1 */ });
-  //         }
-  //         else {
-  //           that.Settings.error(11); //Delete error #2
-  //         }
-  //
-  //       },
-  //       that.Settings.success //doesn't exist - don't worry about it
-  //     );
-  //   }
-  //
-  // };
-  //
-
   // // returns the data from file entry (used for stored json)
   // public readFileData(): any {
   //
@@ -337,28 +332,33 @@ export class FilesystemService  {
 
     const _pathSegments = filePath.split('/');
     const _filename: string = _pathSegments.pop();
-    const _directories = _pathSegments.join('/');
+    const _directory = _pathSegments.join('/') + '/';
 
-    this.readFile(_directories, _filename, function(fileEntry) {
-      fileEntry.remove(function (file) {
-        // File deleted successfully
-        console.log('file deleted');
-      }, function (err) {
-        console.log(err); // Error while removing File
+    this.setupDirectory(_directory, null, function(dirEntry) {
+      dirEntry.getFile(_filename, {create: false}, function(fileEntry) {
+        fileEntry.remove(function (file) {
+          // File deleted successfully
+          console.log('file deleted');
+        }, function (err) {
+          console.log(err); // Error while removing File
+        });
       });
-    });
+    }, false);
   }
 
-  // ... and everything in it
+  // TODO: edited, check functionality!!! delete directory and everything in it
   public deleteDirectory(directoryPath: string, callback: Function): void {
 
     this.setupDirectory(directoryPath, null, function(dirEntry) {
-      dirEntry.removeRecursively(function (dir) {
-        callback(dir);
-      }, function (err) {
-        console.log(err);
-      });
-    })
+      if (dirEntry !== 'error') {
+        dirEntry.removeRecursively(function (dir) {
+          callback(dir);
+        }, function (err) {
+          console.log(err);
+        });
+      } else {
+        callback(dirEntry);
+      }
+    }, false);
   }
-
 }

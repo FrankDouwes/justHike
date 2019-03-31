@@ -6,6 +6,7 @@ import { Poi } from './poi';
 export class Trail {
   // STATIC
   id:             number;
+  utm:            Array<number>;      // utm zones (for grid generation)
   version:        string;             // version of trail data (for updating)
   name:           string;
   abbr:           string;
@@ -31,6 +32,7 @@ not what it downloaded. TrailMeta is used for Trail generation as well as versio
 export class TrailMeta {
 
   id: number;
+  utm?: Array<number>;
   name?: string;
   abbr: string;
   trailVersion: string;
@@ -41,6 +43,7 @@ export class TrailMeta {
   // optional params
   trailFileSize?: number;
   tileFileSize?: number;
+  tilesFileCount?: number;
   snowFileSize?: number;
   availableForPurchase?: boolean;
   isFree?: boolean;
