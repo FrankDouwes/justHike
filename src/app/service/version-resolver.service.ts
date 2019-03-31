@@ -133,7 +133,7 @@ export class VersionResolverService implements Resolve<any> {
     if (_storageVersion) {
       _internal = of(_storageVersion);
     } else {
-      _internal = this._internalDownloader.downloadFile('assets/data/version.json', false);
+      _internal = this._internalDownloader.downloadFile('assets/files/version.json', false);
     }
 
 

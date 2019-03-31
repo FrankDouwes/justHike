@@ -20,6 +20,7 @@ todo:
 - iOS bugs (possibly related to the use of the depricated alerts plugin)
 - iOS scroll bugs (poi list)
 - purchase routines (app store / google play)
+- exclude files (for trail data generation) from build
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
