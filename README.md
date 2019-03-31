@@ -1,6 +1,10 @@
 # JustHike
 
-ng build > cd mobile > cordova build [target] (might have to add platforms first (cordova platform add))
+ng build > cd mobile > cordova build android (might have to add platform first (cordova platform add))
+
+or
+
+ng serve, run in chrome. Unzipping will be disabled so offline maps wont work, and window resizing is buggy (SVG redraw, not needed for mobile)
 
 todo:
 
@@ -20,7 +24,6 @@ todo:
 - iOS bugs (possibly related to the use of the depricated alerts plugin)
 - iOS scroll bugs (poi list)
 - purchase routines (app store / google play)
-- exclude files (for trail data generation) from build
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
