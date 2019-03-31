@@ -1,12 +1,25 @@
 # JustHike
 
-still a mess...
+ng build > cd mobile > cordova build [target] (might have to add platforms first (cordova platform add))
 
-uses capaciter, so > ng build > npx cap copy > npx cap open > select platform (iOS or Android)
+todo:
 
-has 2 file downloader/parser/filesystem routines, neither work like I want em to work...
-
-probably missing some dependencies...
+- back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
+- rating system for water / campsites (username field)
+- related poi lists
+- center user button (in both elevation profile and mile detail)
+- compass heading, all cordova plugins seem to have android issues, iOS only? look at google...
+- make sure the user location updates while walking on both map and elevation profile
+- pause/resume download of map tiles (since it's 400mb and I'm keeping track of downloaded parts anyway)
+- the download indicator doesn't seem to be working
+- switch trail > download tiles goes wrong
+- paid cloud storage of downloadable files
+- remove font awesome references in index
+- Design / CSS / placeholder images
+- instructions screen
+- iOS bugs (possibly related to the use of the depricated alerts plugin)
+- iOS scroll bugs (poi list)
+- purchase routines (app store / google play)
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
