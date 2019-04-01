@@ -10,13 +10,9 @@ todo:
 
 - back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
 - rating system for water / campsites (username field)
-- related poi lists
-- center user button (in both elevation profile and mile detail)
 - compass heading, all cordova plugins seem to have android issues, iOS only? look at google...
 - make sure the user location updates while walking on both map and elevation profile
 - pause/resume download of map tiles (since it's 400mb and I'm keeping track of downloaded parts anyway)
-- the download indicator doesn't seem to be working
-- switch trail > download tiles goes wrong
 - paid cloud storage of downloadable files
 - remove font awesome references in index
 - Design / CSS / placeholder images
