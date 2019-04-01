@@ -57,7 +57,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
   private _currentIndex       = 0;
   private _initialIndex       = 0;
-  private _status             = 'idle';
+  private _isCentered: boolean;
+  private _status: string     = 'idle';
 
   private _parallaxSubscription: Subscription;
   private _parallaxEnabled: boolean;
@@ -107,6 +108,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     if (changes.scrollTo) {
       if (changes.scrollTo.currentValue) {
         if (this.scrollViewport) {
+          this._isCentered = false;
           this._currentIndex = Math.floor(this.scrollViewport.getDataLength() * changes.scrollTo.currentValue);
           this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
         }
@@ -137,18 +139,24 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
   public onStatusChange(status: string): void {
     this.onUserLocationChange(this.user);
+    this._status = this.status;
   }
 
   public onUserLocationChange(user: User): void {
 
     // if we're switching to tracking
-    if (user && this._status !== 'tracking' && this.status === 'tracking' && this.scrollViewport && user.nearestMileId) {
-      this.scrollViewport.scrollToIndex(user.nearestMileId - 1, 'auto');
+    if (user && this.status === 'tracking' && this.scrollViewport && user.nearestMileId) {
+      if (!this._isCentered || this._status !== 'tracking' ) {
+        this.scrollViewport.scrollToIndex(user.nearestMileId - 1, 'auto');
+        this._isCentered = true;
+      }
     }
-
-    this._status = this.status;
   }
 
+  public centerOnUser(): void {
+    super.centerOnUser();
+    this.onStatusChange(null);
+  }
 
 
 // EVENTS & HANDLERS
@@ -288,6 +296,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   private _redraw(): void {
     const _oldRange = this._visibleRange;
     this._visibleRange = this.scrollViewport.getRenderedRange();
+
+    this._isCentered = false;
 
     // only if really needed!
     if (_oldRange !==  this._visibleRange) {

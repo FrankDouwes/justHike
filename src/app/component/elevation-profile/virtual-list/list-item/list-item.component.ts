@@ -20,7 +20,7 @@ declare const SVG: any;    // fixes SVGjs bug
 
 import { svgPath } from '../../../../_util/smoothLine';
 import { isPrime, normalizeElevation } from '../../../../_util/math';
-import {createSvgCircleMarker, createSvgFaElement, createSvgPinMarker, sampleFaIcon, setupMarker} from '../../../../_util/markers';
+import {createSvgCircleMarker, createSvgFaElement, createSvgPinMarker, sampleFaIcon, setupMarker} from '../../../../_util/marker';
 import { getMajorPoiTypes, getPoiTypeByType } from '../../../../_util/poi';
 import { environment } from '../../../../../environments/environment.prod';
 import { LocalStorageService } from 'ngx-webstorage';

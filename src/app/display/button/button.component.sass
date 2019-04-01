@@ -2,6 +2,8 @@ button
   background-image: unset       // material fix
   user-focus: none
 
+  padding: 0 !important
+
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&0.78+0,0.55+100 */
   background: -moz-linear-gradient(-45deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.55) 100%) /* FF3.6-15 */
   background: -webkit-linear-gradient(-45deg, rgba(255,255,255,0.78) 0%,rgba(255,255,255,0.55) 100%) /* Chrome10-25,Safari5.1-6 */
@@ -26,12 +28,24 @@ button
     -ms-transition: opacity 3s ease-in-out
     -o-transition: opacity 3s ease-in-out
 
+
+  display-icon
+    filter: drop-shadow(-1px -2px 1px rgba(0,0,0,0.1)) drop-shadow(2px 3px 2px white)
+    text-rendering: optimizeLegibility
+    display: block
+    width: 100%
+    height: 100%
+    padding-top: 22.5%
+    color: #555
+
   fa-icon
     filter: drop-shadow(-1px -2px 1px rgba(0,0,0,0.1)) drop-shadow(2px 3px 2px white)
     position: absolute
     top: 50%
-    left: -25%
+    left: -35%
     text-rendering: optimizeLegibility
+    color: #555
+
 
 button:focus, button:active
   outline: none !important

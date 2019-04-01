@@ -28,20 +28,20 @@ export class Settings {
     }, {
       type: 'road',
       label: 'road',
-      color: '#989898',
+      color: '#878787',
       iconType: 'fa',
       icon: 'road'
     }, {
       type: 'highway',
       label: 'highway',
       isMajor: true,
-      color: '#8c8c8c',
+      color: '#9b9b9b',
       iconType: 'fa',
       icon: 'car'
     }, {
       type: 'railroad',
       label: 'railroad',
-      color: '#8c8c8c',
+      color: '#afafaf',
       iconType: 'fa',
       icon: 'train'
     }, {
@@ -53,15 +53,9 @@ export class Settings {
     }, {
       type: 'powerline',
       label: 'powerline',
-      color: '#d96758',
+      color: '#8b6765',
       iconType: 'fa',
       icon: 'bolt'
-    }, {
-      type: 'warning',
-      label: 'warning',
-      color: '#F00',
-      iconType: 'fa',
-      icon: 'exclamation-triangle'
     }, {
       type: 'store',
       label: 'store',
@@ -69,7 +63,6 @@ export class Settings {
       iconType: 'fa',
       icon: 'store',
       rateable: true
-
     }, {
       type: 'postoffice',
       label: 'post office',
@@ -79,37 +72,88 @@ export class Settings {
     }, {
       type: 'food',
       label: 'food',
-      color: '#9e58d9',
+      color: '#805bd9',
       iconType: 'fa',
       icon: 'utensils',
       rateable: true
     }, {
       type: 'information',
       label: 'information',
-      color: '#5867d9',
+      color: '#4498d9',
       iconType: 'fa',
       icon: 'info'
     }, {
+      type: 'trailhead',
+      label: 'trail head',
+      color: '#8d5e35',
+      iconType: 'fa',
+      icon: 'parking'
+    }, {
       type: 'sign',
       label: 'sign',
-      color: '#5867d9',
+      color: '#d08d4b',
       iconType: 'fa',
       icon: 'map-signs'
-    },
-    {
+    }, {
+      type: 'bridge',
+      label: 'bridge',
+      color: '#d95da5',
+      iconType: 'fa',
+      icon: 'shoe-prints'
+    }, {
+      type: 'trail',
+      label: 'sign',
+      color: '#a5d958',
+      iconType: 'fa',
+      icon: 'map-signs'
+    }, {
+      type: 'view',
+      label: 'summit / view',
+      color: '#d97948',
+      iconType: 'fa',
+      icon: 'mountain'
+    }, {
+      type: 'boundary',
+      label: 'boundary',
+      color: '#d9c558',
+      iconType: 'fa',
+      icon: 'map-pin'
+    }, {
       type: 'end',
       label: 'sign',
       isMajor: true,
       color: '#d9c558',
       iconType: 'fa',
       icon: 'flag'
+    }, {
+      type: 'sight',
+      label: 'sight',
+      color: '#56ccd9',
+      iconType: 'fa',
+      icon: 'gem'
+    }, {
+      type: 'resort',
+      label: 'resort / inn / lodge / angel',
+      isMajor: true,
+      color: '#48d965',
+      iconType: 'fa',
+      icon: 'hotel'
+    },
+
+    // warning
+    {
+      type: 'warning',       // add
+      label: 'warning',
+      color: '#d75b4e',
+      iconType: 'fa',
+      icon: 'exclamation-triangle'
     },
 
     // multiple type
     {
       type: 'multiple',
       label: 'plus',
-      color: '#3f3f3f',
+      color: '#4b4b4b',
       iconType: 'fa',
       icon: 'plus'
     },
@@ -118,7 +162,7 @@ export class Settings {
     {
       type: 'unknown',
       label: '',
-      color: '#6dd958',
+      color: '#808080',
       iconType: 'fa',
       icon: 'question-circle'
     }

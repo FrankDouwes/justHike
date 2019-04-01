@@ -29,6 +29,7 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
 
   private _locationSubscription:            Subscription;
   private _locationStatusSubscription:      Subscription;
+  private _centerUserSubscription:          Subscription;
   private _user:                            User;
 
   constructor() {
@@ -55,7 +56,7 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
 
     // why attempt location based stuff if there's no location service?
     if (!this.locationService) {
-      //throw new Error('location service error!');
+      // throw new Error('location service error!');
       return;
     }
 
@@ -70,12 +71,19 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
         this.status = status;
         this.onStatusChange(status);
       });
+
+    this._centerUserSubscription = this.locationService.centerUser.subscribe(trigger => {
+      if (trigger !== 0) {
+        this.centerOnUser();
+      }
+    })
   }
 
   ngOnDestroy() {
 
     this._locationSubscription.unsubscribe();
     this._locationStatusSubscription.unsubscribe();
+    this._centerUserSubscription.unsubscribe();
   }
 
 
@@ -142,6 +150,10 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
   }
 
   public onUserLocationChange(user: User): void {
+    // OVERRIDE
+  }
+
+  public centerOnUser(): void {
     // OVERRIDE
   }
 

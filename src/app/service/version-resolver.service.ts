@@ -172,7 +172,7 @@ export class VersionResolverService implements Resolve<any> {
 
       _self._subjects['updateAvailable'].next(false);
 
-      const _activeTrailId = _self._localStorage.retrieve('activeTrailId');
+      const _activeTrailId = _self._localStorage.retrieve('activeTrailId') | 0;
 
       let _trails = _self._localStorage.retrieve('availableUpdates');
 
@@ -184,7 +184,6 @@ export class VersionResolverService implements Resolve<any> {
       for (const key in _trails) {
 
         const _trailMeta: TrailMeta = _trails[key];
-        let _updateAvailable: boolean = false;
 
         // compare versions for each data type
         _self._dataTypes.forEach(function(type: string) {
@@ -209,15 +208,16 @@ export class VersionResolverService implements Resolve<any> {
             _self._subjects[_trailMeta.abbr + '_' + type].next(true);
 
             if (_activeTrailId === _trailMeta.id) {
-              _updateAvailable = true;
+              // set the general update available flag
+              _self._subjects['updateAvailable'].next(true);
             }
           } else {
             _self._subjects[_trailMeta.abbr + '_' + type].next(false);
           }
         });
 
-        // set the general update available flag
-        _self._subjects['updateAvailable'].next(_updateAvailable);
+
+
 
       }
     });

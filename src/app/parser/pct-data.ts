@@ -4,6 +4,7 @@ import { Poi } from '../type/poi';
 import { Trail } from '../type/trail';
 import {environment} from '../../environments/environment.prod';
 
+const _identifierList: Array<string> = [];
 const _x2js = new X2JS({
   attributePrefix : ''    // no attribute prefix
 });
@@ -68,41 +69,14 @@ function parsePois(pois: Array<object>): Array<Poi> {
   const _poisLength: number = pois.length;     // faster
   const _parsedPois: Array<Poi> = [];
 
-  const _identifierTypes: object = {
-    BGCa: "",
-    BV: "",
-    BVB: "",
-    CS: 'camp',
-    CSB: "",
-    CSC: "",
-    GT: 'gate',
-    GTB: "",
-    GTC: "",
-    Hwy: 'highway',
-    MexB: 'end',
-    CanB: 'end',
-    PL: 'powerline',
-    PLB: "",
-    PO: 'postoffice',
-    RD: 'road',
-    RDB: 'road',
-    RDb: "",
-    RR: 'railroad',
-    TR: 'trail',
-    WACS: 'water, camp',
-    WR: 'water',
-    WRA: 'water',
-    WRB: 'water',
-    WRC: 'water',
-    WRCS: 'water, camp',
-  };
-
+  // a static list of poi types based on the raw data identifiers, which are manually linked to poiTypes (or unknown)
+  const _identifierTypes: object =
+    {MexB: 'end', WR: 'water', RD: 'road', RDB: 'road', PO: 'postoffice', Trad: 'store, food', Hwy: 'highway', RR: 'railroad', CS: 'camp', GT: 'gate', GTB: 'gate', PL: 'powerline', PLB: 'powerline', WRCS: 'water, camp', WACS: 'water, camp', OakS: 'store, food', Kitc: 'water', TR: 'trail', RedT: 'information', RDb: 'road', Deck: 'view', TH: 'trailhead', WRA: 'water', WRB: 'water', WRC: 'water', BV: 'camp', BVB: 'camp', CSC: 'camp', CSB: 'camp', BGCa: 'sight', Ranc: 'view', GTC: 'gate', Eagl: 'sight', HwyB: 'highway', TRb: 'trail', WRb: 'water', Heme: 'store, food', Tqtz: 'water', Humb: 'trailhead', Sadd: 'trail', PSTr: 'trail', TrRo: 'trail', WA: 'water', MtSa: 'view', Roun: 'boundary', SJSh: 'shelter', TrWi: 'trail', Well: 'water', SJTr: 'trail', BY: 'boundary', Suic: 'peak', TrSu: 'trail', Stra: 'trailhead', Zigg: 'resort', RDC: 'road', CCra: 'sight', Fish: 'trail', Anim: 'sight', Spli: 'shelter', Brid: 'bridge', MFSp: 'unknown', Stat: 'boundary', Moja: 'powerline', Fore: 'boundary', McDo: 'food', RRB: 'railroad', RDD: 'road', Bald: 'trailhead', MtBa: 'peak', Memo: 'sight', Door: 'water', TRB: 'trail', TRC: 'trail', HwyC: 'highway', BigR: 'water', Burk: 'peak', Punc: 'water', HwyD: 'highway', HwyE: 'highway', Buck: 'road', HWYF: 'highway', HwyG: 'highway', HwyH: 'highway', HwyI: 'highway', Mess: 'camp', Acto: 'resort', Gold: 'sight', Agua: 'town', Sier: 'highway', Benc: 'sight', Casa: 'resort', Iber: 'postoffice, water', Wind: 'sight', Pass: 'peak', Gull: 'sight', KMSt: 'resort', WAB: 'water', Hors: 'camp', JMT: 'trail', BVI: 'camp', CSH: 'camp', CSL: 'camp', CSM: 'camp', MTWh: 'peak', Trai: 'peak', WAC: 'water', WAD: 'water', WAE: 'water', WAJ: 'water', WAN: 'water', WAO: 'water', WAQ: 'water', WAS: 'water', WAT: 'water', WAU: 'water', Onio: 'trailhead', RaeL: 'information', GTD: 'gate', McCl: 'information', HotS: 'sight', Muir: 'resort', CSD: 'camp', VVR: 'resort', Reds: 'resort', CSO: 'camp', WAF: 'water', WAK: 'water', WAV: 'water', MMSk: 'unknown', NoCa: 'warning', Tuol: 'postoffice, store, food', JMTC: 'camp', Happ: 'road', HWYB: 'highway', JMTW: 'water', Walk: 'trailhead', Cars: 'boundary', Meis: 'water', Echo: 'trailhead', Ski: 'sight', Weat: 'sight', Rest: 'sight', Pete: 'camp', Chur: 'sight', Road: 'road', Paul: 'water', EBra: 'water', WBra: 'water', RDN: 'road', Bear: 'water', Hask: 'store, resort', Lake: 'resort', Beld: 'resort', Will: 'water', Myrt: 'water', Cold: 'water', PCTM: 'sight', HWY: 'highway', Drak: 'resort', OldS: 'town', JJsC: 'food, store', Subw: 'water', HatC: 'view', Crys: 'water', Brit: 'water', Fitz: 'water', Fern: 'water', Dead: 'water', Litt: 'water', Wolf: 'water', Etna: 'road', Shel: 'water', Marb: 'water, camp', Seia: 'resort', Alex: 'water', Ward: 'road', Oreg: 'boundary', Rogu: 'boundary', Call: 'resort', OldH: 'highway', Camp: 'resort', Klum: 'camp, water', Howa: 'water, road', Brow: 'water, camp', RimD: 'highway', RimV: 'information', RimT: 'trailhead', Casc: 'water', Summ: 'trailhead', Maza: 'resort', ORWA: 'sign', CSDi: 'camp', SkiS: 'sight, camp', Isla: 'water', Koos: 'camp', Obsi: 'boundary, warning', Sant: 'trailhead', Jeff: 'boundary', SFor: 'water', Park: 'camp', Many: 'view', Olal: 'resort', Pinh: 'trailhead', OakG: 'water', Kohn: 'boundary', Timb: 'resort', Radi: 'sight', Ramo: 'water', Mudd: 'water, camp', Indi: 'water', Mile: 'sight', High: 'sight', Tunn: 'sight', SWMo: 'road', Tabl: 'information', Blue: 'water, camp', Yaka: 'warning', Krac: 'resort', TwoL: 'water', BigC: 'camp', Mart: 'camp', Uric: 'camp, water', Olla: 'sight', MFor: 'camp, water', Dutc: 'view', Lema: 'camp', Deep: 'water', Dece: 'water', HwyJ: 'highway', Rain: 'water', Monu: 'sight', RESO: 'resort'};
   let _count: number = 0;
 
   for (let i = 0; i < _poisLength; i++) {
 
     const _poi: object = pois[i];
-
 
     // delete if poi is mile marker
     if (_poi['icon'] === 'Triangle, Red') {
@@ -110,7 +84,7 @@ function parsePois(pois: Array<object>): Array<Poi> {
     } else {
 
       _poi['id'] = _count;
-      _count ++;
+      _count++;
 
       // create waypoint
       _poi['waypoint'] = {latitude: _poi['latitude'], longitude: _poi['longitude'], elevation: _poi['elevation']} as Waypoint;
@@ -120,10 +94,41 @@ function parsePois(pois: Array<object>): Array<Poi> {
 
       // remove color from icon
       delete _poi['icon'];
-      // _poi['icon'] = _poi['icon'].split(', ')[0].replace(/\s/g, '');
 
       // set the type based on the remaining string
-      const _identifier = _poi['name'].replace(/\d+/g, '').substr(0, 4);
+      let _identifier = _poi['name'].replace(/\d+/g, '');
+
+      // '-' means side trail, which we're ignoring for now.
+      if (!_poi['name'].includes('-')) {
+
+        const _last2Letters = _identifier.substr(_identifier.length - 2, _identifier.length - 1).toLowerCase();
+        const _last3Letters = _identifier.substr(_identifier.length - 3, _identifier.length - 1).toLowerCase();
+        const _last4Letters = _identifier.substr(_identifier.length - 4, _identifier.length - 1).toLowerCase();
+        if (_last2Letters === 'tr') {
+          _identifier = 'TR';
+        } else if (_last2Letters === 'th') {
+          _identifier = 'TH';
+        } else if (_last2Letters === 'cg' || _last3Letters === 'cmp') {
+          _identifier = 'WRCS';
+        } else if (_last2Letters === 'np' || _last2Letters === 'nf' || _last2Letters === 'sp' || _last4Letters === 'wild') {
+          _identifier = 'BY';
+        } else if (_last2Letters === 'rd' || _last4Letters === 'road') {
+          _identifier = 'RD';
+        } else if (_last4Letters === 'inn' || _last4Letters === 'odge' || _last4Letters === 'sort') {
+          _identifier = 'RESO';
+        } else if (_last4Letters === 'pass') {
+          _identifier = 'Pass';
+        } else if (_last4Letters === 'ring' || _last4Letters === 'reek' || _last4Letters === 'iver'
+          || _last4Letters === 'trib' || _last4Letters === 'lake' || _last4Letters === 'pond' || _last4Letters === 'seep'
+          || _last3Letters === 'crk' || _last3Letters === 'spg' || _last4Letters === 'fork') {
+          _identifier = 'WA';
+        } else if (_last4Letters === 'camp') {
+          _identifier = 'CS';
+        } else {
+          _identifier = _poi['name'].replace(/\d+/g, '').substr(0, 4);
+        }
+        // generateIdentifierList(_identifier);
+      }
 
       _poi['type'] = _identifierTypes[_identifier];
       if (!_poi['type']) {
@@ -142,6 +147,11 @@ function parsePois(pois: Array<object>): Array<Poi> {
   return _parsedPois;
 }
 
+function generateIdentifierList(input): void {
+  if (_identifierList.indexOf(input) === -1) {
+    _identifierList.push(input);
+  }
+}
 
 function parseStringUrls(s: string) {
 

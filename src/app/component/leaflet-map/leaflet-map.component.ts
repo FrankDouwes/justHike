@@ -7,7 +7,7 @@ import '../../_util/grid.js';
 import { Poi, PoiType } from '../../type/poi';
 import { fallbackLayer } from '../../_util/tiles';
 import { getPoiTypeByType } from '../../_util/poi';
-import {createUserMarker, setupMarker} from '../../_util/markers';
+import {createUserMarker, setupMarker} from '../../_util/marker';
 import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 import { User } from '../../type/user';
 import { Waypoint } from '../../type/waypoint';
@@ -36,7 +36,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   // data
   @Input() name: String;
   @Input() activeMileId: number;      // id of the currently active mile (selected mile in the overview or the mile nearest to the user location)
-  @Input() centerUser?: boolean;
+  @Input() userCentered?: boolean;
   @Input() centerPoint?: Waypoint;
   @Input() range: object;             // the range of miles to show
 
@@ -51,7 +51,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   // elements
   @Input() showPois: boolean;
-  @Input() trigger?: number;          // triggers user centering without the need for a service
 
   private _orientationSubscription: Subscription;
   private _orientation: number;
@@ -105,10 +104,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       // if (changes.poiRange) {
       //   this._setBounds();
       // }
-
-      if (changes.trigger) {
-        this.centerOnUser();
-      }
     }
   }
 
@@ -119,7 +114,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this.onUserLocationChange(this.user);
 
     this._initialized = true;
-    if (!this.centerUser) {
+    if (!this.userCentered) {
       this._centerOnPoint(this.centerPoint);
     }
   }
@@ -184,13 +179,18 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       const _trailUtm: Array<number> = getTrailMetaDataByAbbr(this._trailGenerator.getTrailData().abbr).utm;
 
       if (_trailUtm && this._showMileGrid) {
+
+        //const _centerUtm = _trailUtm[Math.floor((_trailUtm.length - 1) / 2)];
+
         _trailUtm.forEach(function (zone) {
           const _utmGrid = L.utmGrid(zone, false, {
             color: '#AAA',
             showAxis100km: false,
             weight: 1,
             minInterval: environment.MILE,
-            maxInterval: environment.MILE
+            maxInterval: environment.MILE,
+            opacity: 1,
+            // clip: true
           });
 
           _tileLayers = _tileLayers.concat(_utmGrid);
@@ -201,7 +201,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 14,
+      minZoom: 13.5,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: _tileLayers,
@@ -540,7 +540,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _centerOnPoint(point: Waypoint): void {
     if (this._map) {
-      this._map.panTo([point.latitude, point.longitude], {animate: false, duration: 0.5, maxZoom: 16, minZoom: 15 });
+      this._map.panTo([point.latitude, point.longitude], {animate: this._animateMap, duration: 0.5, maxZoom: 16});
     }
   }
 
@@ -583,7 +583,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       this._drawUser();
     }
 
-    if (this.centerUser) {
+    if (this.userCentered) {
       this.centerOnUser();
     }
   }

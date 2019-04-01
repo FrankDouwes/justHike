@@ -1,13 +1,24 @@
-import {Component, Input, OnInit, ViewChild, OnChanges, SimpleChanges, Output, EventEmitter, ChangeDetectionStrategy} from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  ViewChild,
+  OnChanges,
+  SimpleChanges,
+  Output,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef
+} from '@angular/core';
 import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 
-import {BehaviorSubject} from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 import { Mile } from '../../type/mile';
 import { Poi } from '../../type/poi';
 import { User } from '../../type/user';
-import {LocalStorageService} from 'ngx-webstorage';
+import { LocalStorageService } from 'ngx-webstorage';
 
 @Component({
   selector: 'poi-list',
@@ -29,20 +40,21 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   @Input() showUser: boolean;
   @Input() activeMileId: number;
   @Input() directionReversal?: boolean;     // reverse list
-  @Input() trigger: number;     // center user without the need for a service
 
-  // user and pois combined in a single array
-  public combinedData: BehaviorSubject<Array<any>> = new BehaviorSubject([]);
-  private _dataLength: number;    // the length of the combined data (pois + user), speed optimisation
-  public timestamp: number;       // used to trigger reload
+  public combinedData: BehaviorSubject<Array<any>> = new BehaviorSubject([]);         // user and pois combined in a single (sorted) array
+  private _dataLength: number;              // the length of the combined data (pois + user), speed optimisation
+  public timestamp: number;                 // used to trigger reload
   public userPosition: string;
   public itemSize: number;
   public cacheSize: number = 10;
+  public invisiblePoi: number;
 
   private _staticPoisArray:           Array<any>  = [];
   private _userIndex:                 number;
 
-  constructor(private _localStorage: LocalStorageService) {
+  constructor(
+    private _localStorage: LocalStorageService,
+    private _changeDetector: ChangeDetectorRef) {
 
     super();
   }
@@ -61,9 +73,38 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
         this._dataLength = data.length;
 
         if (this.showUser) {
-          this.scrollToUser();
+          this.centerOnUser();
         }
       });
+
+    // this.container.renderedRangeStream.subscribe(range => {
+    //
+    //   this.invisiblePoi = 0;
+    //
+    //   for (let i = range.start; i <= range.end; i++) {
+    //
+    //     const poiUser = this.combinedData.getValue()[i];
+    //     if (poiUser && poiUser['type'] === 'offtrail') {
+    //       this.invisiblePoi ++;
+    //     }
+    //   }
+    //
+    //   let _newItemSize;
+    //
+    //   if (this.invisiblePoi > 0) {
+    //     _newItemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / (7 + this.invisiblePoi));
+    //     console.log(_newItemSize);
+    //   } else {
+    //     _newItemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / 7);
+    //   }
+    //
+    //   if (_newItemSize !== this.itemSize) {
+    //     // this.itemSize = _newItemSize;
+    //     // console.log(this.itemSize);
+    //     // this._changeDetector.detectChanges();
+    //   }
+    //
+    // });
 
     // TODO does not work on ios
     // window.addEventListener('scroll', this.onScroll.bind(this));
@@ -76,7 +117,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     }
 
     if (changes.trigger) {
-      this.scrollToUser();
+      this.centerOnUser();
     }
   }
 
@@ -109,9 +150,10 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       // filter out of range pois
       const _poi = _self.trailGenerator.getPoiById(_poiId);
 
-      if (_poi.waypoint.distance < _maxPoiDistance) {
-        _self._staticPoisArray.push(_poi);
+      if (_poi.waypoint.distance > _maxPoiDistance) {
+        _poi.type = 'offtrail';
       }
+      _self._staticPoisArray.push(_poi);
     }
 
     if (this.showUser) {
@@ -203,7 +245,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     this.container['elementRef'].nativeElement.dispatchEvent(_event);
   }
 
-  public scrollToUser(): void {
+  public centerOnUser(): void {
+
+    super.centerOnUser();
 
     if (!this.showUser) {
       return;
@@ -267,8 +311,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       // scrolling to 0 somehow scrolls to the end of the list (cdk bug)
       const _total = (_middlePoi === 0) ? 1 : _middlePoi * _self.itemSize;
 
-      _self.container.scrollToOffset(_total, 'auto');
-      // _self.onScroll(_middlePoi)
+      _self.container.scrollToIndex(_middlePoi, 'auto');
+      // _self.container.scrollToOffset(_total, 'auto');
+      // _self.onScroll(_middlePoi)     // TODO: test (offset)
     }, 1);
   }
 
@@ -294,12 +339,12 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       const _poi: Poi | User = this.combinedData.getValue()[i];
 
-        // filter out the user
-        if (_poi && _poi.type !== 'user') {
-          _renderedIndexes.push(i);
-          _renderedPois.push(_poi.id);
-          _renderedMiles.push(_poi['belongsTo']);
-        }
+      // filter out the user
+      if (_poi && _poi.type !== 'user') {
+        _renderedIndexes.push(i);
+        _renderedPois.push(_poi.id);
+        _renderedMiles.push(_poi['belongsTo']);
+      }
     }
 
     // const _firstPoiId: number = (this.directionReversal) ? _renderedIndexes[_renderedIndexes.length - 1] : _renderedIndexes[0];
@@ -310,7 +355,6 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     }
 
     const _mile = this.trailGenerator.getTrailData().miles[_firstPoi['belongsTo'] - 1];
-
     this.scrollToEvent.emit({mileId: _mile.id, renderedPoiRange: _renderedPois, renderedMileRange: _renderedMiles});
   }
 
@@ -339,10 +383,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     // sort array by the trail distance of the anchor point (the nearest on trail location)
     data.sort(
       function(a, b) {
-
         const _aDist = (a.anchorPoint && a.anchorPoint.distanceTotal) ? a.anchorPoint.distanceTotal : 0;
         const _bDist = (b.anchorPoint && b.anchorPoint.distanceTotal) ? b.anchorPoint.distanceTotal : 0;
-
         return _aDist - _bDist;
       });
 

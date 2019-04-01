@@ -4,13 +4,14 @@
 <cdk-virtual-scroll-viewport
   class="mat-list mat-list-base"
   id="poi-list"
-
   orientation="vertical"
   [itemSize]="itemSize"
 
   (scrolledIndexChange)="onScroll($event)"
 
+  autosize
   #poiList>
+
 
   <poi-dynamic-item *cdkVirtualFor="let poi of this.combinedData; templateCacheSize: cacheSize; trackBy: trackElementBy"
 
@@ -26,4 +27,4 @@
 
 </cdk-virtual-scroll-viewport>
 
-<user-indicator *ngIf="showUser" [userPosition]="userPosition" [status]="status" (click)="scrollToUser()"></user-indicator>
+<user-indicator *ngIf="showUser" [userPosition]="userPosition" [status]="status" (click)="centerOnUser()"></user-indicator>

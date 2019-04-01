@@ -211,6 +211,7 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
           alert('canceling downloads');
         }
         this._setActiveTrail();
+        this._changeDetector.markForCheck();
       }
     }
   }

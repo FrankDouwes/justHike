@@ -24,7 +24,7 @@ export function setupMarker(canvasElement: any, poi: Poi, poiTypes?: Array<strin
   let _extraOffset: number = 0;
   let _iconSize: number = 16;
 
-  let poiMeta = getPoiTypeByType(poiTypes[0]);
+  const poiMeta = getPoiTypeByType(poiTypes[0]);
 
   if (!poiMeta || _poiTypesLength > 1) {
     _markerColor = getPoiTypeByType('multiple').color;
@@ -44,6 +44,19 @@ export function setupMarker(canvasElement: any, poi: Poi, poiTypes?: Array<strin
 
   }
 
+  // if multipoi
+  if (poiTypes.length > 1) {
+
+    // check if there's water or resort (which has water)
+
+    const _waterIndex = poiTypes.indexOf('water');
+
+    // swap elements so water is first
+    if (_waterIndex > 0) {
+      poiTypes[0] = poiTypes.splice(_waterIndex, 1, poiTypes[0])[0];
+    }
+  }
+
   for (let t = 0; t < 2; t++) {
 
     let _type = poiTypes[t];
@@ -51,7 +64,7 @@ export function setupMarker(canvasElement: any, poi: Poi, poiTypes?: Array<strin
     if (_type) {
 
       // max of 2 icons in marker, if more types show plus symbol
-      if (t === 1) {
+      if (t === 1 && poiTypes.length > 2) {
         _type = 'multiple';
       }
 
@@ -64,7 +77,6 @@ export function setupMarker(canvasElement: any, poi: Poi, poiTypes?: Array<strin
 }
 
 const markerData: string = 'm16.75,0.75c-8.28366,0 -15,6.71484 -15,15c0,2.32031 0.52734,4.52053 1.46925,6.48047c0.05269,0.11137 13.53075,26.51953 13.53075,26.51953l13.36819,-26.19141c1.04297,-2.04197 1.63181,-4.35647 1.63181,-6.80859c0,-8.28516 -6.71484,-15 -15,-15z';
-// const markerData: string = 'm256,0c-88.359,0 -160,71.625 -160,160c0,24.75 5.625,48.219 15.672,69.125c0.562,1.188 144.328,282.875 144.328,282.875l142.594,-279.375c11.125,-21.781 17.406,-46.469 17.406,-72.625c0,-88.375 -71.625,-160 -160,-160z';
 
 export function createSvgFaElement (canvas: any, id: string, scale: number = 1, offsetX: number = -16.5, offsetY: number = -48) {
 
@@ -110,24 +122,6 @@ export function sampleFaIcon(iconId:string) {
   return 'sample-' + iconId;
 }
 
-
-
-
-// LEAFLET MARKERS
-
-// create leaflet poi marker (using font-awesome 5 webfont)
-// export function createFaLeafletMarker(icon: string, iconPrefix: string, color:string) {
-//
-//   const _marker = L.VectorMarkers.icon({
-//     icon: icon,
-//     markerColor: color,
-//     prefix: iconPrefix,
-//     markerBorderColor: shadeColor(color, -10)
-//   });
-//
-//   return _marker;
-// }
-
 export function createUserMarker(icon: string, iconPrefix: string, color:string) {
 
   let ele = document.createElement("div");
@@ -135,65 +129,6 @@ export function createUserMarker(icon: string, iconPrefix: string, color:string)
   createSvgCircleMarker(draw, '#00FF00', 1);
   return L.divIcon({className: 'user', html: ele.innerHTML});
 }
-
-// export function createLeafletPinMarker(icon: string, iconPrefix: string, color:string): any {
-//
-//   let ele = document.createElement("div");
-//   let draw = SVG(ele).size(50, 50).style('overflow', 'visible');
-//
-//   const _marker = createSvgPinMarker(draw, color, 1);
-//   _marker.use(sampleFaIcon(icon)).width(16).height(16).move(-8, -39);
-//
-//   return L.divIcon({className: 'pin-marker', html: ele.innerHTML});
-// }
-//
-// export function createLeafletCircleMarker(icon: string, iconPrefix: string, color:string): any {
-//
-//   let ele = document.createElement("div");
-//   let draw = SVG(ele).size(50, 50).style('overflow', 'visible');
-//
-//   const _marker = createSvgCircleMarker(draw, color, 1);
-//   _marker.use(sampleFaIcon(icon)).width(16).height(16).move(-8, -39);
-//
-//   return L.divIcon({className: 'circle-marker', html: ele.innerHTML});
-// }
-
-// L.CustomMarker = function (options) {
-//   return new customMarker(options);
-// };
-//
-// const customMarker = L.Icon.extend({
-//
-//   options: {
-//     shadowUrl: 'leaf-shadow.png'
-//   },
-//
-//   initialize: function(options) {
-//     return options = L.Util.setOptions(this, options);
-//   },
-//
-//   createIcon: function(oldIcon) {
-//     let ele = document.createElement("div");
-//     let draw = SVG(ele).size(300, 300);
-//     var rect = draw.rect(100, 100).attr({ fill: '#f06' });
-//   },
-//
-//   _createInner: function() {
-//     return;
-//   },
-//   _setIconStyles: function(img, name) {
-//   },
-//   createShadow: function() {
-//     var div;
-//     div = document.createElement("div");
-//     this._setIconStyles(div, "shadow");
-//     return div;
-//   }
-// });
-
-
-
-
 
 // modified version of https://github.com/hiasinho/Leaflet.vector-markers
 (function() {

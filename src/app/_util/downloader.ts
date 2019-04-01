@@ -116,6 +116,8 @@ export class Downloader {
     const downloadObservable = this._httpClient.request(req);
     this._downloadRequest = downloadObservable.subscribe(event => {
 
+      console.log(event);
+
       if (event.type === HttpEventType.DownloadProgress) {
 
         let _downloadPercentage = (event.loaded / event.total) * 100;

@@ -30,11 +30,7 @@ describe('DownloaderComponent', () => {
     component = fixture.componentInstance;
 
     // defaults
-    component.trailAbbr = 'PCT';
-    component.name = 'test';
     component.label = 'test';
-    component.downloadPath = 'google.com';
-
     fixture.detectChanges();
   });
 

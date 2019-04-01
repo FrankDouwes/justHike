@@ -19,7 +19,6 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   public trailData:               Trail;
   public centerPoint:             Waypoint;
   public isNobo:                  boolean;
-  public centerUserTrigger:       number;
   public isTracking:              boolean;
 
   public visiblePoiRange:         any;          // the visible poi range (in the poi list)
@@ -108,9 +107,5 @@ export class MileDetailComponent implements OnInit, OnDestroy {
     mileId = (mileId === 0) ? 0 : mileId - 1;
 
     this.centerPoint = this.trailData.miles[mileId].centerpoint as Waypoint;
-  }
-
-  public centerOnUser():void {
-    this.centerUserTrigger = new Date().getTime();
   }
 }

@@ -1,10 +1,10 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import { Location } from '@angular/common';
 import {ActivatedRoute, NavigationEnd, Router} from '@angular/router';
 import {DownloadService} from '../../service/download.service';
 import {Subscription} from 'rxjs';
 import {VersionResolverService} from '../../service/version-resolver.service';
 import {LocalStorageService} from 'ngx-webstorage';
+import {LocationService} from '../../service/location.service';
 
 @Component({
   selector: 'navigation-component',
@@ -21,6 +21,8 @@ export class NavigationComponent implements OnInit, OnChanges {
   public isDownloading:               boolean = false;
   public updateAvailable:             boolean = false;
   public isAdmin:                     boolean;
+  public dynamicSide:                 string;
+  private locationStatus:             string;
 
   private _backIndex:                 object;
 
@@ -28,9 +30,8 @@ export class NavigationComponent implements OnInit, OnChanges {
   private _updateSubscription:        Subscription;
 
   constructor(
-
-    private _location:                Location,
     private _versionResolverService:  VersionResolverService,
+    private _locationService:         LocationService,
     private _localStorage:            LocalStorageService,
     private _route:                   ActivatedRoute,
     private _router:                  Router,
@@ -45,11 +46,13 @@ export class NavigationComponent implements OnInit, OnChanges {
         if (event['url'].includes('detail')) {
           this.visibleClass = 'show';
           this.oppositeClass = 'hide';
+          this.dynamicSide = 'left';
         } else if (event['url'].includes('admin')) {
           this.visibleClass = this.oppositeClass = 'show';
         } else {
           this.visibleClass = 'hide';
           this.oppositeClass = 'show';
+          this.dynamicSide = 'right';
         }
       }
     });
@@ -75,6 +78,10 @@ export class NavigationComponent implements OnInit, OnChanges {
     this._localStorage.observe('isAdmin').subscribe( value => {
       this.isAdmin = value;
     });
+
+    this._locationService.locationStatus.subscribe(status => {
+      this.locationStatus = status;
+    })
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -104,6 +111,10 @@ export class NavigationComponent implements OnInit, OnChanges {
   public onAdminClick(): void {
     this._router.navigate(['admin'], {queryParams: {id: this._backIndex}});
     this.navEvent.emit('admin');
+  }
+
+  public onCenterUserClick(): void {
+    this._locationService.onCenterUser();
   }
 
   public notifyUser(message: string): void {

@@ -64,15 +64,69 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.trailMeta = getTrailMetaDataById(this.trailId);
+    this._createDownloader();
+    this._setup();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+
+    if (changes.trailId) {
+      this.trailMeta = getTrailMetaDataById(this.trailId);
+      this._createDownloader();
+      this._setup();
+    }
+  }
+
+
+  ngOnDestroy(): void {
+    this._downloadSubscription.unsubscribe();
+  }
+
+
+
+
+  // SETUP
+  private _createDownloader(): void {
+
+    if (this._downloader) {
+      this._downloader.cancelDownload();
+    }
+
+    // name based downloader, managed by downloader service
+    this._downloader = this._downloadService.createDownloader(this.trailMeta.abbr +  '_' + this.type);
+  }
+
+  private _setup(): void {
 
     const _self = this;
 
-    this._setup();
+    if (this.parts > 1) {
+
+      // multipart download
+      this._url = [];
+
+      for (let i = 0; i < this.parts; i++) {
+        this._url.push(this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '_' + i + '.' + this.extension);
+      }
+
+    } else {
+
+      // single file
+      this._url = this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '.' + this.extension;
+    }
+
+
+
 
     // check if storage is accessible
     this.storageAvailable = this._fileSystemService.isStorageAvailable;
 
     // observe download status
+    if (this._downloadSubscription) {
+      this._downloadSubscription.unsubscribe();
+    }
+
     this._downloadSubscription = this._downloader.meta.subscribe(
       function (status: DownloaderStatus) {
 
@@ -126,7 +180,7 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
         }
 
 
-        }, function (error) {
+      }, function (error) {
 
         alert('Download error');
         _self.isActive = _self._downloader.isActiveSubject.getValue();
@@ -134,65 +188,17 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
         _self.hasFile = false;
         _self.progress = 0;
       });
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-
-    if (changes.trailId) {
-      this._setup();
-      this._createDownloader();
-    }
-  }
-
-
-  ngOnDestroy(): void {
-    this._downloadSubscription.unsubscribe();
-  }
-
-
-
-
-  // SETUP
-  private _createDownloader(): void {
-
-    if (this._downloader) {
-      this._downloader.cancelDownload();
-    }
-
-    // name based downloader, managed by downloader service
-    this._downloader = this._downloadService.createDownloader(this.trailMeta.abbr +  '_' + this.type);
-  }
-
-  private _setup(): void {
-
-    this.trailMeta = getTrailMetaDataById(this.trailId);
-
-    console.log(this.parts);
-
-    if (this.parts > 1) {
-
-      // multipart download
-      this._url = [];
-
-      for (let i = 0; i < this.parts; i++) {
-        this._url.push(this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '_' + i + '.' + this.extension);
-      }
-
-    } else {
-
-      // single file
-      this._url = this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '.' + this.extension;
-    }
 
     // since object changes won't trigger a redraw
     this._changeDetector.detectChanges();
   }
 
-
-
   // EVENT HANDLERS
 
   public onButtonClick(newState: string) {
+
+    console.log(newState);
+    console.log(this._buttonState);
 
     // prevent repetitive actions
     if (this._buttonState !== newState) {
@@ -218,6 +224,8 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
         _url.push(environment.appDomain + environment.fileBaseUrl + file);
       });
     }
+
+    console.log(this._downloader, _url);
 
     this._downloader.downloadFile(_url, !isDevMode(), this._url);
   }

@@ -1,6 +1,5 @@
 <div id="container">
 
-  <display-button class="button back {{this.visibleClass}}" label="" icon="arrow-left" (click)="onBackClick()"></display-button>
 
   <div class="right {{this.oppositeClass}}">
     <locator-button></locator-button>
@@ -12,6 +11,14 @@
 
   <div class="right {{this.oppositeClass}}" *ngIf="isAdmin">
     <display-button class="button" label="" icon="skull" (click)="onAdminClick()"></display-button>
+  </div>
+
+  <div class="left {{this.visibleClass}}">
+    <display-button class="button back" label="" icon="arrow-left" (click)="onBackClick()"></display-button>
+  </div>
+
+  <div id="center-user-btn" [class]="dynamicSide" *ngIf="locationStatus === 'tracking'">
+    <display-button class="button" label="" icon="street-view" (click)="onCenterUserClick()"></display-button>
   </div>
 
 </div>

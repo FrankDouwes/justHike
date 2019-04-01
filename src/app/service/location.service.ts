@@ -18,13 +18,15 @@ export class LocationService {
   // behaviour subjects
   private _locationStatus:  BehaviorSubject<string>     = new BehaviorSubject<string>('idle');
   private _location:        BehaviorSubject<object>     = new BehaviorSubject<object>(undefined);
+  private _centerUser:      BehaviorSubject<number>     = new BehaviorSubject<number>(0);
 
   // Observable streams
   public locationStatus:    Observable<string>  = this._locationStatus.asObservable();
   public location:          Observable<object>  = this._location.asObservable();
+  public centerUser:        Observable<number>  = this._centerUser.asObservable();
 
   // watcher
-  private _locationWatcher:         any;        // web uses number, capacitor uses string?
+  private _locationWatcher:         any;        // web uses number?
   private _previousLocation:        object;
   private _toggleStatus             = false;
   private _locationStatusLocal      = '';
@@ -96,6 +98,8 @@ export class LocationService {
 
     if (navigator.geolocation) {
       navigator.geolocation.clearWatch(this._locationWatcher)
+
+      this._centerUser.next(0);
 
       if (!simulate) {
         this._location.next(undefined);
@@ -182,6 +186,12 @@ export class LocationService {
     if (label !== this._locationStatusLocal) {
       this._locationStatusLocal = label;
       this._locationStatus.next(this._locationStatusLocal);
+    }
+  }
+
+  public onCenterUser(): void {
+    if (this._locationStatus.value === 'tracking') {
+      this._centerUser.next(new Date().getTime());
     }
   }
 }

@@ -25,6 +25,7 @@ use multiple components as list items in a CDK virtual scroll
 if type === user, use user-item, else use poi-item */
 export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
+  @HostBinding('class.offtrail') isHidden = false;
   @ViewChild('container', { read: ViewContainerRef }) container: ViewContainerRef;
 
   @Input() data: object;
@@ -40,7 +41,6 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
-
     this._setup();
   }
 
@@ -55,6 +55,9 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
     if (changes.data) {
 
       if (changes.data.currentValue.type !== this._instance.data.type) {
+
+        this.isHidden = (this.data['type'] === 'offtrail');
+        this._changeDetector.markForCheck();
 
         // item type mismatch, render new instance of correct item
         if (this._instance instanceof PoiListItemComponent && this.data['type'] === 'user'
@@ -88,7 +91,10 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private _setup(): void {
+
     const componentType: any = (this.data['type'] === 'user') ? PoiUserItemComponent : PoiListItemComponent;
+
+    this.isHidden = (this.data['type'] === 'offtrail');
 
     const factory = this._componentFactoryResolver.resolveComponentFactory(componentType);
 

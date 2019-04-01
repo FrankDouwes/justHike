@@ -10,9 +10,12 @@
   #container
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)
 
-    .button, .right
+    .button, .right, .left
       pointer-events: all
       color: #555
+
+    .left
+      float: left
 
     .right
       float: right
@@ -31,3 +34,6 @@
 
     .back
       padding-left: 10px
+
+    #center-user-btn
+      transition: all 300ms ease
