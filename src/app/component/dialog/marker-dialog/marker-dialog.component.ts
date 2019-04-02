@@ -72,6 +72,9 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
     this.poiCollection.push({label: poiType, data: _poiIds});
   }
 
+  public relatedLabel(type: string): string {
+    return getPoiTypeByType(type).label;
+  }
 
 
   // EVENT HANDLERS

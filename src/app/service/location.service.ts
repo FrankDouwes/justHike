@@ -120,11 +120,16 @@ export class LocationService {
 
       const _mileInMeters: number = location * environment.MILE;
 
-      // find nearest 2 waypoints, find out which is closest
-      for (var i = 0; i < _waypoints.length; i ++) {
-        if (_waypoints[i].distanceTotal <= _mileInMeters && _waypoints[i + 1].distanceTotal >= _mileInMeters) {
-          _nearestPoint = (Math.abs(_waypoints[i].distanceTotal - _mileInMeters) < Math.abs(_waypoints[i + 1].distanceTotal - _mileInMeters)) ? _waypoints[i] : _waypoints[i + 1];
-          break;
+      if (_mileInMeters >= _waypoints[_waypoints.length - 1].distanceTotal) {
+        // this only applies to the last (incomplete) mile, if your total simulated distance is greater than the trail length, use last waypoint
+        _nearestPoint = _waypoints[_waypoints.length - 1];
+      } else {
+        // find nearest 2 waypoints, find out which is closest
+        for (var i = 0; i < _waypoints.length - 1; i++) {
+          if (_waypoints[i].distanceTotal <= _mileInMeters && _waypoints[i + 1].distanceTotal >= _mileInMeters) {
+            _nearestPoint = (Math.abs(_waypoints[i].distanceTotal - _mileInMeters) < Math.abs(_waypoints[i + 1].distanceTotal - _mileInMeters)) ? _waypoints[i] : _waypoints[i + 1];
+            break;
+          }
         }
       }
 

@@ -23,22 +23,25 @@ export class OfftrailDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.simulatedMile = Math.floor(Number(this.data['anchorPointDistance']));
-    this.trailLength = this.data['trailLength'] - 1;
+    this.trailLength = this.data['trailLength'];
   }
 
   public onOk(): void {
     // const _value: number = (Math.floor(Number(this.simulateInput.nativeElement.value)) > this.trailLength) ? this.trailLength : Math.floor(Number(this.simulateInput.nativeElement.value));
-    const _value: number = (Number(this.simulateInput.nativeElement.value) <= this.trailLength) ? Number(this.simulateInput.nativeElement.value) : this.trailLength;
-    this.simulateInput.nativeElement.value = _value;
+
+    let _value: number = this.simulateInput.nativeElement.value.replace(',', '.');      // in case of comma
+    _value = (Number(_value) < this.trailLength) ? Number(_value) : this.trailLength - 1;
+
+    console.log(_value, this.trailLength);
+
     const _self = this;
     setTimeout(function() {
-      _self._dialogRef.close({simulatedMile: _self.simulateInput.nativeElement.value});
-    }, 200);
+      _self._dialogRef.close({simulatedMile: _value});
+    }, 100);
   }
 
   public onKey(event): void {
 
-    console.log('key', event.key);
     // if enter pressed
     if (event.key === 'Enter') {
       this.onOk();

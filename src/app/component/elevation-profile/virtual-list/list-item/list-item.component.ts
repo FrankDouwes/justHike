@@ -29,6 +29,8 @@ import { TrailGeneratorService } from '../../../../service/trail-generator.servi
 import { SnowGeneratorService } from '../../../../service/snow-generator.service';
 import { Snowpoint } from '../../../../type/snow';
 import {Waypoint} from '../../../../type/waypoint';
+import {Trail} from '../../../../type/trail';
+import {getTrailMetaDataByAbbr} from '../../../../_util/trail';
 
 @Component({
   selector: 'display-list-item',
@@ -66,6 +68,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   private _initialized:         boolean;          // can only draw after initialization
 
   private _screenMode:          string;
+  private _trailLength:         number;
 
   // SVG MAP
   private _lineCanvas;                            // line (trail/snow) canvas
@@ -92,6 +95,8 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this._majorPoiTypes = getMajorPoiTypes();
 
     this._screenMode = this._localStorage.retrieve('screenMode');
+    this._trailLength = this._trailGenerator.getTrailData().miles.length;
+
 
     // dynamic subscriptions based on PoiTypes that are set as being major (important)
     this._majorPoiTypes.forEach(function(type: string) {
@@ -114,7 +119,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     const _subscription = this._localStorage.observe(_camelName).subscribe(result => {
       this.settings[_camelName] = result;
       if (this._majorPoiTypes.indexOf(name) !== -1) {
-        console.log(name, ' changed');
         this._hasInvisiblePoi();
       }
       this._drawMap();
@@ -276,9 +280,14 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     } else {
       console.log('no marker canvas');
     }
+
+    this._lineCanvas.size(this._svgWidth, this._svgHeight);
+    this._lineCanvas.viewbox(0, 0, this._svgWidth, this._svgHeight);
   }
 
   private _drawLine(): void {
+
+    console.log('draw line for mile', this.data.id);
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -314,6 +323,19 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         drawPoints.push([this._svgWidth + environment.LINEHEIGHT, _elevation]);
         drawPoints.push([this._svgWidth + environment.LINEHEIGHT, this._svgHeight]);
       }
+    }
+
+    if (this.data.id === this._trailLength) {
+
+      const _waypoint: Waypoint = _waypointsArr[_waypointsArr.length - 1];
+      const _lastWaypointDistPerc = _waypoint.distance / environment.MILE;
+
+      this._lineCanvas.size(this._svgWidth * _lastWaypointDistPerc, this._svgHeight);
+      this._lineCanvas.viewbox(0, 0, this._svgWidth * _lastWaypointDistPerc, this._svgHeight)
+
+      // var mask = draw.mask().add()
+
+      // rect.maskWith(mask)
 
     }
 

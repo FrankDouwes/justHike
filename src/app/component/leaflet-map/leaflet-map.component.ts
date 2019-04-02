@@ -603,7 +603,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _color = (this.status === 'tracking') ? '#00FF00' : '#AAAAAA';
 
-    const _user = L.marker([user.waypoint.latitude, user.waypoint.longitude], {icon: createUserMarker('hiking', 'fa', _color), user: user});
+    const _user = L.marker([user.waypoint.latitude, user.waypoint.longitude], {icon: createUserMarker(), user: user, forceZIndex: 1000});
     return _user;
   }
 

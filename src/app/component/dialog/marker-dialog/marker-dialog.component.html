@@ -17,7 +17,7 @@
 <div id="right-panel" [ngStyle]="{'background-color': this.poiTypes[0].color} ">
   <div id="scroll-container">
     <div class="related-poi-list" *ngFor="let poiGroup of poiCollection">
-      <h3>next {{poiGroup.label}}</h3>
+      <h3>Next {{relatedLabel(poiGroup.label)}}</h3>
       <poi-list
         class="poi-list"
         [showUser]="false"

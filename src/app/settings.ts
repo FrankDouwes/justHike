@@ -11,8 +11,13 @@ export class Settings {
       iconType: 'fa',
       icon: 'hiking'
     }, {
+      type: 'user-dot',
+      label: '',
+      iconType: 'far',
+      icon: 'dot-circle'
+    }, {
       type: 'water',
-      label: 'water',
+      label: 'water source',
       isMajor: true,
       color: '#58aed9',
       iconType: 'fa',
@@ -20,7 +25,7 @@ export class Settings {
       rateable: true
     }, {
       type: 'camp',
-      label: 'campspot',
+      label: 'campsite',
       isMajor: true,
       color: '#d9a758',
       iconType: 'fa',
