@@ -173,7 +173,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     if (changes.triggerUserUpdate || changes.user || changes.userStatus) {
 
-      if (!this.userStatus !== 'tracking') {
+      if (this.userStatus !== 'tracking') {
         this._clearUserMarker();
       }
 
