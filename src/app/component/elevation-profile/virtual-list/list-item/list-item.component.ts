@@ -432,16 +432,22 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     const _poisArray = this.data.pois;
 
+    console.log(_poisArray);
+
     // draw markers
     if (_poisArray) {
 
       const _self = this;
       const _maxPoiDistance = this._localStorage.retrieve('poiMaxDistance');
 
+      console.log(_maxPoiDistance);
+
       const _totalPois: number = _poisArray.length;
       for (let i = 0; i < _totalPois; i++) {
 
         const _poi: Poi = this._trailGenerator.getPoiById(_poisArray[i]);
+
+        console.log(_poi);
 
         // filter out of range pois
         if (_poi.waypoint.distance >= _maxPoiDistance) {

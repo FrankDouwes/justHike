@@ -21,6 +21,9 @@
     position: absolute
     z-index: 200
 
+    svg
+      shape-rendering: optimizeSpeed
+
 .meta
   position: absolute
   bottom: 0
@@ -59,7 +62,7 @@
 
     font-size: 12px
     text-align: center
-    //backdrop-filter: blur(6px)    // safari/iOS only, causes glitching...
+    backdrop-filter: blur(6px)    // safari/iOS only, causes glitching...
 
 .icons
   display: block

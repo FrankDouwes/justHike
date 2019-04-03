@@ -47,8 +47,6 @@ export class VersionResolverService implements Resolve<any> {
 
   resolve(): Observable<string> | Observable<never> {
 
-    console.log('resolving versioning');
-
     return this.collectVersionData().pipe(
       take(1),
       switchMap(data => {

@@ -42,13 +42,13 @@ export class DistancePipe implements PipeTransform {
       if (value / environment.MILE >= 0.1 || force === true) {
 
         _convertedValue = Number((value / environment.MILE).toFixed(round));
-        _format = 'mi';
+        _format = 'mi.';
 
       } else {
 
         _convertedValue = Number((value / environment.FOOT).toFixed(0));
         _format = (_convertedValue > 1) ? 'feet' : 'foot';
-        _format = (fromTrailIndicator) ? _format : 'ft.';
+        _format = (!fromTrailIndicator) ? _format : 'ft.';
 
       }
 
@@ -56,7 +56,7 @@ export class DistancePipe implements PipeTransform {
 
       _convertedValue = Number((value / environment.FOOT).toFixed(0));
       _format = (_convertedValue > 1) ? 'feet' : 'foot';
-      _format = (fromTrailIndicator) ? _format : 'ft.';
+      _format = (!fromTrailIndicator) ? _format : 'ft.';
 
     } else {
 
@@ -73,7 +73,7 @@ export class DistancePipe implements PipeTransform {
       }
     } else if (relative) {
 
-      const _relativeString = (value > 0) ? ' ahead' : ' behind';
+      const _relativeString = (value > 0) ? ' ahead' : ' back';
 
       return Math.abs(_convertedValue) + ' ' + _format + ' ' + _relativeString;
 

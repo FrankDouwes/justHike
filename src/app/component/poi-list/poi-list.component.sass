@@ -1,8 +1,9 @@
 \:host
 
   .offtrail
-    opacity: 0.5;
-    background-color: grey;
+    opacity: 0.5
+    background-color: grey
+    pointer-events: none
 
   .hidden
     visibility: hidden
@@ -21,3 +22,9 @@
 
   .cdk-virtual-scroll-content-wrapper
     position: relative !important
+
+    poi-list-item, poi-user-item
+      padding: 0 1vw !important
+
+      .mat-list-text
+        padding-left: 1vw !important

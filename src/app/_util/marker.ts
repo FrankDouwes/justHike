@@ -1,9 +1,10 @@
 import * as L from 'leaflet';
 declare const SVG: any;    // fixes SVGjs bug
-
 import {shadeColor} from './color';
 import {Poi} from '../type/poi';
 import {getPoiTypeByType} from './poi';
+import {toPoint as point} from 'node_modules/leaflet/src/geometry/Point';
+
 
 // UTILS for markers (leaflet & elevation profile markers)
 
@@ -138,7 +139,7 @@ export function createUserMarker() {
   _pulse.classList.add('pulse');
   _element.appendChild(_pulse);
 
-  return L.divIcon({className: 'user', html: _element.innerHTML});
+  return divCloneIcon({className: 'user', html: _element.innerHTML});
 }
 
 
@@ -154,3 +155,26 @@ export function createUserMarker() {
   };
   if (global) global.include(MarkerMixin);
 })(L.Marker);
+
+
+// because the default div icons takes inner html and that breaks the SVG use() href.
+export var DivCloneIcon = L.DivIcon.extend({
+  createIcon: function (oldIcon) {
+    const _div = (oldIcon && oldIcon.tagName === 'DIV') ? oldIcon : this.options.html,
+      options = this.options;
+
+    if (options.bgPos) {
+      const bgPos = point(options.bgPos);
+      _div.style.backgroundPosition = (-bgPos.x) + 'px ' + (-bgPos.y) + 'px';
+    }
+    this._setIconStyles(_div, 'icon');
+
+    return _div;
+  }
+});
+
+// @factory L.divIcon(options: DivIcon options)
+// Creates a `DivIcon` instance with the given options.
+export function divCloneIcon(options) {
+  return new DivCloneIcon(options);
+}

@@ -116,7 +116,7 @@ export class FilesystemService  {
     const _self = this;
     within = (!within) ? this.rootDir : within;
 
-    if (within === 'error') {
+    if (within === 'error' || !within) {
       callback(within);
       return;
     }
@@ -175,6 +175,12 @@ export class FilesystemService  {
   private _createFile(dirEntry, fileName: string, callback: Function, override: boolean = true) {
 
     const _self = this;
+    dirEntry = (!dirEntry) ? this.rootDir : dirEntry;
+
+    if (dirEntry === 'error' || !dirEntry) {
+      callback(dirEntry);
+      return;
+    }
 
     // Creates a new file or returns the file if it already exists.
     dirEntry.getFile(fileName, {create: true, exclusive: !override}, function(fileEntry) {
@@ -240,6 +246,13 @@ export class FilesystemService  {
   private _getFile(dirEntry, fileName: string, callback: Function): void {
 
     const _self = this;
+
+    dirEntry = (!dirEntry) ? this.rootDir : dirEntry;
+
+    if (dirEntry === 'error' || !dirEntry) {
+      callback(dirEntry);
+      return;
+    }
 
     // Creates a new file or returns the file if it already exists.
     dirEntry.getFile(fileName, {create: false}, function(fileEntry) {

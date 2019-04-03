@@ -19,7 +19,7 @@ html, body
 
 body
   position: absolute
-  overscroll-behavior: none
+  overscroll-behavior: contain
   margin: 0px 0px 0px 0.4px     // margin left keeps cdk scroll smooth on mobile (android)
   font-family: Roboto, "Helvetica Neue", sans-serif
   overflow: hidden
@@ -62,7 +62,7 @@ input
 
 // icon button (font awesome for angular)
 fa-icon
-  text-rendering: optimizeLegibility
+  text-rendering: optimizeLegibility;
 
   .icon
     color: #555

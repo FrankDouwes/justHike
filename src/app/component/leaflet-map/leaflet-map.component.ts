@@ -7,7 +7,7 @@ import '../../_util/grid.js';
 import { Poi, PoiType } from '../../type/poi';
 import { fallbackLayer } from '../../_util/tiles';
 import { getPoiTypeByType } from '../../_util/poi';
-import {createUserMarker, setupMarker} from '../../_util/marker';
+import {createUserMarker, divCloneIcon, setupMarker} from '../../_util/marker';
 import { LocationBasedComponent } from '../../display/location-based/location-based.component';
 import { User } from '../../type/user';
 import { Waypoint } from '../../type/waypoint';
@@ -165,7 +165,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
           fallbackTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
           errorTileUrl: './assets/images/missing.png',
           keepBuffer: 0,    // small buffer means faster scrolling
-          updateWhenIdle: false
+          updateWhenIdle: false,
+          updateWhenZooming: false
       });
 
       _tileLayers = _tileLayers.concat(tilesFallback);
@@ -189,7 +190,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
             minInterval: environment.MILE,
             maxInterval: environment.MILE,
             opacity: 1,
-            // clip: true
           });
 
           _tileLayers = _tileLayers.concat(_utmGrid);
@@ -200,11 +200,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 13.5,
+      minZoom: 14,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: _tileLayers,
-      zoomSnap: 0
+      zoomSnap: 0,
+      preferCanvas: true
     });
 
     if (!this.allowPanning) {
@@ -370,7 +371,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // draw waypoints
     const _trailLine = new L.Polyline(_waypoints, {
-      color: 'red', weight: 4, opacity: 1, smoothFactor: 1
+      color: 'red', weight: 4, opacity: 1, smoothFactor: 3
     });
 
     this.renderedData[index].trail = _trailLine;
@@ -425,7 +426,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // draw waypoints
     const _snowLine = new L.Polyline(waypoints, {
-      color: _stroke, weight: 8, smoothFactor: 1
+      color: _stroke, weight: 8, smoothFactor: 3
     });
 
     this.renderedData[index].snow = _snowLine;
@@ -461,12 +462,16 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         }
 
         const _element = document.createElement("div");
-        const _svg = SVG(_element).size(50, 50).style('overflow', 'visible');
+        const _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
 
         const _marker = setupMarker(_svg, _poi, null, _maxPoiDistanceOffTrail);
-        const _icon = L.divIcon({className: 'marker', html: _element.innerHTML});
+
+        // document.body.prepend(_element);
+
+        const _icon = divCloneIcon({className: 'marker', html: _element});
         const _poiMarker = L.marker([_poi.waypoint.latitude, _poi.waypoint.longitude], {icon: _icon , poi: _poi});
         _poiMarker.on('click', this._onMarkerClick.bind({data: _poi, self: this}));
+
 
         // TODO: needs to be optional (settings)
         // if (_poi.waypoint.distance >= environment.MILE / 8) {
