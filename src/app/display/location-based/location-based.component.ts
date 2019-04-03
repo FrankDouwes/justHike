@@ -50,6 +50,44 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
 
 
 
+  // TEST FUNCTIONS
+
+  private _hikeMile(mileId: number): void {
+
+    const _self = this;
+    const _steps = this.trailGenerator.getTrailData().miles[mileId].waypoints;
+    let _stepCount = 0;
+
+    const _interval = setInterval(function() {
+
+      if (_stepCount < _steps.length) {
+
+        const _location = {
+          coords: {
+            accuracy: 0,
+            altitude:  _steps[_stepCount].elevation,
+            altitudeAccuracy: 0,
+            heading: 0,
+            speed: 0,
+            latitude: _steps[_stepCount].latitude,
+            longitude: _steps[_stepCount].longitude
+          },
+          timestamp: new Date().getTime()
+        };
+
+        _stepCount ++;
+
+        _self._onLocationChange(_location as Position);
+
+      } else {
+        clearInterval(_interval);
+      }
+    }, 4000);
+
+  }
+
+
+
   // LIFECYCLE
 
   ngOnInit() {
@@ -63,7 +101,10 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
     // set up subscriptions
     this._locationSubscription = this.locationService.location.subscribe(
       location => {
-        this._onLocationChange(location as Position);
+        if (location) {
+          // this._hikeMile(2);
+          this._onLocationChange(location as Position);
+        }
       });
 
     this._locationStatusSubscription = this.locationService.locationStatus.subscribe(
@@ -114,9 +155,9 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
       // distance
       this._user.waypoint.distance = _nearestAnchorPoint['distance'];
 
-      // toggle warning / mile simulator
+      //toggle warning / mile simulator
       if (this._user.waypoint.distance > this.localStorage.retrieve('maxPoiDistance')
-        && this.localStorage.retrieve('simulatedMile') === -1) {
+        && this.localStorage.retrieve('simulatedMile') === -1 && !this.localStorage.retrieve('disableSimulation')) {
 
         const _event: CustomEvent = new CustomEvent(
           'offtrail',

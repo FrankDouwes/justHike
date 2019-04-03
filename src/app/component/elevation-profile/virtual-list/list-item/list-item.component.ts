@@ -18,19 +18,17 @@ import {Poi} from '../../../../type/poi';
 
 declare const SVG: any;    // fixes SVGjs bug
 
-import { svgPath } from '../../../../_util/smoothLine';
-import { isPrime, normalizeElevation } from '../../../../_util/math';
+import {svgPath} from '../../../../_util/smoothLine';
+import {isPrime, normalizeElevation} from '../../../../_util/math';
 import {createSvgCircleMarker, createSvgFaElement, createSvgPinMarker, sampleFaIcon, setupMarker} from '../../../../_util/marker';
-import { getMajorPoiTypes, getPoiTypeByType } from '../../../../_util/poi';
-import { environment } from '../../../../../environments/environment.prod';
-import { LocalStorageService } from 'ngx-webstorage';
-import { Subscription } from 'rxjs';
-import { TrailGeneratorService } from '../../../../service/trail-generator.service';
-import { SnowGeneratorService } from '../../../../service/snow-generator.service';
-import { Snowpoint } from '../../../../type/snow';
+import {getMajorPoiTypes} from '../../../../_util/poi';
+import {environment} from '../../../../../environments/environment.prod';
+import {LocalStorageService} from 'ngx-webstorage';
+import {Subscription} from 'rxjs';
+import {TrailGeneratorService} from '../../../../service/trail-generator.service';
+import {SnowGeneratorService} from '../../../../service/snow-generator.service';
+import {Snowpoint} from '../../../../type/snow';
 import {Waypoint} from '../../../../type/waypoint';
-import {Trail} from '../../../../type/trail';
-import {getTrailMetaDataByAbbr} from '../../../../_util/trail';
 
 @Component({
   selector: 'display-list-item',
@@ -87,6 +85,10 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     private _changeDetectorRef: ChangeDetectorRef,
   ) {}
 
+
+
+
+
 // LIFECYCLE HOOKS
 
   ngOnInit(): void {
@@ -96,7 +98,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     this._screenMode = this._localStorage.retrieve('screenMode');
     this._trailLength = this._trailGenerator.getTrailData().miles.length;
-
 
     // dynamic subscriptions based on PoiTypes that are set as being major (important)
     this._majorPoiTypes.forEach(function(type: string) {
@@ -109,6 +110,84 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     this._hasInvisiblePoi();
     _self._addSubscription('snow');
   }
+
+  ngAfterViewInit(): void {
+
+    // @ViewChild not always available, so get whichever is largest
+    this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth) / 4.5);
+    this._svgHeight = Math.floor(Math.max(document.documentElement.clientHeight, window.innerHeight) * 0.6);
+
+    this._lineCanvas = SVG('map_' + this.data.id)
+      .size(this._svgWidth, this._svgHeight)
+      .viewbox(0, 0, this._svgWidth, this._svgHeight)
+      .attr({focusable: false});
+
+    this._markerSvgCanvas = SVG('markers_' + this.data.id)
+      .size(this._svgWidth, this._svgHeight)
+      .viewbox(0, 0, this._svgWidth, this._svgHeight)
+      .attr({focusable: false})
+      .style('overflow', 'visible');
+
+    this._initialized = true;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+
+    // since this component requires the dom for drawing svg, it'll have to wait until initialization finishes
+    if (!this._initialized) {
+      return;
+    }
+
+    if (changes.data || changes.visibleOHLC) {
+
+      if (!this.visibleOHLC) {
+        return;
+      }
+
+      this._snowData = this._snowGenerator.getSnowForMile(this.data.id);
+      this._hasInvisiblePoi();
+      this._drawMap();
+    }
+
+    if (changes.update) {
+
+      this._screenMode = this._localStorage.retrieve('screenMode');
+      this._drawMap();
+    }
+
+    if (changes.resize) {
+
+      this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth) / 4.5);
+      this._svgHeight = Math.floor(Math.max(document.documentElement.clientHeight, window.innerHeight) * 0.6);
+
+      // update svg size
+      if (this._lineCanvas) {
+        const svg = window.document.getElementById(this._lineCanvas.node.id);
+        if (svg) {
+          svg.setAttribute('viewBox', '0 0 ' + this._svgWidth + ' ' + this._svgHeight + '');
+          svg.setAttribute('width', this._svgWidth + '');
+          svg.setAttribute('height', this._svgHeight + '');
+        }
+      }
+    }
+
+    if (changes.triggerUserUpdate || changes.user || changes.userStatus) {
+
+      if (!this.userStatus !== 'tracking') {
+        this._clearUserMarker();
+      }
+
+      this._updateUserLocation();
+    }
+  }
+
+  ngOnDestroy(): void {
+    for (const key in this._dynamicSubscriptions) {
+      this._removeSubscription(key);
+    }
+  }
+
+
 
 
   // add a poi type subscription to the subscriptionsObject
@@ -143,68 +222,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
-  ngAfterViewInit(): void {
-
-    // @ViewChild not always available, so get whichever is largest
-    this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth) / 4.5);
-    this._svgHeight = Math.floor(Math.max(document.documentElement.clientHeight, window.innerHeight) * 0.6);
-
-    this._lineCanvas = SVG('map_' + this.data.id)
-      .size(this._svgWidth, this._svgHeight)
-      .viewbox(0, 0, this._svgWidth, this._svgHeight)
-      .attr({focusable: false});
-
-    this._markerSvgCanvas = SVG('markers_' + this.data.id)
-      .size(this._svgWidth, this._svgHeight)
-      .viewbox(0, 0, this._svgWidth, this._svgHeight)
-      .attr({focusable: false})
-      .style('overflow', 'visible');
-
-    this._initialized = true;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-
-    // since this component requires the dom for drawing svg, it'll have to wait until initialization finishes
-    if (!this._initialized) {
-      return;
-    }
-
-    if (changes.data || changes.visibleOHLC) {
-      this._snowData = this._snowGenerator.getSnowForMile(this.data.id);
-      this._hasInvisiblePoi();
-      this._drawMap();
-    }
-
-    if (changes.update) {
-
-      this._screenMode = this._localStorage.retrieve('screenMode');
-      this._drawMap();
-    }
-
-    if (changes.resize) {
-
-      // this._svgWidth = Math.ceil(this.map.nativeElement.clientWidth);
-      // this._svgHeight = Math.ceil(this.map.nativeElement.clientHeight);
-      this._svgWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth) / 4.5);
-      this._svgHeight = Math.floor(Math.max(document.documentElement.clientHeight, window.innerHeight) * 0.6);
-
-      // update svg size
-      if (this._lineCanvas) {
-        const svg = window.document.getElementById(this._lineCanvas.node.id);
-        if (svg) {
-          svg.setAttribute('viewBox', '0 0 ' + this._svgWidth + ' ' + this._svgHeight + '');
-          svg.setAttribute('width', this._svgWidth + '');
-          svg.setAttribute('height', this._svgHeight + '');
-        }
-      }
-    }
-
-    if (changes.triggerUserUpdate || changes.user) {
-      this._updateUserLocation();
-    }
-  }
-
   // used to indicate that this mile has more pois than are being shown in elevation profile
   private _hasInvisiblePoi(): void {
 
@@ -231,12 +248,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     if (this.hasInvisiblePoi !== _newValue) {
       this.hasInvisiblePoi = _newValue;
       this._changeDetectorRef.detectChanges();
-    }
-  }
-
-  ngOnDestroy(): void {
-    for (const key in this._dynamicSubscriptions) {
-      this._removeSubscription(key);
     }
   }
 
@@ -276,7 +287,13 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     // marker canvas
     if (this._markerSvgCanvas && markers) {
+
+      if (this._userMarker) {
+        this._clearUserMarker();
+      }
+
       this._markerSvgCanvas.clear();
+
     } else {
       console.log('no marker canvas');
     }
@@ -287,7 +304,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   private _drawLine(): void {
 
-    console.log('draw line for mile', this.data.id);
+    // console.log('draw line for mile', this.data.id);
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
@@ -332,11 +349,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
       this._lineCanvas.size(this._svgWidth * _lastWaypointDistPerc, this._svgHeight);
       this._lineCanvas.viewbox(0, 0, this._svgWidth * _lastWaypointDistPerc, this._svgHeight)
-
-      // var mask = draw.mask().add()
-
-      // rect.maskWith(mask)
-
     }
 
     // draw line
@@ -504,34 +516,60 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   private _drawUserMarker(): void {
 
-    // clear old
-    if (this._userMarker) {
-      this._userMarker.remove();
-      this._userMarker = null;
-    }
+    console.log('draw user');
 
-    if(!this.user) {
+    if (!this.user) {
       return;
     }
 
-    const _color: string = (this.userStatus === 'tracking') ? '#00FF00' : '#CCCCCC';
     const _onTrail: boolean = (this.user.distance <= this._localStorage.retrieve('userDistanceOffTrail'));
 
+    // if user matches in both type & status, move (animate) the current user to it's new position
+    // else redraw
 
+    if (this._userMarker) {
+
+      const _attr = this._userMarker.node.attributes;
+
+      if (Boolean(_attr.onTrail.value) === _onTrail && _attr.type.value === 'pin' ||
+        Boolean(_attr.onTrail.value) === _onTrail && _attr.type.value === 'circle') {
+
+        console.log('no redraw');
+
+        return; // marker is already what it should be, no need to redraw
+      } else {
+
+        this._clearUserMarker();
+      }
+    }
+
+    const _color: string = (this.userStatus === 'tracking') ? '#00FF00' : '#CCCCCC';
+
+    // create user maker
     if (_onTrail) {
 
       this._userMarker = createSvgPinMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker.attr('type', 'pin');
       this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -39);
 
     } else {
 
       this._userMarker = createSvgCircleMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker.attr('type', 'circle');
       this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -8);
     }
+
+    this._userMarker.attr('onTrail', _onTrail);
 
     this._userMarker.click(this._onUserClick.bind(this));
   }
 
+  private _clearUserMarker(): void {
+    if (this._userMarker) {
+      this._userMarker.remove();
+      this._userMarker = null;
+    }
+  }
 
 
 // EVENT HANDLERS
@@ -564,6 +602,8 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     const max: number = this.visibleOHLC.high;  // low point
     const range = (max - min);
 
+    console.log('update location');
+
     this._drawUserMarker();
 
     if (this.user && this._userMarker) {
@@ -583,7 +623,23 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       }
 
       // set the user marker position
-      this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / environment.MILE), _userElevation);
+      if (!this._userMarker.attr('x')) {
+        this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / environment.MILE), _userElevation);
+      } else {
+
+        const _distance = this._trailGenerator.calcDistanceFlat(
+          {latitude:  this._userMarker.attr('x'), longitude: this._userMarker.attr('y')},
+          {latitude: this._svgWidth * (this.user.anchorPoint.distance / environment.MILE), longitude: _userElevation});
+
+        if (_distance > 1000000) {
+          this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / environment.MILE), _userElevation);
+        } else {
+          this._userMarker.animate({duration: 300,  ease: ''}).move(this._svgWidth * (this.user.anchorPoint.distance / environment.MILE), _userElevation);
+        }
+      }
+
+      this._userMarker.attr('x', this._svgWidth * (this.user.anchorPoint.distance / environment.MILE));
+      this._userMarker.attr('y', _userElevation);
     }
   }
 

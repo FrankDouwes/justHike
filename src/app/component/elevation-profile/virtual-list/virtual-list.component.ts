@@ -8,7 +8,7 @@ import {
   ViewChild,
   SimpleChanges,
   EventEmitter,
-  Output, ElementRef
+  Output, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef
 } from '@angular/core';
 
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
@@ -28,6 +28,7 @@ import {ScreenModeService} from '../../../service/screen-mode.service';
   selector: 'virtual-list-component',
   templateUrl: './virtual-list.component.html',
   styleUrls: ['./virtual-list.component.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
@@ -57,8 +58,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
   private _currentIndex       = 0;
   private _initialIndex       = 0;
-  private _isCentered: boolean;
-  private _status: string     = 'idle';
+  private _isCentered:        boolean;
+  private _status             = 'idle';
 
   private _parallaxSubscription: Subscription;
   private _parallaxEnabled: boolean;
@@ -70,6 +71,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     private _route:                     ActivatedRoute,
     private _localStorageService:       LocalStorageService,
     private _screenMode:                ScreenModeService,
+    private _changeDetector:            ChangeDetectorRef
   ) {
 
     super();
@@ -108,7 +110,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     if (changes.scrollTo) {
       if (changes.scrollTo.currentValue) {
         if (this.scrollViewport) {
-          this._isCentered = false;
           this._currentIndex = Math.floor(this.scrollViewport.getDataLength() * changes.scrollTo.currentValue);
           this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
         }
@@ -138,8 +139,11 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 // OVERRIDES
 
   public onStatusChange(status: string): void {
+    super.onStatusChange(status);
+    if (status !== 'tracking') {
+      this._status = status;
+    }
     this.onUserLocationChange(this.user);
-    this._status = this.status;
   }
 
   public onUserLocationChange(user: User): void {
@@ -147,15 +151,25 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     // if we're switching to tracking
     if (user && this.status === 'tracking' && this.scrollViewport && user.nearestMileId) {
       if (!this._isCentered || this._status !== 'tracking' ) {
-        this.scrollViewport.scrollToIndex(user.nearestMileId - 1, 'auto');
+        this.centerOnUser();
         this._isCentered = true;
       }
     }
+
+    this._status = this.status;
+    this._changeDetector.markForCheck();
   }
 
   public centerOnUser(): void {
     super.centerOnUser();
-    this.onStatusChange(null);
+    this._scrollToMile(this.user.nearestMileId);
+  }
+
+  private _scrollToMile(mileId: number) {
+    if (this.user && this.scrollViewport) {
+      const _index = (this.user.nearestMileId - 2 < 0) ? 0 : this.user.nearestMileId - 2;
+      this.scrollViewport.scrollToIndex(_index, 'auto');
+    }
   }
 
 
@@ -182,8 +196,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
       const _self = this;
 
-      const _milesLength = this.trailData.miles.length;
-
       if (event.target === _self.scrollViewport.elementRef.nativeElement) {
 
         event.preventDefault();
@@ -195,18 +207,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
         const _width: number = _self.scrollViewport.elementRef.nativeElement.clientWidth;
         const _repeated: number = Math.ceil(_scrollOffset / _width);
         const _finalOffset: number = _scrollOffset - (_repeated * _width);
-
-        // update background position
-        // const _wrapper = _self.scrollViewport.elementRef.nativeElement;
-        // _wrapper.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.1) + 'px;');
-
-        // const _verticalChange = (_self.visibleOHLC.high - _self.visibleOHLC.low) / 1500;
-        // _self.background.nativeElement.style.transform = 'translate(' + -(_self.scrollOffset * 0.015) + 'px,y)';
         _self.background.nativeElement.style.transform = 'translateX(' + _finalOffset + 'px)';
-        // _self.background.nativeElement.setAttribute('style', 'background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
-        // _self.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(_self.scrollOffset * 0.015) + 'px;');
       }
-
   }
 
   public onClick(listItem: Mile): void {
@@ -294,18 +296,20 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
   // redraw guides and trigger a scroll event (that redraws the list)
   private _redraw(): void {
+
     const _oldRange = this._visibleRange;
     this._visibleRange = this.scrollViewport.getRenderedRange();
-
-    this._isCentered = false;
 
     // only if really needed!
     if (_oldRange !==  this._visibleRange) {
       this.scrollEvent.emit({visibleRange: this._visibleRange, scrollX: this.scrollViewport.getOffsetToRenderedContentStart()});
-      this.visibleOHLC = this._calculateVisOHLC(this._visibleRange);
-      // const _verticalChange = (this.visibleOHLC.high - this.visibleOHLC.low) / 1500;
-      // this.backgroundFlat.nativeElement.setAttribute('style', 'opacity: ' + (_verticalChange - 0.25) + '; background-position-x: ' + -(this.scrollOffset * 0.015) + 'px;');
-      this._calculateGuides();
+
+      // prevent redraw if not needed
+      const _newOHLC = this._calculateVisOHLC(this._visibleRange);
+      if (!this.visibleOHLC || _newOHLC.high !== this.visibleOHLC.high || _newOHLC.low !== this.visibleOHLC.low) {
+        this.visibleOHLC = _newOHLC;
+        this._calculateGuides();
+      }
     }
   }
 

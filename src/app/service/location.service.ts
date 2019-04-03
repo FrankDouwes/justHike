@@ -69,13 +69,10 @@ export class LocationService {
 
   // simulate location
   private _simulateLocation(): void {
-    // simulate mile number
     this._parseLocation(this._localStorage.retrieve('simulatedMile'));
   }
 
   private _trackLocation(): void {
-
-    const _self = this;
 
     const _watchOptions = {
       enableHighAccuracy: true,

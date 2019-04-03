@@ -18,13 +18,17 @@
 
   .user
     color: white
+    width: 0 !important
+    height: 0 !important
+    background-color: aqua
+    transition: transform .3s ease-out
 
     .pulse
       position: absolute
-      top: -24px
-      left: -24px
-      width: 48px
-      height: 48px
+      top: -11px
+      left: -13px
+      width: 26px
+      height: 26px
       -webkit-border-radius: 50%
       -moz-border-radius: 50%
       border-radius: 50%
@@ -32,6 +36,17 @@
       animation: pulse 3s ease-out
       animation-iteration-count: infinite
       z-index: -1
+
+  .user svg
+    position: absolute
+    top: 2px
+    shape-rendering: geometricPrecision
+
+  .marker svg
+    position: absolute
+    top: 6px
+    left: 6px
+    shape-rendering: geometricPrecision
 
   .mile-marker
 
@@ -73,8 +88,8 @@
     transform: scale(0)
     opacity: 0.0
   75%
-    transform: scale(0.5)
+    transform: scale(1)
     opacity: 0.6
   100%
-    transform: scale(1)
+    transform: scale(1.65)
     opacity: 0.0

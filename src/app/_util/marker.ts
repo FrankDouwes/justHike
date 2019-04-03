@@ -87,29 +87,26 @@ export function createSvgFaElement (canvas: any, id: string, scale: number = 1, 
 }
 
 // by default a point marker is 30 x 45px, and the border color is 10% darker than the fill color
-export function createSvgPinMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.85) {
-
-  const _alpha = Number(Math.round(opacity * 255)).toString(16);
-  color = color + _alpha;
+export function createSvgPinMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.9) {
 
   const _marker = canvas.group();
-  _marker.attr('vOffset', -(48 * scale));
+  _marker.attr('vOffset', -(50 * scale));
+  _marker.attr('fill-opacity', opacity);
   _marker.addClass('fa-marker');
-  _marker.path(markerData).fill(color).width(33 * scale).height(50 * scale).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(48 * scale));
+  _marker.path(markerData).fill(color).width(33 * scale).height(50 * scale).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(50 * scale));
 
   return _marker;
 }
 
 // by default a round marker is 30 x 30px, and the border color is 10% darker than the fill color
-export function createSvgCircleMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.85) {
-
-  const _alpha = Number(Math.round(opacity * 255)).toString(16);
-  color = color + _alpha;
+export function createSvgCircleMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.9) {
 
   const _marker = canvas.group();
   _marker.attr('vOffset', -(16.5 * scale));
+  _marker.attr('fill-opacity', opacity);
   _marker.addClass('fa-marker');
-  _marker.circle(33 * scale, 33 * scale).fill(color).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(16.5 * scale));
+  const _size = Math.round(33 * scale);
+  _marker.circle(_size, _size).fill(color).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(16.5 * scale));
 
   return _marker;
 }
@@ -131,9 +128,10 @@ export function sampleFaIcon(iconId:string) {
 export function createUserMarker() {
 
   let _element = document.createElement('div');
+  _element.classList.add('user-marker');
   let _draw = SVG(_element).size(50, 50).style('overflow', 'visible');
-  createSvgCircleMarker(_draw, '#00FF00', 0.75);
-  _draw.use(sampleFaIcon('user-dot')).width(23).height(23).move(-11.5, -11.5);
+  createSvgCircleMarker(_draw, '#00FF00', 0.787878);
+  _draw.use(sampleFaIcon('user-dot')).width(24).height(24).move(-12, -12);
 
   // pulsing circle
   let _pulse = document.createElement('div');

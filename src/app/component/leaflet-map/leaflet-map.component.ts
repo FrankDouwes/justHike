@@ -79,11 +79,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   }
 
   ngOnInit(): void {
+    super.ngOnInit();
 
     this._showMileGrid = this._localStorageService.retrieve('showMileGrid');
     this._animateMap = this._localStorageService.retrieve('animateMap');
-
-    super.ngOnInit();
     this._trailLength = this._trailGenerator.getTrailData().miles.length;
   }
 
@@ -222,6 +221,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
 
     this._map.setView([0, 0], 15);
+
+    if (this.user) {
+      this.onUserLocationChange(this.user);
+    }
   }
 
 
@@ -461,7 +464,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         const _svg = SVG(_element).size(50, 50).style('overflow', 'visible');
 
         const _marker = setupMarker(_svg, _poi, null, _maxPoiDistanceOffTrail);
-        const _icon = L.divIcon({className: 'pin-marker', html: _element.innerHTML});
+        const _icon = L.divIcon({className: 'marker', html: _element.innerHTML});
         const _poiMarker = L.marker([_poi.waypoint.latitude, _poi.waypoint.longitude], {icon: _icon , poi: _poi});
         _poiMarker.on('click', this._onMarkerClick.bind({data: _poi, self: this}));
 
@@ -483,14 +486,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _drawUser(): void {
 
-    if (this._userMarker) {
-      this._map.removeLayer(this._userMarker); // remove
-      this._userMarker = null;
+    if (!this._userMarker) {
+      this._userMarker = this._createUserMarker(this.user);
     }
 
-    if (this.user && !this._userMarker && this._map && this.user.waypoint) {
+    if (this.user && this._map && this.user.waypoint) {
 
-      this._userMarker = this._createUserMarker(this.user);
       const _userLocation = new L.LatLng(this.user.waypoint.latitude, this.user.waypoint.longitude);
 
       this._userMarker.setLatLng(_userLocation);
@@ -540,7 +541,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _centerOnPoint(point: Waypoint): void {
     if (this._map) {
-      this._map.panTo([point.latitude, point.longitude], {animate: this._animateMap, duration: 0.5, maxZoom: 16});
+
+      const _animate = (this.userCentered || this._animateMap);
+
+      this._map.panTo([point.latitude, point.longitude], {animate: _animate, duration: 0.5, maxZoom: 16});
     }
   }
 
@@ -600,6 +604,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   }
 
   private _createUserMarker(user: User): any {
+
+    if (!user) {
+      return;
+    }
 
     const _color = (this.status === 'tracking') ? '#00FF00' : '#AAAAAA';
 

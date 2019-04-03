@@ -46,6 +46,13 @@ export class TrailGeneratorService {
     return this._trailData.pois[id];
   }
 
+  public calcDistanceFlat(p1: any, p2: any): number {
+    return geolib.getDistance(
+      {latitude: p1.latitude, longitude: p1.longitude} as geolib.PositionAsDecimal,
+      {latitude: p2.latitude, longitude: p2.longitude} as geolib.PositionAsDecimal
+    );
+  }
+
   public getPoisByIds(ids: Array<number>): Array<Poi> {
 
     const _self = this;

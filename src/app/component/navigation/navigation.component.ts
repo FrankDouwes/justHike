@@ -22,7 +22,7 @@ export class NavigationComponent implements OnInit, OnChanges {
   public updateAvailable:             boolean = false;
   public isAdmin:                     boolean;
   public dynamicSide:                 string;
-  private locationStatus:             string;
+  public locationStatus:             string;
 
   private _backIndex:                 object;
 

@@ -156,4 +156,10 @@ export class AdminComponent implements OnInit {
     this.clearStorage();
     this.defaultUserData();
   }
+
+  public disableSimulation(): void {
+
+    const _current = this._localStorageService.retrieve('disableSimulation');
+    this._localStorageService.store('disableSimulation', !(_current))
+  }
 }

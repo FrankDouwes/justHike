@@ -26,7 +26,7 @@
       [isLast]="last"
 
       [user]="(user && li.id === user.nearestMileId) ? user : null"
-      [triggerUserUpdate]="(user && status === 'tracking' && li.id === user.nearestMileId) ? timestamp : null"
+      [triggerUserUpdate]="(update && user && status === 'tracking' && li.id === user.nearestMileId) ? update : null"
       [userStatus] = "(user && li.id === user.nearestMileId) ? status : null"
 
       [visibleOHLC]="visibleOHLC"
