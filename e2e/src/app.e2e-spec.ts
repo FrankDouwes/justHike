@@ -7,7 +7,7 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should display welcome message', () => {
+  it('should base welcome message', () => {
     page.navigateTo();
     expect(page.getTitleText()).toEqual('Welcome to just-hike!');
   });

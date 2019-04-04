@@ -30,6 +30,7 @@
     <plugin name="cordova-plugin-geolocation" spec="~4.0.2-dev" />
     <plugin name="cordova-plugin-screen-orientation" spec="~3.0.1" />
     <plugin name="cordova-plugin-downloader" spec="~0.0.4" />
+    <preference name="KeepRunning" value="false"/>
     <preference name="DisallowOverscroll" value="true" />
     <preference name="Orientation" value="landscape" />
     <preference name="Fullscreen" value="true" />
@@ -48,4 +49,5 @@
     <plugin name="cordova-plugin-dialogs" spec="^2.0.1" />
     <engine name="android" spec="^7.1.4" />
     <engine name="ios" spec="^5.0.0" />
+    <engine name="browser" spec="^5.0.4" />
 </widget>

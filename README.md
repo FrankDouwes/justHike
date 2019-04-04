@@ -1,47 +1,45 @@
 # JustHike
 
-ng build > cd mobile > cordova build android (might have to add platform first (cordova platform add))
-
-or
-
-ng serve, run in chrome. Unzipping will be disabled so offline maps wont work, and window resizing is buggy (SVG redraw, not needed for mobile)
-
-todo:
+TODO:
 
 - back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
 - rating system for water / campsites (username field)
-- compass heading, all cordova plugins seem to have android issues, iOS only? look at google...
-- make sure the user location updates while walking on both map and elevation profile
-- pause/resume download of map tiles (since it's 400mb and I'm keeping track of downloaded parts anyway)
-- paid cloud storage of downloadable files
-- remove font awesome references in index
+- compass heading, all cordova plugins seem to have android issues, iOS only?
+- overlapping UTM lines (square miles)
+- contact form
+- optimising (virtual list rendering)
+<br/><br/>
 - Design / CSS / placeholder images
-- instructions screen
+- instructions screen content
+<br/><br/>
+- improve elevation profile scrollbar accuracy
+- paid cloud storage for downloadable files (map tiles)
+- purchase routines (app store / google play)
+<br/><br/>
+- update to Cordova 9 (assuming this will break everything!)
+<br/><br/>
+- iOS still not animating to correct mile when clicking on mile in elevation profile?
 - iOS bugs (possibly related to the use of the depricated alerts plugin)
 - iOS scroll bugs (poi list)
-- purchase routines (app store / google play)
+- iOS locator bug
+- iOS unknown navigation error: Scroll on leaflet map (id = 70?), go back to elevation profile, grey screen...
+
+recently added/fixed:
+- resume multipart downloads (saves bandwidth + hosting costs)
+- disable GPS tracking when application is in background, resume once in foreground
+- fix: 2 location updates before showing locator?
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
 ## Development server
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
+<b>ng build</b> > <b>cd mobile</b> > <b>cordova build android</b> (might have to add platform first (<b>cordova platform add</b>))
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+or
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+<b>ng serve</b>, run in chrome. Unzipping will be disabled so offline maps wont work, and window resizing is buggy (SVG redraw, not needed for mobile), it's even more limited in Safari.
 
 ## Further help
 
