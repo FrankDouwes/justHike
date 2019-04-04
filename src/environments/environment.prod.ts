@@ -44,11 +44,11 @@ export const environment = {
     maxPoiDistance: 1,              // maximum poi distance from trail (in mi) to be included in the app
     scrollbarSegmentSize: 26,       // scrollbar (elevation profile) renders 1 point for every X points)
     simulatedMile: -1,              // the simulated mile number
-    userName: "Hiker",              // default username
+    userName: 'Hiker',              // default username
 
     // elevationProfile
     parallaxEnabled: false,         // parallax effect in elevation profile
-    screenMode: "default",          // 'default', 'highContrast' or 'nighHike'
+    screenMode: 'default',          // 'default', 'highContrast' or 'nighHike'
     showExtraDesign: true,          // show extra design features in elevation profile (trees)
   },
 

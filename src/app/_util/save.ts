@@ -1,5 +1,6 @@
 import { saveAs } from 'file-saver';
 
+// save file as, only works for desktop, used for generating data files (admin only)
 export function saveFileAs(data:any, filename:string, ): void {
 
   if (typeof data !== 'string') {

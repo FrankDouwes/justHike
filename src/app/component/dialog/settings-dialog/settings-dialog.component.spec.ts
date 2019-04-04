@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SettingsDialogComponent } from './settings-dialog.component';
-import {IconComponent} from '../../../display/icon/icon.component';
-import {ButtonComponent} from '../../../display/button/button.component';
+import {IconComponent} from '../../../base/icon/icon.component';
+import {ButtonComponent} from '../../../base/button/button.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {
   MAT_DIALOG_DATA,

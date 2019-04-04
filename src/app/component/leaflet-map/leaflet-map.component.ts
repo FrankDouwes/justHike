@@ -1,14 +1,14 @@
+import * as L from 'leaflet';
+import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
+import '../../_util/leaflet/grid.js';
+import '../../_util/leaflet/marker.js';
+
 import {Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges, ElementRef, ViewChild, OnDestroy} from '@angular/core';
 import { Mile } from '../../type/mile';
 import { ActivatedRoute } from '@angular/router';
-import * as L from 'leaflet';
-import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
-import '../../_util/grid.js';
-import { Poi, PoiType } from '../../type/poi';
-import { fallbackLayer } from '../../_util/tiles';
-import { getPoiTypeByType } from '../../_util/poi';
-import {createUserMarker, divCloneIcon, setupMarker} from '../../_util/marker';
-import { LocationBasedComponent } from '../../display/location-based/location-based.component';
+import { Poi } from '../../type/poi';
+import { fallbackLayer } from '../../_util/leaflet/tiles';
+import { LocationBasedComponent } from '../../base/location-based/location-based.component';
 import { User } from '../../type/user';
 import { Waypoint } from '../../type/waypoint';
 import { environment } from '../../../environments/environment.prod';
@@ -19,6 +19,9 @@ import {Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
 import {ScreenModeService} from '../../service/screen-mode.service';
 import {getTrailMetaDataByAbbr} from '../../_util/trail';
+import {MarkerService} from '../../factory/marker.service';
+import {htmlIcon} from '../../_util/leaflet/icon';
+
 declare const SVG: any;    // fixes SVGjs bug
 
 @Component({
@@ -73,7 +76,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     private _trailGenerator:        TrailGeneratorService,
     private _orientationService:    OrientationService,
     private _localStorageService:   LocalStorageService,
-    private _screenModeService:     ScreenModeService
+    private _screenModeService:     ScreenModeService,
+    private _markerFactory:         MarkerService
   ) {
     super();
   }
@@ -447,7 +451,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // pois sit on top of label markers
     if (this.showPois && mile.pois) {
 
-      const _maxPoiDistanceOffTrail = this.localStorage.retrieve('poiDistanceOffTrail');
       const _maxPoiDistance = this.localStorage.retrieve('poiMaxDistance');
 
       const _poiLength = mile.pois.length;
@@ -464,11 +467,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         const _element = document.createElement("div");
         const _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
 
-        const _marker = setupMarker(_svg, _poi, null, _maxPoiDistanceOffTrail);
+        this._markerFactory.setupMarker(_svg, _poi, null);
 
-        // document.body.prepend(_element);
-
-        const _icon = divCloneIcon({className: 'marker', html: _element});
+        const _icon = htmlIcon({className: 'marker', html: _element});
         const _poiMarker = L.marker([_poi.waypoint.latitude, _poi.waypoint.longitude], {icon: _icon , poi: _poi});
         _poiMarker.on('click', this._onMarkerClick.bind({data: _poi, self: this}));
 
@@ -609,15 +610,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   }
 
   private _createUserMarker(user: User): any {
-
     if (!user) {
       return;
     }
-
-    const _color = (this.status === 'tracking') ? '#00FF00' : '#AAAAAA';
-
-    const _user = L.marker([user.waypoint.latitude, user.waypoint.longitude], {icon: createUserMarker(), user: user, forceZIndex: 1000});
-    return _user;
+    return L.marker([user.waypoint.latitude, user.waypoint.longitude], {icon: this._markerFactory.createLeafletUserMarker(), user: user, forceZIndex: 1000});
   }
 
   // private _createPoiGuideLine(poi: Poi): Array<any> {

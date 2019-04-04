@@ -1,6 +1,3 @@
-import { isDevMode } from '@angular/core';
-import { environment } from '../../environments/environment.prod';
-import { saveFileAs } from './save';
 import {Snow, Snowpoint} from '../type/snow';
 
 export function parseSnow(snow: Array<any>, trailId: number, abbr: string, version: string): Snow {

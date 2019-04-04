@@ -9,6 +9,10 @@ import { ElevationProfileComponent } from './component/elevation-profile/elevati
 import {SequentialResolverService} from './service/sequential-resolver.service';
 import {AdminComponent} from './component/admin/admin.component';
 
+export function handleErrors(error):void {
+  console.log('app routing error');
+}
+
 const routes: Routes = [
   {
     path: 'elevation-profile',
@@ -39,7 +43,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'reload', useHash: true})],
+  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'ignore', useHash: true, enableTracing: true, errorHandler: handleErrors})],
   exports: [RouterModule]
 })
 

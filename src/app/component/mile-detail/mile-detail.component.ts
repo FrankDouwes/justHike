@@ -61,15 +61,15 @@ export class MileDetailComponent implements OnInit, OnDestroy {
     })
 
     this.isNobo = (this._localStorage.retrieve('direction') === 0);
-
-    this._screenModeSubscription = this._screenModeService.screenModeChangeObserver.subscribe(function(screenMode) {
-
-      if (_self._screenMode !== screenMode) {
-        console.log('screenmode changed');
-        _self._screenMode = screenMode;
-        _self._changeDetector.detectChanges();
-      }
-    })
+    //
+    // this._screenModeSubscription = this._screenModeService.screenModeChangeObserver.subscribe(function(screenMode) {
+    //
+    //   if (_self._screenMode !== screenMode) {
+    //     console.log('screenmode changed');
+    //     _self._screenMode = screenMode;
+    //     _self._changeDetector.markForCheck();
+    //   }
+    // })
   }
 
   ngOnDestroy(): void {

@@ -1,10 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MarkerDialogComponent } from './marker-dialog.component';
-import {ButtonComponent} from '../../../display/button/button.component';
+import {ButtonComponent} from '../../../base/button/button.component';
 import {DistancePipe} from '../../../pipe/distance.pipe';
 import {PoiListComponent} from '../../poi-list/poi-list.component';
-import {IconComponent} from '../../../display/icon/icon.component';
+import {IconComponent} from '../../../base/icon/icon.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {DynamicItemComponent} from '../../poi-list/dynamic-item/dynamic-item.component';

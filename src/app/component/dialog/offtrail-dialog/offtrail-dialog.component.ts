@@ -32,8 +32,6 @@ export class OfftrailDialogComponent implements OnInit {
     let _value: number = this.simulateInput.nativeElement.value.replace(',', '.');      // in case of comma
     _value = (Number(_value) < this.trailLength) ? Number(_value) : this.trailLength - 1;
 
-    console.log(_value, this.trailLength);
-
     const _self = this;
     setTimeout(function() {
       _self._dialogRef.close({simulatedMile: _value});

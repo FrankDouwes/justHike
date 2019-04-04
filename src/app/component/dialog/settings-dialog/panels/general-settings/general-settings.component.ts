@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {SettingsPanelComponent} from '../../../../../display/settings-panel/settings-panel.component';
+import {SettingsPanelComponent} from '../../../../../base/settings-panel/settings-panel.component';
 import {LocalStorageService} from 'ngx-webstorage';
 import {MatCheckboxChange, MatSelectChange} from '@angular/material';
 import {VersionResolverService} from '../../../../../service/version-resolver.service';

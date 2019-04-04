@@ -14,7 +14,6 @@ import {Subscription} from 'rxjs';
 import {Downloader, DownloaderStatus} from '../../../../../../_util/downloader';
 import {environment} from '../../../../../../../environments/environment.prod';
 import {FilesystemService} from '../../../../../../service/filesystem.service';
-import {getExtensionFromString} from '../../../../../../_util/file';
 import {getTrailMetaDataById} from '../../../../../../_util/trail';
 import {TrailMeta} from '../../../../../../type/trail';
 

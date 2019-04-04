@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDes
 import {TrailMeta} from '../../../../../type/trail';
 import {LocalStorageService} from 'ngx-webstorage';
 import {MatSelectChange} from '@angular/material';
-import {SettingsPanelComponent} from '../../../../../display/settings-panel/settings-panel.component';
+import {SettingsPanelComponent} from '../../../../../base/settings-panel/settings-panel.component';
 import {DownloadService} from '../../../../../service/download.service';
 import {getTrailMetaDataById, getTrailsMetaData} from '../../../../../_util/trail';
 import {ConnectionService} from '../../../../../service/connection.service';
@@ -156,7 +156,7 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
 
   // triggered from template
   public displayVersion(name: string): string {
-    // console.log('display version', name);
+    // console.log('base version', name);
 
     if (this.updates[name]) {
       // console.log('- from updates', this.activeTrail[name + 'Version']);

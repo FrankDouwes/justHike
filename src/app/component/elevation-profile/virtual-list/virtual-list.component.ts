@@ -18,7 +18,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {OHLC} from '../../../type/ohlc';
 import {Mile} from '../../../type/mile';
 import {Trail} from '../../../type/trail';
-import {LocationBasedComponent} from '../../../display/location-based/location-based.component';
+import {LocationBasedComponent} from '../../../base/location-based/location-based.component';
 import {User} from '../../../type/user';
 import {LocalStorageService} from 'ngx-webstorage';
 import {Subscription} from 'rxjs';

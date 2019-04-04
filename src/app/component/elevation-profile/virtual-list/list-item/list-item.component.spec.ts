@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ListItemComponent } from './list-item.component';
-import {IconComponent} from '../../../../display/icon/icon.component';
+import {IconComponent} from '../../../../base/icon/icon.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {LocalStorageStrategy, NgxWebstorageModule, STORAGE_STRATEGIES, StorageStrategy, StorageStrategyStub} from 'ngx-webstorage';
 import {Mile} from '../../../../type/mile';

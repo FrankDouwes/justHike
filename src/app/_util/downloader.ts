@@ -3,14 +3,14 @@ import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { getExtensionFromString } from './file';
 import { FilesystemService } from '../service/filesystem.service';
+import {LocalStorageService} from 'ngx-webstorage';
 
 // file downloader
-// TODO: resume download, or check if file exists > skip
 // sets type using file extension, currently supports json & blob (zip)
 // supports multiple files for a single downloader (zip parts, due to size limitations on mobile)
 // has caching (for large files)
 // has save / unzip / delete file (for zips)
-// if file needs unzipping download progress will be 2/3, unzipping will be 1/3 of progress total
+// has resume download function (for multipart files)
 export class DownloaderStatus {
   type: string;       // http, filesystem or downloader (which are generic complete/error messages).
   label: string;
@@ -30,12 +30,14 @@ export class Downloader {
   private _urls:                      Array<string>;     // allow sequential downloading
   private _paths:                     Array<string>;
   private _cache:                     boolean;
-  private _completedFiles:            number = 0;        // TODO: write this to storage so I can create a resume download function
+  private _completedFiles:            number = 0;
   private _hasParts:                  boolean;
 
   constructor(
+    private _name:                    string,
     private _filesystemService:       FilesystemService,
-    private _httpClient:              HttpClient
+    private _httpClient:              HttpClient,
+    private _localStorageService:     LocalStorageService
   ) {
 
     // setup status subscription
@@ -44,10 +46,6 @@ export class Downloader {
 
   // allows multipart file downloading
   private _sequencer(): void {
-
-    // this._urls.splice(0, 1);
-    // this._paths.splice(0, 1);
-
     if (this._downloadRequest) {
       this._downloadRequest.unsubscribe();
       this._downloadRequest = null;
@@ -55,15 +53,27 @@ export class Downloader {
 
     this._completedFiles += 1;
 
+    if (this._hasParts) {
+      this._localStorageService.store(this._name + '_filesDownloaded', this._completedFiles);
+    }
+
     if (this._urls.length > this._completedFiles) {
       this.downloadFile(this._urls, this._cache, this._paths);
     } else {
+      if (this._hasParts) {
+        this._localStorageService.clear(this._name + '_filesDownloaded');
+      }
       this._setStatus('downloader', 'complete', null, false);
     }
   }
 
   // converts string to array if needed
   private _setupPaths(urls, paths): any {
+
+    const _storedCompletedCount: number = this._localStorageService.retrieve(this._name + '_filesDownloaded');
+    if (_storedCompletedCount && _storedCompletedCount > this._completedFiles) {
+      this._completedFiles = _storedCompletedCount;
+    }
 
     if (!this._urls && !this._paths) {
       if (typeof urls === 'string') {
@@ -116,8 +126,6 @@ export class Downloader {
     const downloadObservable = this._httpClient.request(req);
     this._downloadRequest = downloadObservable.subscribe(event => {
 
-      console.log(event);
-
       if (event.type === HttpEventType.DownloadProgress) {
 
         let _downloadPercentage = (event.loaded / event.total) * 100;
@@ -158,6 +166,10 @@ export class Downloader {
 
     this.clearFile();
 
+    if (this._hasParts) {
+      this._localStorageService.clear(this._name + '_filesDownloaded');
+    }
+
     this._setStatus('downloader', '', null, false);
   }
 
@@ -175,8 +187,6 @@ export class Downloader {
       this._paths.forEach(function (path, index) {
 
         if (index < _self._completedFiles) {
-
-          // _self._filesystemService.deleteFile(path);
 
           // multiple parts are all extracted in the same directory, therefor this will only have to run once
           if (index === 0) {

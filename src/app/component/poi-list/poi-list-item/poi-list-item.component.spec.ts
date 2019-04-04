@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { PoiListItemComponent } from './poi-list-item.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {Poi} from '../../../type/poi';
-import {IconComponent} from '../../../display/icon/icon.component';
+import {IconComponent} from '../../../base/icon/icon.component';
 import {DistancePipe} from '../../../pipe/distance.pipe';
 
 describe('PoiListItemComponent', () => {

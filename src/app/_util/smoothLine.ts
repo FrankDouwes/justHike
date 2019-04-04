@@ -14,7 +14,7 @@ const line = (pointA, pointB) => {
 };
 
 // Position of a control point
-const controlPoint = (current, previous, next, reverse:boolean = false) => {
+const controlPoint = (current, previous, next, reverse: boolean = false) => {
 
   // When 'current' is the first or last point of the array
   // 'previous' or 'next' don't exist.

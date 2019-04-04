@@ -10,7 +10,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef
 } from '@angular/core';
-import { LocationBasedComponent } from '../../display/location-based/location-based.component';
+import { LocationBasedComponent } from '../../base/location-based/location-based.component';
 
 import { BehaviorSubject } from 'rxjs';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';

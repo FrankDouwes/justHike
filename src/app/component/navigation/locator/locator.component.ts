@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../../../type/user';
 import { Subscription } from 'rxjs';
-import { LocationBasedComponent } from '../../../display/location-based/location-based.component';
+import { LocationBasedComponent } from '../../../base/location-based/location-based.component';
 
 @Component({
   selector: 'locator-button',

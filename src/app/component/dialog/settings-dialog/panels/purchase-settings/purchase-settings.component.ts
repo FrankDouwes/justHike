@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TrailMeta } from '../../../../../type/trail';
 import { LocalStorageService } from 'ngx-webstorage';
-import { SettingsPanelComponent } from '../../../../../display/settings-panel/settings-panel.component';
+import { SettingsPanelComponent } from '../../../../../base/settings-panel/settings-panel.component';
 import {getTrailsMetaData} from '../../../../../_util/trail';
 
 @Component({

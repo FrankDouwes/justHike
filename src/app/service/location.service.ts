@@ -6,6 +6,7 @@ import { TrailGeneratorService } from './trail-generator.service';
 // ionic capacitor
 import {Waypoint} from '../type/waypoint';
 import {environment} from '../../environments/environment.prod';
+import {cordovaEnabled} from '../_util/cordova';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,8 @@ export class LocationService {
   // watcher
   private _locationWatcher:         any;        // web uses number?
   private _previousLocation:        object;
+  private _paused:                  boolean;
+
   private _toggleStatus             = false;
   private _locationStatusLocal      = '';
 
@@ -41,6 +44,11 @@ export class LocationService {
     private _trailGenerator: TrailGeneratorService
   ) {
     this._updateStatusLabel('idle');
+
+    if (cordovaEnabled()) {
+      document.addEventListener("pause", this._onPause, false);
+      document.addEventListener("resume", this._onResume, false);
+    }
   }
 
   // enable / disable location tracking
@@ -194,6 +202,20 @@ export class LocationService {
   public onCenterUser(): void {
     if (this._locationStatus.value === 'tracking') {
       this._centerUser.next(new Date().getTime());
+    }
+  }
+
+  private _onPause(event): void {
+    if (this._toggleStatus === true && !this._paused) {
+      this._stopTracking();
+      this._paused = true;
+    }
+  }
+
+  private _onResume(event): void {
+    if (this._toggleStatus === false && this._paused) {
+      this.toggleTracking(true);
+      this._paused = false;
     }
   }
 }

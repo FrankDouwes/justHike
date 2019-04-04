@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { OfftrailDialogComponent } from './offtrail-dialog.component';
-import {ButtonComponent} from '../../../display/button/button.component';
+import {ButtonComponent} from '../../../base/button/button.component';
 import {MAT_DIALOG_DATA, MatCardContent, MatDialogRef} from '@angular/material';
 import {DistancePipe} from '../../../pipe/distance.pipe';
-import {IconComponent} from '../../../display/icon/icon.component';
+import {IconComponent} from '../../../base/icon/icon.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import { MatInputModule } from '@angular/material/input';

@@ -4,6 +4,7 @@ import { Downloader } from '../_util/downloader';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { FilesystemService } from './filesystem.service';
+import {LocalStorageService} from 'ngx-webstorage';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,8 @@ export class DownloadService {
 
   constructor(
     private _fileSystemService: FilesystemService,
-    private _httpClient: HttpClient
+    private _httpClient: HttpClient,
+    private _localStorageService: LocalStorageService
   ) {
 
     this.isDownloadingObservable  = this._isDownloading.asObservable().pipe(share());
@@ -35,7 +37,7 @@ export class DownloadService {
     let _dl: Downloader = this._downloaders[name];
 
     if (!_dl) {
-      _dl = new Downloader(this._fileSystemService, this._httpClient);
+      _dl = new Downloader(name, this._fileSystemService, this._httpClient, this._localStorageService);
       this._downloaders[name] = _dl;
       this._addStatusObserver(name, _dl);
     }

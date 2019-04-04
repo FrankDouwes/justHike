@@ -7,12 +7,16 @@ import * as Browser from 'leaflet/src/core/Browser';
 // 2. internet tiles (fallbackTileUrl)
 // 3. assets missing tile image (errorTileUrl)
 // TODO: prevent 404 on image URL (stackoverflow.com/questions/9893886/prevent-image-load-errors-going-to-the-javascript-console)
-
-const FallbackTileLayer = L.TileLayer.extend({
+const _fallbackTileLayer = L.TileLayer.extend({
 
   createTile: function (coords, done) {
-    let _tile = L.TileLayer.prototype.createTile.call(this, coords, done);
-    _tile.setAttribute('coords', JSON.stringify(coords));
+    const _tile = L.TileLayer.prototype.createTile.call(this, coords, done);
+
+    // html attributes are strings
+    _tile.setAttribute('cx', coords.x);
+    _tile.setAttribute('cy', coords.y);
+    _tile.setAttribute('cz', coords.z);
+
     _tile.setAttribute('state', 'default');
 
     return _tile;
@@ -22,7 +26,12 @@ const FallbackTileLayer = L.TileLayer.extend({
   _tileOnError: function (done, tile, e) {
 
     const _tileState = tile.getAttribute('state');
-    const _tileCoords = JSON.parse(tile.getAttribute('coords'));
+
+    const _tileCoords = {
+        x: tile.getAttribute('cx'),
+        y: tile.getAttribute('cy'),
+        z: tile.getAttribute('cz')
+    };
 
     if (_tileState === 'default') {
       tile.setAttribute('state', 'fallback');
@@ -56,7 +65,6 @@ const FallbackTileLayer = L.TileLayer.extend({
   }
 });
 
-// Supply with a factory for consistency with Leaflet.
 export function fallbackLayer (url, options) {
-  return new FallbackTileLayer(url, options);
+  return new _fallbackTileLayer(url, options);
 }

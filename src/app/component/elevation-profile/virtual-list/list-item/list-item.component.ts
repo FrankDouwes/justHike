@@ -20,7 +20,6 @@ declare const SVG: any;    // fixes SVGjs bug
 
 import {svgPath} from '../../../../_util/smoothLine';
 import {isPrime, normalizeElevation} from '../../../../_util/math';
-import {createSvgCircleMarker, createSvgFaElement, createSvgPinMarker, sampleFaIcon, setupMarker} from '../../../../_util/marker';
 import {getMajorPoiTypes} from '../../../../_util/poi';
 import {environment} from '../../../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
@@ -29,6 +28,7 @@ import {TrailGeneratorService} from '../../../../service/trail-generator.service
 import {SnowGeneratorService} from '../../../../service/snow-generator.service';
 import {Snowpoint} from '../../../../type/snow';
 import {Waypoint} from '../../../../type/waypoint';
+import {MarkerService} from '../../../../factory/marker.service';
 
 @Component({
   selector: 'display-list-item',
@@ -83,6 +83,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     private _trailGenerator: TrailGeneratorService,
     private _snowGenerator: SnowGeneratorService,
     private _changeDetectorRef: ChangeDetectorRef,
+    private _markerFactory: MarkerService
   ) {}
 
 
@@ -432,22 +433,16 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     const _poisArray = this.data.pois;
 
-    console.log(_poisArray);
-
     // draw markers
     if (_poisArray) {
 
       const _self = this;
       const _maxPoiDistance = this._localStorage.retrieve('poiMaxDistance');
 
-      console.log(_maxPoiDistance);
-
       const _totalPois: number = _poisArray.length;
       for (let i = 0; i < _totalPois; i++) {
 
         const _poi: Poi = this._trailGenerator.getPoiById(_poisArray[i]);
-
-        console.log(_poi);
 
         // filter out of range pois
         if (_poi.waypoint.distance >= _maxPoiDistance) {
@@ -480,9 +475,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
           const _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, environment.LINEHEIGHT / 2);
 
-          const _maxPoiDistanceOffTrail = this._localStorage.retrieve('poiDistanceOffTrail');
-
-          const _marker = setupMarker(this._markerSvgCanvas, _poi, _visibleTypes, _maxPoiDistanceOffTrail);
+          const _marker = this._markerFactory.setupMarker(this._markerSvgCanvas, _poi, _visibleTypes);
 
           _marker.click(this._onMarkerClick.bind({data:_poi, self:this}));
           _marker.move(this._svgWidth * (_poi.anchorPoint.distance / environment.MILE), _markerElevation);
@@ -510,7 +503,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
       for (let i = 0; i < _count; i ++) {
 
-        const primeMarker = createSvgFaElement(this._markerSvgCanvas, 'tree', 0.5 + Math.random() * 0.75);
+        const primeMarker = this._markerFactory.createSvgFaElement(this._markerSvgCanvas, 'tree', 0.5 + Math.random() * 0.75);
         let treeline = normalizeElevation(this._svgHeight, this.data.elevationRange.low, min, range, 0);
         treeline = treeline + (Math.random() * (treeline * 2));
 
@@ -521,8 +514,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   }
 
   private _drawUserMarker(): void {
-
-    console.log('draw user');
 
     if (!this.user) {
       return;
@@ -554,15 +545,13 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     // create user maker
     if (_onTrail) {
 
-      this._userMarker = createSvgPinMarker(this._markerSvgCanvas, _color, 1);
-      this._userMarker.attr('type', 'pin');
-      this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -39);
+      this._userMarker = this._markerFactory.createSvgPinMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker.use(this._markerFactory.sampleFaIcon('user')).width(16).height(16).move(-8, -39);
 
     } else {
 
-      this._userMarker = createSvgCircleMarker(this._markerSvgCanvas, _color, 1);
-      this._userMarker.attr('type', 'circle');
-      this._userMarker.use(sampleFaIcon('user')).width(16).height(16).move(-8, -8);
+      this._userMarker = this._markerFactory.createSvgCircleMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker.use(this._markerFactory.sampleFaIcon('user')).width(16).height(16).move(-8, -8);
     }
 
     this._userMarker.attr('onTrail', _onTrail);

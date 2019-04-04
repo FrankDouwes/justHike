@@ -37,7 +37,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgxWebstorageModule } from 'ngx-webstorage';
 
 // component
-import { LocationBasedComponent } from './display/location-based/location-based.component';
+import { LocationBasedComponent } from './base/location-based/location-based.component';
 import { ListItemComponent } from './component/elevation-profile/virtual-list/list-item/list-item.component';
 import { ElevationProfileComponent } from './component/elevation-profile/elevation-profile.component';
 import { MileDetailComponent } from './component/mile-detail/mile-detail.component';
@@ -57,13 +57,13 @@ import { PurchaseSettingsComponent } from './component/dialog/settings-dialog/pa
 import { GeneralSettingsComponent } from './component/dialog/settings-dialog/panels/general-settings/general-settings.component';
 import { AboutComponent } from './component/dialog/settings-dialog/panels/about/about.component';
 import { InstructionsComponent } from './component/dialog/settings-dialog/panels/instructions/instructions.component';
-import { SettingsPanelComponent } from './display/settings-panel/settings-panel.component';
+import { SettingsPanelComponent } from './base/settings-panel/settings-panel.component';
 import { DownloaderComponent } from './component/dialog/settings-dialog/panels/trail-settings/downloader/downloader.component';
 import { LoaderOverlayComponent } from './component/loader-overlay/loader-overlay.component';
 import { FaSamplerComponent } from './component/fa-sampler/fa-sampler.component';
 import { FaIconComponent } from './component/fa-sampler/fa-icon/fa-icon.component';
-import { IconComponent } from './display/icon/icon.component';
-import { ButtonComponent } from './display/button/button.component';
+import { IconComponent } from './base/icon/icon.component';
+import { ButtonComponent } from './base/button/button.component';
 import { SettingsComponent } from './component/navigation/settings/settings.component';
 import { TrailSettingsComponent } from './component/dialog/settings-dialog/panels/trail-settings/trail-settings.component';
 import { AdminComponent } from './component/admin/admin.component';
