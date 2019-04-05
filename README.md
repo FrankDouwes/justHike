@@ -3,7 +3,8 @@
 TODO:
 
 - back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
-- rating system for water / campsites (username field)
+- rating system for water / campsite
+- username field (only used for Admin mode right now, not needed for rating, so remove it?)
 - compass heading, all cordova plugins seem to have android issues, iOS only?
 - overlapping UTM lines (square miles)
 - contact form
