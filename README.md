@@ -8,6 +8,12 @@ TODO:
 - overlapping UTM lines (square miles)
 - contact form
 - optimising (virtual list rendering)
+- fix nightHike background image
+- fix rendering bugs when switching between screen modes (elevation profile)
+- different contrast settings for online/offline maps.
+Check:
+- When is a poi considered off trail
+- When is a poi no longer rendered
 <br/><br/>
 - Design / CSS / placeholder images
 - instructions screen content
@@ -19,8 +25,7 @@ TODO:
 - update to Cordova 9 (assuming this will break everything!)
 <br/><br/>
 - iOS still not animating to correct mile when clicking on mile in elevation profile?
-- iOS bugs (possibly related to the use of the depricated alerts plugin)
-- iOS scroll bugs (poi list)
+- iOS scroll jump bug
 - iOS locator bug
 - iOS unknown navigation error: Scroll on leaflet map (id = 70?), go back to elevation profile, grey screen...
 

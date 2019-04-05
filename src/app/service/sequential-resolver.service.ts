@@ -38,7 +38,7 @@ export class SequentialResolverService implements Resolve<any> {
 
     this.firstRun();
 
-    //cordova enabled or not
+    // cordova enabled or not
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/)) {
 
       return new Promise(function(resolve, reject) {

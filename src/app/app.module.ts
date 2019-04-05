@@ -77,6 +77,7 @@ import { SettingsDialogComponent } from './component/dialog/settings-dialog/sett
 import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
+import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.component';
 
 
 @NgModule({
@@ -117,7 +118,8 @@ import { FilesizePipe } from './pipe/filesize.pipe';
     SettingsComponent,
     TrailSettingsComponent,
     AdminComponent,
-    UserIndicatorComponent
+    UserIndicatorComponent,
+    RatingComponent
   ],
   entryComponents: [
     SettingsDialogComponent,

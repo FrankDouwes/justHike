@@ -23,7 +23,9 @@ export class PoiType {
   color?:     string;           // color (must be hex!, no "white" "red" etc.)
   iconType:   string;           // Font Awesome has prefixes for different icons styles (fa, fas)
   icon:       string;           // the Font Awesome icon name
+
   rateable?:  boolean;          // can be rated (optional)
+  rateBy?: Array<string>;       // all the aspects the poi can be rated by
 }
 
 

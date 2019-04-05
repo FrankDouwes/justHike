@@ -4,7 +4,6 @@ import {PoiType} from './type/poi';
 export class Settings {
 
   public static POITYPES: Array<PoiType> = [
-
     {
       type: 'user',
       label: 'user',
@@ -22,14 +21,15 @@ export class Settings {
       color: '#58aed9',
       iconType: 'fa',
       icon: 'tint',
-      rateable: true
+      rateable: true,
+      rateBy: ['quality', 'flow', 'accessibility']
     }, {
       type: 'camp',
       label: 'campsite',
       isMajor: true,
       color: '#d9a758',
       iconType: 'fa',
-      icon: 'campground'
+      icon: 'campground',
     }, {
       type: 'road',
       label: 'road',
@@ -67,7 +67,8 @@ export class Settings {
       color: '#9e58d9',
       iconType: 'fa',
       icon: 'store',
-      rateable: true
+      rateable: true,
+      rateBy: ['assortment', 'price']
     }, {
       type: 'postoffice',
       label: 'post office',
@@ -80,7 +81,8 @@ export class Settings {
       color: '#805bd9',
       iconType: 'fa',
       icon: 'utensils',
-      rateable: true
+      rateable: true,
+      rateBy: ['quantity', 'quality', 'price']
     }, {
       type: 'information',
       label: 'information',
@@ -142,7 +144,9 @@ export class Settings {
       isMajor: true,
       color: '#48d965',
       iconType: 'fa',
-      icon: 'hotel'
+      icon: 'hotel',
+      rateable: true,
+      rateBy: ['amenities', 'price']
     },
 
     // warning

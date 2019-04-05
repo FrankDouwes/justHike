@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Resolve, Router} from '@angular/router';
 import {LocalStorageService} from 'ngx-webstorage';
 import {environment} from '../../environments/environment.prod';
-import {getTrailMetaDataById, getTrailsMetaData, setTrailMetaData} from '../_util/trail';
+import {getTrailMetaDataById, setTrailMetaData} from '../_util/trail';
 import {BehaviorSubject, forkJoin, Observable, of} from 'rxjs';
 import {share, switchMap, take} from 'rxjs/operators';
 import {TrailGeneratorService} from './trail-generator.service';

@@ -15,12 +15,12 @@ import {LocalStorageService} from 'ngx-webstorage';
 // has a global state (isDownloading), to see if there are still active processes
 export class DownloadService {
 
+  public isDownloadingObservable: Observable<boolean>;
+
   private _downloaders = {};
   private _observers = {};
   private _states = {};
   private _isDownloading: BehaviorSubject<boolean> = new BehaviorSubject(false);
-
-  public isDownloadingObservable: Observable<boolean>;
 
   constructor(
     private _fileSystemService: FilesystemService,
@@ -79,7 +79,7 @@ export class DownloadService {
         _dl.cancelDownload();
         _dl = null;
 
-        let _ob: Subscription = this._observers[key]
+        let _ob: Subscription = this._observers[key];
         _ob.unsubscribe();
         _ob = null;
       }

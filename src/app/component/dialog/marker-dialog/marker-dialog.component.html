@@ -8,13 +8,13 @@
   <h3 *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</h3>
   <p [innerHTML]="data.description"></p>
   <hr />
-
-  (rating goes here)
-
+  <div *ngFor="let type of poiTypes">
+    <rating-form *ngIf="type.rateable" [poiType]="type" [waypoint]="data.waypoint"></rating-form>
+  </div>
 </div>
 
 <!-- right -->
-<div id="right-panel" [ngStyle]="{'background-color': this.poiTypes[0].color} ">
+<div id="right-panel" [ngStyle]="{'background-color': poiTypes[0].color} ">
   <div id="scroll-container">
     <div class="related-poi-list" *ngFor="let poiGroup of poiCollection">
       <h3>Next {{relatedLabel(poiGroup.label)}}</h3>
