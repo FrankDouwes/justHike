@@ -196,10 +196,11 @@ export class Downloader {
         _self._filesystemService.deleteDirectory(_directory, function (result) {
           console.log('delete dir', result);
         });
-      } else {
-        // TODO: untested, not sure if this is needed as files are generally overwritten..?
-        _self._filesystemService.deleteFile(this._paths[0]);
       }
+    } else if (this._paths) {
+
+      // TODO: untested, not sure if this is needed as files are generally overwritten..?
+      _self._filesystemService.deleteFile(this._paths[0]);
     }
 
     this._completedFiles = 0;
