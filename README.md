@@ -12,9 +12,8 @@ TODO:
 - fix nightHike background image
 - fix rendering bugs when switching between screen modes (elevation profile)
 - different contrast settings for online/offline maps.
-Check:
-- When is a poi considered off trail
-- When is a poi no longer rendered
+- Check/Settings: When is a poi considered off trail
+- Check/Settings: When is a poi no longer rendered
 <br/><br/>
 - Design / CSS / placeholder images
 - instructions screen content
