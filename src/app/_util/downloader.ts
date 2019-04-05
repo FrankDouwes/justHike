@@ -184,28 +184,22 @@ export class Downloader {
 
     if (this._paths && this._completedFiles > 0) {
 
-      this._paths.forEach(function (path, index) {
+      // multiple parts are all extracted in the same directory, therefor this will only have to run once
+      const _extension = getExtensionFromString(this._paths[0]);
 
-        if (index < _self._completedFiles) {
+      // if we're dealing with a zip, we'll have to remove the unzipped directory
+      if (_extension === 'zip') {
 
-          // multiple parts are all extracted in the same directory, therefor this will only have to run once
-          if (index === 0) {
+        const _seperator = (_self._hasParts) ? '_' : '.';
+        const _directory = this._paths[0].split(_seperator)[0] + '/';
 
-            const _extension = getExtensionFromString(path);
-
-            // if we're dealing with a zip, we'll have to remove the unzipped directory
-            if (_extension === 'zip') {
-
-              const _seperator = (_self._hasParts) ? '_' : '.';
-              const _directory = path.split(_seperator)[0] + '/';
-
-              _self._filesystemService.deleteDirectory(_directory, function (result) {
-                console.log('delete dir', result);
-              });
-            }
-          }
-        }
-      });
+        _self._filesystemService.deleteDirectory(_directory, function (result) {
+          console.log('delete dir', result);
+        });
+      } else {
+        // TODO: untested, not sure if this is needed as files are generally overwritten..?
+        _self._filesystemService.deleteFile(this._paths[0]);
+      }
     }
 
     this._completedFiles = 0;
