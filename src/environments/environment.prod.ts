@@ -1,13 +1,20 @@
-import {Trail} from '../app/type/trail';
-
 export const environment = {
 
-  production: false,               //  parsing raw data will trigger file download if set to false
+  production: false,              //  parsing raw data will trigger file download if set to false
   simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
   appDomain: 'http://hike.frankdouwes.com/',
   fileBaseUrl: 'files/',
+
+  firebase: {
+    apiKey: 'AIzaSyDRLgOjEo_CP-GFmyVU6qoLQ0AJ1CFdVUw',
+    authDomain: 'just-hike.firebaseapp.com',
+    databaseURL: 'https://just-hike.firebaseio.com',
+    projectId: 'just-hike',
+    storageBucket: 'just-hike.appspot.com',
+    messagingSenderId: '923235623455'
+  },
 
   updateCheckInterval: 86400000,      // the time between (online) data update checks
 

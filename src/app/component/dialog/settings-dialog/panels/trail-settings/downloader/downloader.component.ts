@@ -1,12 +1,13 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, isDevMode,
   OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {DownloadService} from '../../../../../../service/download.service';
-import {Subscription} from 'rxjs';
+import {forkJoin, Observable, Subscription} from 'rxjs';
 import {Downloader, DownloaderStatus} from '../../../../../../_util/downloader';
 import {environment} from '../../../../../../../environments/environment.prod';
 import {FilesystemService} from '../../../../../../service/filesystem.service';
 import {getTrailMetaDataById} from '../../../../../../_util/trail';
 import {TrailMeta} from '../../../../../../type/trail';
+import {AngularFireStorage} from '@angular/fire/storage';
 
 export class DownloadStatus {
   label: string;
@@ -49,7 +50,8 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private _changeDetector:        ChangeDetectorRef,
     private _downloadService:       DownloadService,
-    private _fileSystemService:     FilesystemService
+    private _fileSystemService:     FilesystemService,
+    private _fireStorage:           AngularFireStorage
   ) {
   }
 
@@ -93,21 +95,15 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
     if (this.parts > 1) {
 
-      // multipart download
       this._url = [];
-
+      // multipart download
       for (let i = 0; i < this.parts; i++) {
         this._url.push(this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '_' + i + '.' + this.extension);
       }
-
     } else {
-
       // single file
       this._url = this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '.' + this.extension;
     }
-
-
-
 
     // check if storage is accessible
     this.storageAvailable = this._fileSystemService.isStorageAvailable;
@@ -132,8 +128,6 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
           }
 
         } else if (status['label'] && status['label'] === 'progress') {
-
-
 
           // TODO: currently not showing saving/unzipping as part of the progress bar
 
@@ -187,9 +181,6 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
   public onButtonClick(newState: string) {
 
-    console.log(newState);
-    console.log(this._buttonState);
-
     // prevent repetitive actions
     if (this._buttonState !== newState) {
       this['_' + newState]();     // dynamic function call
@@ -202,22 +193,31 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
   private _download(): void {
 
-    let _url;
+    const _self = this;
+    const _fsObservables = [];
 
     if (typeof this._url === 'string') {
-      _url = environment.appDomain + environment.fileBaseUrl + this._url;
+      _fsObservables.push(this._resolveFireStore(this._url));
     } else {
-
-      _url = [];
-
       this._url.forEach(function(file) {
-        _url.push(environment.appDomain + environment.fileBaseUrl + file);
+        _fsObservables.push(_self._resolveFireStore(file));
       });
     }
 
-    console.log(this._downloader, _url);
+    forkJoin(_fsObservables).subscribe(function(result) {
 
-    this._downloader.downloadFile(_url, !isDevMode(), this._url);
+      let _fsUrl;
+
+      if (result.length === 1) {
+        _fsUrl = result[0];
+      } else {
+        _fsUrl = result;
+      }
+
+      console.log(_fsUrl);
+
+      _self._downloader.downloadFile(_fsUrl, !isDevMode(), _self._url);
+    });
   }
 
   // clear all data
@@ -232,5 +232,10 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   private _cancel(): void {
     this._downloader.cancelDownload();
     this.onClear(this.type);
+  }
+
+  private _resolveFireStore(path: string): Observable<string> {
+    const ref = this._fireStorage.ref(path);
+    return ref.getDownloadURL();
   }
 }

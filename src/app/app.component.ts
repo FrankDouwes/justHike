@@ -9,7 +9,6 @@ import { LocalStorageService } from 'ngx-webstorage';
 import {FilesystemService} from './service/filesystem.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConnectionService} from './service/connection.service';
-import {ScreenModeService} from './service/screen-mode.service';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +33,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     private _element: ElementRef,
     private _injector: Injector,
     private _localStorage: LocalStorageService,
-    private _connectionService: ConnectionService,
+    private _connectionService: ConnectionService
   ) {
 
     // makes constructor props accessible through LocationService, needed for inheritance

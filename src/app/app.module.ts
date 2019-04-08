@@ -79,6 +79,11 @@ import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
 import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.component';
 
+// firebase
+import { AngularFireModule } from '@angular/fire';
+import { AngularFirestoreModule } from '@angular/fire/firestore';
+import {environment} from '../environments/environment.prod';
+import {AngularFireStorageModule} from '@angular/fire/storage';
 
 @NgModule({
   declarations: [
@@ -132,6 +137,9 @@ import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.
     BrowserModule,
     FormsModule,
     NgxWebstorageModule.forRoot(),
+    AngularFireModule.initializeApp(environment.firebase),
+    AngularFirestoreModule.enablePersistence(),
+    AngularFireStorageModule,
     HttpClientModule,
     ScrollingModule,
     BrowserAnimationsModule,
