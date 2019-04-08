@@ -6,6 +6,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 })
 
 /* Orientation being compass orientation, not device, web standard doesn't work on android, cordova plugin does */
+// TODO: research a better compass direction solution, as none seem to be compatible with the various devices (mainly android issues)
 export class OrientationService {
 
   public orientationObserver: Observable<number>;

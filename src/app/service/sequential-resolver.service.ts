@@ -91,6 +91,7 @@ export class SequentialResolverService implements Resolve<any> {
   }
 
   // app needs version data before it can start resolving trail data, so we await, before returning a promise to the router
+  // sets cordova helper functions
   private _sequencer(event?: Event): Promise<any> {
 
     if (event) {

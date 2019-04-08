@@ -50,8 +50,6 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
-
-
     if (changes.data) {
 
       if (changes.data.currentValue.type !== this._instance.data.type) {

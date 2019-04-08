@@ -6,9 +6,7 @@ import { Mile } from '../type/mile';
 import { Poi } from '../type/poi';
 import {Trail, TrailMeta} from '../type/trail';
 import { environment } from '../../environments/environment.prod';
-import { isDevMode } from '@angular/core';
 import { LoaderService } from './loader.service';
-import { saveFileAs } from '../_util/save';
 
 import PositionAsDecimal = geolib.PositionAsDecimal;
 import {getPoiTypeByType} from '../_util/poi';
@@ -16,6 +14,7 @@ import {getPoiTypeByType} from '../_util/poi';
 @Injectable({
   providedIn: 'root'
 })
+
 export class TrailGeneratorService {
 
   public flatTrailData: any;
@@ -65,6 +64,8 @@ export class TrailGeneratorService {
     return _result;
   }
 
+  // called to generate new trail data files (json), only used by admin, not for users)
+  // TODO: move this to a webworker, not a priority as it's rarely used (trail data won't update often)
   public generateMiles(trail: TrailMeta, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number): Trail {
 
     this._trailData = JSON.parse(JSON.stringify(trail));
@@ -138,7 +139,7 @@ export class TrailGeneratorService {
   }
 
   // create overlapping miles (first/last waypoint overlap, insert 2 new points at 0 & 100%
-  // input:     x *------------------------------------* x               (flat array with lon/lat/elevation points
+  // input:     x *--------------------------------------* x             (flat array with lon/lat/elevation points
   // output:    x                                                        (arr)
   //              */------/*                                                  (mile)
   //                    */------/*                                            (mile)
@@ -255,7 +256,8 @@ export class TrailGeneratorService {
     return _miles;
   }
 
-  // create data tree
+  /* create data tree, a sorting mechanism to quickly figure out where the user is in relation to the trail,
+  and what the closest waypoint it. TODO: research optimal algo, someone smart probably made something for this. */
   public createMileTree(startData: Array<Waypoint>, returnArray?: Array<Array<Waypoint>>): void {
 
     if (!returnArray) {
@@ -302,91 +304,96 @@ export class TrailGeneratorService {
     return {id: Number(nearestMile['key']), distance: nearestMile['distance'], mile: this._trailData.miles[nearestMile['key']]};
   }
 
+  // get the nearest point
   public findNearestWaypointInMile(waypoint: Waypoint, nearestMile: Mile): object {
 
     return geolib.orderByDistance({latitude: waypoint.latitude, longitude: waypoint.longitude} as geolib.PositionAsDecimal,
       nearestMile.waypoints);
   }
 
+  // links points of interest to miles, this is a slow loop
   private _linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
 
     const _self = this;
 
     this._loaderService.showMessage('linking pois to miles');
 
-    pois.forEach(function(poi, index) {
+    const _poisLength = pois.length;
+    for (let p = 0; p < _poisLength; p++) {
 
-      poi.id = index; // to prevent mismatching ids in raw data
+      const _poi = pois[p];
 
-      _self._loaderService.showMessage('linking pois to miles:' + poi.id);
+      _poi.id = p; // to prevent mismatching ids in raw data
 
-      poi.waypoint.elevation = poi.waypoint.elevation / environment.FOOT;
+      _self._loaderService.showMessage('linking pois to miles:' + _poi.id);
+
+      _poi.waypoint.elevation = _poi.waypoint.elevation / environment.FOOT;
 
       // find nearest mile
-      const _nearestMile: Mile = miles[_self.findNearestMileInTree({latitude: poi.waypoint.latitude, longitude: poi.waypoint.longitude} as Waypoint)['id']];
+      const _nearestMile: Mile = miles[_self.findNearestMileInTree({latitude: _poi.waypoint.latitude, longitude: _poi.waypoint.longitude} as Waypoint)['id']];
 
-      const _nearestWaypointRef: object = _self.findNearestWaypointInMile(poi.waypoint, _nearestMile);
+      const _nearestWaypointRef: object = _self.findNearestWaypointInMile(_poi.waypoint, _nearestMile);
 
-      const _anchorData = _self._anchorDistanceCalculation(poi.waypoint, _nearestMile, _nearestWaypointRef);
+      const _anchorData = _self._anchorDistanceCalculation(_poi.waypoint, _nearestMile, _nearestWaypointRef);
 
-      poi.anchorPoint = _anchorData.anchorPoint;
-      poi.belongsTo = _nearestMile.id;
+      _poi.anchorPoint = _anchorData.anchorPoint;
+      _poi.belongsTo = _nearestMile.id;
 
       // setup poi reference in waypoint
       if (!_anchorData.nearestWaypoint.nearestToPois) {
         _anchorData.nearestWaypoint.nearestToPois = [];
       }
-      _anchorData.nearestWaypoint.nearestToPois.push(poi.id);
+      _anchorData.nearestWaypoint.nearestToPois.push(_poi.id);
 
       // the distance of poi from trail
-      poi.waypoint.distance = _nearestWaypointRef[0].distance;
+      _poi.waypoint.distance = _nearestWaypointRef[0].distance;
 
       // add poi to mile
       if (!_nearestMile.pois) {
         _nearestMile.pois = [];
       }
 
-      _nearestMile.pois.push(poi.id);
+      _nearestMile.pois.push(_poi.id);
 
-      const _curPoiTypes: Array<string> = String(poi.type).split(', ');
-
-      _curPoiTypes.forEach(function(type) {
-
-        // if array doesn't exist
-        if (!_self._trailData.sortedPoiIds.hasOwnProperty(type)) {
-          _self._trailData.sortedPoiIds[type] = [];
-        }
-        _self._trailData.sortedPoiIds[type].push(poi.id);
-      });
 
       // set poi types for current mile, so it's clear what kind of poi a mile has in it
       // differentiates between major and minor poi (major are the ones possibly shown on elevation profile
       // sets a flag for each poi type in 'poiTypes' property
+      const _curPoiTypes: Array<string> = String(_poi.type).split(', ');
 
-      const _poiTypes: Array<string> = poi.type.split(', ');
+      const _poiTypesLength = _curPoiTypes.length;
+      for (let t = 0; t < _poiTypesLength; t++) {
 
-      _poiTypes.forEach(function(type) {
-        _nearestMile.poiTypes[type + ''] = true;
+        const _type = _curPoiTypes[t];
 
-        if (getPoiTypeByType(type) && getPoiTypeByType(type).isMajor) {
+        // create arrays for each type
+        if (!_self._trailData.sortedPoiIds.hasOwnProperty(_type)) {
+          _self._trailData.sortedPoiIds[_type] = [];
+        }
+        _self._trailData.sortedPoiIds[_type].push(_poi.id);
+
+        _nearestMile.poiTypes[_type + ''] = true;
+
+        // identify major/minor poi per mile
+        if (getPoiTypeByType(_type) && getPoiTypeByType(_type).isMajor) {
           _nearestMile.hasMajorPoi = true;
         } else {
           _nearestMile.hasMinorPoi = true;
         }
-      });
+      }
 
       if (_nearestMile.hasMajorPoi) {
         // refactor ohlc if needed
-        if (_nearestMile.elevationRange.high < poi.waypoint.elevation) {
-          _nearestMile.elevationRange.high = poi.waypoint.elevation;
-        } else if (_nearestMile.elevationRange.low > poi.waypoint.elevation) {
-          _nearestMile.elevationRange.low = poi.waypoint.elevation;
+        if (_nearestMile.elevationRange.high < _poi.waypoint.elevation) {
+          _nearestMile.elevationRange.high = _poi.waypoint.elevation;
+        } else if (_nearestMile.elevationRange.low > _poi.waypoint.elevation) {
+          _nearestMile.elevationRange.low = _poi.waypoint.elevation;
         }
       }
-
-    });
+    }
   }
 
+  // distance calculation
   private _anchorDistanceCalculation(location: Waypoint, nearestMile: Mile, nearestWaypoints: object) {
 
     const _nearestWaypoint = nearestMile.waypoints[nearestWaypoints[0]['key'] as number];

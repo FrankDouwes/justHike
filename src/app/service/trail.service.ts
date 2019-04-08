@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin, Observable } from 'rxjs';
 import { of } from 'rxjs';
-import {Trail, TrailMeta} from '../type/trail';
+import { TrailMeta } from '../type/trail';
 import { LocalStorageService } from 'ngx-webstorage';
 import { LoaderService } from './loader.service';
 import { TrailGeneratorService } from './trail-generator.service';
@@ -10,9 +10,9 @@ import { Waypoint } from '../type/waypoint';
 import { Poi } from '../type/poi';
 import { SnowGeneratorService } from './snow-generator.service';
 import { parseSnow, reverseSnow } from '../_util/snow';
-import {environment} from '../../environments/environment.prod';
-import {getTrailMetaDataById} from '../_util/trail';
-import {FilesystemService} from './filesystem.service';
+import { environment } from '../../environments/environment.prod';
+import { getTrailMetaDataById } from '../_util/trail';
+import { FilesystemService } from './filesystem.service';
 
 // dynamically called
 import { parsePCTData } from '../parser/pct-data';
@@ -145,14 +145,4 @@ export class TrailService {
 
     return {trail: _trail, snow: _snow};
   }
-
-  // handleError(error: HttpErrorResponse): void {
-  //   if (error.error instanceof ErrorEvent) {
-  //     console.error('An error occurred:', error.error.message);
-  //   } else {
-  //     console.error(`Backend returned code ${error.status}`);
-  //   }
-  //   // return throwError('Something bad happened; please try again later.');
-  //   // TODO: show popup with retry button
-  // }
 }

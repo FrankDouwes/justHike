@@ -1,0 +1,4 @@
+<div id="indicator-bar" *ngIf="userPosition !== 'visible'" class="{{userPosition}} {{status}}">
+  <fa-icon *ngIf="userPosition === 'above'" icon="chevron-up"></fa-icon>
+  <fa-icon *ngIf="userPosition === 'below'" icon="chevron-down"></fa-icon>
+</div>

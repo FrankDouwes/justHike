@@ -1,15 +1,5 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  OnChanges,
-  ElementRef,
-  SimpleChanges,
-  Output,
-  EventEmitter,
-  ViewChild,
-  AfterViewInit, ChangeDetectionStrategy
-} from '@angular/core';
+import {Component, Input, OnInit, OnChanges, ElementRef, SimpleChanges, Output,
+  EventEmitter, ViewChild, AfterViewInit} from '@angular/core';
 import {Trail} from '../../../type/trail';
 import {Waypoint} from '../../../type/waypoint';
 import {normalizeElevation} from '../../../_util/math';

@@ -8,6 +8,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 })
 
 // TODO: needs better error handling? a retry dialog/function?
+// TODO: unzipping for chrome (desktop), just nice to have...
 export class FilesystemService  {
 
   public rootPath: string;
@@ -359,7 +360,7 @@ export class FilesystemService  {
     }, false);
   }
 
-  // TODO: edited, check functionality!!! delete directory and everything in it
+  // TODO: edited, test, check functionality!!! delete directory and everything in it
   public deleteDirectory(directoryPath: string, callback: Function): void {
 
     this.setupDirectory(directoryPath, null, function(dirEntry) {

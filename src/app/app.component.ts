@@ -9,7 +9,6 @@ import { LocalStorageService } from 'ngx-webstorage';
 import {FilesystemService} from './service/filesystem.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConnectionService} from './service/connection.service';
-import {Subscription} from 'rxjs';
 import {ScreenModeService} from './service/screen-mode.service';
 
 @Component({
@@ -25,9 +24,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   public showLoader      = true;    // show loader/spinner by default
   public navIsVisible    = true;    // nav visibility
 
-  public uri: string;
-  public uri2: string;
-
   private _offtrailDialog: any;
 
   constructor(
@@ -39,7 +35,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     private _injector: Injector,
     private _localStorage: LocalStorageService,
     private _connectionService: ConnectionService,
-    private _screenModeService: ScreenModeService
   ) {
 
     // makes constructor props accessible through LocationService, needed for inheritance
@@ -61,11 +56,6 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       this._onReady();
     }
 
-    // reload on storage timestamp change (user settings changed that require a reload)
-    this._localStorage.observe('timestamp').subscribe((value) => {
-      window.location.reload();
-    });
-
     // loader (spinner)
     this._loaderService.observe.subscribe((obj: object) => {
       this.showLoader = (obj['type'] === 'self') ? (obj['action'] === 'show') : this.showLoader;
@@ -84,18 +74,15 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     this._connectionService.startTracking();
-
     this._element.nativeElement.addEventListener('markerClick', this._onDialogEvent.bind(this), false);
     this._element.nativeElement.addEventListener('offtrail', this._onDialogEvent.bind(this), false);
   }
 
-  ngAfterViewInit(): void {
-  }
+  ngAfterViewInit(): void {}
 
   ngOnDestroy(): void {
 
     this._connectionService.stopTracking();
-
     this._element.nativeElement.removeEventListener('markerClick', this._onDialogEvent.bind(this));
     this._element.nativeElement.removeEventListener('offtrail', this._onDialogEvent.bind(this), false);
   }
@@ -122,7 +109,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  // on marker click (using standard events as angular events don't bubble
+  // on marker click (using standard events as angular events don't bubble)
   private _onDialogEvent(event: Event): void {
 
     // destination reached

@@ -5,9 +5,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 
+// to communicate with the overlay loader component, which lives outside of the router
 export class LoaderService {
 
-  // to communicate with the overlay loader component
   constructor() {}
 
   private _overlaySubject:  BehaviorSubject<object>     = new BehaviorSubject<object>({});
@@ -29,8 +29,6 @@ export class LoaderService {
   }
 
   public showMessage(message: string): void {
-
-    console.log(message);
 
     this._overlaySubject.next({action: 'show', type: 'message', data: message});
   }

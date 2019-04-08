@@ -2,16 +2,16 @@ import { Injectable, Injector } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { LocalStorageService } from 'ngx-webstorage';
 import { TrailGeneratorService } from './trail-generator.service';
-
-// ionic capacitor
-import {Waypoint} from '../type/waypoint';
-import {environment} from '../../environments/environment.prod';
-import {cordovaEnabled} from '../_util/cordova';
+import { Waypoint } from '../type/waypoint';
+import { environment } from '../../environments/environment.prod';
+import { cordovaEnabled } from '../_util/cordova';
 
 @Injectable({
   providedIn: 'root'
 })
 
+/* tracks user location, has a simulated mile (location) option
+also pauses/resumes based on app state (pause/resume) to preserve battery */
 export class LocationService {
 
   static injector: Injector;
@@ -204,6 +204,9 @@ export class LocationService {
       this._centerUser.next(new Date().getTime());
     }
   }
+
+
+  // APPLICATION STATE (BACKGROUND/FOREGROUND)
 
   private _onPause(event): void {
     if (this._toggleStatus === true && !this._paused) {

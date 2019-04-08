@@ -2,13 +2,12 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
 import {share} from 'rxjs/operators';
-import {rename} from 'fs';
 
 @Injectable({
   providedIn: 'root'
 })
 
-// standalone class that injects stylesheet based on screen settings
+// class that injects stylesheets based on (user) screen settings
 export class ScreenModeService implements OnDestroy {
 
   private _screenModeSubscription: Subscription;

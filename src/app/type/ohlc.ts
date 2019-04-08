@@ -11,7 +11,7 @@ export class OHLC {
 export function calculateOHLC(data: any, range: object, identifier: string = 'elevation', nested: boolean = true) {
 
   // select sub data set to use for calculations
-  let _subArr = data.slice(range["start"], range["end"]);
+  const _subArr = data.slice(range['start'], range['end']);
 
   return _ohlc(_subArr);
 }
@@ -40,5 +40,5 @@ function _ohlc(waypoints:Array<Waypoint>){
     }
   }
 
-  return {open:_open, high:_high, low:_low, close:_close};
+  return {open: _open, high: _high, low: _low, close: _close};
 }

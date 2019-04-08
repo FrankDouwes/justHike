@@ -4,14 +4,15 @@ import { Poi } from './poi';
 
 // the current trail data
 export class Trail {
+
   // STATIC
-  id:             number;
-  utm:            Array<number>;      // utm zones (for grid generation)
-  version:        string;             // version of trail data (for updating)
-  name:           string;
-  abbr:           string;
-  length:         number;             // the given length of the trail (so not calculated with available waypoints)
-  scrollbarSegmentSize: number;       // one scrollbar segment for every X miles
+  id:                     number;
+  utm:                    Array<number>;      // utm zones (for grid generation)
+  version:                string;             // version of trail data (for updating)
+  name:                   string;
+  abbr:                   string;
+  length:                 number;             // the given length of the trail (so not calculated with available waypoints)
+  scrollbarSegmentSize:   number;       // one scrollbar segment for every X miles
 
   // CALCULATED
   direction?:         number;             // 0 for NOBO, 1 for SOBO
@@ -30,23 +31,22 @@ export class Trail {
 TrailMeta represents the most recent available data for a given trail, meaning the version data is what is available online,
 not what it downloaded. TrailMeta is used for Trail generation as well as version checking */
 export class TrailMeta {
-
-  id: number;
-  utm?: Array<number>;
-  name?: string;
-  abbr: string;
-  trailVersion: string;
-  tilesVersion: string;
-  snowVersion: string;
-  length: number;
+  id:             number;
+  abbr:           string;
+  trailVersion:   string;
+  tilesVersion:   string;
+  snowVersion:    string;
+  length:         number;
 
   // optional params
-  trailFileSize?: number;
-  tileFileSize?: number;
-  tilesFileCount?: number;
-  snowFileSize?: number;
-  availableForPurchase?: boolean;
-  isFree?: boolean;
-  dataPath?: string;
-  scrollSegmentSize?: number;
+  utm?:                   Array<number>;
+  name?:                  string;
+  trailFileSize?:         number;
+  tileFileSize?:          number;
+  tilesFileCount?:        number;
+  snowFileSize?:          number;
+  availableForPurchase?:  boolean;
+  isFree?:                boolean;
+  dataPath?:              string;
+  scrollSegmentSize?:     number;
 }

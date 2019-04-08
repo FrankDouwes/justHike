@@ -13,6 +13,7 @@ import {getTrailMetaDataById} from '../_util/trail';
 // Ratings for ratable poi types
 // ratings are stored on local storage and online
 // TODO: check the actual filesize of the data stored locally, if large, possibly save to filesystem instead / or use mongodb?
+// TODO: very much WIP!
 
 export class RateService implements OnDestroy {
 

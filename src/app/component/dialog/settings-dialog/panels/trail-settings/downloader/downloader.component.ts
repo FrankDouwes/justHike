@@ -1,14 +1,5 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  Input,
-  isDevMode,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  SimpleChanges
-} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, isDevMode,
+  OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {DownloadService} from '../../../../../../service/download.service';
 import {Subscription} from 'rxjs';
 import {Downloader, DownloaderStatus} from '../../../../../../_util/downloader';

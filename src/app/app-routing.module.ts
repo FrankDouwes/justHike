@@ -9,6 +9,8 @@ import { ElevationProfileComponent } from './component/elevation-profile/elevati
 import {SequentialResolverService} from './service/sequential-resolver.service';
 import {AdminComponent} from './component/admin/admin.component';
 
+
+// TODO: temp, iOS navigation error...
 export function handleErrors(error):void {
   console.log('app routing error');
 }

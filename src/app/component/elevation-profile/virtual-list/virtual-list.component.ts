@@ -1,28 +1,18 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  OnChanges,
-  OnDestroy,
-  Input,
-  ViewChild,
-  SimpleChanges,
-  EventEmitter,
-  Output, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef
-} from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnChanges, OnDestroy, Input, ViewChild,
+  SimpleChanges, EventEmitter, Output, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {ActivatedRoute, Router} from '@angular/router';
+import {Subscription} from 'rxjs';
+import {LocationBasedComponent} from '../../../base/location-based/location-based.component';
+import {LocalStorageService} from 'ngx-webstorage';
+import {ScreenModeService} from '../../../service/screen-mode.service';
 
 // type classes
 import {OHLC} from '../../../type/ohlc';
 import {Mile} from '../../../type/mile';
 import {Trail} from '../../../type/trail';
-import {LocationBasedComponent} from '../../../base/location-based/location-based.component';
 import {User} from '../../../type/user';
-import {LocalStorageService} from 'ngx-webstorage';
-import {Subscription} from 'rxjs';
-import {ScreenModeService} from '../../../service/screen-mode.service';
 
 @Component({
   selector: 'virtual-list-component',

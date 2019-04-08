@@ -116,8 +116,4 @@ export class NavigationComponent implements OnInit, OnChanges {
   public onCenterUserClick(): void {
     this._locationService.onCenterUser();
   }
-
-  public notifyUser(message: string): void {
-    this.updateAvailable = true;
-  }
 }

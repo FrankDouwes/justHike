@@ -1,23 +1,6 @@
-import {
-  AfterViewInit,
-  ChangeDetectionStrategy, ChangeDetectorRef,
-  Component,
-  ElementRef, EventEmitter,
-  Input, OnChanges, OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
+  Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import 'seedrandom/seedrandom';
-
-import {OHLC} from '../../../../type/ohlc';
-import {Mile} from '../../../../type/mile';
-import {User} from '../../../../type/user';
-import {Poi} from '../../../../type/poi';
-
-declare const SVG: any;    // fixes SVGjs bug
-
 import {svgPath} from '../../../../_util/smoothLine';
 import {isPrime, normalizeElevation} from '../../../../_util/math';
 import {getMajorPoiTypes} from '../../../../_util/poi';
@@ -26,9 +9,16 @@ import {LocalStorageService} from 'ngx-webstorage';
 import {Subscription} from 'rxjs';
 import {TrailGeneratorService} from '../../../../service/trail-generator.service';
 import {SnowGeneratorService} from '../../../../service/snow-generator.service';
+import {MarkerService} from '../../../../factory/marker.service';
+
+declare const SVG: any;    // fixes SVGjs bug
+
+import {OHLC} from '../../../../type/ohlc';
+import {Mile} from '../../../../type/mile';
+import {User} from '../../../../type/user';
+import {Poi} from '../../../../type/poi';
 import {Snowpoint} from '../../../../type/snow';
 import {Waypoint} from '../../../../type/waypoint';
-import {MarkerService} from '../../../../factory/marker.service';
 
 @Component({
   selector: 'display-list-item',

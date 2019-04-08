@@ -13,14 +13,13 @@ import { User } from '../../type/user';
 import { Waypoint } from '../../type/waypoint';
 import { environment } from '../../../environments/environment.prod';
 import { SnowGeneratorService } from '../../service/snow-generator.service';
-import {TrailGeneratorService} from '../../service/trail-generator.service';
-import {OrientationService} from '../../service/orientation.service';
-import {Subscription} from 'rxjs';
-import {LocalStorageService} from 'ngx-webstorage';
-import {ScreenModeService} from '../../service/screen-mode.service';
-import {getTrailMetaDataByAbbr} from '../../_util/trail';
-import {MarkerService} from '../../factory/marker.service';
-import {htmlIcon} from '../../_util/leaflet/icon';
+import { TrailGeneratorService } from '../../service/trail-generator.service';
+import { OrientationService } from '../../service/orientation.service';
+import { LocalStorageService } from 'ngx-webstorage';
+import { ScreenModeService } from '../../service/screen-mode.service';
+import { getTrailMetaDataByAbbr } from '../../_util/trail';
+import { MarkerService } from '../../factory/marker.service';
+import { htmlIcon } from '../../_util/leaflet/icon';
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -31,7 +30,8 @@ declare const SVG: any;    // fixes SVGjs bug
 })
 
 // uses basic for loops for performance
-/* TODO: needs cleanup, needs to use simular marker generation methods as the elevation profile */
+/* TODO: needs cleanup */
+/* TODO: needs guidelines for towns */
 export class LeafletMapComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('leaflet') leaflet: ElementRef;
@@ -54,9 +54,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   // elements
   @Input() showPois: boolean;
-
-  private _orientationSubscription: Subscription;
-  private _orientation: number;
 
   private _map: L;
   private _initialized = false;
@@ -94,19 +91,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (this._initialized) {
 
-      // if (changes.centerPoint && !this.centerUser) {
-      //   this._centerOnPoint(this.centerPoint);
-      // }
-
       if (changes.activeMileId) {
         this._dataManager();
         this.onUserLocationChange(this.user);
-        // this._centerMap(this.centerUser);
       }
-
-      // if (changes.poiRange) {
-      //   this._setBounds();
-      // }
     }
   }
 

@@ -12,20 +12,20 @@ export class Poi {
   belongsTo?:         number;             // mileId
   description?:       string;             // optional description
   distanceFromUser?:  number;             // distance from user in meters
-  distanceFromPoi?:  number;              // distance from another poi in meters
+  distanceFromPoi?:   number;              // distance from another poi in meters
   isBehind?:          boolean;            // is this poi behind the current poi (or user)
 }
 
 export class PoiType {
   type:       string;           // string
   label:      string;           // default label
-  isMajor?:   boolean;          // crucial are 'water', 'camp', 'road'
-  color?:     string;           // color (must be hex!, no "white" "red" etc.)
   iconType:   string;           // Font Awesome has prefixes for different icons styles (fa, fas)
   icon:       string;           // the Font Awesome icon name
 
+  isMajor?:   boolean;          // crucial are 'water', 'camp', 'road'
+  color?:     string;           // color (must be hex!, no "white" "red" etc.
   rateable?:  boolean;          // can be rated (optional)
-  rateBy?: Array<string>;       // all the aspects the poi can be rated by
+  rateBy?:    Array<string>;       // all the aspects the poi can be rated by
 }
 
 

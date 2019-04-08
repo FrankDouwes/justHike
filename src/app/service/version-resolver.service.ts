@@ -23,18 +23,19 @@ export class VersionResolverService implements Resolve<any> {
   private _internalDownloader: Downloader;     // downloads file from assets
   private _externalDownloader: Downloader;     // downloads online file
 
-  public observables: any = {};     // object containing all observables
+  public observables: any = {};       // object containing all observables
   private _subjects: any = {};        // object containing all behaviorSubjects
 
+  // TODO: incorporate town list (will be a seperate file)
   private _dataTypes: Array<string> = ['trail', 'snow', 'tiles'];
 
   constructor(
-    private _router: Router,
-    private _localStorage: LocalStorageService,
-    private _snowGeneratorService: SnowGeneratorService,
-    private _trailGeneratorService: TrailGeneratorService,
-    private _connectionService: ConnectionService,
-    private _downloadService: DownloadService
+    private _router:                  Router,
+    private _localStorage:            LocalStorageService,
+    private _snowGeneratorService:    SnowGeneratorService,
+    private _trailGeneratorService:   TrailGeneratorService,
+    private _connectionService:       ConnectionService,
+    private _downloadService:         DownloadService
   ) {
 
     // create the update available observer
@@ -48,6 +49,7 @@ export class VersionResolverService implements Resolve<any> {
   resolve(): Observable<string> | Observable<never> {
 
     return this.collectVersionData().pipe(
+
       take(1),
       switchMap(data => {
 
@@ -160,8 +162,8 @@ export class VersionResolverService implements Resolve<any> {
 
   /* separately called: if internet were to become available and the app hasn't checked for updates in 24 hours, check.
    * check if the version of currently loaded trail data === the latest available trail data
-   * show version mismatch warning (update data dialog) on mismatch
-   * trigger auto snow data download if user setting is enabled. */
+   * show version mismatch (download available indicator)
+   * TODO: trigger auto snow data download if user setting is enabled. */
   public versionCheck(currentTrailOnly: boolean = false): void {
 
     const _self = this;
@@ -213,10 +215,6 @@ export class VersionResolverService implements Resolve<any> {
             _self._subjects[_trailMeta.abbr + '_' + type].next(false);
           }
         });
-
-
-
-
       }
     });
   }

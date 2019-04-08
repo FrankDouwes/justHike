@@ -1,0 +1,38 @@
+\:host
+  position: absolute
+  z-index: 1000
+  right: 0
+  width: 38.2vw
+  height: calc(100vh / 14) !important
+  text-align: center
+
+  #indicator-bar
+    height: 100%
+    box-sizing: border-box
+    text-align: center
+    font-size: 3vh
+
+  .idle
+    background-color: #DDD
+
+  .fetching
+    background-color: lightgoldenrodyellow
+
+  .error
+    background-color: lightsalmon
+
+  .tracking
+    background-color: lightgreen
+
+\:host.above
+  top: 0
+
+  #indicator-bar
+    padding-top: 1.75vh
+
+\:host.below
+  bottom: 0
+
+  #indicator-bar
+    padding-top: 2vh
+

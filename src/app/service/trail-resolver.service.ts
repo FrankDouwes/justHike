@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {Router, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
-import {Observable, of} from 'rxjs';
+import { Router, Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Observable, of } from 'rxjs';
 import { switchMap, take } from 'rxjs/operators';
 import { TrailService }  from './trail.service';
 import { LoaderService } from './loader.service';
@@ -11,7 +11,7 @@ import { TrailGeneratorService } from './trail-generator.service';
 import { SnowGeneratorService } from './snow-generator.service';
 import { Snow } from '../type/snow';
 import { reverseSnow } from '../_util/snow';
-import {DownloadService} from './download.service';
+import { DownloadService } from './download.service';
 
 @Injectable({
   providedIn: 'root'
@@ -37,10 +37,9 @@ export class TrailResolverService implements Resolve<any> {
 
   /* there are 3 locations for trail data
    * - assets: contains default trail data that shipped with the app
-   * - filesystem: contains downloaded versions of the trail data */
+   * - filesystem: contains downloaded versions of the trail data
+   * - online data */
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<object> | Observable<never> {
-
-    console.log('resolving trail/snow');
 
     this._activeTrailId = this._localStorage.retrieve('activeTrailId') | 0;
     const _direction: number = this._localStorage.retrieve('direction') | 0;
@@ -92,6 +91,5 @@ export class TrailResolverService implements Resolve<any> {
           })
         );
       }
-    //}
   }
 }

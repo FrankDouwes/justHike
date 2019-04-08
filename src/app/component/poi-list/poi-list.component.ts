@@ -47,14 +47,12 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   public userPosition: string;
   public itemSize: number;
   public cacheSize: number = 10;
-  public invisiblePoi: number;
 
   private _staticPoisArray:           Array<any>  = [];
   private _userIndex:                 number;
 
   constructor(
-    private _localStorage: LocalStorageService,
-    private _changeDetector: ChangeDetectorRef) {
+    private _localStorage: LocalStorageService) {
 
     super();
   }
