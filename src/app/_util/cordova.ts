@@ -4,8 +4,6 @@
 /* cordova for native stuff (that tends to be buggy) */
 let _cordova: any;
 
-
-
 /* cordova */
 export function getCordova(): any {
   return _cordova;

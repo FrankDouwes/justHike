@@ -2,9 +2,29 @@
   color: #555
 
   fa-layers
+    display: block
 
   fa-icon
     //filter: drop-shadow(-1px -2px 1px rgba(0,0,0,0.1)) drop-shadow(2px 3px 2px white);
+
+
+  #icons
+
+    // if 2 icons
+    fa-icon:first-child:nth-last-child(2), fa-icon:first-child:nth-last-child(2) ~ fa-icon
+      position: absolute
+      font-size: 2vw
+
+    fa-icon:first-child:nth-last-child(2)
+      text-align: left
+      top: 25%
+      left: 5%
+
+    fa-icon:first-child:nth-last-child(2) ~ fa-icon
+      text-align: right
+      left: 45%
+      bottom: 25%
+
 //
 //  #icons
 //

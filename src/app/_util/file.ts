@@ -1,8 +1,3 @@
-
-
-
-
-
 // get the file extension as different filetypes are parsed differently
 export function getExtensionFromString(filename: string): string {
 
