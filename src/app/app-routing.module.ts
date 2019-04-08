@@ -45,7 +45,8 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'ignore', useHash: true, enableTracing: true, errorHandler: handleErrors})],
+  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'ignore', useHash: true, enableTracing: false, errorHandler: handleErrors})
+  ],
   exports: [RouterModule]
 })
 

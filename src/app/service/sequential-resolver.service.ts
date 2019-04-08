@@ -95,7 +95,7 @@ export class SequentialResolverService implements Resolve<any> {
   private _sequencer(event?: Event): Promise<any> {
 
     if (event) {
-      console.log('device');
+      // console.log('device');
 
       // setup cordova helpers
       if (cordova && !getCordova()) {
@@ -106,7 +106,7 @@ export class SequentialResolverService implements Resolve<any> {
         setDialogs(navigator['notification']);
       }
     } else {
-      console.log('browser');
+      // console.log('browser');
     }
 
     const _self = this;

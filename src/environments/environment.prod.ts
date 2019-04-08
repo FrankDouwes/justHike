@@ -1,6 +1,6 @@
 export const environment = {
 
-  production: false,              //  parsing raw data will trigger file download if set to false
+  production: true,              //  parsing raw data will trigger file download if set to false
   simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)

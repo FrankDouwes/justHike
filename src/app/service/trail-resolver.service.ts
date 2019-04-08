@@ -46,6 +46,7 @@ export class TrailResolverService implements Resolve<any> {
 
       if (this._cachedTrail && this._cachedTrail.id === this._activeTrailId && this._cachedTrail.direction === _direction) {
 
+        console.log('using cache');
         return of({trail: this._cachedTrail, snow: this._cachedSnow});
 
       } else {

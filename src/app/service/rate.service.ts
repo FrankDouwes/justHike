@@ -4,7 +4,7 @@ import {Rating} from '../type/rating';
 import {Observable, Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
 import {getTrailMetaDataById} from '../_util/trail';
-import {AngularFirestore} from '@angular/fire/firestore';
+// import {AngularFirestore} from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
