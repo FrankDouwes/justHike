@@ -106,18 +106,25 @@ export class Downloader {
     this._fileType = (_extension === 'json') ? _extension : 'blob';
 
     let _headers = new HttpHeaders();
-    _headers = _headers.append('Content-Type', 'application/json; charset=utf-8');
+
+    // TODO: research on cloud storage caching/ headers
+
+    if (_extension === 'json') {
+      // _headers = _headers.append('Content-Type', 'application/json; charset=utf-8');
+    } else {
+      // _headers = _headers.append('Content-Type', 'application/zip;');
+    }
 
     if (!cache) {
-      _headers = _headers.append('Cache-Control', 'no-cache');
-      _headers = _headers.append('Pragma', 'no-cache');
-      _paths.url += '?' + (Math.random() * Number.MAX_VALUE);
+      // _headers = _headers.append('Cache-Control', 'no-cache');
+      // _headers = _headers.append('Pragma', 'no-cache');
+      // _paths.url += '?' + (Math.random() * Number.MAX_VALUE);
     }
 
     // download file
     const req = new HttpRequest('GET', _paths.url, {
       reportProgress: true,
-      headers: _headers,
+      // headers: _headers,
       responseType: this._fileType
     });
 

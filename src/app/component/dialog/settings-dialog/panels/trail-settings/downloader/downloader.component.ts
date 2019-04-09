@@ -106,9 +106,6 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
       this._url = this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '.' + this.extension;
     }
 
-
-
-
     // check if storage is accessible
     this.storageAvailable = this._fileSystemService.isStorageAvailable;
 
@@ -187,9 +184,6 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
   public onButtonClick(newState: string) {
 
-    console.log(newState);
-    console.log(this._buttonState);
-
     // prevent repetitive actions
     if (this._buttonState !== newState) {
       this['_' + newState]();     // dynamic function call
@@ -205,13 +199,15 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
     let _url;
 
     if (typeof this._url === 'string') {
-      _url = environment.appDomain + environment.fileBaseUrl + this._url;
+      // _url = environment.appDomain + environment.fileBaseUrl + this._url;
+      _url = 'https://storage.googleapis.com/just-hike/' + this._url;
     } else {
 
       _url = [];
 
       this._url.forEach(function(file) {
-        _url.push(environment.appDomain + environment.fileBaseUrl + file);
+        // _url.push(environment.appDomain + environment.fileBaseUrl + file);
+        _url.push('https://storage.googleapis.com/just-hike/' + file);
       });
     }
 
