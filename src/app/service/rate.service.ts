@@ -4,6 +4,7 @@ import {Rating} from '../type/rating';
 import {Observable, Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
 import {getTrailMetaDataById} from '../_util/trail';
+// import {AngularFirestore} from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,13 @@ export class RateService implements OnDestroy {
   private _activeTrailSubscription: Subscription;
   private _activeTrailAbbr: string;
 
-  constructor(private _localStorage: LocalStorageService) {
+  constructor(
+    // private _fireStore: AngularFirestore,
+    private _localStorage: LocalStorageService) {
+
+    // const items = _fireStore.collection('ratings').valueChanges().subscribe(response => {
+    //   console.log(response);
+    // });
 
     this._activeTrailSubscription = this._localStorage.observe('activeTrailId').subscribe(trailId => {
       this._activeTrailAbbr = getTrailMetaDataById(trailId).abbr;
