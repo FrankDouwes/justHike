@@ -20,7 +20,7 @@ import {SequentialResolverService} from '../../service/sequential-resolver.servi
 })
 export class AdminComponent implements OnInit {
 
-  public compass:number;
+  // public compass: number;
 
   public trailMeta: Array<TrailMeta>;
   public selectedTrail = 0;
@@ -40,7 +40,7 @@ export class AdminComponent implements OnInit {
     private _trailGeneratorService: TrailGeneratorService,
     private _localStorageService: LocalStorageService,
     private _loaderService: LoaderService,
-    private _orientationService: OrientationService,
+    // private _orientationService: OrientationService,
     private _sequentialResolver: SequentialResolverService
   ) { }
 
@@ -52,12 +52,12 @@ export class AdminComponent implements OnInit {
     this.trailMeta = Object.keys(_trailMetaObj).map(function(key) {
       return _trailMetaObj[key];
     });
-
-    this._orientationService.orientationObserver.subscribe(function(direction) {
-      _self.compass = direction;
-    });
-
-    this._orientationService.startTracking();
+    //
+    // this._orientationService.orientationObserver.subscribe(function(direction) {
+    //   _self.compass = direction;
+    // });
+    //
+    // this._orientationService.startTracking();
   }
 
   public genGpxData(): void {

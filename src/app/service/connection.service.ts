@@ -53,7 +53,7 @@ export class ConnectionService {
     _states[_connection.CELL]     = 'Cell generic connection';
     _states[_connection.NONE]     = 'No network connection';
 
-    alert('Connection type: ' + _states[_networkState]);
+    // alert('Connection type: ' + _states[_networkState]);
 
     return {state: _networkState, message: _states[_networkState]};
   }

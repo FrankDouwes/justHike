@@ -53,11 +53,36 @@ export function parsePCTData (trail: Trail, trailData: string, poiData: string, 
 
   // adjust individual pois
 
-  // Highway 78 elevation fix (mi 77), elevation seems to be in feet, while rest of the waypoints is in meters
-  _pois[80].waypoint.elevation = _pois[80].waypoint.elevation * environment.FOOT;
+  // Highway elevation seems to be in feet, while rest of the waypoints is in meters
+  const _highwayExceptions = ['Highway 78', 'Highway 74', 'Highway 178', 'Highway 108', 'Highway 50', 'Highway 49', 'Highway 36'
+    , 'Highway 299', 'Highway 5', 'Highway 99', 'Highway 140', 'Hwy 242', 'under Highway 84', 'Stevens Pass', 'Highway 20']
+
+  const _pLength = _pois.length;
+  const _eLength = _highwayExceptions.length;
+
+  for (let p = 0; p < _pLength; p++) {
+
+    let _exception = -1;
+    for (let e = 0; e < _eLength; e++) {
+
+      if (_pois[p].label.includes(_highwayExceptions[e])) {
+        _pois[p].waypoint.elevation = _pois[p].waypoint.elevation * environment.FOOT;
+        _exception = e;
+        break;
+      }
+    }
+
+    if (_exception !== -1) {
+      _highwayExceptions.splice( _exception,1);
+    }
+
+    if (_highwayExceptions.length === 0) {
+      break;
+    }
+  }
 
   // SNOW (the current snow pack)
-  const _snow = snow['datasets'][0]
+  const _snow = snow['datasets'][0];
 
   // return
   return [trail, _waypoints, _pois, _snow];
@@ -71,7 +96,7 @@ function parsePois(pois: Array<object>): Array<Poi> {
 
   // a static list of poi types based on the raw data identifiers, which are manually linked to poiTypes (or unknown)
   const _identifierTypes: object =
-    {MexB: 'end', WR: 'water', RD: 'road', RDB: 'road', PO: 'postoffice', Trad: 'store, food', Hwy: 'highway', RR: 'railroad', CS: 'camp', GT: 'gate', GTB: 'gate', PL: 'powerline', PLB: 'powerline', WRCS: 'water, camp', WACS: 'water, camp', OakS: 'store, food', Kitc: 'water', TR: 'trail', RedT: 'information', RDb: 'road', Deck: 'view', TH: 'trailhead', WRA: 'water', WRB: 'water', WRC: 'water', BV: 'camp', BVB: 'camp', CSC: 'camp', CSB: 'camp', BGCa: 'sight', Ranc: 'view', GTC: 'gate', Eagl: 'sight', HwyB: 'highway', TRb: 'trail', WRb: 'water', Heme: 'store, food', Tqtz: 'water', Humb: 'trailhead', Sadd: 'trail', PSTr: 'trail', TrRo: 'trail', WA: 'water', MtSa: 'view', Roun: 'boundary', SJSh: 'shelter', TrWi: 'trail', Well: 'water', SJTr: 'trail', BY: 'boundary', Suic: 'peak', TrSu: 'trail', Stra: 'trailhead', Zigg: 'resort', RDC: 'road', CCra: 'sight', Fish: 'trail', Anim: 'sight', Spli: 'shelter', Brid: 'bridge', MFSp: 'unknown', Stat: 'boundary', Moja: 'powerline', Fore: 'boundary', McDo: 'food', RRB: 'railroad', RDD: 'road', Bald: 'trailhead', MtBa: 'peak', Memo: 'sight', Door: 'water', TRB: 'trail', TRC: 'trail', HwyC: 'highway', BigR: 'water', Burk: 'peak', Punc: 'water', HwyD: 'highway', HwyE: 'highway', Buck: 'road', HWYF: 'highway', HwyG: 'highway', HwyH: 'highway', HwyI: 'highway', Mess: 'camp', Acto: 'resort', Gold: 'sight', Agua: 'town', Sier: 'highway', Benc: 'sight', Casa: 'resort', Iber: 'postoffice, water', Wind: 'sight', Pass: 'peak', Gull: 'sight', KMSt: 'resort', WAB: 'water', Hors: 'camp', JMT: 'trail', BVI: 'camp', CSH: 'camp', CSL: 'camp', CSM: 'camp', MTWh: 'peak', Trai: 'peak', WAC: 'water', WAD: 'water', WAE: 'water', WAJ: 'water', WAN: 'water', WAO: 'water', WAQ: 'water', WAS: 'water', WAT: 'water', WAU: 'water', Onio: 'trailhead', RaeL: 'information', GTD: 'gate', McCl: 'information', HotS: 'sight', Muir: 'resort', CSD: 'camp', VVR: 'resort', Reds: 'resort', CSO: 'camp', WAF: 'water', WAK: 'water', WAV: 'water', MMSk: 'unknown', NoCa: 'warning', Tuol: 'postoffice, store, food', JMTC: 'camp', Happ: 'road', HWYB: 'highway', JMTW: 'water', Walk: 'trailhead', Cars: 'boundary', Meis: 'water', Echo: 'trailhead', Ski: 'sight', Weat: 'sight', Rest: 'sight', Pete: 'camp', Chur: 'sight', Road: 'road', Paul: 'water', EBra: 'water', WBra: 'water', RDN: 'road', Bear: 'water', Hask: 'store, resort', Lake: 'resort', Beld: 'resort', Will: 'water', Myrt: 'water', Cold: 'water', PCTM: 'sight', HWY: 'highway', Drak: 'resort', OldS: 'town', JJsC: 'food, store', Subw: 'water', HatC: 'view', Crys: 'water', Brit: 'water', Fitz: 'water', Fern: 'water', Dead: 'water', Litt: 'water', Wolf: 'water', Etna: 'road', Shel: 'water', Marb: 'water, camp', Seia: 'resort', Alex: 'water', Ward: 'road', Oreg: 'boundary', Rogu: 'boundary', Call: 'resort', OldH: 'highway', Camp: 'resort', Klum: 'camp, water', Howa: 'water, road', Brow: 'water, camp', RimD: 'highway', RimV: 'information', RimT: 'trailhead', Casc: 'water', Summ: 'trailhead', Maza: 'resort', ORWA: 'sign', CSDi: 'camp', SkiS: 'sight, camp', Isla: 'water', Koos: 'camp', Obsi: 'boundary, warning', Sant: 'trailhead', Jeff: 'boundary', SFor: 'water', Park: 'camp', Many: 'view', Olal: 'resort', Pinh: 'trailhead', OakG: 'water', Kohn: 'boundary', Timb: 'resort', Radi: 'sight', Ramo: 'water', Mudd: 'water, camp', Indi: 'water', Mile: 'sight', High: 'sight', Tunn: 'sight', SWMo: 'road', Tabl: 'information', Blue: 'water, camp', Yaka: 'warning', Krac: 'resort', TwoL: 'water', BigC: 'camp', Mart: 'camp', Uric: 'camp, water', Olla: 'sight', MFor: 'camp, water', Dutc: 'view', Lema: 'camp', Deep: 'water', Dece: 'water', HwyJ: 'highway', Rain: 'water', Monu: 'sight', RESO: 'resort'};
+    {MexB: 'end', WR: 'water', RD: 'road', RDB: 'road', PO: 'postoffice', Trad: 'store, food', Hwy: 'highway', RR: 'railroad', CS: 'camp', GT: 'gate', GTB: 'gate', PL: 'powerline', PLB: 'powerline', WRCS: 'water, camp', WACS: 'water, camp', OakS: 'store, food', Kitc: 'water', TR: 'trail', RedT: 'information', RDb: 'road', Deck: 'view', TH: 'trailhead', WRA: 'water', WRB: 'water', WRC: 'water', BV: 'camp', BVB: 'camp', CSC: 'camp', CSB: 'camp', BGCa: 'sight', Ranc: 'view', GTC: 'gate', Eagl: 'sight', HwyB: 'highway', TRb: 'trail', WRb: 'water', Heme: 'store, food', Tqtz: 'water', Humb: 'trailhead', Sadd: 'trail', PSTr: 'trail', TrRo: 'trail', WA: 'water', MtSa: 'view', Roun: 'boundary', SJSh: 'shelter', TrWi: 'trail', Well: 'water', SJTr: 'trail', BY: 'boundary', Suic: 'peak', TrSu: 'trail', Stra: 'trailhead', Zigg: 'resort', RDC: 'road', CCra: 'sight', Fish: 'trail', Anim: 'sight', Spli: 'shelter', Brid: 'bridge', MFSp: 'unknown', Stat: 'boundary', Moja: 'powerline', Fore: 'boundary', McDo: 'food', RRB: 'railroad', RDD: 'road', Bald: 'trailhead', MtBa: 'peak', Memo: 'sight', Door: 'water', TRB: 'trail', TRC: 'trail', HwyC: 'highway', BigR: 'water', Burk: 'peak', Punc: 'water', HwyD: 'highway', HwyE: 'highway', Buck: 'road', HWYF: 'highway', HwyG: 'highway', HwyH: 'highway', HwyI: 'highway', Mess: 'camp', Acto: 'resort', Gold: 'sight', Agua: 'town', Sier: 'highway', Benc: 'sight', Casa: 'resort', Iber: 'postoffice, water', Wind: 'sight', Pass: 'peak', Gull: 'sight', KMSt: 'resort', WAB: 'water', Hors: 'camp', JMT: 'trail', BVI: 'camp', CSH: 'camp', CSL: 'camp', CSM: 'camp', MTWh: 'peak', Trai: 'peak', WAC: 'water', WAD: 'water', WAE: 'water', WAJ: 'water', WAN: 'water', WAO: 'water', WAQ: 'water', WAS: 'water', WAT: 'water', WAU: 'water', Onio: 'trailhead', RaeL: 'information', GTD: 'gate', McCl: 'information', HotS: 'sight', Muir: 'resort', CSD: 'camp', VVR: 'resort', Reds: 'resort', CSO: 'camp', WAF: 'water', WAK: 'water', WAV: 'water', MMSk: 'unknown', NoCa: 'warning', Tuol: 'postoffice, store, food', JMTC: 'camp', Happ: 'road', HWYB: 'highway', JMTW: 'water', Walk: 'trailhead', Cars: 'boundary', Meis: 'water', Echo: 'trailhead', Ski: 'sight', Weat: 'sight', Rest: 'sight', Pete: 'camp', Chur: 'sight', Road: 'road', Paul: 'water', EBra: 'water', WBra: 'water', RDN: 'road', Bear: 'water', Hask: 'store, resort', Lake: 'resort', Beld: 'resort', Will: 'water', Myrt: 'water', Cold: 'water', PCTM: 'sight', HWY: 'highway', Drak: 'resort', OldS: 'town', JJsC: 'food, store', Subw: 'water', HatC: 'view', Crys: 'water', Brit: 'water', Fitz: 'water', Fern: 'water', Dead: 'water', Litt: 'water', Wolf: 'water', Etna: 'road', Shel: 'water', Marb: 'water, camp', Seia: 'resort', Alex: 'water', Ward: 'road', Oreg: 'boundary', Rogu: 'boundary', Call: 'resort', OldH: 'highway', Camp: 'resort', Klum: 'camp, water', Howa: 'water, road', Brow: 'water, camp', RimD: 'highway', RimV: 'information', RimT: 'trailhead', Casc: 'water', Summ: 'trailhead', Maza: 'resort', ORWA: 'sign', CSDi: 'camp', SkiS: 'sight, camp', Isla: 'water', Koos: 'camp', Obsi: 'boundary, warning', Sant: 'trailhead', Jeff: 'boundary', SFor: 'water', Park: 'camp', Many: 'view', Olal: 'resort', Pinh: 'trailhead', OakG: 'water', Kohn: 'boundary', Timb: 'resort', Radi: 'sight', Ramo: 'water', Mudd: 'water, camp', Indi: 'water', Mile: 'sight', High: 'sight', Tunn: 'sight', SWMo: 'road', Tabl: 'information', Blue: 'water, camp', Yaka: 'warning', Krac: 'resort', TwoL: 'water', BigC: 'camp', Mart: 'camp', Uric: 'camp, water', Olla: 'sight', MFor: 'camp, water', Dutc: 'view', Lema: 'camp', Deep: 'water', Dece: 'water', HwyJ: 'highway', Rain: 'water', Monu: 'end', RESO: 'resort'};
   let _count: number = 0;
 
   for (let i = 0; i < _poisLength; i++) {

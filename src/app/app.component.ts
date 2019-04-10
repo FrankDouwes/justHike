@@ -154,6 +154,9 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this._markerDialogCloseSubscription = this._markerDialog.afterClosed().subscribe(result => {
       this._toggleNavigationVisibility(true);
+      this._markerDialogCloseSubscription.unsubscribe();
+      this._markerDialogCloseSubscription = null;
+      this._markerDialog = null;
     });
   }
 
