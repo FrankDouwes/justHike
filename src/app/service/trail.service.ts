@@ -92,11 +92,9 @@ export class TrailService {
           _self._fileSystemService.readFile(_trailMeta.abbr, _fileName, async function(result) {
 
             if (result && result !== 'error') {
-              console.log('using filesystem ',  + _fileName);
+              console.log('using filesystem ',  _fileName);
 
-              if (name === 'snow') {
-                console.log(_fileName);
-              }
+              console.log(result);
 
               resolve(result);
 

@@ -167,6 +167,8 @@ export class AdminComponent implements OnInit {
       _tileSettings[meta.abbr + 'Version'] = _self._localStorageService.retrieve(meta.abbr + 'Version');
     });
 
+    console.log(_tileSettings);
+
     // clear all
     this._localStorageService.clear();
 
@@ -174,7 +176,8 @@ export class AdminComponent implements OnInit {
     this._sequentialResolver.firstRun();
 
     this.trailMeta.forEach(function(meta: TrailMeta) {
-      if (_tileSettings[meta.abbr + 'Version']) {
+      console.log(_tileSettings[meta.abbr + 'Version']);
+      if (_tileSettings[meta.abbr + 'Version'] !== null) {
         _self._localStorageService.store(meta.abbr + 'Version', _tileSettings[meta.abbr + 'Version']);
       }
     });

@@ -6,6 +6,7 @@ import {Downloader, DownloaderStatus} from '../../../../../../_util/downloader';
 import {FilesystemService} from '../../../../../../service/filesystem.service';
 import {getTrailMetaDataById} from '../../../../../../_util/trail';
 import {TrailMeta} from '../../../../../../type/trail';
+import {environment} from '../../../../../../../environments/environment.prod';
 
 export class DownloadStatus {
   label: string;
@@ -29,6 +30,7 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   @Input() hasFile?:                boolean;    // is there a file available locally (in local storage/assets/filesystem)
   @Input() hasUpdate?:              boolean;    // is there an update available for this files
   @Input() version:                 string;
+  @Input() isVersionSpecific?:      boolean;    // is the download based on version (trail data / tiles data)
 
   @Input() file:                    string;     // the filename (without extension)
   @Input() extension:               string;     // just the extension, no .)
@@ -88,19 +90,25 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
     this.isActive = this._downloader.isActiveSubject.getValue();
 
+    const _base: string = this.trailMeta.abbr + '/';
+    if (this.isVersionSpecific) {
+      _base = _base.concat(this.trailMeta[this.type + 'Version'] + '/');
+    }
+
     if (this.parts > 1) {
 
       // multipart download
       this._url = [];
 
       for (let i = 0; i < this.parts; i++) {
-        this._url.push(this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '_' + i + '.' + this.extension);
+
+        this._url.push(_base + this.file + '_' + i + '.' + this.extension);
       }
 
     } else {
 
       // single file
-      this._url = this.trailMeta.abbr + '/' + this.trailMeta[this.type + 'Version'] + '/' + this.file + '.' + this.extension;
+      this._url = _base + this.file + '.' + this.extension;
     }
 
     // check if storage is accessible
@@ -110,6 +118,8 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
     if (this._downloadSubscription) {
       this._downloadSubscription.unsubscribe();
     }
+
+    console.log(this._url);
 
     this._downloadSubscription = this._downloader.meta.subscribe(
       function (status: DownloaderStatus) {
@@ -146,6 +156,8 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
           }
 
         } else if (status['label'] && status['label'] === 'error') {
+
+          console.log(status, _self._url);
 
           alert('Downloader error');
           _self.hasFile = false;
@@ -196,15 +208,13 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
     let _url;
 
     if (typeof this._url === 'string') {
-      // _url = environment.appDomain + environment.fileBaseUrl + this._url;
-      _url = 'https://storage.googleapis.com/just-hike/' + this._url;
+      _url = environment.appDomain + environment.fileBaseUrl + this._url;
     } else {
 
       _url = [];
 
       this._url.forEach(function(file) {
-        // _url.push(environment.appDomain + environment.fileBaseUrl + file);
-        _url.push('https://storage.googleapis.com/just-hike/' + file);
+        _url.push(environment.appDomain + environment.fileBaseUrl + file);
       });
     }
 

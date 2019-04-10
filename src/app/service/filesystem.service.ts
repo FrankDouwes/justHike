@@ -198,7 +198,14 @@ export class FilesystemService  {
   }
 
   // // write to a fileEntry
-  private _writeFile(file, data: Blob, callback: Function) {
+  private _writeFile(file, data: any, callback: Function) {
+
+    if (data instanceof Blob === false) {
+      if (typeof data !== 'string') {
+        data = JSON.stringify(data);
+      }
+      data = new Blob([data], {type : 'application/json'});
+    }
 
     file.createWriter(function (fileWriter) {
 
@@ -275,7 +282,15 @@ export class FilesystemService  {
       var reader = new FileReader();
 
       reader.onloadend = function() {
-        console.log("Successful file read: " + this.result);
+        console.log("Successful file read", fileEntry);
+
+        let _res = this.result;
+
+        if (typeof _res === 'string') {
+          _res = JSON.parse(_res);
+        }
+
+        callback(_res);
       };
 
       reader.readAsText(file);

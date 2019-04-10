@@ -4,17 +4,8 @@ export const environment = {
   simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
-  appDomain: 'http://hike.frankdouwes.com/',
-  fileBaseUrl: 'files/',
-
-  firebase: {
-    apiKey: 'AIzaSyDRLgOjEo_CP-GFmyVU6qoLQ0AJ1CFdVUw',
-    authDomain: 'just-hike.firebaseapp.com',
-    databaseURL: 'https://just-hike.firebaseio.com',
-    projectId: 'just-hike',
-    storageBucket: 'just-hike.appspot.com',
-    messagingSenderId: '923235623455'
-  },
+  appDomain: 'https://storage.googleapis.com/',
+  fileBaseUrl: 'just-hike/',
 
   updateCheckInterval: 86400000,      // the time between (online) data update checks
 
