@@ -363,7 +363,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // draw waypoints
     const _trailLine = new L.Polyline(_waypoints, {
-      color: 'red', weight: 4, opacity: 1, smoothFactor: 3
+      color: 'red', weight: 4, opacity: 1, smoothFactor: 0
     });
 
     this.renderedData[index].trail = _trailLine;
@@ -418,7 +418,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // draw waypoints
     const _snowLine = new L.Polyline(waypoints, {
-      color: _stroke, weight: 8, smoothFactor: 3
+      color: _stroke, weight: 8, smoothFactor: 0
     });
 
     this.renderedData[index].snow = _snowLine;
