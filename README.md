@@ -9,17 +9,15 @@ TODO:
 - overlapping UTM lines (square miles)
 - contact form
 - optimising (virtual list rendering)
-- fix nightHike background image
-- fix rendering bugs when switching between screen modes (elevation profile)
 - different contrast settings for online/offline maps.
 - Check/Settings: When is a poi considered off trail
 - Check/Settings: When is a poi no longer rendered
 <br/><br/>
 - Design / CSS / placeholder images
 - instructions screen content
+- fix nightHike background image
 <br/><br/>
 - improve elevation profile scrollbar accuracy
-- paid cloud storage for downloadable files (map tiles)
 - purchase routines (app store / google play)
 <br/><br/>
 - update to Cordova 9 (assuming this will break everything!)
@@ -28,12 +26,6 @@ TODO:
 - iOS scroll jump bug
 - iOS locator bug
 - iOS unknown navigation error: Scroll on leaflet map (id = 70?), go back to elevation profile, grey screen...
-
-recently added/fixed:
-- resume multipart downloads (saves bandwidth + hosting costs)
-- disable GPS tracking when application is in background, resume once in foreground
-- fix: 2 location updates before showing locator?
-
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
