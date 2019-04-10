@@ -1,5 +1,9 @@
 # JustHike
 
+BETA 1 released to first group of testers on: April 10th 2019.
+
+----- ----- ----- ----- ----
+
 TODO v1:
 - add: towns (+info and link towns to nearest trail road/trail junction)
 - add: rating system for water / campsite
@@ -12,6 +16,7 @@ TODO v1:
 - fix: different contrast settings for online/offline maps.
 - fix: downloader state (has downloaded file, but theres an update available)
 - fix: optimising (virtual list rendering)
+- fix: vertical red lines on startup (android)
 <br/><br/>
 - test: Check/Settings: When is a poi considered off trail
 - test: Check/Settings: When is a poi no longer rendered
