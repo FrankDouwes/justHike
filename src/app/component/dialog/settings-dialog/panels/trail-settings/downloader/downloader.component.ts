@@ -90,9 +90,9 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
     this.isActive = this._downloader.isActiveSubject.getValue();
 
-    const _base: string = this.trailMeta.abbr + '/';
+    let _base: string = this.trailMeta.abbr + '/';
     if (this.isVersionSpecific) {
-      _base = _base.concat(this.trailMeta[this.type + 'Version'] + '/');
+      _base += this.trailMeta[this.type + 'Version'] + '/';
     }
 
     if (this.parts > 1) {
