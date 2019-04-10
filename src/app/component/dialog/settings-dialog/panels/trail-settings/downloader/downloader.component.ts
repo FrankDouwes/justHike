@@ -131,7 +131,8 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
           if (_self.extension !== 'zip' && _self.extension !== 'json') {
 
             _self._clear();
-            _self.hasFile = _self.isActive = false;
+            _self.hasFile = false;
+            _self.isActive = false;
             throw new Error('downloaded an unsupported file');
           }
 
@@ -226,6 +227,7 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
     this._downloader.cancelDownload();
     this._downloader.clearFile();
+    this.hasFile = false;
     this.onClear(this.type);
   }
 

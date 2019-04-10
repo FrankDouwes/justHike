@@ -92,15 +92,14 @@ export class TrailService {
           _self._fileSystemService.readFile(_trailMeta.abbr, _fileName, async function(result) {
 
             if (result && result !== 'error') {
-              console.log('using filesystem ',  _fileName);
 
-              console.log(result);
+              console.log('using filesystem ',  _fileName);
 
               resolve(result);
 
             } else {
 
-              console.log('using assets ' + _fileName);
+              console.log('using assets ', _fileName);
 
               // if there isn't a trail, get it from assets
               _self._http.get('assets/files/' + _trailMeta.abbr + '/' + _fileName, {responseType: 'json'}).subscribe(function (result) {

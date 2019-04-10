@@ -11,15 +11,15 @@
     </button>
 
   <!-- download complete / has file-->
-  <button *ngIf="!hasUpdate && hasFile && !isActive" mat-fab class="delete" (click)="onButtonClick('clear')">
+  <button *ngIf="!hasUpdate && !isActive" mat-fab class="delete" (click)="onButtonClick('clear')">
     <fa-icon icon="trash" size="lg"></fa-icon>
   </button>
 </div>
 <div id="meta">
   <h3>{{type + ' data '}}<small>{{'v' + version}}</small></h3>
   <div>
-    <p *ngIf="!isActive && !hasFile">{{trailMeta[type + 'FileSize'] | filesize}}</p>
-    <p *ngIf="!isActive && hasFile">Downloaded</p>
+    <p *ngIf="!isActive && hasUpdate">{{trailMeta[type + 'FileSize'] | filesize}}</p>
+    <p *ngIf="!isActive && !hasUpdate">Downloaded</p>
     <!--<p *ngIf="isActive">{{progressLabel}}</p>-->
     <mat-progress-bar *ngIf="isActive" mode="determinate" [value]="progress" class="progress"></mat-progress-bar>
   </div>

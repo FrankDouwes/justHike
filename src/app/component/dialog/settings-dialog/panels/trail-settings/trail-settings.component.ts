@@ -125,7 +125,7 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   private _setupVersionSubscription(name: string):void {
 
     this._versionSubscriptions[name] = this._localStorage.observe(this.activeTrail.abbr + '_' + name + 'Version').subscribe(result => {
-      // console.log('VERSION CHANGED', name, result);
+      console.log('VERSION CHANGED', name, result);
       this.currentVersions[name + 'Version'] = result;
       this._changeDetector.detectChanges();
     });
@@ -158,6 +158,11 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   public displayVersion(name: string): string {
     // console.log('base version', name);
 
+    if (name === 'snow') {
+      console.log(name);
+      console.log('update version', this.activeTrail[name + 'Version'], this.currentVersions[name + 'Version']);
+      console.log(this.updates[name]);
+    }
     if (this.updates[name]) {
       // console.log('- from updates', this.activeTrail[name + 'Version']);
       return this.activeTrail[name + 'Version'];    // the online version
@@ -178,8 +183,7 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   // triggered from template
   public hasFile(name: string): boolean {
     // console.log('has file', this.currentVersions[name + 'Version']);
-
-    return !!(this.currentVersions[name + 'Version']);
+    return (this.currentVersions[name + 'Version'] === this.updates[name + 'Version']);
   }
 
 
@@ -243,12 +247,12 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   }
 
   public onDownloadComplete(type: string): void {
-    // console.log(type + 'data downloaded');
+    console.log(type + 'data downloaded');
     this._localStorage.store(this.activeTrail.abbr + '_' + type + 'Version', this.activeTrail[type + 'Version']);
   }
 
   public onDownloadCleared(type: string): void {
-    // console.log('CLEAR');
-    this._localStorage.clear(this.activeTrail.abbr + '_' + type + 'Version');
+    console.log('CLEAR');
+    this._localStorage.store(this.activeTrail.abbr + '_' + type + 'Version', 0.1);
   }
 }

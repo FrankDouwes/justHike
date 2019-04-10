@@ -15,7 +15,7 @@
 
     <section id="download">
 
-      <div *ngIf="hasInternet">{{(!hasWifi) ? 'Cellular network detected, consider locating wifi before downloading large files!' : ''}}</div>
+      <div class="warning" *ngIf="hasInternet">{{(!hasWifi) ? 'Cellular network detected, consider locating wifi before downloading large files!' : ''}}</div>
 
       <downloader
         *ngFor="let downloader of downloaders"
