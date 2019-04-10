@@ -113,20 +113,20 @@ export class MarkerService {
   }
 
   // by default a point marker is 30 x 45px, and the border color is 10% darker than the fill color
-  public createSvgPinMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.9) {
+  public createSvgPinMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.85) {
 
     const _marker = canvas.group();
     _marker.attr('vOffset', -(50 * scale));
     _marker.attr('fill-opacity', opacity);
     _marker.addClass('fa-marker');
     _marker.attr('type', 'pin');
-    _marker.path(this._markerData).fill(color).width(33 * scale).height(50 * scale).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(50 * scale));
+    _marker.path(this._markerData).fill(color).width(33 * scale).height(50 * scale).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(50 * scale)).addClass('pin');
 
     return _marker;
   }
 
   // by default a round marker is 30 x 30px, and the border color is 10% darker than the fill color
-  public createSvgCircleMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.9) {
+  public createSvgCircleMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.85) {
 
     const _marker = canvas.group();
     _marker.attr('vOffset', -(16.5 * scale));
@@ -135,7 +135,7 @@ export class MarkerService {
     _marker.attr('type', 'pin');
     _marker.attr('type', 'circle');
     const _size = Math.round(33 * scale);
-    _marker.circle(_size, _size).fill(color).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(16.5 * scale));
+    _marker.circle(_size, _size).fill(color).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(16.5 * scale)).addClass('circle');
 
     return _marker;
   }
@@ -165,7 +165,7 @@ export class MarkerService {
 
     // create circle + icon
     const _draw = SVG(_element).size(26, 26).style('overflow', 'visible');
-    this.createSvgCircleMarker(_draw, '#00FF00', 0.787878);
+    this.createSvgCircleMarker(_draw, '#7f7f7f', 0.787878);
     _draw.use(this.sampleFaIcon('user-dot')).width(24).height(24).move(-12, -12);
 
     // pulsing circle

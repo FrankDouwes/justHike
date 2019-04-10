@@ -569,11 +569,15 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   public onStatusChange(status: string): void {
 
     super.onStatusChange(status);
-
     this.onUserLocationChange(this.user);
   }
 
   public onUserLocationChange(user: User): void {
+
+    // use the id for status
+    if (this._userMarker) {
+      this._userMarker._icon.id = this.status;
+    }
 
     super.onUserLocationChange(user);
 

@@ -517,13 +517,12 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     if (this._userMarker) {
 
+      this._userMarker.node.id = this.userStatus;
+
       const _attr = this._userMarker.node.attributes;
 
       if (Boolean(_attr.onTrail.value) === _onTrail && _attr.type.value === 'pin' ||
         Boolean(_attr.onTrail.value) === _onTrail && _attr.type.value === 'circle') {
-
-        console.log('no redraw');
-
         return; // marker is already what it should be, no need to redraw
       } else {
 
@@ -531,20 +530,19 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       }
     }
 
-    const _color: string = (this.userStatus === 'tracking') ? '#00FF00' : '#CCCCCC';
-
     // create user maker
     if (_onTrail) {
 
-      this._userMarker = this._markerFactory.createSvgPinMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker = this._markerFactory.createSvgPinMarker(this._markerSvgCanvas, '#7f7f7f', 1);
       this._userMarker.use(this._markerFactory.sampleFaIcon('user')).width(16).height(16).move(-8, -39);
 
     } else {
 
-      this._userMarker = this._markerFactory.createSvgCircleMarker(this._markerSvgCanvas, _color, 1);
+      this._userMarker = this._markerFactory.createSvgCircleMarker(this._markerSvgCanvas, '#7f7f7f', 1);
       this._userMarker.use(this._markerFactory.sampleFaIcon('user')).width(16).height(16).move(-8, -8);
     }
 
+    this._userMarker.node.id = this.userStatus;
     this._userMarker.attr('onTrail', _onTrail);
 
     this._userMarker.click(this._onUserClick.bind(this));

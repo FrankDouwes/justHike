@@ -16,6 +16,22 @@
 
 \:host /deep/
 
+  #idle .circle, #undefined .circle, #idle .pin, #undefined .pin
+    fill: #7f7f7f
+    stroke: #6c6c6c
+
+  #fetching .circle, #fetching .pin
+    fill: #feff00
+    stroke: #d7d800
+
+  #tracking .circle, #tracking .pin
+    fill: #00ff00
+    stroke: #00d800
+
+  #error .circle, #error .pin
+    fill: #ff0100
+    stroke: #d80100
+
   .user
     color: white
     width: 0 !important
@@ -24,7 +40,7 @@
     transition: transform .3s ease-out
     text-rendering: optimizeLegibility;
 
-    .pulse
+  #tracking .pulse
       position: absolute
       top: -13px
       left: -13px
