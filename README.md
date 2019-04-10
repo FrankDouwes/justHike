@@ -1,31 +1,36 @@
 # JustHike
 
-TODO:
+TODO v1:
+- add: towns (+info and link towns to nearest trail road/trail junction)
+- add: rating system for water / campsite
+- add: compass heading, all cordova plugins seem to have android issues, iOS only?
+- add: purchase routines (app store / google play)
+<br/><br/>
+- fix: improve elevation profile scrollbar accuracy
+- fix: back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
+- fix: overlapping UTM lines (square miles)
+- fix: different contrast settings for online/offline maps.
+- fix: downloader state (has downloaded file, but theres an update available)
+- fix: optimising (virtual list rendering)
+<br/><br/>
+- test: Check/Settings: When is a poi considered off trail
+- test: Check/Settings: When is a poi no longer rendered
+<br/><br/>
+- design: Make it look good / CSS
+- design: nightHike background image
+- design: instructions screen content
+<br/><br/>
+- iOS: still not animating to correct mile when clicking on mile in elevation profile?
+- iOS: scroll jump bug
+- iOS: unknown navigation error: Scroll on leaflet map (id = 70?), go back to elevation profile, grey screen...
+<br/><br/>
+- eventually: update to Cordova 9 (assuming this will break everything!)
 
-- back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
-- rating system for water / campsite
-- username field (only used for Admin mode right now, not needed for rating, so remove it?)
-- compass heading, all cordova plugins seem to have android issues, iOS only?
-- overlapping UTM lines (square miles)
-- contact form
-- optimising (virtual list rendering)
-- different contrast settings for online/offline maps.
-- Check/Settings: When is a poi considered off trail
-- Check/Settings: When is a poi no longer rendered
-<br/><br/>
-- Design / CSS / placeholder images
-- instructions screen content
-- fix nightHike background image
-<br/><br/>
-- improve elevation profile scrollbar accuracy
-- purchase routines (app store / google play)
-<br/><br/>
-- update to Cordova 9 (assuming this will break everything!)
-<br/><br/>
-- iOS still not animating to correct mile when clicking on mile in elevation profile?
-- iOS scroll jump bug
-- iOS locator bug
-- iOS unknown navigation error: Scroll on leaflet map (id = 70?), go back to elevation profile, grey screen...
+TODO v2:
+- add: side trails
+- add: comments
+- add: lock/mark locations
+- add: personal notes
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
