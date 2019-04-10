@@ -39,7 +39,6 @@ export class Downloader {
     private _httpClient:              HttpClient,
     private _localStorageService:     LocalStorageService
   ) {
-
     // setup status subscription
     this.meta  = this._meta.asObservable().pipe(share());
   }

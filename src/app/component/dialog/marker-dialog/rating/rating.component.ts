@@ -1,7 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {PoiType} from '../../../../type/poi';
 import {RateService} from '../../../../service/rate.service';
-import {getTrailMetaDataById} from '../../../../_util/trail';
 import {Waypoint} from '../../../../type/waypoint';
 
 @Component({

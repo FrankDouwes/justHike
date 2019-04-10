@@ -150,7 +150,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       const tilesFallback = fallbackLayer(_url,
       {
-
           // regular min & max zoom prop causes flickering
           minNativeZoom: 15,
           maxNativeZoom: 15,
@@ -192,12 +191,13 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 14,
+      minZoom: 13.75,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: _tileLayers,
       zoomSnap: 0,
-      preferCanvas: true
+      preferCanvas: true,
+      maxBoundsViscosity: 0.95 // solid
     });
 
     if (!this.allowPanning) {

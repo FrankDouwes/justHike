@@ -147,9 +147,37 @@ export class AdminComponent implements OnInit {
     });
   }
 
+  // clears all user data with the exception of tile downloaded flags ([abbr]Version)
   public defaultUserData(): void {
+
+    // clear all
     this._localStorageService.clear();
+
+    // set defaults
     this._sequentialResolver.firstRun();
+  }
+
+  public safeClearUserData(): void {
+
+    const _self = this;
+    
+    // get tile settings (don't want to delete those flags as it would require a re-download of all tiles)
+    const _tileSettings = {};
+    this.trailMeta.forEach(function(meta: TrailMeta) {
+      _tileSettings[meta.abbr + 'Version'] = _self._localStorageService.retrieve(meta.abbr + 'Version');
+    });
+
+    // clear all
+    this._localStorageService.clear();
+
+    // set defaults
+    this._sequentialResolver.firstRun();
+
+    this.trailMeta.forEach(function(meta: TrailMeta) {
+      if (_tileSettings[meta.abbr + 'Version']) {
+        _self._localStorageService.store(meta.abbr + 'Version', _tileSettings[meta.abbr + 'Version']);
+      }
+    });
   }
 
   public reset(): void {

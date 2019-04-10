@@ -177,6 +177,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     this._screenModeSubscription = this._screenMode.screenModeChangeObserver.subscribe(function(result) {
       if (_self.scrollViewport) {
         _self.update = new Date().getTime();
+        _self._changeDetector.markForCheck();
       }
     });
   }

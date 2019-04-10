@@ -142,6 +142,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     if (changes.update) {
 
+      console.log('changes, set screenmode, redraw');
       this._screenMode = this._localStorage.retrieve('screenMode');
       this._drawMap();
     }

@@ -5,6 +5,7 @@ import {Subscription} from 'rxjs';
 import {VersionResolverService} from '../../service/version-resolver.service';
 import {LocalStorageService} from 'ngx-webstorage';
 import {LocationService} from '../../service/location.service';
+import {LoaderService} from '../../service/loader.service';
 
 @Component({
   selector: 'navigation-component',
@@ -36,6 +37,7 @@ export class NavigationComponent implements OnInit, OnChanges {
     private _route:                   ActivatedRoute,
     private _router:                  Router,
     private _downloadService:         DownloadService,
+    private _loaderOverlay:           LoaderService
   ) {
     _router.events.forEach((event) => {
 
@@ -104,6 +106,7 @@ export class NavigationComponent implements OnInit, OnChanges {
   public onBackClick(): void {
     this.visibleClass = 'hide';
     this.oppositeClass = 'show';
+    this._loaderOverlay.showOverlay();
     this._router.navigate(['elevation-profile/'], {queryParams: {id: this._backIndex}});
     this.navEvent.emit('elevation-profile');
   }

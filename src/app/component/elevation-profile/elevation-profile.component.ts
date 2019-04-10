@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
 import {Snow} from '../../type/snow';
+import {LoaderService} from '../../service/loader.service';
 
 @Component({
   selector: 'app-elevation-profile',
@@ -18,13 +19,15 @@ export class ElevationProfileComponent implements OnInit {
   public snowData: Snow;
 
   constructor(
-    private _route: ActivatedRoute)
+    private _route: ActivatedRoute,
+    private _loaderOverlay: LoaderService)
   {}
 
   ngOnInit(): void {
     this._route.data.subscribe(result => {
         this.trailData = result.data['trail'];
         this.snowData = result.data['snow'];
+        this._loaderOverlay.hideOverlay();
       }
     );
   }

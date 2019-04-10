@@ -3,7 +3,6 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, isDevMode,
 import {DownloadService} from '../../../../../../service/download.service';
 import {Subscription} from 'rxjs';
 import {Downloader, DownloaderStatus} from '../../../../../../_util/downloader';
-import {environment} from '../../../../../../../environments/environment.prod';
 import {FilesystemService} from '../../../../../../service/filesystem.service';
 import {getTrailMetaDataById} from '../../../../../../_util/trail';
 import {TrailMeta} from '../../../../../../type/trail';
@@ -39,7 +38,7 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   public isActive:                  boolean;
   public storageAvailable:          boolean;
   public progress:                  number;
-  public progressState:             string = 'determinate';
+  public progressState              = 'determinate';
 
   private _buttonState:             string;
   private _downloadSubscription:    Subscription;
@@ -79,10 +78,6 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   // SETUP
   private _createDownloader(): void {
 
-    if (this._downloader) {
-      this._downloader.cancelDownload();
-    }
-
     // name based downloader, managed by downloader service
     this._downloader = this._downloadService.createDownloader(this.trailMeta.abbr +  '_' + this.type);
   }
@@ -90,6 +85,8 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   private _setup(): void {
 
     const _self = this;
+
+    this.isActive = this._downloader.isActiveSubject.getValue();
 
     if (this.parts > 1) {
 
@@ -124,7 +121,7 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
           if (_self.extension !== 'zip' && _self.extension !== 'json') {
 
             _self._clear();
-            _self.hasFile = false;
+            _self.hasFile = _self.isActive = false;
             throw new Error('downloaded an unsupported file');
           }
 
@@ -210,8 +207,6 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
         _url.push('https://storage.googleapis.com/just-hike/' + file);
       });
     }
-
-    console.log(this._downloader, _url);
 
     this._downloader.downloadFile(_url, !isDevMode(), this._url);
   }
