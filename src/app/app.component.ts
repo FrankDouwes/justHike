@@ -9,6 +9,7 @@ import { LocalStorageService } from 'ngx-webstorage';
 import {FilesystemService} from './service/filesystem.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConnectionService} from './service/connection.service';
+import {Subscription} from 'rxjs-observable';
 
 @Component({
   selector: 'app-root',
@@ -24,7 +25,10 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
   public navIsVisible    = true;    // nav visibility
 
   private _offtrailDialog: any;
+  private _markerDialog: any;
+  private _markerDialogCloseSubscription: Subscription;
 
+  
   constructor(
     private _route: ActivatedRoute,
     private _fileSystemService: FilesystemService,
@@ -125,7 +129,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
   // DIALOGS
-
+  
   // marker dialog
   private _openMarkerDialog(event): void {
 
@@ -134,14 +138,21 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
       this._toggleNavigationVisibility(false);
     }
 
-    const _markerDialog = this._dialog.open(MarkerDialogComponent, {
+    if (this._markerDialog) {
+      this._dialog.closeAll();
+      this._markerDialogCloseSubscription.unsubscribe();
+      this._markerDialogCloseSubscription = null;
+      this._markerDialog = null;
+    }
+
+    this._markerDialog = this._dialog.open(MarkerDialogComponent, {
       autoFocus: false,
       width: '85%',
       height: '75%',
       data: event.detail
     });
 
-    _markerDialog.afterClosed().subscribe(result => {
+    this._markerDialogCloseSubscription = this._markerDialog.afterClosed().subscribe(result => {
       this._toggleNavigationVisibility(true);
     });
   }

@@ -240,7 +240,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
         detail: poi
       });
 
-    this.container['elementRef'].nativeElement.dispatchEvent(_event);
+    document.getElementsByTagName('app-root')[0].dispatchEvent(_event);
   }
 
   public centerOnUser(): void {

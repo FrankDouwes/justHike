@@ -26,16 +26,12 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   public drawRange:               any;          // the range thats actually rendered
 
   private _locationSubscription:  Subscription;
-  private _screenModeSubscription: Subscription;
-  private _screenMode: string;
 
   constructor(
     private _localStorage: LocalStorageService,
     private _locationService: LocationService,
     private _route: ActivatedRoute,
     private _router: Router,
-    private _screenModeService: ScreenModeService,
-    private _changeDetector: ChangeDetectorRef
   ) {
   }
 

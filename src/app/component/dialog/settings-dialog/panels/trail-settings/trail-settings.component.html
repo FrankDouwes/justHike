@@ -27,7 +27,7 @@
         [trailId]="activeTrail.id"
         [file]="downloader"
         [isVersionSpecific]="(downloader !== 'snow') ? true : false"
-        [extension]="(downloader !== 'tiles') ? 'json' : 'zip'"
+        [extension]="(downloader === 'snow') ? 'json' : 'zip'"
         [parts]="(downloader === 'tiles') ? activeTrail.tilesFileCount : 1"
         [onComplete]="onDownloadComplete.bind(this)"
         [onClear]="onDownloadCleared.bind(this)"
