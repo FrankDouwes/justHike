@@ -204,6 +204,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       this._map.dragging.disable();
     }
 
+    const _self = this;
+
     if (!this.allowZooming) {
       this._map['scrollWheelZoom'].disable();
       this._map.touchZoom.disable();
@@ -433,7 +435,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (mile.id !== 1 && mile.id !== this._trailLength) {
       // startMile marker
-      _mileMarkers.push(this._createLabelMarker((mile.id - 1) + '', mile.waypoints[0]));
+      _mileMarkers = _mileMarkers.concat(this._createLabelMarker(index, mile));
     }
 
     // pois sit on top of label markers
@@ -593,13 +595,173 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   // CREATE MAP ELEMENTS
 
-  private _createLabelMarker(label: string, waypoint: Waypoint) {
+  // a label marker is drawn at the start of a mile
+  private _createLabelMarker(index: number, mile: Mile) {
 
-    const _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + label + '</div>'});
-    const _marker = L.marker([waypoint.latitude, waypoint.longitude], {icon: _labelIcon, mileNumber: label});
+    const _prevMile = this._trailGenerator.getTrailData().miles[index - 1];
 
-    return _marker;
+    const _zeroPoint: Waypoint = mile.waypoints[0];
+    const _nearPoint: Waypoint = mile.waypoints[2];
+    const _prevNearPoint: Waypoint = _prevMile.waypoints[_prevMile.waypoints.length - 4];
+    const _prevCenter: object = _prevMile.centerpoint;
+    const _mileCenter: object = mile.centerpoint;
+
+    const _quarterMilePoint: object = {
+      latitude: (_zeroPoint.latitude + Number(_mileCenter['latitude'])) / 2,
+      longitude: (_zeroPoint.longitude + Number(_mileCenter['longitude'])) / 2,
+    };
+
+    const _prevQuarterMilePoint: object = {
+      latitude: (_zeroPoint.latitude + Number(_prevCenter['latitude'])) / 2,
+      longitude: (_zeroPoint.longitude + Number(_prevCenter['longitude'])) / 2,
+    };
+
+    const _prevQPoint = new L.latLng(_prevQuarterMilePoint['latitude'], _prevQuarterMilePoint['longitude'], 0);
+    const _qPoint = new L.latLng(_quarterMilePoint['latitude'], _quarterMilePoint['longitude'], 0);
+    const _zPoint = new L.latLng(_zeroPoint.latitude, _zeroPoint.longitude, 0);
+    const _nPoint = new L.latLng(_nearPoint.latitude, _nearPoint.longitude, 0);
+    const _prevNPoint = new L.latLng(_prevNearPoint.latitude, _prevNearPoint.longitude, 0);
+
+    const calcHeading = function (waypoint1: Waypoint, waypoint2: Waypoint): number {
+      return Math.atan2(waypoint2.lng - waypoint1.lng, waypoint2.lat - waypoint1.lat) * 180 / Math.PI;
+    }
+
+    const _headingLong = calcHeading(_zPoint, _qPoint);
+    const _headingLongPrev = calcHeading(_prevQPoint, _zPoint);
+
+    const _headingShort = calcHeading(_zPoint, _nPoint);
+    const _headingShortPrev = calcHeading(_prevNPoint, _zPoint);
+
+    // console.log(mile.id - 1 + ' :', _headingLongPrev, _headingLong, _headingShortPrev, _headingShort);
+
+    const _longBend = _headingLong - _headingLongPrev;
+    const _shortBend = _headingShort - _headingShortPrev;
+
+    const _shortPrevLongBend = _headingShort - _headingLongPrev;
+
+    let _useShort:boolean;
+    let _overHalf:boolean;
+
+    if (_longBend > 0) {
+      if (_shortPrevLongBend < _longBend) {
+        console.log(mile.id - 1 + ' positive, use short over long');
+        _useShort = true;
+      } else {
+        _overHalf = true;
+        console.log(mile.id - 1 + ' positive, use long');
+      }
+    } else {
+      if (_shortPrevLongBend > _longBend) {
+        _useShort = true;
+        console.log(mile.id - 1 + ' negative, use short over long');
+      } else {
+        console.log(mile.id - 1 + ' negative, use long');
+      }
+    }
+
+    if (_useShort) {
+      if (_shortBend > 0) {
+        _overHalf = true;
+        console.log('positive');
+      } else {
+        console.log('negative');
+      }
+    }
+
+
+    // the actual angle calculation
+
+    const _startAngle = (_useShort) ? _headingShortPrev : _headingLongPrev;
+    const _offsetAngle = (_useShort) ? _shortBend : _longBend;
+
+    // distance gets smaller the sharper the corner is...
+    const _distancePerc = 1 - Math.abs(_offsetAngle / 180);
+
+    let _angle: number;
+
+    if (_overHalf) {
+      _angle = _startAngle + (_offsetAngle / 2) - 90;
+    } else {
+      _angle = _startAngle + (_offsetAngle / 2) + 90;
+    }
+
+    if (_angle > 180) {
+      _angle = -180 - (_angle - 180);
+    } else if (_angle < -180) {
+      _angle = 180 - Math.abs(_angle - 180);
+    }
+
+    const _distance = (environment.MILE / 8) * _distancePerc;
+
+    const _point: Waypoint = this._createPoint(_zeroPoint, _angle, _distance / 1000);
+
+    // const T_guideLine1 = new L.Polyline([_prevQPoint, _zPoint, _qPoint], {
+    //     color: 'rgb(0, 0, 255)',
+    //     dashArray: '5 7',
+    //     weight: 2,
+    //     opacity: 0.5,
+    //     smoothFactor: 0
+    //   });
+    //
+    // const T_guideLine2 = new L.Polyline([_prevNPoint, _zPoint, _nPoint], {
+    //     color: 'rgb(0, 255, 0)',
+    //     dashArray: '5 7',
+    //     weight: 2,
+    //     opacity: 0.5,
+    //     smoothFactor: 0
+    // });
+
+    const _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + (mile.id - 1) + '</div>'});
+    const _marker = L.marker([_point.latitude, _point.longitude], {icon: _labelIcon, mileNumber: mile.id - 1});
+
+    const _newPoint = new L.latLng(_point.latitude, _point.longitude, 0);
+
+    const _realGuide = new L.Polyline([_zPoint, _newPoint], {
+      color: 'rgb(187, 97, 0)',
+      dashArray: '5 7',
+      weight: 2,
+      opacity: 1,
+      smoothFactor: 0
+    });
+
+    return [_realGuide, _marker];
   }
+
+
+
+
+  private _createPoint(point: Waypoint, angle: number, dist: number): Waypoint {
+
+    const toRad = function(deg: number) {
+      return deg * Math.PI / 180;
+    }
+
+    const toDeg = function(rad: number) {
+      return rad * 180 / Math.PI;
+    }
+
+    dist = dist / 6371;
+    angle = toRad(angle);
+
+    const lat1 = toRad(point.latitude), lon1 = toRad(point.longitude);
+
+    const lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) +
+      Math.cos(lat1) * Math.sin(dist) * Math.cos(angle));
+
+    const lon2 = lon1 + Math.atan2(Math.sin(angle) * Math.sin(dist) *
+      Math.cos(lat1),
+      Math.cos(dist) - Math.sin(lat1) *
+      Math.sin(lat2));
+
+    if (isNaN(lat2) || isNaN(lon2)) return null;
+
+    return {latitude: toDeg(lat2), longitude: toDeg(lon2), elevation: 0};
+  }
+
+
+
+
+
 
   private _createUserMarker(user: User): any {
     if (!user) {
