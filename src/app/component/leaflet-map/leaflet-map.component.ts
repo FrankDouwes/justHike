@@ -622,7 +622,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     const _nPoint = new L.latLng(_nearPoint.latitude, _nearPoint.longitude, 0);
     const _prevNPoint = new L.latLng(_prevNearPoint.latitude, _prevNearPoint.longitude, 0);
 
-    const calcHeading = function (waypoint1: Waypoint, waypoint2: Waypoint): number {
+    const calcHeading = function (waypoint1: any, waypoint2: any): number {
       return Math.atan2(waypoint2.lng - waypoint1.lng, waypoint2.lat - waypoint1.lat) * 180 / Math.PI;
     }
 
