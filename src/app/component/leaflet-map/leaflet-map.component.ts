@@ -375,7 +375,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _drawSnow(mile: Mile, index: number): void {
 
-    const snowMile = this._snowGenerator.getSnowForMile(index)[0];
+    const _snowData = this._snowGenerator.getSnowForMile(index);
+
+    const snowMile = (_snowData) ? _snowData[0] : undefined;
 
     let _snowPoints: Array<any> = [];
 
@@ -602,7 +604,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _zeroPoint: Waypoint = mile.waypoints[0];
     const _nearPoint: Waypoint = mile.waypoints[2];
-    const _prevNearPoint: Waypoint = _prevMile.waypoints[_prevMile.waypoints.length - 4];
+    const _prevNearPoint: Waypoint = _prevMile.waypoints[_prevMile.waypoints.length - 3];
     const _prevCenter: object = _prevMile.centerpoint;
     const _mileCenter: object = mile.centerpoint;
 

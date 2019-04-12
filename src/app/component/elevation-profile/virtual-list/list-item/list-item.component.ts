@@ -359,7 +359,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
   private _drawSnow(): void {
 
-    if (!this._snowData[0] || this._snowData[0].length < 0) {
+    if (!this._snowData || !this._snowData[0] || this._snowData[0].length < 0) {
       return;
     }
 
@@ -447,7 +447,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
         const _poiTypes = _poi['type'].split(', ');
 
         // if poi is of visible type
-        let _visibleTypes: Array<string> = [];
+        const _visibleTypes: Array<string> = [];
 
         const _poiTypesLength = _poiTypes.length;
         for (let p = 0; p < _poiTypesLength; p++) {
@@ -468,7 +468,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
           const _marker = this._markerFactory.setupMarker(this._markerSvgCanvas, _poi, _visibleTypes);
 
-          _marker.click(this._onMarkerClick.bind({data:_poi, self:this}));
+          _marker.click(this._onMarkerClick.bind({data: _poi, self:this}));
           _marker.move(this._svgWidth * (_poi.anchorPoint.distance / environment.MILE), _markerElevation);
         }
 

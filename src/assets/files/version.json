@@ -65,5 +65,22 @@
     "length": 2199,
     "availableForPurchase": false,
     "isFree": false
+  },
+
+  "SHR": {
+    "id": 4,
+    "utm": [17],
+    "name": "Sierra High Route",
+    "abbr": "SHR",
+    "trailVersion": "1.0",
+    "tilesVersion": "1.0",
+    "snowVersion": "1.0",
+    "trailFileSize": 1,
+    "tilesFileCount": 1,
+    "tilesFileSize": 1,
+    "snowFileSize": 1,
+    "length": 195,
+    "availableForPurchase": true,
+    "isFree": true
   }
 }

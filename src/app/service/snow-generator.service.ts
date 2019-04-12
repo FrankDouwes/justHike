@@ -17,6 +17,10 @@ export class SnowGeneratorService {
 
   public getSnowForMile(mileId: number | Array<number>): Array<Array<Snowpoint>> {
 
+    if (! this._snowData) {
+      return;
+    }
+
     if (typeof mileId === 'number') {
       mileId = [mileId];
     }

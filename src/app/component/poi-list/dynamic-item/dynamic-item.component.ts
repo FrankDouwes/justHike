@@ -54,7 +54,7 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
       if (changes.data.currentValue.type !== this._instance.data.type) {
 
-        this.isHidden = (this.data['type'] === 'offtrail');
+        this.isHidden = (this.data['type'].includes('offtrail'));
         this._changeDetector.markForCheck();
 
         // item type mismatch, render new instance of correct item

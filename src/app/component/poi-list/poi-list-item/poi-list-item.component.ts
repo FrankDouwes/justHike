@@ -34,6 +34,10 @@ export class PoiListItemComponent implements OnInit {
 
       _poiStrArr.forEach(function(poi, index) {
 
+        if (poi === 'offtrail') {
+          return;
+        }
+
         const _poiData = getPoiTypeByType(poi);
 
         if (_poiData !== undefined) {

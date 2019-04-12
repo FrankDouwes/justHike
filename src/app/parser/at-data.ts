@@ -1,5 +1,5 @@
 import * as X2JS from 'x2js';
-import {Trail} from '../type/trail';
+import {TrailMeta} from '../type/trail';
 import {Poi} from '../type/poi';
 import {Waypoint} from '../type/waypoint';
 
@@ -8,7 +8,7 @@ const _x2js = new X2JS({
 });
 
 // trail specific parser for AT data
-export function parseATData (trail: Trail, trailData: string, poiData: string, snow: object): Array<object> {
+export function parseATData (trail: TrailMeta, trailData: string, poiData: string, snow: object): Array<object> {
 
   // TRAIL (trail is KML)
   const _waypoints: Array<Waypoint> = [];

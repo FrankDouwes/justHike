@@ -116,7 +116,13 @@ export class Settings {
       icon: 'map-signs'
     }, {
       type: 'view',
-      label: 'summit / view',
+      label: 'view',
+      color: '#d97948',
+      iconType: 'fa',
+      icon: 'mountain'
+    }, {
+      type: 'peak',
+      label: 'summit',
       color: '#d97948',
       iconType: 'fa',
       icon: 'mountain'

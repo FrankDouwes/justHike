@@ -1,7 +1,7 @@
 import * as X2JS from 'x2js';
 import { Waypoint } from '../type/waypoint';
 import { Poi } from '../type/poi';
-import { Trail } from '../type/trail';
+import {TrailMeta} from '../type/trail';
 import {environment} from '../../environments/environment.prod';
 
 const _x2js = new X2JS({
@@ -10,7 +10,7 @@ const _x2js = new X2JS({
 
 // trail specific parser for PCT data
 
-export function parseDEMOData (trail: Trail, trailData: string, poiData: string, snow: object): Array<object> {
+export function parseDEMOData (trail: TrailMeta, trailData: string, poiData: string, snow: object): Array<object> {
 
   // TRAIL
   let _waypoints: Array<Waypoint> = [];

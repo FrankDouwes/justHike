@@ -35,12 +35,12 @@ export class TrailMeta {
   abbr:           string;
   trailVersion:   string;
   tilesVersion:   string;
-  snowVersion:    string;
   length:         number;
 
   // optional params
   utm?:                   Array<number>;
   name?:                  string;
+  snowVersion?:           string;           // not all trails have snow
   trailFileSize?:         number;
   tileFileSize?:          number;
   tilesFileCount?:        number;

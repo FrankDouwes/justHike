@@ -6,8 +6,16 @@
 <div id="left-panel">
   <h1 mat-dialog-title>{{data.label}}</h1>
   <h3 *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</h3>
-  <p [innerHTML]="data.description"></p>
-  <hr />
+
+  <div *ngIf="data.description">
+    <p [innerHTML]="data.description"></p>
+    <hr />
+  </div>
+
+  <div *ngIf="data.comment">
+    <p [innerHTML]="data.comment"></p>
+    <hr />
+  </div>
   <div *ngFor="let type of poiTypes">
     <rating-form *ngIf="type.rateable" [poiType]="type" [waypoint]="data.waypoint"></rating-form>
   </div>

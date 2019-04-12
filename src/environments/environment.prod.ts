@@ -1,11 +1,14 @@
 export const environment = {
 
-  production: true,              //  parsing raw data will trigger file download if set to false
+  production: true,
   simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
-  appDomain: 'https://storage.googleapis.com/',
-  fileBaseUrl: 'just-hike/',
+  // appDomain: 'https://storage.googleapis.com/',
+  // fileBaseUrl: 'just-hike/',
+
+  appDomain: 'https://hike.frankdouwes.com/',
+  fileBaseUrl: 'files/',
 
   updateCheckInterval: 86400000,      // the time between (online) data update checks
 
@@ -59,36 +62,44 @@ export const environment = {
       tilesVersion: '1.0',
       snowVersion: '1.0',
       abbr: 'DEMO',
-      length: 109.5,                  // estimated length (first section is 109.5)
+      length: 109.5,                   // estimated length (first section is 109.5)
       dataPath: 'DEMO/',
-      scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 100        // one scrollbar segment for every X miles
     }, {
       id: 1,
       trailVersion: '1.0',
       tilesVersion: '1.0',
       snowVersion: '1.0',
       abbr: 'PCT',
-      length: 2661.4,                 // estimated length (including 8mi into Canada) according to halfmile pct data
+      length: 2661.4,                  // estimated length (including 8mi into Canada) according to halfmile pct data
       dataPath: 'PCT/',
-      scrollbarSegmentSize: 200,        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
     }, {
       id: 2,
       trailVersion: '1.0',
       tilesVersion: '1.0',
       snowVersion: '1.0',
       abbr: 'CDT',
-      length: 3011,                   // estimated length
+      length: 3011,                    // estimated length
       dataPath: 'CDT/',
-      scrollbarSegmentSize: 200,        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
     }, {
       id: 3,
       trailVersion: '1.0',
       tilesVersion: '1.0',
       snowVersion: '1.0',
       abbr: 'AT',
-      length: 2199,                   // estimated length
+      length: 2199,                    // estimated length
       dataPath: 'AT/',
-      scrollbarSegmentSize: 200,        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
+    }, {
+      id: 4,
+      trailVersion: '1.0',
+      tilesVersion: '1.0',
+      abbr: 'SHR',
+      length: 215,                      // estimated length
+      dataPath: 'SHR/',
+      scrollbarSegmentSize: 100         // one scrollbar segment for every X miles
     }
   ]
 };

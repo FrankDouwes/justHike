@@ -46,7 +46,6 @@ export class TrailResolverService implements Resolve<any> {
 
       if (this._cachedTrail && this._cachedTrail.id === this._activeTrailId && this._cachedTrail.direction === _direction) {
 
-        console.log('using cache');
         return of({trail: this._cachedTrail, snow: this._cachedSnow});
 
       } else {
@@ -62,13 +61,18 @@ export class TrailResolverService implements Resolve<any> {
               this._cachedTrail = data[0] as Trail;
               this._trailGenerator.setTrailData(this._cachedTrail);
 
-              // parse snow data individually (as it's a seperate update/download)
-              this._cachedSnow = data[1] as Snow;
-              this._snowGenerator.setSnowData(this._cachedSnow);
+              // if there's snow data, there might not be
+              if (data[1]) {
 
-              // reverse if needed
-              if (_direction === 1) {
-                this._cachedSnow = reverseSnow(this._cachedSnow, this._cachedTrail.miles.length);
+                // parse snow data individually (as it's a seperate update/download)
+                this._cachedSnow = data[1] as Snow;
+                this._snowGenerator.setSnowData(this._cachedSnow);
+
+
+                // reverse if needed
+                if (_direction === 1) {
+                  this._cachedSnow = reverseSnow(this._cachedSnow, this._cachedTrail.miles.length);
+                }
               }
 
               // generate a mileTree (for GPS location)

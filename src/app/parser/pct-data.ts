@@ -1,7 +1,7 @@
 import * as X2JS from 'x2js';
 import { Waypoint } from '../type/waypoint';
 import { Poi } from '../type/poi';
-import { Trail } from '../type/trail';
+import {TrailMeta} from '../type/trail';
 import {environment} from '../../environments/environment.prod';
 
 const _identifierList: Array<string> = [];
@@ -11,7 +11,7 @@ const _x2js = new X2JS({
 
 // trail specific parser for PCT data
 
-export function parsePCTData (trail: Trail, trailData: string, poiData: string, snow: object): Array<object> {
+export function parsePCTData (trail: TrailMeta, trailData: string, poiData: string, snow: object): Array<object> {
 
   // TRAIL
   let _waypoints: Array<Waypoint> = [];
@@ -43,6 +43,7 @@ export function parsePCTData (trail: Trail, trailData: string, poiData: string, 
     .split('lat=').join('latitude=')
     .split('lon=').join('longitude=')
     .split('desc').join('description')
+    .split('cmt').join('comment')
     .split('sym').join('icon');
 
   // 2. parser to JSON
@@ -83,6 +84,8 @@ export function parsePCTData (trail: Trail, trailData: string, poiData: string, 
 
   // SNOW (the current snow pack)
   const _snow = snow['datasets'][0];
+
+  return;
 
   // return
   return [trail, _waypoints, _pois, _snow];
@@ -164,6 +167,8 @@ function parsePois(pois: Array<object>): Array<Poi> {
       const _descriptionArr = _poi['description'].split('---').join('').split(',');
       _poi['label'] = _descriptionArr.shift();
       _poi['description'] = parseStringUrls(_descriptionArr.join(''));
+
+      console.log(_poi);
 
       _parsedPois.push(_poi as Poi);
     }

@@ -7,8 +7,7 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { LocationBasedComponent } from '../../base/location-based/location-based.component';
 
@@ -149,7 +148,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       const _poi = _self.trailGenerator.getPoiById(_poiId);
 
       if (_poi.waypoint.distance > _maxPoiDistance) {
-        _poi.type = 'offtrail';
+        _poi.type += ', offtrail';
       }
       _self._staticPoisArray.push(_poi);
     }

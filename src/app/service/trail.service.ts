@@ -19,6 +19,7 @@ import { parsePCTData } from '../parser/pct-data';
 import { parseDEMOData } from '../parser/demo-data';
 import { parseCDTData } from '../parser/cdt-data';
 import { parseATData } from '../parser/at-data';
+import {parseSHRData} from '../parser/shr-data';
 
 
 @Injectable({
@@ -36,6 +37,7 @@ export class TrailService {
   private _parsePCTData:    Function = parsePCTData;
   private _parseCDTData:    Function = parseCDTData;
   private _parseATData:     Function = parseATData;
+  private _parseSHRData:    Function = parseSHRData;
 
   constructor(
     private _http: HttpClient,
@@ -51,6 +53,7 @@ export class TrailService {
   public getRawTrailData(trailId: number): Observable<object> {
 
     let _trailMeta: TrailMeta;
+    const _observables = [];
 
     for (const key in environment.TRAILS_GENERATION) {
       if (environment.TRAILS_GENERATION[key].id === trailId) {
@@ -59,19 +62,30 @@ export class TrailService {
     }
 
     const _metaAsObservable = of(_trailMeta);     // so it can be passed into the forkjoin
+    _observables.push(_metaAsObservable);
 
     // AT data from the ATC
     // PCT data from halfmile
     // CDT data from CDTC (might be able to get better dataset)
-    // snow data ripped from postholer (not very nice, I know)
+    // SHR http://onthetrail.org/trekking/shr/ (unofficial)
+    // TODO: snow data ripped from postholer (not very nice, I know)
 
     // .dat is an xml structured file (so .gpx or .kml)
+
+
     const _assetsDir: string = 'assets/data/';
     const _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', {responseType: 'text'});
     const _poi = this._http.get(_assetsDir + _trailMeta.dataPath + 'poi.dat', {responseType: 'text'});
-    const _snow = this._http.get(_assetsDir + _trailMeta.dataPath + 'snow.json', {responseType: 'json'});
+    _observables.push(_trail, _poi);
 
-    return forkJoin([_metaAsObservable, _trail, _poi, _snow]);
+    // snow is an optional data file
+    let _snow: Observable<Object>;
+    if (_trailMeta.snowVersion) {
+      _snow = this._http.get(_assetsDir + _trailMeta.dataPath + 'snow.json', {responseType: 'json'});
+      _observables.push(_snow);
+    }
+
+    return forkJoin(_observables);
   }
 
   // Get the pre parsed trail data (regular user), returns a promise
@@ -93,28 +107,32 @@ export class TrailService {
 
             if (result && result !== 'error') {
 
-              console.log('using filesystem ',  _fileName);
-
               resolve(result);
 
             } else {
 
-              console.log('using assets ', _fileName);
-
               // if there isn't a trail, get it from assets
-              _self._http.get('assets/files/' + _trailMeta.abbr + '/' + _fileName, {responseType: 'json'}).subscribe(function (result) {
-                resolve(result);
+              _self._http.get('assets/files/' + _trailMeta.abbr + '/' + _fileName, {responseType: 'json'}).subscribe(function (file) {
+                resolve(file);
               });
             }
           });
       });
     };
 
-    // attempt to get data from filesystem, if that fails, get it from assets
-    const _trailData = _getData('trail', true);
-    const _snowData = _getData('snow', false);
 
-    return forkJoin([_trailData, _snowData]);
+    // attempt to get data from filesystem, if that fails, get it from assets
+    const _observables = [];
+
+    const _trailData = _getData('trail', true);
+    _observables.push(_trailData);
+
+    if (_trailMeta.snowVersion) {
+      const _snowData = _getData('snow', false);
+      _observables.push(_snowData);
+    }
+
+    return forkJoin(_observables);
   }
 
   // Parse the raw data (routines for each trail), returns a promise
@@ -132,13 +150,17 @@ export class TrailService {
       direction
     );
 
-    let _snow = parseSnow(_parsed[3], _trail.id, _trail.abbr, trail.snowVersion);
+    let _snow;
+    if (_parsed[3]) {
+      _snow = parseSnow(_parsed[3], _trail.id, _trail.abbr, trail.snowVersion);
 
-    if (direction === 1) {
-      _snow = reverseSnow(_snow, _trail.miles.length);
+      if (direction === 1) {
+        _snow = reverseSnow(_snow, _trail.miles.length);
+      }
+
+      this._snowGenerator.setSnowData(_snow);
     }
 
-    this._snowGenerator.setSnowData(_snow);
 
     return {trail: _trail, snow: _snow};
   }
