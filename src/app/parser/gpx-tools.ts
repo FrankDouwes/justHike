@@ -7,13 +7,8 @@ import {Waypoint} from '../type/waypoint';
 /* dev only class for creating clean GPX data (for use with mobile atlas creator to generate tile sets) */
 export function createGPX(trailMeta: TrailMeta, flatTrailData: any): any {
 
-  if (!isDevMode()) {
-    alert('Attempting to access a dev only function: gpxCombine()');
-    return;
-  }
-
   const _gpxOptions: object = {
-    activityName: 'PCT simplified',
+    activityName: trailMeta.abbr + 'simplified',
     creator: 'Frank Douwes',
     startTime: null,
     timeKey: 'time',
@@ -27,14 +22,16 @@ export function createGPX(trailMeta: TrailMeta, flatTrailData: any): any {
   })
 
   // split in 3
-  const _fileLength = Math.ceil(flatTrailData.length / 3);
-  const _arrays = _splitArray(flatTrailData, _fileLength);
+  // const _fileLength = Math.ceil(flatTrailData.length / 3);
+  // const _arrays = _splitArray(flatTrailData, _fileLength);
   const _files: Array<any> = [];
+  //
+  // _arrays.forEach(function(fileData) {
+  //   _files.push(createGpx(fileData, _gpxOptions));
+  // });
 
-  _arrays.forEach(function(fileData) {
-    _files.push(createGpx(fileData, _gpxOptions));
-  });
-
+  _files.push(createGpx(flatTrailData, _gpxOptions));
+  
   return _files;
 }
 

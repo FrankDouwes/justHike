@@ -74,12 +74,10 @@
     "abbr": "SHR",
     "trailVersion": "1.0",
     "tilesVersion": "1.0",
-    "snowVersion": "1.0",
     "trailFileSize": 1,
-    "tilesFileCount": 1,
-    "tilesFileSize": 1,
-    "snowFileSize": 1,
-    "length": 195,
+    "tilesFileCount": 4,
+    "tilesFileSize": 36565880,
+    "length": 215,
     "availableForPurchase": true,
     "isFree": true
   }

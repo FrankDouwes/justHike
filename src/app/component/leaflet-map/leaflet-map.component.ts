@@ -65,7 +65,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _userMarker;
   private _visibleMiles: Array<number> = [];
 
-  private renderedData: Array<any> = [];
+  private _renderedData: Array<any> = [];
+  private _renderedCenterMileId: number;
 
   constructor(
     private _route:                 ActivatedRoute,
@@ -191,7 +192,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 13.75,
+      minZoom: 14,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: _tileLayers,
@@ -238,6 +239,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     const _relativeRange = {start: this.activeMileId - this.range['behind'], end: this.activeMileId + this.range['ahead']};
     const _oldmMilesToDelete: Array<number> = [];
     const _newVisibleMiles: Array<number> = [];
+
+    if (_relativeRange.start < _relativeRange.end - 9) {
+      this._renderedCenterMileId = _relativeRange.start + Math.floor((_relativeRange.end - _relativeRange.start) / 2);
+    } else {
+      this._renderedCenterMileId = -1;
+    }
 
     // create range array (check for trail ends)
     for (let i = _relativeRange.start; i <= _relativeRange.end; i++) {
@@ -295,7 +302,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         _self._centerpoint = _mile.centerpoint;
       }
 
-      _self.renderedData[_mileId] = {};
+      _self._renderedData[_mileId] = {};
 
       _self._drawTrail(_mile, _mileId);
       _self._drawSnow(_mile, _mileId);
@@ -319,23 +326,23 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       try {
 
-        if (_self.renderedData[_mileId] && _self._map) {
+        if (_self._renderedData[_mileId] && _self._map) {
 
           // remove miles/markers/snow data
-          for (const key in _self.renderedData[_mileId]) {
-            _self._map.removeLayer(_self.renderedData[_mileId][key]);
+          for (const key in _self._renderedData[_mileId]) {
+            _self._map.removeLayer(_self._renderedData[_mileId][key]);
 
             if (key === 'markers') {
-              _self.renderedData[_mileId][key].clearLayers();
+              _self._renderedData[_mileId][key].clearLayers();
             }
 
-            _self.renderedData[_mileId][key] = null;
-            delete _self.renderedData[_mileId][key];
+            _self._renderedData[_mileId][key] = null;
+            delete _self._renderedData[_mileId][key];
           }
 
           // clear container
-          _self.renderedData[_mileId] = null;
-          delete _self.renderedData[_mileId];
+          _self._renderedData[_mileId] = null;
+          delete _self._renderedData[_mileId];
           _self._visibleMiles.splice(_self._visibleMiles.indexOf(_mileId), 1);
 
           // this leaves the array structure in plac (it'll be the length of the trail, as we're using the index for reference)
@@ -368,7 +375,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       color: 'red', weight: 4, opacity: 1, smoothFactor: 0
     });
 
-    this.renderedData[index].trail = _trailLine;
+    this._renderedData[index].trail = _trailLine;
 
     _trailLine.addTo(this._map);
   }
@@ -425,7 +432,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       color: _stroke, weight: 8, smoothFactor: 0
     });
 
-    this.renderedData[index].snow = _snowLine;
+    this._renderedData[index].snow = _snowLine;
 
     _snowLine.addTo(this._map);
   }
@@ -478,7 +485,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _markerGroup = L.featureGroup(_mileMarkers);
 
-    this.renderedData[index].markers = _markerGroup;
+    this._renderedData[index].markers = _markerGroup;
     _markerGroup.addTo(this._map);
   }
 
@@ -508,11 +515,16 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _bounds: Array<any> = [];
 
-    for (let i = 0; i < this.renderedData.length; i++) {
+    const _rLength = this._renderedData.length;
+    let _visibleMileCount = 0;
 
-      const _mileData = this.renderedData[i];
+    for (let i = 0; i < _rLength; i++) {
+
+      const _mileData = this._renderedData[i];
 
       if (_mileData && _mileData.markers) {
+
+
 
         for (const key in _mileData.markers._layers) {
 
@@ -520,7 +532,11 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
           if (_marker.options.poi && this.poiRange.indexOf(_marker.options.poi.id) !== -1
             || _marker.options.mileNumber && this.mileRange.indexOf(Number(_marker.options.mileNumber)) !== -1) {
-            _bounds.push(_marker);
+
+            if (_visibleMileCount < 5) {
+              _visibleMileCount++;
+              _bounds.push(_marker);
+            }
           }
         }
       }
@@ -530,11 +546,16 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       const _group = new L.featureGroup(_bounds, this.centerPoint);
 
-      // TODO: animation, it works, I just need a routine to force/finish the current ani before starting the next
-      this._map.fitBounds(_group.getBounds().pad(0.1), {animate: this._animateMap, duration: 0.5, maxZoom: 16});
-      // this._map.setMaxBounds(_group.getBounds().pad(0.25));
-    }
+      this._map.stop();
 
+      // else center on the center mile of the rendered range.
+      if (this._renderedCenterMileId === -1) {
+        this._map.fitBounds(_group.getBounds(), {animate: this._animateMap, duration: 0.5, maxZoom: 16});
+      } else {
+        const _centerPoint = this._trailGenerator.getTrailData().miles[this._renderedCenterMileId].centerpoint;
+        this._map.setView([_centerPoint.latitude, _centerPoint.longitude], 14, {animate: this._animateMap, duration: 0.5, maxZoom: 16});
+      }
+    }
   }
 
   private _centerOnPoint(point: Waypoint): void {
@@ -598,29 +619,57 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   // CREATE MAP ELEMENTS
 
   // a label marker is drawn at the start of a mile
-  private _createLabelMarker(index: number, mile: Mile) {
+  private _createLabelMarker(index: number, mile: Mile): Array<any> {
+
+    let _labelElements: Array<any> = [];
+
+    /* calculate the exact X (start) location for the mile,
+    miles overlap so it's somewhere between point 0 and 1
+    [0]=====[X]=====[1] */
+
+    // calculate percentage of X point in total covered distance by 2 points
+    const _xDistance = Math.abs(mile.waypoints[0].distance) + mile.waypoints[1].distance;
+    const _xPercentage = Math.abs(mile.waypoints[0].distance) / _xDistance;
+
+    // calculate lang/long/elevation based on percentage
+    const _xPoint: Waypoint = {
+      latitude: mile.waypoints[0].latitude + ((mile.waypoints[1].latitude - mile.waypoints[0].latitude) * _xPercentage),
+      longitude: mile.waypoints[0].longitude + ((mile.waypoints[1].longitude - mile.waypoints[0].longitude) * _xPercentage),
+      elevation: mile.waypoints[0].elevation + ((mile.waypoints[1].elevation - mile.waypoints[0].elevation) * _xPercentage),
+      distance: 0,
+      distanceTotal: (mile.id - 1) * environment.MILE
+    };
+
+    /* calculate the position of the mile marker based on the angle of the trail
+    * there are 2 measurements:
+    * - a long one (based on a quarter mile in either direction
+    * - a short one (based on 2 points ahead / 2 points behind
+    *
+    * depending on the angle and the direction a new point is generated
+    * depending on the sharpness of bend the marker distance is calucated*/
+
+    // TODO: optimise / cleanup, works fine, could/should be shorter/clearer
 
     const _prevMile = this._trailGenerator.getTrailData().miles[index - 1];
 
-    const _zeroPoint: Waypoint = mile.waypoints[0];
     const _nearPoint: Waypoint = mile.waypoints[2];
     const _prevNearPoint: Waypoint = _prevMile.waypoints[_prevMile.waypoints.length - 3];
     const _prevCenter: object = _prevMile.centerpoint;
     const _mileCenter: object = mile.centerpoint;
 
     const _quarterMilePoint: object = {
-      latitude: (_zeroPoint.latitude + Number(_mileCenter['latitude'])) / 2,
-      longitude: (_zeroPoint.longitude + Number(_mileCenter['longitude'])) / 2,
+      latitude: (_xPoint.latitude + Number(_mileCenter['latitude'])) / 2,
+      longitude: (_xPoint.longitude + Number(_mileCenter['longitude'])) / 2,
     };
 
     const _prevQuarterMilePoint: object = {
-      latitude: (_zeroPoint.latitude + Number(_prevCenter['latitude'])) / 2,
-      longitude: (_zeroPoint.longitude + Number(_prevCenter['longitude'])) / 2,
+      latitude: (_xPoint.latitude + Number(_prevCenter['latitude'])) / 2,
+      longitude: (_xPoint.longitude + Number(_prevCenter['longitude'])) / 2,
     };
 
     const _prevQPoint = new L.latLng(_prevQuarterMilePoint['latitude'], _prevQuarterMilePoint['longitude'], 0);
     const _qPoint = new L.latLng(_quarterMilePoint['latitude'], _quarterMilePoint['longitude'], 0);
-    const _zPoint = new L.latLng(_zeroPoint.latitude, _zeroPoint.longitude, 0);
+    const _zPoint = new L.latLng(_xPoint.latitude, _xPoint.longitude, 0);
     const _nPoint = new L.latLng(_nearPoint.latitude, _nearPoint.longitude, 0);
     const _prevNPoint = new L.latLng(_prevNearPoint.latitude, _prevNearPoint.longitude, 0);
 
@@ -630,63 +679,47 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _headingLong = calcHeading(_zPoint, _qPoint);
     const _headingLongPrev = calcHeading(_prevQPoint, _zPoint);
-
     const _headingShort = calcHeading(_zPoint, _nPoint);
     const _headingShortPrev = calcHeading(_prevNPoint, _zPoint);
-
-    // console.log(mile.id - 1 + ' :', _headingLongPrev, _headingLong, _headingShortPrev, _headingShort);
 
     const _longBend = _headingLong - _headingLongPrev;
     const _shortBend = _headingShort - _headingShortPrev;
 
     const _shortPrevLongBend = _headingShort - _headingLongPrev;
 
-    let _useShort:boolean;
-    let _overHalf:boolean;
+    let _useShort: boolean;
+    let _overHalf: boolean;
 
     if (_longBend > 0) {
       if (_shortPrevLongBend < _longBend) {
-        console.log(mile.id - 1 + ' positive, use short over long');
         _useShort = true;
       } else {
         _overHalf = true;
-        console.log(mile.id - 1 + ' positive, use long');
       }
     } else {
       if (_shortPrevLongBend > _longBend) {
         _useShort = true;
-        console.log(mile.id - 1 + ' negative, use short over long');
       } else {
-        console.log(mile.id - 1 + ' negative, use long');
       }
     }
 
     if (_useShort) {
       if (_shortBend > 0) {
         _overHalf = true;
-        console.log('positive');
-      } else {
-        console.log('negative');
       }
     }
 
-
     // the actual angle calculation
-
     const _startAngle = (_useShort) ? _headingShortPrev : _headingLongPrev;
     const _offsetAngle = (_useShort) ? _shortBend : _longBend;
 
     // distance gets smaller the sharper the corner is...
     const _distancePerc = 1 - Math.abs(_offsetAngle / 180);
 
-    let _angle: number;
+    let _angle: number = _startAngle + (_offsetAngle / 2);
+    _angle = (_overHalf) ? _angle - 90 : _angle + 90;
 
-    if (_overHalf) {
-      _angle = _startAngle + (_offsetAngle / 2) - 90;
-    } else {
-      _angle = _startAngle + (_offsetAngle / 2) + 90;
-    }
-
+    // from -180 to 180
     if (_angle > 180) {
       _angle = -180 - (_angle - 180);
     } else if (_angle < -180) {
@@ -695,44 +728,22 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _distance = (environment.MILE / 8) * _distancePerc;
 
-    const _point: Waypoint = this._createPoint(_zeroPoint, _angle, _distance / 1000);
-
-    // const T_guideLine1 = new L.Polyline([_prevQPoint, _zPoint, _qPoint], {
-    //     color: 'rgb(0, 0, 255)',
-    //     dashArray: '5 7',
-    //     weight: 2,
-    //     opacity: 0.5,
-    //     smoothFactor: 0
-    //   });
-    //
-    // const T_guideLine2 = new L.Polyline([_prevNPoint, _zPoint, _nPoint], {
-    //     color: 'rgb(0, 255, 0)',
-    //     dashArray: '5 7',
-    //     weight: 2,
-    //     opacity: 0.5,
-    //     smoothFactor: 0
-    // });
+    const _point: Waypoint = this._createPoint(_xPoint, _angle, _distance);
 
     const _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + (mile.id - 1) + '</div>'});
-    const _marker = L.marker([_point.latitude, _point.longitude], {icon: _labelIcon, mileNumber: mile.id - 1});
+    _labelElements.push(L.marker([_point.latitude, _point.longitude], {icon: _labelIcon, mileNumber: mile.id - 1}));
 
     const _newPoint = new L.latLng(_point.latitude, _point.longitude, 0);
 
-    const _realGuide = new L.Polyline([_zPoint, _newPoint], {
-      color: 'rgb(187, 97, 0)',
-      dashArray: '5 7',
-      weight: 2,
-      opacity: 1,
-      smoothFactor: 0
-    });
+    if (_distance > 0) {
+      _labelElements = _labelElements.concat(this._createGuide(_zPoint, _newPoint, true));
+    }
 
-    return [_realGuide, _marker];
+    return _labelElements;
   }
 
-
-
-
-  private _createPoint(point: Waypoint, angle: number, dist: number): Waypoint {
+  // create a point based on distance/angle of another point
+  private _createPoint(point: Waypoint, angle: number, kms: number): Waypoint {
 
     const toRad = function(deg: number) {
       return deg * Math.PI / 180;
@@ -742,7 +753,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       return rad * 180 / Math.PI;
     }
 
-    dist = dist / 6371;
+    const dist = (kms / 1000) / 6371;
     angle = toRad(angle);
 
     const lat1 = toRad(point.latitude), lon1 = toRad(point.longitude);
@@ -755,16 +766,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       Math.cos(dist) - Math.sin(lat1) *
       Math.sin(lat2));
 
-    if (isNaN(lat2) || isNaN(lon2)) return null;
+    if (isNaN(lat2) || isNaN(lon2)) { return; }
 
     return {latitude: toDeg(lat2), longitude: toDeg(lon2), elevation: 0};
   }
 
-
-
-
-
-
+  // create an svg user marker
   private _createUserMarker(user: User): any {
     if (!user) {
       return;
@@ -772,44 +779,47 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     return L.marker([user.waypoint.latitude, user.waypoint.longitude], {icon: this._markerFactory.createLeafletUserMarker(), user: user, forceZIndex: 1000});
   }
 
-  // private _createPoiGuideLine(poi: Poi): Array<any> {
-  //
-  //   const poiLoc = new L.latLng(poi.waypoint.latitude, poi.waypoint.longitude, poi.waypoint.elevation);
-  //   const anchorLoc = new L.latLng(poi.anchorPoint.latitude, poi.anchorPoint.longitude, poi.anchorPoint.elevation);
-  //
-  //   const _guideLine = new L.Polyline([poiLoc, anchorLoc], {
-  //     color: 'rgb(187, 97, 0)',
-  //     dashArray: '5 7',
-  //     weight: 2,
-  //     opacity: 1,
-  //     smoothFactor: 0
-  //   });
-  //
-  //   const _arrowHead = L.polylineDecorator(_guideLine, {
-  //     patterns: [
-  //       {
-  //         offset: '100%',
-  //         repeat: 0,
-  //         symbol: L.Symbol.arrowHead({
-  //           pixelSize: 5,
-  //           headAngle: 90,
-  //           polygon: false,
-  //           pathOptions: {color: 'rgb(187, 97, 0)', weight: 2}
-  //         })
-  //       },
-  //       {
-  //         offset: '0%',
-  //         repeat: 0,
-  //         symbol: L.Symbol.arrowHead({
-  //           pixelSize: 5,
-  //           headAngle: 270,
-  //           polygon: false,
-  //           pathOptions: {color: 'rgb(187, 97, 0)', weight: 2}
-  //         })
-  //       }
-  //     ]
-  //   });
-  //
-  //   return [_guideLine, _arrowHead];
-  // }
+  // create a guide line, with optional arrowheads on either side.
+  private _createGuide(point1: any, point2: any, arrowHeadStart?: boolean, arrowHeadEnd?: boolean): Array<any> {
+
+    const _elements: Array<any> = [];
+
+    const _guide = new L.Polyline([point1, point2], {
+      color: 'rgb(187, 97, 0)',
+      dashArray: '5 7',
+      weight: 2,
+      opacity: 1,
+      smoothFactor: 0
+    });
+
+    _elements.push(_guide);
+
+    const _createArrowHead = function (guide: any, positionPerc: number): any {
+
+      const _angle = (positionPerc === 0 ) ? 270 : 90;
+
+      return L.polylineDecorator(guide, {
+        patterns: [{
+          offset: positionPerc + '%',
+          repeat: 0,
+          symbol: L.Symbol.arrowHead({
+            pixelSize: 5,
+            headAngle: _angle,
+            polygon: false,
+            pathOptions: {color: 'rgb(187, 97, 0)', weight: 2}
+          })
+        }]
+      });
+    };
+
+    if (arrowHeadStart) {
+      _elements.push(_createArrowHead(_guide, 0));
+    }
+
+    if (arrowHeadEnd) {
+      _elements.push(_createArrowHead(_guide, 100));
+    }
+
+    return _elements;
+  }
 }
