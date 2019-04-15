@@ -63,14 +63,6 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-ionic-webview": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-ionic-webview@latest"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-device-orientation": {
     "source": {
       "type": "registry",
@@ -83,6 +75,14 @@
     "source": {
       "type": "registry",
       "id": "cordova-plugin-dialogs"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-ionic-webview": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-ionic-webview@latest"
     },
     "is_top_level": true,
     "variables": {}

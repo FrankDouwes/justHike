@@ -1,8 +1,8 @@
 {
   "_from": "cordova-plugin-ionic-webview@latest",
-  "_id": "cordova-plugin-ionic-webview@4.0.0",
+  "_id": "cordova-plugin-ionic-webview@4.0.1",
   "_inBundle": false,
-  "_integrity": "sha512-4CNDDXS9PZ+j38ZpzFqC6Ua5GySr/McXTPnWdRfhFSbuFCL6B/xhIHUVoeoj48wo6Sh+gDURvbaH9uu1Z53TJA==",
+  "_integrity": "sha512-rJf7jFQNw7l0U4Y7P6DjxwmO/qQgS7xqiTgwDbNFS4z4+FZ3EZyupll7/cFEDnxGRNMgWsMKDhIABUo5mIDaUQ==",
   "_location": "/cordova-plugin-ionic-webview",
   "_phantomChildren": {},
   "_requested": {
@@ -19,8 +19,8 @@
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-ionic-webview/-/cordova-plugin-ionic-webview-4.0.0.tgz",
-  "_shasum": "d00f36761309d31ade55e9740731ffca141f4e54",
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-ionic-webview/-/cordova-plugin-ionic-webview-4.0.1.tgz",
+  "_shasum": "2ff5e73998d87316d3ab8dbe4b6ccf768ab7f637",
   "_spec": "cordova-plugin-ionic-webview@latest",
   "_where": "/Users/frankdouwes/work/just-hike/mobile",
   "author": {
@@ -103,5 +103,5 @@
     "sync_plugin_xml": "sync-cordova-xml package.json plugin.xml --output=plugin.xml",
     "version": "npm run sync_plugin_xml && git add plugin.xml"
   },
-  "version": "4.0.0"
+  "version": "4.0.1"
 }

@@ -26,21 +26,22 @@
 <body>
   <app-root></app-root>
 </body>
+<!-- Include Cordova script only when needed -->
 <script>
-  // https://github.com/angular/angular/issues/22509
-  window.addEventListener = function () {
-    (window.EventTarget || Window).prototype.addEventListener.apply(this, arguments);
-  };
-  window.removeEventListener = function () {
-    (window.EventTarget || Window).prototype.removeEventListener.apply(this, arguments);
-  };
-  document.addEventListener = function () {
-    (window.EventTarget || Document).prototype.addEventListener.apply(this, arguments);
-  };
-  document.removeEventListener = function () {
-    (window.EventTarget || Document).prototype.removeEventListener.apply(this, arguments);
-  };
+    console.log(location.protocol);
+    window.addEventListener = function () {
+      EventTarget.prototype.addEventListener.apply(this, arguments);
+    };
+    window.removeEventListener = function () {
+      EventTarget.prototype.removeEventListener.apply(this, arguments);
+    };
+    document.addEventListener = function () {
+      EventTarget.prototype.addEventListener.apply(this, arguments);
+    };
+    document.removeEventListener = function () {
+      EventTarget.prototype.removeEventListener.apply(this, arguments);
+    };
+    document.write('<script src="cordova.js"><\/script>');
+    document.write('<script src="js/index.js"><\/script>');
 </script>
-<script type="text/javascript" src="cordova.js"></script>
-<script type="text/javascript" src="js/index.js"></script>
 </html>
