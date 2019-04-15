@@ -82,7 +82,11 @@ export class VersionResolverService implements Resolve<any> {
                 const _storedKeyName: string = _trail.abbr + '_' + type + 'Version';
 
                 if (type !== 'tiles' && !_self._localStorage.retrieve(_storedKeyName)) {
-                  _self._localStorage.store(_storedKeyName, _trail[type + 'Version']);
+
+                  // if the trail has data of type (not all trails have snow data)
+                  if (_trail[type + 'Version']) {
+                    _self._localStorage.store(_storedKeyName, _trail[type + 'Version']);
+                  }
                 }
               });
             }

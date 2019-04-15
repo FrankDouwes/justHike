@@ -21,7 +21,8 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
 
   @ViewChild('trailSelector') trailSelector: ElementRef;
 
-  public downloaders = ['trail', 'snow', 'tiles'];
+  private _dataTypes = ['trail', 'snow', 'tiles'];
+  public downloaders = [];
 
   public purchasedTrailList:        Array<TrailMeta> = [];
   public activeTrail:               TrailMeta;      // meta of the current trail
@@ -111,6 +112,15 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
     this._removeVersionSubscriptions();
     this._removeUpdateSubscriptions();
 
+    _self.downloaders = [];
+
+    this._dataTypes.forEach(function(type) {
+      console.log(_self.activeTrail[type + 'Version']);
+      if (_self.activeTrail[type + 'Version']) {
+        _self.downloaders.push(type);
+      }
+    })
+
     this.downloaders.forEach(function(name) {
 
       _self._setupVersionSubscription(name);
@@ -158,11 +168,6 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
   public displayVersion(name: string): string {
     // console.log('base version', name);
 
-    if (name === 'snow') {
-      console.log(name);
-      console.log('update version', this.activeTrail[name + 'Version'], this.currentVersions[name + 'Version']);
-      console.log(this.updates[name]);
-    }
     if (this.updates[name]) {
       // console.log('- from updates', this.activeTrail[name + 'Version']);
       return this.activeTrail[name + 'Version'];    // the online version
@@ -236,6 +241,8 @@ export class TrailSettingsComponent extends SettingsPanelComponent implements On
       }
       this._storedTrailId = this._localStorage.store('activeTrailId', _newValue);
       this.activeTrail = getTrailMetaDataById(_newValue);
+
+
 
       this._setupUpdateSubscriptions();
 
