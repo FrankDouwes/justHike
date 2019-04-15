@@ -85,8 +85,6 @@ export function parsePCTData (trail: TrailMeta, trailData: string, poiData: stri
   // SNOW (the current snow pack)
   const _snow = snow['datasets'][0];
 
-  return;
-
   // return
   return [trail, _waypoints, _pois, _snow];
 }

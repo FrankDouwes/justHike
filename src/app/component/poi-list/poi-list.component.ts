@@ -23,7 +23,7 @@ import { LocalStorageService } from 'ngx-webstorage';
   selector: 'poi-list',
   templateUrl: './poi-list.component.html',
   styleUrls: ['./poi-list.component.sass'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 // using basic for loops, nothing fancy for performance.
@@ -46,6 +46,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   public userPosition: string;
   public itemSize: number;
   public cacheSize: number = 10;
+  private _visibleItemCount = 7;
+  private _userStatus: string;
 
   private _staticPoisArray:           Array<any>  = [];
   private _userIndex:                 number;
@@ -62,16 +64,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     super.ngOnInit();
 
-    this.itemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / 7);
+    this.itemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / this._visibleItemCount);
 
     this.combinedData.subscribe(
       data => {
-
         this._dataLength = data.length;
-
-        if (this.showUser) {
-          this.centerOnUser();
-        }
       });
 
     // this.container.renderedRangeStream.subscribe(range => {
@@ -111,6 +108,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     if (changes.milesData || changes.poisData) {
       this.setup();
+      this._scrollToCenterMile();
     }
 
     if (changes.trigger) {
@@ -164,8 +162,6 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
         this._calculateDistance(this.masterPoi);
       }
     }
-
-    this._scrollToCenterMile();
   }
 
 
@@ -175,9 +171,10 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   public onStatusChange(status: string): void {
 
     // if we're switching to tracking
-    if (this.status !== 'tracking' && status === 'tracking') {
-      // xxx
+    if (!this._userStatus || this._userStatus !== 'tracking' && status === 'tracking') {
+      this.centerOnUser();
     }
+    this._userStatus = this.status;
   }
 
   public onUserLocationChange(user: User): void {
@@ -297,7 +294,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       const _maxIndex = _self.combinedData.getValue().length;
 
       if (_self.directionReversal) {
-        _middlePoi = _maxIndex - _middlePoi - 7;
+        _middlePoi = _maxIndex - _middlePoi - _self._visibleItemCount;
         if (_middlePoi < 0) {
           _middlePoi = 0;
         }else if ( _middlePoi > _maxIndex) {
@@ -308,10 +305,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       // scrolling to 0 somehow scrolls to the end of the list (cdk bug)
       const _total = (_middlePoi === 0) ? 1 : _middlePoi * _self.itemSize;
 
-      _self.container.scrollToIndex(_middlePoi, 'auto');
-      // _self.container.scrollToOffset(_total, 'auto');
-      // _self.onScroll(_middlePoi)     // TODO: test (offset)
-    }, 1);
+      //_self.container.scrollToIndex(_middlePoi, 'auto');
+      _self.container.scrollToOffset(_total, 'auto');
+    }, 50);
   }
 
   public onScroll(event): void {
@@ -332,7 +328,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     const _firstIndex = Math.floor(_renderedOffset / this.itemSize);
 
     // using 8 instead of 7 to compensate for the possibility that there is a user visible in list data
-    for (let i = _firstIndex; i < _firstIndex + 8; i++) {
+    for (let i = _firstIndex; i < _firstIndex + (this._visibleItemCount + 1); i++) {
 
       const _poi: Poi | User = this.combinedData.getValue()[i];
 
@@ -390,7 +386,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     }
 
     this.cacheSize = Math.floor(data.length / 10);
-    this.cacheSize = (this.cacheSize < 7 ) ? 7 : this.cacheSize;
+    this.cacheSize = (this.cacheSize < this._visibleItemCount ) ? this._visibleItemCount : this.cacheSize;
 
     this._userIndex = data.findIndex(poi => poi.type === 'user');
     this.combinedData.next(data);

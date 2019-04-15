@@ -8,6 +8,7 @@ import {environment} from '../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {FilesystemService} from '../../service/filesystem.service';
+import {sortByKey} from '../../_util/generic';
 
 @Component({
   selector: 'app-location-based',
@@ -145,12 +146,17 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
         elevation: location['coords']['altitude']} as Waypoint;
 
       // mile
-      const _mileData: object = this.trailGenerator.findNearestMileInTree(this._user.waypoint);
-      this._user.nearestMileId = _mileData['id'] + 1;
+      let _waypoint: object = this.trailGenerator.findNearestPointInMileTree(this._user.waypoint, 1)[0];
+      const _mile: Mile = this.trailGenerator.getTrailData().miles[_waypoint['belongsTo']];
+
+      console.log(_waypoint);
+
+      console.log(_waypoint['belongsTo']);
+      this._user.nearestMileId = _mile.id;
 
       // anchorPoint
-      const _nearestAnchorPoint = this.trailGenerator.findNearestWaypointInMile(this._user.waypoint, _mileData['mile'])[0];
-      this._user.anchorPoint =   (_mileData['mile'] as Mile).waypoints[_nearestAnchorPoint['key']];
+      const _nearestAnchorPoint = _waypoint;
+      this._user.anchorPoint = _mile.waypoints[_nearestAnchorPoint['key']];
 
       // distance
       this._user.waypoint.distance = _nearestAnchorPoint['distance'];

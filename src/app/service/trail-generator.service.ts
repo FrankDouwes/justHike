@@ -10,6 +10,7 @@ import { LoaderService } from './loader.service';
 
 import PositionAsDecimal = geolib.PositionAsDecimal;
 import {getPoiTypeByType} from '../_util/poi';
+import {sortByKey} from '../_util/generic';
 
 @Injectable({
   providedIn: 'root'
@@ -288,24 +289,51 @@ export class TrailGeneratorService {
     }
   }
 
-  public findNearestMileInTree(location: Waypoint):object {
+  /* parses nearest 3 miles, sorts the reulting top 2 waypoints for each mile by distance
+  returns 1 of 2 nearest points (in nearest mile) */
+  public findNearestPointInMileTree(location: Waypoint, count: number = 1): Array<any> {
 
-    let nearestMile: object;
+    let _nearestMiles: Array<any> = [];
+    let _nearestPoints: Array<any> = [];
+    let _nearestMileNearestPoints: Array<any> = [];
 
     for (let i = 0; i < this._tree.length; i ++) {
 
-      const orderedWaypoints: Array<object> = geolib.orderByDistance(location, this._tree[i]);
+      const _orderedWaypoints: Array<object> = geolib.orderByDistance(location, this._tree[i]);
 
       if (i === this._tree.length - 1) {
-        nearestMile = orderedWaypoints[0];
+        _nearestMiles = _orderedWaypoints.slice(0,3);
       }
     }
 
-    return {id: Number(nearestMile['key']), distance: nearestMile['distance'], mile: this._trailData.miles[nearestMile['key']]};
+    const _mLength = _nearestMiles.length;
+    for (let i = 0; i < _mLength; i++) {
+
+      const _mile = this._trailData.miles[_nearestMiles[i].key];
+      const _nearestWaypoints: Array<object> = this._findNearestWaypointInMile(location, _mile);
+
+      // limit to 2 for faster sorting (as we only really need 2
+      const _selection = _nearestWaypoints.splice(0,2);
+      for (let j = 0 ; j < _selection.length; j++) {
+        _selection[j]['belongsTo'] = _nearestMiles[i].key;
+      }
+
+      _nearestPoints = _nearestPoints.concat(_selection);
+    }
+
+    _nearestPoints = sortByKey(_nearestPoints, 'distance');
+
+    _nearestPoints.filter(function(point) {
+      return point['belongsTo'] === _nearestPoints[0]['belongsTo']
+    }).map(function(point) {
+      _nearestMileNearestPoints.push(point);
+    });
+
+    return _nearestMileNearestPoints.slice(0, count + 1);
   }
 
   // get the nearest point
-  public findNearestWaypointInMile(waypoint: Waypoint, nearestMile: Mile): object {
+  private _findNearestWaypointInMile(waypoint: Waypoint, nearestMile: Mile): Array<object> {
 
     return geolib.orderByDistance({latitude: waypoint.latitude, longitude: waypoint.longitude} as geolib.PositionAsDecimal,
       nearestMile.waypoints);
@@ -329,12 +357,11 @@ export class TrailGeneratorService {
 
       _poi.waypoint.elevation = _poi.waypoint.elevation / environment.FOOT;
 
-      // find nearest mile
-      const _nearestMile: Mile = miles[_self.findNearestMileInTree({latitude: _poi.waypoint.latitude, longitude: _poi.waypoint.longitude} as Waypoint)['id']];
+      // get nearest point from 3 miles to fix potentially odd trail shape (loops and traverses)
+      const _nearestMileWaypoints: any = _self.findNearestPointInMileTree({latitude: _poi.waypoint.latitude, longitude: _poi.waypoint.longitude} as Waypoint, 2);
+      const _nearestMile = this._trailData.miles[_nearestMileWaypoints[0]['belongsTo']];
 
-      const _nearestWaypointRef: object = _self.findNearestWaypointInMile(_poi.waypoint, _nearestMile);
-
-      const _anchorData = _self._anchorDistanceCalculation(_poi.waypoint, _nearestMile, _nearestWaypointRef);
+      const _anchorData = _self._anchorDistanceCalculation(_poi.waypoint, _nearestMile, _nearestMileWaypoints);
 
       _poi.anchorPoint = _anchorData.anchorPoint;
       _poi.belongsTo = _nearestMile.id;
@@ -346,7 +373,7 @@ export class TrailGeneratorService {
       _anchorData.nearestWaypoint.nearestToPois.push(_poi.id);
 
       // the distance of poi from trail
-      _poi.waypoint.distance = _nearestWaypointRef[0].distance;
+      _poi.waypoint.distance = _nearestMileWaypoints[0].distance;
 
       // add poi to mile
       if (!_nearestMile.pois) {

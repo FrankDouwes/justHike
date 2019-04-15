@@ -192,7 +192,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 14,
+      minZoom: 13.75,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: _tileLayers,
@@ -442,7 +442,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     let _mileMarkers: Array<any> = [];
 
-    if (mile.id !== 1 && mile.id !== this._trailLength) {
+    if (mile.id !== 1) {
       // startMile marker
       _mileMarkers = _mileMarkers.concat(this._createLabelMarker(index, mile));
     }
@@ -458,7 +458,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
         const _poi: Poi = this._trailGenerator.getPoiById(mile.pois[i]);
 
-        // filter out of range pois
+        // filter out of range pois (TODO: side trails)
         if (_poi.waypoint.distance >= _maxPoiDistance) {
           return;
         }
@@ -524,8 +524,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       if (_mileData && _mileData.markers) {
 
-
-
         for (const key in _mileData.markers._layers) {
 
           const _marker = _mileData.markers._layers[key];
@@ -553,7 +551,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         this._map.fitBounds(_group.getBounds(), {animate: this._animateMap, duration: 0.5, maxZoom: 16});
       } else {
         const _centerPoint = this._trailGenerator.getTrailData().miles[this._renderedCenterMileId].centerpoint;
-        this._map.setView([_centerPoint['latitude'], _centerPoint['longitude']], 14, {animate: this._animateMap, duration: 0.5, maxZoom: 16});
+        this._map.setView([_centerPoint['latitude'], _centerPoint['longitude']], 13.75, {animate: this._animateMap, duration: 0.5, maxZoom: 16});
       }
     }
   }

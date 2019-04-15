@@ -17,6 +17,7 @@ TODO v1:
 - fix: downloader state (has downloaded file, but theres an update available)
 - fix: optimising (virtual list rendering)
 - fix: vertical red lines on startup (android)
+- fix: end of trail scrolling (last 2 mile never visible on map)
 <br/><br/>
 - test: Check/Settings: When is a poi considered off trail
 - test: Check/Settings: When is a poi no longer rendered
@@ -25,8 +26,6 @@ TODO v1:
 - design: nightHike background image
 - design: instructions screen content
 <br/><br/>
-- iOS: still not animating to correct mile when clicking on mile in elevation profile?
-- iOS: scroll jump bug
 - iOS: unknown navigation error: Scroll on leaflet map (id = 70?), go back to elevation profile, grey screen...
 <br/><br/>
 - eventually: update to Cordova 9 (assuming this will break everything!)

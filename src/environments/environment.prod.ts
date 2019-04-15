@@ -57,38 +57,38 @@ export const environment = {
   // Data set by DEVs before generating new trail data.
   TRAILS_GENERATION: [
     {
+      abbr: 'DEMO',
       id: 0,
-      trailVersion: '1.0',
+      trailVersion: '1.1',
       tilesVersion: '1.0',
       snowVersion: '1.0',
-      abbr: 'DEMO',
       length: 109.5,                   // estimated length (first section is 109.5)
       dataPath: 'DEMO/',
       scrollbarSegmentSize: 100        // one scrollbar segment for every X miles
     }, {
+      abbr: 'PCT',
       id: 1,
-      trailVersion: '1.0',
+      trailVersion: '1.1',
       tilesVersion: '1.0',
       snowVersion: '1.0',
-      abbr: 'PCT',
       length: 2661.4,                  // estimated length (including 8mi into Canada) according to halfmile pct data
       dataPath: 'PCT/',
       scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
     }, {
+      abbr: 'CDT',
       id: 2,
       trailVersion: '1.0',
       tilesVersion: '1.0',
       snowVersion: '1.0',
-      abbr: 'CDT',
       length: 3011,                    // estimated length
       dataPath: 'CDT/',
       scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
     }, {
+      abbr: 'AT',
       id: 3,
       trailVersion: '1.0',
       tilesVersion: '1.0',
       snowVersion: '1.0',
-      abbr: 'AT',
       length: 2199,                    // estimated length
       dataPath: 'AT/',
       scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
