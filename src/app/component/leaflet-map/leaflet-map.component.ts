@@ -553,7 +553,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         this._map.fitBounds(_group.getBounds(), {animate: this._animateMap, duration: 0.5, maxZoom: 16});
       } else {
         const _centerPoint = this._trailGenerator.getTrailData().miles[this._renderedCenterMileId].centerpoint;
-        this._map.setView([_centerPoint.latitude, _centerPoint.longitude], 14, {animate: this._animateMap, duration: 0.5, maxZoom: 16});
+        this._map.setView([_centerPoint['latitude'], _centerPoint['longitude']], 14, {animate: this._animateMap, duration: 0.5, maxZoom: 16});
       }
     }
   }
