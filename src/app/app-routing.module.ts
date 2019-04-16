@@ -35,10 +35,10 @@ const routes: Routes = [
     redirectTo: 'elevation-profile',
     pathMatch: 'full'
   },
-  {
-    path: '*',
-    redirectTo: 'elevation-profile',
-  },
+  // {
+  //   path: '*',
+  //   redirectTo: 'elevation-profile',
+  // },
   {
     path: 'admin',
     component: AdminComponent,

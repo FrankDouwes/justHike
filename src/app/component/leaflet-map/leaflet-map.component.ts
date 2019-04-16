@@ -1,5 +1,8 @@
 import * as L from 'leaflet';
 import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
+import 'node_modules/leaflet-geometryutil/src/leaflet.geometryutil.js';
+import 'node_modules/leaflet.Geodesic/Leaflet.Geodesic.js';
+
 import '../../_util/leaflet/grid.js';
 import '../../_util/leaflet/marker.js';
 
@@ -20,6 +23,7 @@ import { ScreenModeService } from '../../service/screen-mode.service';
 import { getTrailMetaDataByAbbr } from '../../_util/trail';
 import { MarkerService } from '../../factory/marker.service';
 import { htmlIcon } from '../../_util/leaflet/icon';
+import {createMapsLatLngLink, sortByKey} from '../../_util/generic';
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -67,6 +71,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _renderedData: Array<any> = [];
   private _renderedCenterMileId: number;
+  private _popupBelongsTo: number = -1;       // uses mile index, not mile.id
+
+  private _trailLayers: any = L.layerGroup();
 
   constructor(
     private _route:                 ActivatedRoute,
@@ -128,6 +135,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
 
   private _setupMap(): void {
+
+    const _self = this;
 
     // no data, no map
     if (!this.trailGenerator.getTrailData()) {
@@ -198,14 +207,15 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       layers: _tileLayers,
       zoomSnap: 0,
       preferCanvas: true,
-      maxBoundsViscosity: 0.95 // solid
+      closePopupOnClick: false,     // manual toggle
+      maxBoundsViscosity: 0.95      // near solid
     });
+
+    this._setupPopupListeners();
 
     if (!this.allowPanning) {
       this._map.dragging.disable();
     }
-
-    const _self = this;
 
     if (!this.allowZooming) {
       this._map['scrollWheelZoom'].disable();
@@ -223,7 +233,150 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
   }
 
+  private _createNearestPoint(): void {
 
+  }
+
+  /* setup routines for popup/ indicator showing the poition and trail mileage
+  * manually closes popup (disabled feature on map */
+  private _setupPopupListeners(): void {
+
+    const _self = this;
+    let _popupElements: Array<any>;
+    let _hasTooltip: boolean;
+
+    // show popup or inditor (and guides)
+    this._map.on('click', function(e) {
+
+      // if there's still a popup, close it (essentially creating a toggle)
+      if (_popupElements && _popupElements.length > 0) {
+        _self._map.closePopup();
+        return;
+      }
+
+      // use a plugin to get the nearest point in the nearest (rendered) trail segment.
+      const _closestLayer = L.GeometryUtil.closestLayer(_self._map,
+        _self._trailLayers.getLayers(), e.latlng);
+
+      if (_closestLayer) {
+
+        // get the nearest point(s) for mile (own data routine)
+        const _mile: Mile = _self._trailGenerator.getTrailData().miles[Number(_closestLayer.layer.mileId) - 1];
+        let _nearestPoints = _self._trailGenerator.findNearestWaypointInMile({latitude: e.latlng.lat, longitude: e.latlng.lng}, _mile);
+
+        let _nearestPoint: Waypoint = _mile.waypoints[_nearestPoints[0]['key']];
+        let _point2: Waypoint = _mile.waypoints[_nearestPoints[1]['key']];
+
+        let _location = _self._calclatePointBasedOnDistance(_nearestPoints, [_nearestPoint, _point2]);
+
+        /* found a loop/bend, which causes the _nearestPoint keys to not be in a consecutive order.
+        figure out the trailDistance between the 2 nearest points
+        find a point within all points that's closest to that trailDistance
+        after that do the above calculation with 2 points based on that centerpoint.
+        this is 'good enough, a trade-off between performance and slightly less optimal overlay/popup locations. */
+        if (Number(_nearestPoints[1]['key']) !== Number(_nearestPoints[0]['key']) + 1
+          && Number(_nearestPoints[1]['key']) !== Number(_nearestPoints[0]['key']) - 1) {
+
+          let _selectionWaypoinst;
+
+          if ((_nearestPoints[0]['key'] < _nearestPoints[1]['key'])) {
+            _selectionWaypoinst = _mile.waypoints.slice(_nearestPoints[0]['key'], _nearestPoints[1]['key'] + 1);
+          } else {
+            _selectionWaypoinst = _mile.waypoints.slice(_nearestPoints[1]['key'], _nearestPoints[0]['key'] + 1);
+          }
+
+          _selectionWaypoinst.sort(function(a, b){
+            return Math.abs(_location.distance - a.distance) - Math.abs(_location.distance - b.distance);
+          });
+
+          _location = _self._calclatePointBasedOnDistance(_nearestPoints, [_selectionWaypoinst[0], _selectionWaypoinst[1]]);
+        }
+
+        const _nearestMileage: string = (_location.distanceTotal / environment.MILE).toFixed(2);
+
+        // if the distance is substantial, show a guideline/popup, else show a tooltip
+        const _offTrail = (_nearestPoints[0]['distance'] > _self.localStorage.retrieve('poiDistanceOffTrail'));
+
+        if (_offTrail) {
+          _self._showPopup(e.latlng,
+            '<strong>' + (_nearestPoints[0]['distance'] / environment.MILE).toFixed(2) + ' mi. off trail</strong>' +
+            '<br/> Nearest: mi. ' + _nearestMileage +
+            '<hr/><i>' + createMapsLatLngLink(e.latlng) + '</i>');
+
+          _popupElements = _self._createGuide({lat: _location.latitude, lng: _location.longitude}, e.latlng, true );
+
+        } else {
+          const _tooltip = L.tooltip();
+          _tooltip.setContent('<strong>mi. ' + _nearestMileage + '</strong>');
+          _self._map.openTooltip(_tooltip, {lat: _location.latitude, lng: _location.longitude});
+          setTimeout(function() {
+            _self._map.closeTooltip(_tooltip);
+            _hasTooltip = false;
+          }, 1500);
+          _hasTooltip = true;
+          _popupElements = [];
+        }
+
+        // render everything
+        _popupElements.forEach(function(element) {
+          element.addTo(_self._map);
+        });
+
+        _self._popupBelongsTo = Number(_closestLayer.layer.mileId) - 1;
+      }
+    });
+
+    const _onInfoClose = function(e) {
+
+      if (_popupElements && _popupElements.length > 0) {
+        _popupElements.forEach(function(element) {
+          _self._map.removeLayer(element); // remove
+        });
+
+        _self._popupBelongsTo = -1;
+        _popupElements = null;
+      }
+    }
+
+    // hide indicator (and guides)
+    this._map.on('tooltipclose', _onInfoClose.bind(this));
+    this._map.on('popupclose', _onInfoClose.bind(this));
+  }
+
+  private _waypointsToLatLng(waypoints: Array<Waypoint>): Array<L.latlng> {
+
+    const _length = waypoints.length;
+    const _returnArr: Array<L.latlng> = [];
+    for (var i = 0; i < _length; i++) {
+      _returnArr.push({lat: waypoints[i].latitude, lng: waypoints[i].longitude, alt: waypoints[i].elevation});
+    }
+
+    return _returnArr;
+  }
+
+  // TODO: this type of calculation happens multiple times throughout the app, combine them
+  // calculate a point based on the distance away from 2 points, the mile data is the mile those points belong to
+  private _calclatePointBasedOnDistance(distancePoints: Array<any>, waypoints: Array<Waypoint>): Waypoint {
+
+    // get the waypoints from a mile
+    const _point1: Waypoint = waypoints[0];
+    const _point2: Waypoint = waypoints[1];
+
+    const _distancePerc = distancePoints[0].distance / (distancePoints[0].distance + distancePoints[1].distance);
+
+    // calculate new props based on distance percentage
+    const _props: Array<string> = ['latitude', 'longitude', 'elevation', 'distance', 'distanceTotal'];
+    const _length: number = _props.length;
+
+    const _waypoint = {};
+
+    for (let i = 0; i < _length; i++) {
+      const _prop = _props[i];
+      _waypoint[_prop] = _point1[_prop] + (((_point2[_prop] - _point1[_prop]) / 2) * _distancePerc);
+    }
+
+    return _waypoint as Waypoint;
+  }
 
   // ELEMENT CREATION
 
@@ -324,6 +477,11 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
       const _mileId = mileIds[i];
 
+      if (_self._popupBelongsTo === _mileId) {
+        this._map.closePopup();
+        this._map.closeTooltip();
+      }
+
       try {
 
         if (_self._renderedData[_mileId] && _self._map) {
@@ -375,8 +533,11 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       color: 'red', weight: 4, opacity: 1, smoothFactor: 0
     });
 
+    _trailLine['mileId'] = mile.id;       // set the mileId for referencing
+
     this._renderedData[index].trail = _trailLine;
 
+    this._trailLayers.addLayer(_trailLine);
     _trailLine.addTo(this._map);
   }
 
@@ -491,6 +652,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _drawUser(): void {
 
+    const _self = this;
+
     if (!this._userMarker) {
       this._userMarker = this._createUserMarker(this.user);
     }
@@ -500,6 +663,34 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       const _userLocation = new L.LatLng(this.user.waypoint.latitude, this.user.waypoint.longitude);
 
       this._userMarker.setLatLng(_userLocation);
+      this._userMarker.on('click', function(e) {
+
+        const _closestLayer = L.GeometryUtil.closestLayer(_self._map,
+          _self._trailLayers.getLayers(), e.latlng);
+
+        if (_closestLayer) {
+
+          // get the nearest point(s) for mile (own data routine)
+          const _mile: Mile = _self._trailGenerator.getTrailData().miles[Number(_closestLayer.layer.mileId) - 1];
+          const _nearestPoints = _self._trailGenerator.findNearestWaypointInMile(_self.user.waypoint, _mile);
+
+          const _nearestMileage: string = (_self.user.anchorPoint.distanceTotal / environment.MILE).toFixed(2);
+
+          let _onOffTrailString;
+          let _2ndLine = '';
+
+          const _offTrail = (_nearestPoints[0]['distance'] > _self.localStorage.retrieve('poiDistanceOffTrail'));
+          if (_offTrail) {
+            _onOffTrailString = (_nearestPoints[0]['distance'] / environment.MILE).toFixed(2) + ' mi. off trail';
+            _2ndLine = '<br/> Nearest: mi. ' + _nearestMileage;
+          } else {
+            _onOffTrailString = 'On trail at mi. ' + _nearestMileage;
+          }
+
+          _self._showPopup(e.latlng,  '<strong>' + _onOffTrailString + '</strong>' + _2ndLine +
+          '<hr/><i>' + createMapsLatLngLink(e.latlng) + '</i>');
+        }
+      });
 
       this._userMarker.addTo(this._map);
     }
@@ -634,7 +825,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       latitude: mile.waypoints[0].latitude + ((mile.waypoints[1].latitude - mile.waypoints[0].latitude) * _xPercentage),
       longitude: mile.waypoints[0].longitude + ((mile.waypoints[1].longitude - mile.waypoints[0].longitude) * _xPercentage),
       elevation: mile.waypoints[0].elevation + ((mile.waypoints[1].elevation - mile.waypoints[0].elevation) * _xPercentage),
-      distance: 0,
+      distance: 0,    // unused
       distanceTotal: (mile.id - 1) * environment.MILE
     };
 
@@ -782,13 +973,16 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _elements: Array<any> = [];
 
-    const _guide = new L.Polyline([point1, point2], {
+    const _guide = new L.geodesic([], {
       color: 'rgb(187, 97, 0)',
       dashArray: '5 7',
       weight: 2,
       opacity: 1,
-      smoothFactor: 0
+      smoothFactor: 3,
+      steps: 10
     });
+
+    _guide.setLatLngs([[point1, point2]]);
 
     _elements.push(_guide);
 
@@ -819,5 +1013,13 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
 
     return _elements;
+  }
+
+  private _showPopup(location: L.LatLng, text?: string): void {
+
+    const popup = L.popup({closeButton: false})
+      .setLatLng(location)
+      .setContent('<p>' + text + '</p>')
+      .openOn(this._map);
   }
 }

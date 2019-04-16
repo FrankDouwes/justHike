@@ -310,7 +310,7 @@ export class TrailGeneratorService {
     for (let i = 0; i < _mLength; i++) {
 
       const _mile = this._trailData.miles[_nearestMiles[i].key];
-      const _nearestWaypoints: Array<object> = this._findNearestWaypointInMile(location, _mile);
+      const _nearestWaypoints: Array<object> = this.findNearestWaypointInMile(location, _mile);
 
       // limit to 2 for faster sorting (as we only really need 2
       const _selection = _nearestWaypoints.splice(0,2);
@@ -333,7 +333,7 @@ export class TrailGeneratorService {
   }
 
   // get the nearest point
-  private _findNearestWaypointInMile(waypoint: Waypoint, nearestMile: Mile): Array<object> {
+  public findNearestWaypointInMile(waypoint: Waypoint, nearestMile: Mile): Array<object> {
 
     return geolib.orderByDistance({latitude: waypoint.latitude, longitude: waypoint.longitude} as geolib.PositionAsDecimal,
       nearestMile.waypoints);

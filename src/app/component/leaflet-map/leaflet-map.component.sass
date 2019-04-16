@@ -102,6 +102,50 @@
     margin: 0 !important
     color: white
 
+  .leaflet-popup-content-wrapper, .leaflet-tooltip
+    border-radius: 6px
+    border: 1px solid #777
+
+  .leaflet-popup
+    margin-bottom: 13px !important
+
+  .leaflet-tooltip
+    border-radius: 3px
+    padding: 1px 4px
+
+  .leaflet-popup-content-wrapper, .leaflet-tooltip, .leaflet-popup-tip
+    box-shadow: unset !important
+    text-align: center !important
+    background-color: rgba(255, 255, 255, 0.75)  !important
+    backdrop-filter: blur(3px)    // safari/iOS only, causes glitching...
+
+  .leaflet-popup-tip
+    width: 6px
+    height: 6px
+    margin-top: -4px
+    background-color: #777 !important
+
+  .leaflet-popup-tip-container
+    height: 7px
+    bottom: -7px
+
+  .leaflet-popup-content
+    margin: 6px !important
+
+    p
+      margin: 0
+
+  .leaflet-tooltip-left:before
+    border-left-color: #777 !important
+
+  .leaflet-tooltip-right:before
+    border-right-color: #777 !important
+
+  .leaflet-tooltip-top:before
+    border-top-color: #777 !important
+
+  .leaflet-tooltip-bottom:before
+    border-bottom-color: #777 !important
 
 @keyframes pulse
   0%
