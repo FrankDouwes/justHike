@@ -10,7 +10,6 @@ TODO v1:
 - add: compass heading, all cordova plugins seem to have android issues, iOS only?
 - add: purchase routines (app store / google play)
 <br/><br/>
-- !!!fix: set 'back' mile id to in navigator for use on back button click
 - fix: improve elevation profile scrollbar accuracy
 - fix: back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
 - fix: overlapping UTM lines (square miles)
@@ -27,6 +26,7 @@ TODO v1:
 - design: nightHike background image
 - design: instructions screen content
 <br/><br/>
+- iOS jumping in scroll list (either an event issue or a css issue)
 - iOS (sporadically): (possibly related to ionic webview) - [IPC] Connection::waitForSyncReply: Timed-out while waiting for reply
 - iOS (sporadically): (possibly related to ionic webview) - [LayoutConstraints] Unable to simultaneously satisfy constraints.
 
