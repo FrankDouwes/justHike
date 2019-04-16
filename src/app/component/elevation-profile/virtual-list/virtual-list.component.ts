@@ -203,7 +203,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   }
 
   public onClick(listItem: Mile): void {
-    this._router.navigate(['detail/', listItem.id - 1], {queryParams: {back: this._currentIndex}});
+    this._router['scrollToPosition'] = listItem.id - 1;
+    this._router.navigate(['detail/', this._router['scrollToPosition']]);
   }
 
   // only executed once every 250ms as it's a redraw of all list items

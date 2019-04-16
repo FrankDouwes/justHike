@@ -39,6 +39,7 @@ export class NavigationComponent implements OnInit, OnChanges {
     private _downloadService:         DownloadService,
     private _loaderOverlay:           LoaderService
   ) {
+
     _router.events.forEach((event) => {
 
       if (event instanceof NavigationEnd && event['url']) {
@@ -107,12 +108,12 @@ export class NavigationComponent implements OnInit, OnChanges {
     this.visibleClass = 'hide';
     this.oppositeClass = 'show';
     this._loaderOverlay.showOverlay();
-    this._router.navigate(['elevation-profile/'], {queryParams: {id: this._backIndex}});
+    this._router.navigate(['elevation-profile/'], {queryParams: {id: this._router['scrollToPosition']}});
     this.navEvent.emit('elevation-profile');
   }
 
   public onAdminClick(): void {
-    this._router.navigate(['admin'], {queryParams: {id: this._backIndex}});
+    this._router.navigate(['admin']);
     this.navEvent.emit('admin');
   }
 

@@ -7,7 +7,7 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy, ChangeDetectorRef
 } from '@angular/core';
 import { LocationBasedComponent } from '../../base/location-based/location-based.component';
 
@@ -23,7 +23,7 @@ import { LocalStorageService } from 'ngx-webstorage';
   selector: 'poi-list',
   templateUrl: './poi-list.component.html',
   styleUrls: ['./poi-list.component.sass'],
-  // changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 // using basic for loops, nothing fancy for performance.
@@ -53,7 +53,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   private _userIndex:                 number;
 
   constructor(
-    private _localStorage: LocalStorageService) {
+    private _localStorage: LocalStorageService,
+    private _changeDetector: ChangeDetectorRef) {
 
     super();
   }
@@ -70,41 +71,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       data => {
         this._dataLength = data.length;
       });
-
-    // this.container.renderedRangeStream.subscribe(range => {
-    //
-    //   this.invisiblePoi = 0;
-    //
-    //   for (let i = range.start; i <= range.end; i++) {
-    //
-    //     const poiUser = this.combinedData.getValue()[i];
-    //     if (poiUser && poiUser['type'] === 'offtrail') {
-    //       this.invisiblePoi ++;
-    //     }
-    //   }
-    //
-    //   let _newItemSize;
-    //
-    //   if (this.invisiblePoi > 0) {
-    //     _newItemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / (7 + this.invisiblePoi));
-    //     console.log(_newItemSize);
-    //   } else {
-    //     _newItemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / 7);
-    //   }
-    //
-    //   if (_newItemSize !== this.itemSize) {
-    //     // this.itemSize = _newItemSize;
-    //     // console.log(this.itemSize);
-    //     // this._changeDetector.detectChanges();
-    //   }
-    //
-    // });
-
-    // TODO does not work on ios
-    // window.addEventListener('scroll', this.onScroll.bind(this));
   }
 
   ngOnChanges(changes: SimpleChanges) {
+
+    console.log(changes);
 
     if (changes.milesData || changes.poisData) {
       this.setup();
@@ -171,10 +142,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   public onStatusChange(status: string): void {
 
     // if we're switching to tracking
-    if (!this._userStatus || this._userStatus !== 'tracking' && status === 'tracking') {
+    if (this._userStatus && this._userStatus !== 'tracking' && status === 'tracking') {
       this.centerOnUser();
     }
     this._userStatus = this.status;
+    this._changeDetector.markForCheck();      // needed to update user poi list item
   }
 
   public onUserLocationChange(user: User): void {
@@ -250,7 +222,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     const _self = this;
     if (this.container) {
 
-      window.requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+
         const _padding = _self.itemSize * 2;    // this makes sure the user list item is fully on screen, therefor the poi/mile index is correct
         let _verticalOffset = _padding;
 
@@ -289,7 +262,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     let _middlePoi: number = _activeMile.pois[Math.floor(_activeMile.pois.length - 1)];
 
-    setTimeout(function () {
+    window.requestAnimationFrame(function () {
 
       const _maxIndex = _self.combinedData.getValue().length;
 
@@ -305,9 +278,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       // scrolling to 0 somehow scrolls to the end of the list (cdk bug)
       const _total = (_middlePoi === 0) ? 1 : _middlePoi * _self.itemSize;
 
-      //_self.container.scrollToIndex(_middlePoi, 'auto');
+      _self.container.scrollToIndex(_middlePoi, 'auto');
       _self.container.scrollToOffset(_total, 'auto');
-    }, 50);
+    });
   }
 
   public onScroll(event): void {

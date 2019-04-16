@@ -42,7 +42,7 @@ export class PoiUserItemComponent implements OnInit {
   }
 
   constructor(
-    public changeDetector: ChangeDetectorRef
+    private _changeDetector: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {}

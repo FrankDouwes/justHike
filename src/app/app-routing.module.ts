@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import {Routes, RouterModule, NavigationError, Router, NavigationStart, NavigationEnd} from '@angular/router';
 
 // component
 import { MileDetailComponent } from './component/mile-detail/mile-detail.component';
@@ -10,10 +10,10 @@ import {SequentialResolverService} from './service/sequential-resolver.service';
 import {AdminComponent} from './component/admin/admin.component';
 
 
-// TODO: temp, iOS navigation error...
-export function handleErrors(error):void {
-  console.log('app routing error');
-}
+// // TODO: temp, iOS navigation error...
+// export function handleErrors(error: NavigationError):void {
+//   console.log('app routing error');
+// }
 
 const routes: Routes = [
   {
@@ -36,6 +36,10 @@ const routes: Routes = [
     pathMatch: 'full'
   },
   {
+    path: '*',
+    redirectTo: 'elevation-profile',
+  },
+  {
     path: 'admin',
     component: AdminComponent,
     resolve: {
@@ -44,8 +48,10 @@ const routes: Routes = [
   }
 ];
 
+
+// , errorHandler: handleErrors
 @NgModule({
-  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'ignore', useHash: true, enableTracing: false, errorHandler: handleErrors})
+  imports: [RouterModule.forRoot(routes, {onSameUrlNavigation: 'ignore', useHash: false, enableTracing: false})
   ],
   exports: [RouterModule]
 })
@@ -54,5 +60,24 @@ export class AppRoutingModule {
 
   // STARTUP
 
-  constructor() {}
+  constructor(private _router: Router) {
+
+    _router.events.subscribe( (event: any) => {
+
+      if (event instanceof NavigationStart) {
+        // Show loading indicator
+      }
+
+      if (event instanceof NavigationEnd) {
+        // Hide loading indicator
+      }
+
+      if (event instanceof NavigationError) {
+        // Hide loading indicator
+
+        // Present error to user
+        console.log(event.error);
+      }
+    });
+  }
 }

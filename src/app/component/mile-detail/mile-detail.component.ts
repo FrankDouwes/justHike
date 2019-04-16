@@ -1,11 +1,10 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Trail} from '../../type/trail';
 import {Waypoint} from '../../type/waypoint';
 import {LocalStorageService} from 'ngx-webstorage';
 import {LocationService} from '../../service/location.service';
 import {Subscription} from 'rxjs';
-import {ScreenModeService} from '../../service/screen-mode.service';
 
 @Component({
   selector: 'app-mile-detail',
@@ -79,7 +78,11 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   public onScrollTo(data: any): void {
     this._setMapData(data.mileId, data.renderedPoiRange, data.renderedMileRange);
     this.routedMile = data.mileId;
-    this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
+
+    /* updating queryParamams (this._router.navigate) seems to cause bugs over time on iOS,
+    so i'm setting a property that will be used for the back button navigate call */
+    this._router['scrollToPosition'] = this.routedMile;
+    //this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
   }
 
   private _setMapData(mileId: number, poiRange?: any, mileRange?: any): void {
