@@ -586,8 +586,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     const max: number = this.visibleOHLC.high;  // low point
     const range = (max - min);
 
-    console.log('update location');
-
     this._drawUserMarker();
 
     if (this.user && this._userMarker) {

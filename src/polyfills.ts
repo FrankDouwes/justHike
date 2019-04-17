@@ -78,3 +78,8 @@ import 'zone.js/dist/zone';  // Included with Angular CLI.
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+/* fixes creation of dynamic elements:
+- https://github.com/angular/angular/issues/24556,
+- https://github.com/Asymmetrik/ngx-leaflet/issues/178 */
+import '@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js';

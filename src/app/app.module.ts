@@ -1,15 +1,15 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import {isDevMode, NgModule} from '@angular/core';
+import {Injector, isDevMode, NgModule} from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 // font awesome
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView,
-  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt,
+import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView, faPenAlt,
+  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock,
   faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload, faMapPin, faHotel,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle, faGem,
   faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faParking, faShoePrints
@@ -78,6 +78,9 @@ import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
 import { DistancePipe } from './pipe/distance.pipe';
 import { FilesizePipe } from './pipe/filesize.pipe';
 import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.component';
+import { PopupComponent } from './component/leaflet-map/elements/popup/popup.component';
+import {createCustomElement} from '@angular/elements';
+import { NoteDialogComponent } from './component/dialog/note-dialog/note-dialog.component';
 
 @NgModule({
   declarations: [
@@ -118,14 +121,18 @@ import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.
     TrailSettingsComponent,
     AdminComponent,
     UserIndicatorComponent,
-    RatingComponent
+    RatingComponent,
+    PopupComponent,
+    NoteDialogComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
     MarkerDialogComponent,
     OfftrailDialogComponent,
     PoiUserItemComponent,
-    PoiListItemComponent
+    PoiListItemComponent,
+    PopupComponent,
+    NoteDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -156,7 +163,11 @@ import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.
 })
 export class AppModule {
 
-  constructor() {
+  constructor(private _injector: Injector) {
+
+    // Register the custom element(s)
+    const _popupElement = createCustomElement(PopupComponent, {injector: _injector});
+    customElements.define('leaflet-element-popup', _popupElement);
 
     if (isDevMode()) {
       console.log('\n');
@@ -167,10 +178,10 @@ export class AppModule {
     }
 
     // font awesome library
-    library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faHotel, faStreetView,
+    library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faHotel, faStreetView, faPenAlt,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt,
       faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload,
       faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake, faGem, faMapPin,
-      faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faTimes, faParking, faShoePrints);
+      faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faTimes, faParking, faShoePrints, faLock);
   }
 }

@@ -15,8 +15,6 @@ import {
 } from '@angular/material';
 import {InstructionsComponent} from './panels/instructions/instructions.component';
 import {AboutComponent} from './panels/about/about.component';
-import {DetailSettingsComponent} from './panels/detail-settings/detail-settings.component';
-import {ElevationSettingsComponent} from './panels/elevation-settings/elevation-settings.component';
 import {GeneralSettingsComponent} from './panels/general-settings/general-settings.component';
 import {PurchaseSettingsComponent} from './panels/purchase-settings/purchase-settings.component';
 import {MatCarouselModule} from '@ngmodule/material-carousel';
@@ -53,8 +51,6 @@ describe('SettingsDialogComponent', () => {
         ButtonComponent,
         InstructionsComponent,
         AboutComponent,
-        DetailSettingsComponent,
-        ElevationSettingsComponent,
         GeneralSettingsComponent,
         PurchaseSettingsComponent,
         DownloaderComponent,

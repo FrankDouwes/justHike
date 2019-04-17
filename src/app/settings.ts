@@ -32,6 +32,14 @@ export class Settings {
       iconType: 'fa',
       icon: 'campground',
     }, {
+      type: 'shelter',
+      label: 'shelter',
+      isMajor: false,
+      color: '#d9a758',
+      iconType: 'fa',
+      icon: 'shelter',
+      rateBy: ['pests', 'amenities']
+    },{
       type: 'road',
       label: 'road',
       color: '#878787',
@@ -154,6 +162,15 @@ export class Settings {
       icon: 'hotel',
       rateable: true,
       rateBy: ['amenities', 'price']
+    },
+
+    // warning
+    {
+      type: 'note',       // add
+      label: 'note',
+      color: '#E8D6BD',
+      iconType: 'fas',
+      icon: 'pen-alt'
     },
 
     // warning
