@@ -1,9 +1,17 @@
 import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
-import {LocalStorageService} from 'ngx-webstorage';
 import {Waypoint} from '../../../type/waypoint';
-import {TrailGeneratorService} from '../../../service/trail-generator.service';
 import {Poi} from '../../../type/poi';
+import {NoteService} from '../../../service/note.service';
+
+export class NoteProperties {
+  type: string;
+  label: string;
+  anchorPoint: Waypoint;
+  belongsTo: number;
+  belongsToType: string;
+  waypoint?: Waypoint;
+}
 
 @Component({
   selector: 'app-note-dialog',
@@ -14,45 +22,32 @@ export class NoteDialogComponent implements OnInit {
 
   @ViewChild('titleField') titleField: ElementRef;
 
+  public poiTypes: Array<string> = ['note', 'water', 'camp'];
   private _notes: Array<Poi>;
 
   constructor(
     private _dialogRef: MatDialogRef<NoteDialogComponent>,
-    private _localStorage: LocalStorageService,
-    private _trailGenerator: TrailGeneratorService,
+    private _noteService: NoteService,
     @Inject(MAT_DIALOG_DATA)
-    public data: object
+    public data: NoteProperties
   ) {}
 
   ngOnInit() {
-
-    this._notes = JSON.parse(this._localStorage.retrieve(this._trailGenerator.getTrailData().abbr + '_notes'));
-
     this.titleField.nativeElement.focus();
   }
 
   public submitNote(formData: object): void {
 
-    const _notePoi = {
-      id: new Date().getTime(),
-      trail: this._trailGenerator.getTrailData().abbr,
-      waypoint: this.data['location'],
-      type: 'note',
-      label: formData['title'],
-      anchorPoint: this.data['location'],
-      distance: 0,
-      belongsTo: this.data['belongsTo'],
-      description: formData['note']
-    } as Poi;
+    // add missing properties to data object so we can convert it to a Poi
+    this.data['id'] = new Date().getTime();
+    this.data['type'] = 'note';
+    this.data['label'] = formData['title'];
+    this.data['description'] = formData['note'];
 
-    if (!this._notes) {
-      this._notes = [];
-    }
+    const _notePoi: Poi = this.data as Poi;
 
-    this._notes.push(_notePoi);
-
-    this._localStorage.store(this._trailGenerator.getTrailData().abbr + '_notes', JSON.stringify(this._notes));
-    this._dialogRef.close();
+    this._noteService.saveNote(_notePoi);
+    this._dialogRef.close('success');
   }
 
   public onButtonClick(action: string): void {
@@ -60,7 +55,7 @@ export class NoteDialogComponent implements OnInit {
   }
 
   private _cancel(): void {
-    this._dialogRef.close();
+    this._dialogRef.close('cancel');
   }
 
 }

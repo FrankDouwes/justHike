@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Poi, PoiType } from '../../../type/poi';
 import { getPoiTypeByType } from '../../../_util/poi';
 import {TrailGeneratorService} from '../../../service/trail-generator.service';
+import {NoteService} from '../../../service/note.service';
 
 @Component({
   selector: 'marker-dialog',
@@ -17,6 +18,7 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
 
   constructor(
     private _trailGeneratorService: TrailGeneratorService,
+    private _noteService: NoteService,
     public dialogRef: MatDialogRef<MarkerDialogComponent>,
     @Inject(MAT_DIALOG_DATA)
     public data: Poi
@@ -74,6 +76,11 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
 
   public relatedLabel(type: string): string {
     return getPoiTypeByType(type).label;
+  }
+
+  public deletePoi(): void {
+    this._noteService.deleteNote(this.data.id, this.data.belongsToType, this.data.belongsTo);
+    this.dialogRef.close();
   }
 
 

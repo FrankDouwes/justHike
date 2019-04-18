@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
+import {Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import { LoaderService } from './service/loader.service';
 import { MatDialog } from '@angular/material';
 import { SettingsDialogComponent } from './component/dialog/settings-dialog/settings-dialog.component';
@@ -16,7 +16,7 @@ import {Subscription} from 'rxjs-observable';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.sass']
 })
-export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
+export class AppComponent implements OnInit, OnDestroy {
 
   @ViewChild('loader', { read: ViewContainerRef }) loader: ViewContainerRef;
 
@@ -37,9 +37,8 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     private _element: ElementRef,
     private _injector: Injector,
     private _localStorage: LocalStorageService,
-    private _connectionService: ConnectionService
+    private _connectionService: ConnectionService,
   ) {
-
     // makes constructor props accessible through LocationService, needed for inheritance
     LocationService.injector = this._injector;
   }
@@ -81,10 +80,7 @@ export class AppComponent implements OnInit, OnDestroy, AfterViewInit {
     this._element.nativeElement.addEventListener('offtrail', this._onDialogEvent.bind(this), false);
   }
 
-  ngAfterViewInit(): void {}
-
   ngOnDestroy(): void {
-
     this._connectionService.stopTracking();
     this._element.nativeElement.removeEventListener('markerClick', this._onDialogEvent.bind(this));
     this._element.nativeElement.removeEventListener('offtrail', this._onDialogEvent.bind(this), false);

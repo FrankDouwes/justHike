@@ -1,12 +1,23 @@
 <form #noteForm="ngForm" class="example-form" (ngSubmit)="submitNote(noteForm.value)">
+
+  <mat-form-field class="select-form-field">
+    <mat-select [value]="note">
+      <mat-option *ngFor="let type of poiTypes" [value]="type">
+        {{type}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <mat-form-field class="example-full-width">
     <input matInput placeholder="title" name="title" id="title" ngModel #titleField>
   </mat-form-field>
 
   <mat-form-field class="example-full-width">
-    <textarea matInput placeholder="note" value="{{data.title}}" name="note" id="note" ngModel></textarea>
+    <textarea matInput placeholder="note" name="note" id="note" ngModel>{{data.label}}</textarea>
   </mat-form-field>
 
+  <mat-checkbox [checked]="true">Share with developer!</mat-checkbox>
+
   <button mat-button type="submit">Save</button>
-  <button mat-button (click)="onButtonClick('cancel')">Cancel</button>
+  <button mat-button (click)="onButtonClick('cancel')" type="button">Cancel</button>
 </form>

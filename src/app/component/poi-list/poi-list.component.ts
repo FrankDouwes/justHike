@@ -7,17 +7,18 @@ import {
   SimpleChanges,
   Output,
   EventEmitter,
-  ChangeDetectionStrategy, ChangeDetectorRef
+  ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy
 } from '@angular/core';
 import { LocationBasedComponent } from '../../base/location-based/location-based.component';
 
-import { BehaviorSubject } from 'rxjs';
+import {BehaviorSubject, Subscription} from 'rxjs';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 import { Mile } from '../../type/mile';
 import { Poi } from '../../type/poi';
 import { User } from '../../type/user';
 import { LocalStorageService } from 'ngx-webstorage';
+import {NoteService} from '../../service/note.service';
 
 @Component({
   selector: 'poi-list',
@@ -27,7 +28,7 @@ import { LocalStorageService } from 'ngx-webstorage';
 })
 
 // using basic for loops, nothing fancy for performance.
-export class PoiListComponent extends LocationBasedComponent implements OnInit, OnChanges {
+export class PoiListComponent extends LocationBasedComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('poiList') container: CdkVirtualScrollViewport;
 
@@ -51,9 +52,12 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   private _staticPoisArray:           Array<any>  = [];
   private _userIndex:                 number;
+  private _notesSubscription: Subscription;
+  private _dataSubscription: Subscription;
 
   constructor(
     private _localStorage: LocalStorageService,
+    private _noteService: NoteService,
     private _changeDetector: ChangeDetectorRef) {
 
     super();
@@ -63,14 +67,39 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   ngOnInit(): void {
 
+    const _self = this;
     super.ngOnInit();
 
     this.itemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / this._visibleItemCount);
 
-    this.combinedData.subscribe(
+    this._dataSubscription = this.combinedData.subscribe(
       data => {
         this._dataLength = data.length;
       });
+
+    this._notesSubscription = this._noteService.noteUpdateObserver.subscribe(function(update) {
+      if (update === 'added') {
+
+        const _lastAddedNote: Poi = _self._noteService.getLastNote();
+        const _newCombinedData: Array<any> = _self.combinedData.getValue();
+        _newCombinedData.push(_lastAddedNote);
+        _self._sortListData(_newCombinedData);
+
+      } else if (update === 'removed') {
+
+        const _deletedNote: Poi = _self._noteService.getLastNote();
+        const _data: Array<any> = _self.combinedData.getValue();
+
+        const _length = _data.length;
+        for(let i = 0; i < _length; i++) {
+          if (_data[i].id === _deletedNote.id) {
+            _data.splice(i, 1);
+            _self._sortListData(_data);
+            break;
+          }
+        }
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -82,6 +111,20 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     if (changes.trigger) {
       this.centerOnUser();
+    }
+  }
+
+  ngOnDestroy() {
+    super.ngOnDestroy();
+
+    if (this._dataSubscription) {
+      this._dataSubscription.unsubscribe();
+      this._dataSubscription = null;
+    }
+
+    if (this._notesSubscription) {
+      this._notesSubscription.unsubscribe();
+      this._notesSubscription = null;
     }
   }
 
@@ -122,11 +165,18 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     if (this.showUser) {
       const _userRef: User = (this.user !== undefined) ? this.user : super.createBlankUser();
-      this._sortListData(this._staticPoisArray.concat(_userRef));
+
+      let _array = this._staticPoisArray.concat(_userRef);
+
+      const _notes = this._localStorage.retrieve(this.trailGenerator.getTrailData().abbr + '_notes');
+      if (_notes) {
+        _array = _array.concat(JSON.parse(_notes));
+      }
+
+      this._sortListData(_array);
       this.onUserLocationChange(_userRef);
     } else {
       this._sortListData(this._staticPoisArray);
-
       if (this.masterPoi) {
         this._calculateDistance(this.masterPoi);
       }
@@ -149,11 +199,20 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   public onUserLocationChange(user: User): void {
 
+    let _notes = this._localStorage.retrieve(this.trailGenerator.getTrailData().abbr + '_notes');
+
     // // if tracking
     if (location && this.status !== 'idle') {
 
       if (this.showUser) {
-        this._sortListData(this._staticPoisArray.concat(user));
+
+        let _array = this._staticPoisArray.concat(user);
+
+        if (_notes) {
+          _array = _array.concat(JSON.parse(_notes));
+        }
+
+        this._sortListData(_array);
       }
 
       if (this.milesData) {
@@ -163,7 +222,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     } else if (this.showUser) {
 
       user.waypoint = user.anchorPoint = undefined;
-      this._sortListData(this._staticPoisArray.concat(user));
+
+      let _array = this._staticPoisArray.concat(user);
+
+      if (_notes) {
+        _array = _array.concat(JSON.parse(_notes));
+      }
+
+      this._sortListData(_array);
     }
   }
 
@@ -191,20 +257,25 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   // EVENT HANDLERS
 
-  public onListItemClick(poi: Poi): void {
+  public onListItemClick(poi: Poi, event: any): void {
+
+    let _event: CustomEvent;
 
     if (poi.type === 'user') {
+
       this.locationService.toggleTracking();
       return;
-    }
 
-    const _event: CustomEvent = new CustomEvent(
-      'markerClick',
-      {
-        bubbles: true,
-        cancelable: true,
-        detail: poi
-      });
+    } else {
+
+      _event = new CustomEvent(
+        'markerClick',
+        {
+          bubbles: true,
+          cancelable: true,
+          detail: poi
+        });
+    }
 
     document.getElementsByTagName('app-root')[0].dispatchEvent(_event);
   }

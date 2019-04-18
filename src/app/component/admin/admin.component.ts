@@ -12,6 +12,7 @@ import {createGPX} from '../../parser/gpx-tools';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {OrientationService} from '../../service/orientation.service';
 import {SequentialResolverService} from '../../service/sequential-resolver.service';
+import {cloneData} from '../../_util/generic';
 
 @Component({
   selector: 'app-admin',
@@ -66,7 +67,7 @@ export class AdminComponent implements OnInit {
     const _trailMeta: TrailMeta = getTrailMetaDataById(Number(this.selectedTrail));
 
     // simplify the track for app: Mobile Atlas Creator
-    let _clone: Array<any> = JSON.parse(JSON.stringify(this._trailGeneratorService.flatTrailData));
+    let _clone: Array<any> = cloneData(this._trailGeneratorService.flatTrailData) as Array<any>;
 
     // 55 gives roughly 3 points per mile (PCT)
     _clone = this._trailGeneratorService.simplify(_clone, 80, true);
@@ -192,5 +193,14 @@ export class AdminComponent implements OnInit {
 
     const _current = this._localStorageService.retrieve('disableSimulation');
     this._localStorageService.store('disableSimulation', !(_current))
+  }
+
+  public sendAllNotes(): void {
+    const _notes = this._localStorageService.retrieve(this._trailGeneratorService.getTrailData().abbr + '_notes');
+    window.open('mailto:frankdouwes@gmail.com?subject=Hello there&body=' + _notes);
+  }
+
+  public sendAllPins(): void {
+    alert('not implemented');
   }
 }

@@ -4,11 +4,14 @@ export const environment = {
   simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
+
   // appDomain: 'https://storage.googleapis.com/',
   // fileBaseUrl: 'just-hike/',
 
   appDomain: 'https://hike.frankdouwes.com/',
   fileBaseUrl: 'files/',
+
+  onlineTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
 
   updateCheckInterval: 86400000,      // the time between (online) data update checks
 
@@ -50,7 +53,7 @@ export const environment = {
     // elevationProfile
     parallaxEnabled: false,         // parallax effect in elevation profile
     screenMode: 'default',          // 'default', 'highContrast' or 'nighHike'
-    showExtraDesign: true,          // show extra design features in elevation profile (trees)
+    showExtraDesign: true,          // TODO: unused, show extra design features in elevation profile (trees)
   },
 
 

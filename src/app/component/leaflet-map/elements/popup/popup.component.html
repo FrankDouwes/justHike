@@ -1,10 +1,10 @@
 <div class="{{position}}">
   <div id="menu">
-    <button (click)="onLockClick()">
-      <fa-icon [icon]="['fa', 'lock']"></fa-icon>
+    <button (click)="tag()">
+      <fa-icon [icon]="['fas', 'pen-alt']"></fa-icon>
     </button>
   </div>
-  <h3>{{title}}</h3>
-  <p>{{message}}</p>
+  <h3>{{label}}</h3>
+  <p>{{description}}</p>
   <a *ngIf="showCoords" [href]="createMapsLatLngLink()" target="_blank">Coordinates</a>
 </div>

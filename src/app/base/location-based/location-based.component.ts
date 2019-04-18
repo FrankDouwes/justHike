@@ -8,7 +8,7 @@ import {environment} from '../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {FilesystemService} from '../../service/filesystem.service';
-import {sortByKey} from '../../_util/generic';
+import {cloneData, sortByKey} from '../../_util/generic';
 
 @Component({
   selector: 'app-location-based',
@@ -185,7 +185,7 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
 
       } else {
 
-        this.user = JSON.parse(JSON.stringify(this._user)) as User;
+        this.user = cloneData(this._user) as User;
         this.timestamp = location['timestamp'];
         this.onUserLocationChange(this.user);
       }

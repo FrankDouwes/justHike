@@ -79,6 +79,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     this._initialIndex = (this._route.snapshot) ? Number(this._route.snapshot.queryParams['id']) : 0;
 
+    const _notes = this._localStorageService.retrieve(this.trailData.abbr + '_notes');
+
     this.cacheSize = Math.floor(this.trailData.miles.length / 10);
 
     this._setupEventListeners();

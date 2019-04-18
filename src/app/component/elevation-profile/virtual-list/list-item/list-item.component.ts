@@ -1,7 +1,7 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
   Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import 'seedrandom/seedrandom';
-import {svgPath} from '../../../../_util/smoothLine';
+import {svgPath} from '../../../../_util/smooth-line';
 import {isPrime, normalizeElevation} from '../../../../_util/math';
 import {getMajorPoiTypes} from '../../../../_util/poi';
 import {environment} from '../../../../../environments/environment.prod';
@@ -19,6 +19,7 @@ import {User} from '../../../../type/user';
 import {Poi} from '../../../../type/poi';
 import {Snowpoint} from '../../../../type/snow';
 import {Waypoint} from '../../../../type/waypoint';
+import {NoteService} from '../../../../service/note.service';
 
 @Component({
   selector: 'display-list-item',
@@ -48,7 +49,9 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   @Input() userStatus?:         string;           // idle/fetching/tracking
 
   private _majorPoiTypes:         Array<string>;
+
   public hasInvisiblePoi:     boolean;
+  public hasNotes:            boolean;
 
   private _snowData:            Array<Array<Snowpoint>>;
   private _dynamicSubscriptions: object           = {};
@@ -73,7 +76,8 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     private _trailGenerator: TrailGeneratorService,
     private _snowGenerator: SnowGeneratorService,
     private _changeDetectorRef: ChangeDetectorRef,
-    private _markerFactory: MarkerService
+    private _markerFactory: MarkerService,
+    private _noteService: NoteService
   ) {}
 
 
@@ -217,7 +221,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   // used to indicate that this mile has more pois than are being shown in elevation profile
   private _hasInvisiblePoi(): void {
 
-    let _newValue;
+    let _newValue: boolean;
 
     const _self = this;
 
@@ -236,10 +240,28 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
       _newValue = false;
     }
 
+    this._hasNotes();
+
     // only redraw if needed
     if (this.hasInvisiblePoi !== _newValue) {
       this.hasInvisiblePoi = _newValue;
-      this._changeDetectorRef.detectChanges();
+      this._changeDetectorRef.markForCheck();
+    }
+  }
+
+  private _hasNotes(): void {
+
+    const _mileNotes = this._noteService.getNotes('mile', this.data.id);
+    let _newValue: boolean;
+
+    if (_mileNotes) {
+      _newValue = true;
+    }
+
+    // only redraw if needed
+    if (this.hasNotes !== _newValue) {
+      this.hasNotes = _newValue;
+      this._changeDetectorRef.markForCheck();
     }
   }
 

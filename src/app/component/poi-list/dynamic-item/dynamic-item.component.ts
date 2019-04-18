@@ -105,8 +105,6 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
     this._instance.data = this.data;
     this._instance.status = this.status;
     this._instance.timeStamp = new Date().getTime();
-    this._instance.class = 'mat-list-item-content';
-
     this._changeDetector.markForCheck();
   }
 

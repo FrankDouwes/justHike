@@ -1,13 +1,18 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, HostBinding, Input, OnInit} from '@angular/core';
 import { Poi, PoiType } from '../../../type/poi';
 import { getPoiTypeByType } from '../../../_util/poi';
 
 @Component({
-  selector: 'poi-list-item[class=mat-list-item-content]',
+  selector: 'poi-list-item',
   templateUrl: './poi-list-item.component.html',
   styleUrls: ['./poi-list-item.component.sass']
 })
 export class PoiListItemComponent implements OnInit {
+
+  @HostBinding('class')
+  get typeClass(){
+    return 'mat-list-item-content ' + this.data['type'].split(',').join('');
+  };
 
   @Input() data: Poi;
   @Input('status') status: string = 'idle';
@@ -23,9 +28,8 @@ export class PoiListItemComponent implements OnInit {
 
   public setupIcons(): void {
 
-    this.poiTypes = [];
-
     const _self = this;
+    this.poiTypes = [];
 
     if (this.data) {
 

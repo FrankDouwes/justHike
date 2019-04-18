@@ -10,6 +10,7 @@
 
   <div class="icons">
     <span class="icon-wrap" *ngIf="hasInvisiblePoi"><fa-icon [icon]="['fas', 'map-marker-alt']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
+    <span class="icon-wrap" *ngIf="hasNotes"><fa-icon [icon]="['fas', 'pen-alt']" [ngClass]="['fa-fw']" size="sm"></fa-icon></span>
   </div>
 
   <div class="label" *ngIf="!isLast">{{data.id}}</div>

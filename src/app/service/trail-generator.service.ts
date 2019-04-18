@@ -10,7 +10,7 @@ import { LoaderService } from './loader.service';
 
 import PositionAsDecimal = geolib.PositionAsDecimal;
 import {getPoiTypeByType} from '../_util/poi';
-import {sortByKey} from '../_util/generic';
+import {cloneData, sortByKey} from '../_util/generic';
 
 @Injectable({
   providedIn: 'root'
@@ -69,7 +69,7 @@ export class TrailGeneratorService {
   // TODO: move this to a webworker, not a priority as it's rarely used (trail data won't update often)
   public generateMiles(trail: TrailMeta, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number): Trail {
 
-    this._trailData = JSON.parse(JSON.stringify(trail));
+    this._trailData = cloneData(trail) as Trail;
     this._trailData.version = trail.trailVersion;
 
     // remove unneeded trail meta
@@ -224,7 +224,7 @@ export class TrailGeneratorService {
         _miles.push({
           id:               _miles.length + 1,
           elevationRange:   _combinedOhlc,
-          waypoints:        JSON.parse(JSON.stringify(_mileWaypoints)),     // duplicate data
+          waypoints:        cloneData(_mileWaypoints) as Array<Waypoint>,
           elevationGain:    Math.round(_totalGain),
           elevationLoss:    Math.round(_totalLoss),
           scale:            scale,
