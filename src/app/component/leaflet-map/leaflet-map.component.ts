@@ -27,7 +27,7 @@ import {createGridLayer, createMapTileLayer} from '../../_util/leaflet/layer';
 import {clearTimeOut, setTimeOut, TimerObj} from '../../_util/timer';
 import {Subscription} from 'rxjs';
 import {Distance} from '../../_util/geolib/distance';
-import {createPopupComponent, createTooltipComponent} from './elements/dynamic-component';
+import {DynamicComponentManager} from './elements/dynamic-component-manager';
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -63,6 +63,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   // elements
   @Input() showPois: boolean;
+
+  private _dynamicComponentManager: DynamicComponentManager;
 
   private _map: any;
   private _initialized = false;
@@ -209,6 +211,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     });
 
     this._setupMapListeners();
+    this._dynamicComponentManager = new DynamicComponentManager(this._map);
     this._setMapInteractionProperties();
 
     // set an initial location
@@ -339,7 +342,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _label: string =  + _offTrailDistanceConverted.distance + ' ' + _offTrailDistanceConverted.unit + ' off trail';
     const _description: string = 'Nearest: ' + _nearestMileageConverted.unit + ' ' + _nearestMileageConverted.distance;
-    createPopupComponent(waypoint,
+    this._popupTimer = this._dynamicComponentManager.createPopupComponent(waypoint,
       {
         label: _label,
         description: _description,
@@ -348,7 +351,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         distance: offTrailDistance,
         distanceTotal: nearestMileage,
         belongsTo: this._popupBelongsTo
-      });
+      }, this._clearOverlayElements.bind(this));
 
     this._overlayElements = this._createGuide(anchor, waypoint, false, false, 'rgb(180, 163, 146)', 3);
   }
@@ -360,14 +363,14 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     _nearestMileageConverted.unit = String(_nearestMileageConverted.unit).charAt(0).toUpperCase() + String(_nearestMileageConverted.unit).slice(1);
 
-    createTooltipComponent(waypoint, {
+    this._dynamicComponentManager.createTooltipComponent(waypoint, {
       waypoint: waypoint,
       anchorPoint: waypoint,
       label: _nearestMileageConverted.unit + ' ' + _nearestMileageConverted.distance,
       distance: 0,
       distanceTotal: nearestMileage,
       belongsTo: this._popupBelongsTo
-    });
+    },this._clearOverlayElements.bind(this));
   }
 
 
@@ -724,7 +727,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
             _2ndLine = 'mi. ' + _nearestMileage;
           }
 
-          createPopupComponent(e.latlng,
+          _self._dynamicComponentManager.createPopupComponent(e.latlng,
             {
               waypoint: e.latlng,
               label: _onOffTrailString,
@@ -732,7 +735,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
               distance: _nearestPoints[0].distance,
               distanceTotal: _nearestMileage,
               showCoords: true
-            });
+            }, _self._clearOverlayElements.bind(_self));
         }
       });
 
