@@ -39,7 +39,7 @@ export class Settings {
       isMajor: false,
       color: '#d9a758',
       iconType: 'fa',
-      icon: 'shelter',
+      icon: 'house-damage',
       rateBy: ['pests', 'amenities'],
       userEnabled: true
     },{
@@ -133,7 +133,7 @@ export class Settings {
       userEnabled: true
     }, {
       type: 'trail',
-      label: 'sign',
+      label: 'trail',
       color: '#a5d958',
       iconType: 'fa',
       icon: 'map-signs',

@@ -5,15 +5,13 @@ export const environment = {
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
 
-  // appDomain: 'https://storage.googleapis.com/',
-  // fileBaseUrl: 'just-hike/',
+  appDomain: 'https://storage.googleapis.com/',
+  fileBaseUrl: 'just-hike/',
 
-  appDomain: 'https://hike.frankdouwes.com/',
-  fileBaseUrl: 'files/',
-
+  // appDomain: 'https://hike.frankdouwes.com/',
+  // fileBaseUrl: 'files/',
   onlineTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-
-  updateCheckInterval: 86400000,      // the time between (online) data update checks
+  updateCheckInterval: 86400000,      // the time between (online) data update check
 
   MILE: 1609.344,    // mile in meters
   FOOT: 0.3048,      // foot in meters

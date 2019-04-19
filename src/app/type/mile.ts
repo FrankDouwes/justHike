@@ -2,7 +2,7 @@ import { Waypoint } from './waypoint';
 import { OHLC } from './ohlc';
 import { Snowpoint } from './snow';
 
-export class Mile {
+export interface Mile {
 
   id:                 number;             // id (mile number, starts at 1 not 0)
   elevationGain:      number;             // the elevation gain

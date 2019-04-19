@@ -6,7 +6,7 @@ export function getPoiTypeByType(type:string) {
 
   const _pois = Settings.POITYPES;
 
-  var result = _pois.filter(function(poi) {
+  const result = _pois.filter(function(poi) {
     return poi['type'] === type;
   });
 

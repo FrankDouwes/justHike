@@ -1,4 +1,4 @@
-export class Waypoint {
+export interface Waypoint {
   longitude:        number;
   latitude:         number;
   elevation?:       number;           // optional elevation

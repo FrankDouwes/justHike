@@ -1,6 +1,6 @@
 import { Waypoint } from './waypoint';
 
-export class Poi {
+export interface Poi {
   id:                 number;             // id (mile number, starts at 1 not 0)
   trail:              string;              // abbr. of trail mile belongs to
   waypoint:           Waypoint;           // coordinates (+ elevation)
@@ -16,7 +16,7 @@ export class Poi {
   distanceFromPoi?:   number;             // distance from another poi in meters
 }
 
-export class PoiType {
+export interface PoiType {
   type:           string;           // string
   label:          string;           // default label
   iconType:       string;           // Font Awesome has prefixes for different icons styles (fa, fas)

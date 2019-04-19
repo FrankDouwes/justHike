@@ -18,6 +18,21 @@ used for the User marker (always on top) */
 })(L.Marker);
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Copyright (C) 2013 Maxime Hadjinlian <maxime.hadjinlian@gmail.com>
  * All Rights Reserved.
@@ -47,8 +62,8 @@ used for the User marker (always on top) */
 
 (function() {
   // Retain the value of the original onAdd and onRemove functions
-  let originalOnAdd = L.Marker.prototype.onAdd;
-  let originalOnRemove = L.Marker.prototype.onRemove;
+  const originalOnAdd = L.Marker.prototype.onAdd;
+  const originalOnRemove = L.Marker.prototype.onRemove;
 
   // Add bounceonAdd options
   L.Marker.mergeOptions({

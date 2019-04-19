@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TrailMeta } from '../../../../../type/trail';
 import { LocalStorageService } from 'ngx-webstorage';
 import { SettingsPanelComponent } from '../../../../../base/settings-panel/settings-panel.component';
-import {getTrailsMetaData} from '../../../../../_util/trail';
+import {getTrailsMetaData} from '../../../../../_util/trail-meta';
 
 @Component({
   selector: 'purchase-settings',

@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import * as L from 'leaflet';
 import {DialogService} from '../../../../factory/dialog.service';
 import {latLngToWaypoint} from '../../../../_util/leaflet/converter';
@@ -11,7 +11,7 @@ import {environment} from '../../../../../environments/environment.prod';
   templateUrl: './popup.component.html',
   styleUrls: ['./popup.component.sass']
 })
-export class PopupComponent implements OnInit {
+export class PopupComponent implements OnInit, OnChanges {
 
   @Input() waypoint?:       L.latlng;
   @Input() anchorPoint?:    L.latlng;
@@ -25,6 +25,7 @@ export class PopupComponent implements OnInit {
 
   @Input() showCoords:      boolean;
   @Input() timer:           TimerObj;   // popups have a timer that hides/destroys them
+  @Input() direction?:      string = '';
 
   public position: string = '';
 
@@ -35,6 +36,10 @@ export class PopupComponent implements OnInit {
     if (!this.description) {
       this.position = 'inline';
     }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes);
   }
 
   public tag(): void {

@@ -7,7 +7,7 @@ import {PoiType} from '../../type/poi';
   styleUrls: ['./button.component.sass']
 })
 
-export class ButtonComponent implements OnInit {
+export class ButtonComponent {
 
   @Input() icon?:    string;
   @Input() badge?:    string;
@@ -15,8 +15,4 @@ export class ButtonComponent implements OnInit {
 
   // simple button with label & font awesome icon
   constructor() { }
-
-  ngOnInit() {
-
-  }
 }

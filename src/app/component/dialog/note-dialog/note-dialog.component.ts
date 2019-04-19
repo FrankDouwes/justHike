@@ -1,8 +1,10 @@
 import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {Waypoint} from '../../../type/waypoint';
-import {Poi} from '../../../type/poi';
+import {Poi, PoiType} from '../../../type/poi';
 import {NoteService} from '../../../service/note.service';
+import {environment} from '../../../../environments/environment.prod';
+import {Settings} from '../../../settings';
 
 export class NoteProperties {
   type: string;
@@ -56,6 +58,18 @@ export class NoteDialogComponent implements OnInit {
 
   private _cancel(): void {
     this._dialogRef.close('cancel');
+  }
+
+  public getTypes(): Array<PoiType> {
+
+    const _types = [];
+    Settings.POITYPES.forEach(function(type) {
+      if (type.userEnabled) {
+        _types.push(type);
+      }
+    });
+
+    return _types;
   }
 
 }

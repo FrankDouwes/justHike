@@ -3,7 +3,7 @@ import { OHLC } from './ohlc';
 import { Poi } from './poi';
 
 // the current trail data
-export class Trail {
+export interface Trail {
 
   // STATIC
   id:                     number;

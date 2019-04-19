@@ -1,6 +1,6 @@
 import * as L from 'leaflet';
 import {fallbackLayer} from './tiles';
-import {getTrailMetaDataByAbbr} from '../trail';
+import {getTrailMetaDataByAbbr} from '../trail-meta';
 import {environment} from '../../../environments/environment.prod';
 
 // create the main map tile layer, based on the custom fallback tile.

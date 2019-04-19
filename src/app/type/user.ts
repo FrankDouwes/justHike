@@ -2,7 +2,7 @@ import { Waypoint } from './waypoint';
 
 // !user does not hold a status property (idle, fetching, tracking, error)
 
-export class User {
+export interface User {
   type: 'user';
   waypoint:           Waypoint;           // coordinates (+ elevation)
   anchorPoint:        Waypoint;           // calculated nearest trail location (between 2 waypoints in a mile)

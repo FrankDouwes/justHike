@@ -200,4 +200,9 @@ export class NoteService implements OnDestroy {
     this._parseNotes([note]);
     this._updateStorage();
   }
+
+  // easier to sort by distance (poi list)
+  public getFlatNotesArray(): Array<Poi> {
+    return this._notes;
+  }
 }

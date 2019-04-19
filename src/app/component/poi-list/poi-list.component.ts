@@ -46,7 +46,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   public timestamp: number;                 // used to trigger reload
   public userPosition: string;
   public itemSize: number;
-  public cacheSize: number = 10;
+  public cacheSize = 10;
   private _visibleItemCount = 7;
   private _userStatus: string;
 
@@ -168,9 +168,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       let _array = this._staticPoisArray.concat(_userRef);
 
-      const _notes = this._localStorage.retrieve(this.trailGenerator.getTrailData().abbr + '_notes');
+      const _notes = this._noteService.getFlatNotesArray();
       if (_notes) {
-        _array = _array.concat(JSON.parse(_notes));
+        _array = _array.concat(_notes);
       }
 
       this._sortListData(_array);
@@ -199,20 +199,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   public onUserLocationChange(user: User): void {
 
-    let _notes = this._localStorage.retrieve(this.trailGenerator.getTrailData().abbr + '_notes');
+    const _notes = this._noteService.getFlatNotesArray();
+    let _poisArray: Array<Poi>;
 
     // // if tracking
     if (location && this.status !== 'idle') {
 
       if (this.showUser) {
-
-        let _array = this._staticPoisArray.concat(user);
-
-        if (_notes) {
-          _array = _array.concat(JSON.parse(_notes));
-        }
-
-        this._sortListData(_array);
+        _poisArray = this._staticPoisArray.concat(user);
       }
 
       if (this.milesData) {
@@ -223,14 +217,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       user.waypoint = user.anchorPoint = undefined;
 
-      let _array = this._staticPoisArray.concat(user);
-
-      if (_notes) {
-        _array = _array.concat(JSON.parse(_notes));
-      }
-
-      this._sortListData(_array);
+      _poisArray = this._staticPoisArray.concat(user);
     }
+
+    if (_notes) {
+      _poisArray = _poisArray.concat(_notes);
+    }
+
+    this._sortListData(_poisArray);
   }
 
   private _calculateDistance(master: Poi | User): void {

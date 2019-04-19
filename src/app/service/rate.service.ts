@@ -3,7 +3,7 @@ import {Waypoint} from '../type/waypoint';
 import {Rating} from '../type/rating';
 import {Observable, Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
-import {getTrailMetaDataById} from '../_util/trail';
+import {getTrailMetaDataById} from '../_util/trail-meta';
 // import {AngularFirestore} from '@angular/fire/firestore';
 
 @Injectable({

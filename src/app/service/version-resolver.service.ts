@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {Resolve, Router} from '@angular/router';
 import {LocalStorageService} from 'ngx-webstorage';
 import {environment} from '../../environments/environment.prod';
-import {getTrailMetaDataById, setTrailMetaData} from '../_util/trail';
+import {getTrailMetaDataById, setTrailMetaData} from '../_util/trail-meta';
 import {BehaviorSubject, forkJoin, Observable, of} from 'rxjs';
 import {share, switchMap, take} from 'rxjs/operators';
 import {TrailGeneratorService} from './trail-generator.service';
@@ -10,7 +10,7 @@ import {SnowGeneratorService} from './snow-generator.service';
 import {ConnectionService} from './connection.service';
 import {hasConnection} from '../_util/cordova';
 import {DownloadService} from './download.service';
-import {Downloader} from '../_util/downloader';
+import {Downloader} from '../_util/downloader/downloader';
 import {HttpResponse} from '@angular/common/http';
 import {TrailMeta} from '../type/trail';
 

@@ -1,4 +1,4 @@
-// UNUSED XXX TODO ?
+// TODO: currently unused, would add another calculation
 
 // The smoothing ratio
 const smoothing = 0.025;

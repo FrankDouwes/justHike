@@ -7,6 +7,12 @@ export class Snow {
 }
 
 export class Snowpoint {
-  elevation?:       number;           // optional elevation
-  distance?:        number;           // percentage within mile (so it won't have to be recalculated)
+
+  public elevation?:       number;           // optional elevation
+  public distance?:        number;           // percentage within mile (so it won't have to be recalculated)
+
+  constructor(elevation: number, distance: number) {
+    this.elevation = elevation;
+    this.distance = distance;
+  }
 }

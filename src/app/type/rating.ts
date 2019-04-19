@@ -1,6 +1,6 @@
 import {Waypoint} from './waypoint';
 
-export class Score {
+export interface Score {
   category:         string;
   score:            number;
 }

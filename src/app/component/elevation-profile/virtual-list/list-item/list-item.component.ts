@@ -12,14 +12,13 @@ import {SnowGeneratorService} from '../../../../service/snow-generator.service';
 import {MarkerService} from '../../../../factory/marker.service';
 
 declare const SVG: any;    // fixes SVGjs bug
-
-import {OHLC} from '../../../../type/ohlc';
 import {Mile} from '../../../../type/mile';
 import {User} from '../../../../type/user';
 import {Poi} from '../../../../type/poi';
 import {Snowpoint} from '../../../../type/snow';
 import {Waypoint} from '../../../../type/waypoint';
 import {NoteService} from '../../../../service/note.service';
+import {OHLC} from '../../../../type/ohlc';
 
 @Component({
   selector: 'display-list-item',

@@ -2,7 +2,7 @@ import {TrailMeta} from '../type/trail';
 
 let trails: Array<TrailMeta>;
 
-// set (once?)
+// set
 export function setTrailMetaData(data: Array<TrailMeta>) {
   trails = data;
 }
@@ -13,7 +13,7 @@ export function getTrailsMetaData(): Array<TrailMeta> {
 }
 
 // get a trailmeta object based on the trail id (does not have to equal the array index)
-export function getTrailMetaDataById(id: Number): TrailMeta {
+export function getTrailMetaDataById(id: number): TrailMeta {
 
   if (!trails) {
     throw new Error('no trails available!');

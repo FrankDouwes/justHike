@@ -1,23 +1,31 @@
-<form #noteForm="ngForm" class="example-form" (ngSubmit)="submitNote(noteForm.value)">
+<mat-card-content>
 
-  <mat-form-field class="select-form-field">
-    <mat-select [value]="note">
-      <mat-option *ngFor="let type of poiTypes" [value]="type">
-        {{type}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+  <h2>Add location</h2>
 
-  <mat-form-field class="example-full-width">
-    <input matInput placeholder="title" name="title" id="title" ngModel #titleField>
-  </mat-form-field>
+  <form #noteForm="ngForm" class="example-form" (ngSubmit)="submitNote(noteForm.value)">
 
-  <mat-form-field class="example-full-width">
-    <textarea matInput placeholder="note" name="note" id="note" ngModel>{{data.label}}</textarea>
-  </mat-form-field>
+    <mat-form-field class="select-form-field">
+      <mat-select value="note">
+        <mat-option *ngFor="let poiType of getTypes()" [value]="poiType.type">
+          {{poiType.label}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <mat-checkbox [checked]="true">Share with developer!</mat-checkbox>
+    <mat-form-field class="example-full-width">
+      <input matInput placeholder="title" name="title" id="title" ngModel #titleField>
+    </mat-form-field>
 
-  <button mat-button type="submit">Save</button>
-  <button mat-button (click)="onButtonClick('cancel')" type="button">Cancel</button>
-</form>
+    <mat-form-field class="example-full-width">
+      <textarea matInput placeholder="note" name="note" id="note" rows="5" ngModel></textarea>
+    </mat-form-field>
+
+    <mat-checkbox [checked]="true">Share with developer!</mat-checkbox>
+
+    <div class="btn-group">
+      <button mat-stroked-button (click)="onButtonClick('cancel')" type="button">Cancel</button>
+      <button mat-stroked-button color="primary" type="submit">Save</button>
+    </div>
+  </form>
+
+</mat-card-content>

@@ -1,4 +1,4 @@
-import {Component, HostBinding, Input, OnInit} from '@angular/core';
+import {Component, HostBinding, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import { Poi, PoiType } from '../../../type/poi';
 import { getPoiTypeByType } from '../../../_util/poi';
 
@@ -7,7 +7,7 @@ import { getPoiTypeByType } from '../../../_util/poi';
   templateUrl: './poi-list-item.component.html',
   styleUrls: ['./poi-list-item.component.sass']
 })
-export class PoiListItemComponent implements OnInit {
+export class PoiListItemComponent implements OnInit, OnChanges {
 
   @HostBinding('class')
   get typeClass(){
@@ -24,6 +24,10 @@ export class PoiListItemComponent implements OnInit {
 
   ngOnInit(): void {
     this.setupIcons();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes);
   }
 
   public setupIcons(): void {

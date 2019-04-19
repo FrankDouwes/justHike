@@ -11,7 +11,7 @@ import { Poi } from '../type/poi';
 import { SnowGeneratorService } from './snow-generator.service';
 import { parseSnow, reverseSnow } from '../_util/snow';
 import { environment } from '../../environments/environment.prod';
-import { getTrailMetaDataById } from '../_util/trail';
+import { getTrailMetaDataById } from '../_util/trail-meta';
 import { FilesystemService } from './filesystem.service';
 
 // dynamically called

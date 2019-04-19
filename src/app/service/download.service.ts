@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Downloader } from '../_util/downloader';
+import { Downloader } from '../_util/downloader/downloader';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { share } from 'rxjs/operators';
 import { FilesystemService } from './filesystem.service';
@@ -100,7 +100,7 @@ export class DownloadService {
           this._updateGlobalStatus();
       });
 
-    this._states[name] = downloader.isActiveSubject;
+    this._states[name] = downloader.status.isActiveSubject;
     this._observers[name] = _downloadState;
   }
 

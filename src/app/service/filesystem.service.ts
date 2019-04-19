@@ -375,17 +375,25 @@ export class FilesystemService  {
     }, false);
   }
 
-  // TODO: edited, test, check functionality!!! delete directory and everything in it
+  // delete directory and everything in it
   public deleteDirectory(directoryPath: string, callback: Function): void {
 
     this.setupDirectory(directoryPath, null, function(dirEntry) {
       if (dirEntry !== 'error') {
-        dirEntry.removeRecursively(function (dir) {
-          callback(dir);
-        }, function (err) {
-          console.log(err);
+
+        /* poorly described cordova only? function, it's not clear if chrome still has this
+        as the status of the filesysem of chrome is unclear. */
+        dirEntry.removeRecursively(function (directory) {
+
+          callback(directory);
+        }, function (error) {
+          // TODO: needs an error check, not sure what I'm getting here
+          alert('error deleting directory' + error);
+          callback(error);
         });
+
       } else {
+
         callback(dirEntry);
       }
     }, false);

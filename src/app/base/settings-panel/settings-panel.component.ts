@@ -5,6 +5,9 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
   templateUrl: './settings-panel.component.html',
   styleUrls: ['./settings-panel.component.sass']
 })
+
+// a panel with an invalidate function which triggers a reload of the application
+// used for forms that require an app reload on change
 export class SettingsPanelComponent implements OnInit, OnDestroy {
 
   @Output() onSettingsChanged: EventEmitter<boolean> = new EventEmitter()

@@ -11,8 +11,8 @@ import {ScreenModeService} from '../../../service/screen-mode.service';
 // type classes
 import {OHLC} from '../../../type/ohlc';
 import {Mile} from '../../../type/mile';
-import {Trail} from '../../../type/trail';
 import {User} from '../../../type/user';
+import {Trail} from '../../../type/trail';
 
 @Component({
   selector: 'virtual-list-component',

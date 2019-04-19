@@ -4,7 +4,7 @@ import {LocalStorageService} from 'ngx-webstorage';
 import {MatSelectChange} from '@angular/material';
 import {SettingsPanelComponent} from '../../../../../base/settings-panel/settings-panel.component';
 import {DownloadService} from '../../../../../service/download.service';
-import {getTrailMetaDataById, getTrailsMetaData} from '../../../../../_util/trail';
+import {getTrailMetaDataById, getTrailsMetaData} from '../../../../../_util/trail-meta';
 import {ConnectionService} from '../../../../../service/connection.service';
 import {getConnection, getDialogs, hasDialogs} from '../../../../../_util/cordova';
 import {Subscription} from 'rxjs';

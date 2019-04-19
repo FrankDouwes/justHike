@@ -9,6 +9,7 @@ import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {FilesystemService} from '../../service/filesystem.service';
 import {cloneData, sortByKey} from '../../_util/generic';
+import {Distance} from '../../_util/geolib/distance';
 
 @Component({
   selector: 'app-location-based',
@@ -53,39 +54,39 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
 
   // TEST FUNCTIONS
 
-  private _hikeMile(mileId: number): void {
-
-    const _self = this;
-    const _steps = this.trailGenerator.getTrailData().miles[mileId].waypoints;
-    let _stepCount = 0;
-
-    const _interval = setInterval(function() {
-
-      if (_stepCount < _steps.length) {
-
-        const _location = {
-          coords: {
-            accuracy: 0,
-            altitude:  _steps[_stepCount].elevation,
-            altitudeAccuracy: 0,
-            heading: 0,
-            speed: 0,
-            latitude: _steps[_stepCount].latitude,
-            longitude: _steps[_stepCount].longitude
-          },
-          timestamp: new Date().getTime()
-        };
-
-        _stepCount ++;
-
-        _self._onLocationChange(_location as Position);
-
-      } else {
-        clearInterval(_interval);
-      }
-    }, 4000);
-
-  }
+  // private _hikeMile(mileId: number): void {
+  //
+  //   const _self = this;
+  //   const _steps = this.trailGenerator.getTrailData().miles[mileId].waypoints;
+  //   let _stepCount = 0;
+  //
+  //   const _interval = setInterval(function() {
+  //
+  //     if (_stepCount < _steps.length) {
+  //
+  //       const _location = {
+  //         coords: {
+  //           accuracy: 0,
+  //           altitude:  _steps[_stepCount].elevation,
+  //           altitudeAccuracy: 0,
+  //           heading: 0,
+  //           speed: 0,
+  //           latitude: _steps[_stepCount].latitude,
+  //           longitude: _steps[_stepCount].longitude
+  //         },
+  //         timestamp: new Date().getTime()
+  //       };
+  //
+  //       _stepCount ++;
+  //
+  //       _self._onLocationChange(_location as Position);
+  //
+  //     } else {
+  //       clearInterval(_interval);
+  //     }
+  //   }, 4000);
+  //
+  // }
 
 
 
@@ -146,20 +147,17 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
         elevation: location['coords']['altitude']} as Waypoint;
 
       // mile
-      let _waypoint: object = this.trailGenerator.findNearestPointInMileTree(this._user.waypoint, 1)[0];
+      const _waypoint: Distance = this.trailGenerator.findNearestPointInMileTree(this._user.waypoint, 1)[0];
       const _mile: Mile = this.trailGenerator.getTrailData().miles[_waypoint['belongsTo']];
 
-      console.log(_waypoint);
-
-      console.log(_waypoint['belongsTo']);
       this._user.nearestMileId = _mile.id;
 
       // anchorPoint
       const _nearestAnchorPoint = _waypoint;
-      this._user.anchorPoint = _mile.waypoints[_nearestAnchorPoint['key']];
+      this._user.anchorPoint = _mile.waypoints[_nearestAnchorPoint.key];
 
       // distance
-      this._user.waypoint.distance = _nearestAnchorPoint['distance'];
+      this._user.waypoint.distance = _nearestAnchorPoint.distance;
 
       //toggle warning / mile simulator
       if (this._user.waypoint.distance > this.localStorage.retrieve('maxPoiDistance')

@@ -8,11 +8,11 @@ import { AppComponent } from './app.component';
 // font awesome
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView, faPenAlt,
-  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock,
-  faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload, faMapPin, faHotel,
+import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView, faPenAlt, faHouseDamage,
+  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock, faParking,
+  faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload, faMapPin, faHotel, faShoePrints,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle, faGem,
-  faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faParking, faShoePrints
+  faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp
   } from '@fortawesome/free-solid-svg-icons';
 import { faCompass, faDotCircle, faArrowAltCircleDown} from '@fortawesome/free-regular-svg-icons';
 
@@ -81,6 +81,7 @@ import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.
 import { PopupComponent } from './component/leaflet-map/elements/popup/popup.component';
 import {createCustomElement} from '@angular/elements';
 import { NoteDialogComponent } from './component/dialog/note-dialog/note-dialog.component';
+import { BaseComponent } from './base/base/base.component';
 
 @NgModule({
   declarations: [
@@ -123,7 +124,8 @@ import { NoteDialogComponent } from './component/dialog/note-dialog/note-dialog.
     UserIndicatorComponent,
     RatingComponent,
     PopupComponent,
-    NoteDialogComponent
+    NoteDialogComponent,
+    BaseComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -179,7 +181,7 @@ export class AppModule {
 
     // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faHotel, faStreetView, faPenAlt,
-      faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt,
+      faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt, faHouseDamage,
       faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload,
       faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake, faGem, faMapPin,
       faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faTimes, faParking, faShoePrints, faLock);

@@ -2,16 +2,12 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, isDevMode,
   OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {DownloadService} from '../../../../../../service/download.service';
 import {Subscription} from 'rxjs';
-import {Downloader, DownloaderStatus} from '../../../../../../_util/downloader';
+import {Downloader} from '../../../../../../_util/downloader/downloader';
 import {FilesystemService} from '../../../../../../service/filesystem.service';
-import {getTrailMetaDataById} from '../../../../../../_util/trail';
+import {getTrailMetaDataById} from '../../../../../../_util/trail-meta';
 import {TrailMeta} from '../../../../../../type/trail';
 import {environment} from '../../../../../../../environments/environment.prod';
-
-export class DownloadStatus {
-  label: string;
-  data: any;
-}
+import {DownloaderStatus} from '../../../../../../_util/downloader/status-manager';
 
 @Component({
   selector: 'downloader',
@@ -88,7 +84,7 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
     const _self = this;
 
-    this.isActive = this._downloader.isActiveSubject.getValue();
+    this.isActive = this._downloader.status.isActiveSubject.getValue();
 
     let _base: string = this.trailMeta.abbr + '/';
     if (this.isVersionSpecific) {
@@ -119,68 +115,62 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
       this._downloadSubscription.unsubscribe();
     }
 
-    console.log(this._url);
-
     this._downloadSubscription = this._downloader.meta.subscribe(
       function (status: DownloaderStatus) {
 
-        _self.isActive = _self._downloader.isActiveSubject.getValue();
+        _self.isActive = _self._downloader.status.isActiveSubject.getValue();
 
-        if (status.type === 'http' && status.label && status.label === 'complete') {
+        if (status && status.label) {
 
-          if (_self.extension !== 'zip' && _self.extension !== 'json') {
+          if (status.type === 'http' && status.label === 'complete') {
 
-            _self._clear();
-            _self.hasFile = false;
-            _self.isActive = false;
-            throw new Error('downloaded an unsupported file');
-          }
+            if (_self.extension !== 'zip' && _self.extension !== 'json') {
 
-        } else if (status['label'] && status['label'] === 'progress') {
+              _self._clear();
+              _self.hasFile = false;
+              _self.isActive = false;
+              throw new Error('downloaded an unsupported file');
+            }
 
+          } else if (status.label === 'progress') {
 
+            // TODO: currently not showing saving/unzipping as part of the progress bar
 
-          // TODO: currently not showing saving/unzipping as part of the progress bar
+            if (status.type === 'http') {
 
-          if (status.type === 'http') {
-
-            // only updates on full % difference, to save redraws
-            const _newProgress = Math.floor(status.data.percentage);
-            if (_newProgress !== _self.progress) {
-              _self.progressState = 'determinate';
-              _self.progress = status.data.percentage;
+              // only updates on full % difference, to save redraws
+              const _newProgress = Math.floor(status.data.percentage);
+              if (_newProgress !== _self.progress) {
+                _self.progressState = 'determinate';
+                _self.progress = status.data.percentage;
+                _self._changeDetector.detectChanges();
+              }
+            } else {
+              _self.progressState = 'buffer';
               _self._changeDetector.detectChanges();
             }
-          } else {
-            _self.progressState = 'buffer';
-            _self._changeDetector.detectChanges();
+          } else if (status.label === 'error') {
+
+            alert('Downloader error');
+            _self.hasFile = false;
+            _self.onClear(_self.type);
+            _self.progress = 0;
+
+          } else if (status.type === 'downloader' && status.label === 'complete') {
+            _self.progress = 100;
+            _self.hasFile = true;
+
+            console.log('downloader complete?');
+            _self.onComplete(_self.type);
+
+          } else if (status.type === 'downloader' && status.label === 'cleared') {
+            _self.progress = 0;
           }
-
-        } else if (status['label'] && status['label'] === 'error') {
-
-          console.log(status, _self._url);
-
-          alert('Downloader error');
-          _self.hasFile = false;
-          _self.onClear(_self.type);
-          _self.progress = 0;
-
-        } else if (status.type === 'downloader' && status.label === 'complete') {
-          _self.progress = 100;
-          _self.hasFile = true;
-
-          console.log('downloader complete?');
-          _self.onComplete(_self.type);
-
-        } else if (status.type === 'downloader' && status.label === 'cleared') {
-          _self.progress = 0;
         }
-
-
       }, function (error) {
 
         alert('Download error');
-        _self.isActive = _self._downloader.isActiveSubject.getValue();
+        _self.isActive = _self._downloader.status.isActiveSubject.getValue();
         _self.onClear(_self.type);
         _self.hasFile = false;
         _self.progress = 0;

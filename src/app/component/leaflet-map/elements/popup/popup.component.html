@@ -1,10 +1,12 @@
-<div class="{{position}}">
-  <div id="menu">
-    <button (click)="tag()">
-      <fa-icon [icon]="['fas', 'pen-alt']"></fa-icon>
-    </button>
+<div class="wrapper {{position}}">
+  <div class="container {{direction}}">
+    <span class="icon-wrap" (click)="tag()">
+      <fa-icon class="menu" [icon]="['fas', 'pen-alt']"></fa-icon>
+    </span>
+    <div class="content">
+      <h3>{{label}}</h3>
+      <p>{{description}}</p>
+      <a *ngIf="showCoords" [href]="createMapsLatLngLink()" target="_blank">Coordinates</a>
+    </div>
   </div>
-  <h3>{{label}}</h3>
-  <p>{{description}}</p>
-  <a *ngIf="showCoords" [href]="createMapsLatLngLink()" target="_blank">Coordinates</a>
 </div>

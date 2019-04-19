@@ -25,22 +25,28 @@
 <body>
   <app-root></app-root>
 </body>
+
 <!-- Include Cordova script only when needed -->
 <script>
-    console.log(location.protocol);
-    window.addEventListener = function () {
-      EventTarget.prototype.addEventListener.apply(this, arguments);
-    };
-    window.removeEventListener = function () {
-      EventTarget.prototype.removeEventListener.apply(this, arguments);
-    };
-    document.addEventListener = function () {
-      EventTarget.prototype.addEventListener.apply(this, arguments);
-    };
-    document.removeEventListener = function () {
-      EventTarget.prototype.removeEventListener.apply(this, arguments);
-    };
-    document.write('<script src="cordova.js"><\/script>');
-    document.write('<script src="js/index.js"><\/script>');
+    var isiOS = /(ipod|iphone|ipad)/i.test(navigator.userAgent);
+    var isAndroid = /(android)/i.test(navigator.userAgent);
+
+    if (isiOS || isAndroid) {
+      console.log(location.protocol);
+      window.addEventListener = function () {
+        EventTarget.prototype.addEventListener.apply(this, arguments);
+      };
+      window.removeEventListener = function () {
+        EventTarget.prototype.removeEventListener.apply(this, arguments);
+      };
+      document.addEventListener = function () {
+        EventTarget.prototype.addEventListener.apply(this, arguments);
+      };
+      document.removeEventListener = function () {
+        EventTarget.prototype.removeEventListener.apply(this, arguments);
+      };
+      document.write('<script src="cordova.js"><\/script>');
+      document.write('<script src="js/index.js"><\/script>');
+    }
 </script>
 </html>

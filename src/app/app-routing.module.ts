@@ -62,6 +62,7 @@ export class AppRoutingModule {
 
   constructor(private _router: Router) {
 
+    // iOS router error testing
     _router.events.subscribe( (event: any) => {
 
       if (event instanceof NavigationStart) {

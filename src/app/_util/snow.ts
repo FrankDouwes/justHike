@@ -1,6 +1,18 @@
 import {Snow, Snowpoint} from '../type/snow';
 
-export function parseSnow(snow: Array<any>, trailId: number, abbr: string, version: string): Snow {
+class SnowPivot {
+  label:      string;
+  location:   SnowLocation;
+}
+
+// from source file
+class SnowLocation {
+  x:          number;
+  y:          number;
+  elev:       number;
+}
+
+export function parseSnow(snow: Array<SnowLocation>, trailId: number, abbr: string, version: string): Snow {
 
   if (!snow || snow.length === 0) {
     return;
@@ -12,8 +24,9 @@ export function parseSnow(snow: Array<any>, trailId: number, abbr: string, versi
   _returnObj.version = version;
   _returnObj.abbr = abbr;
 
-  const _snowPivots: Array<any> = [];
+  const _snowPivots: Array<SnowPivot> = [];
 
+  // starting at 1 for a comparison with the previous point
   for (let i = 1; i < snow.length; i++) {
 
     // get pivots (no snow/snow & snow/no-snow)
@@ -74,9 +87,9 @@ export function parseSnow(snow: Array<any>, trailId: number, abbr: string, versi
     }
 
     // set start / end point for end mile
-    _snowMiles[Math.floor(_snowPivots[s + 1].location.x)] = [
-      {distance: 0, elevation: _snowPivots[s].location.elev + (((_miles) / _distance) * _levelChange)},
-      {distance: Number((_distance - _miles).toFixed(2)), elevation: _snowPivots[s + 1].location.elev}
+    _snowMiles[ Math.floor(_snowPivots[s + 1].location.x) ] = [
+      new Snowpoint(0, _snowPivots[s].location.elev + (((_miles) / _distance) * _levelChange)),
+      new Snowpoint(Number((_distance - _miles).toFixed(2)), _snowPivots[s + 1].location.elev)
     ];
   }
 
@@ -91,11 +104,11 @@ export function reverseSnow(snow: Snow, trailLength: number): Snow {
   // snow.snowMiles.reverse();
   const _newSnowArray: Array<any> = [];
 
-  snow.snowMiles.forEach(function (snowMile, index) {
-    Array(snowMile).reverse();
-    Array(snowMile).forEach(function (point) {
+  snow.snowMiles.forEach(function (snowMile: Array<Snowpoint>, index: number) {
+    snowMile.reverse();
+    snowMile.forEach(function (point: Snowpoint) {
       if (point) {
-        point['distance'] = Math.abs(point['distance'] - 1);
+        point.distance = Math.abs(point.distance - 1);
       }
     });
     _newSnowArray[trailLength - index] = snowMile;

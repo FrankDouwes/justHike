@@ -1,11 +1,11 @@
 import {Component, Input, OnInit, OnChanges, ElementRef, SimpleChanges, Output,
   EventEmitter, ViewChild, AfterViewInit} from '@angular/core';
-import {Trail} from '../../../type/trail';
 import {Waypoint} from '../../../type/waypoint';
 import {normalizeElevation} from '../../../_util/math';
 import {environment} from '../../../../environments/environment.prod';
 import * as Hammer from 'hammerjs/hammer.min';
 import {Mile} from '../../../type/mile';
+import {Trail} from '../../../type/trail';
 declare const SVG: any;    // fixed SVG installation bug
 
 @Component({

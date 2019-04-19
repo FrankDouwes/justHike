@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ElementRef, ChangeDetectionStrategy } from '@angular/core';
-import { OHLC } from '../../../../type/ohlc';
 import { normalizeElevation } from '../../../../_util/math';
 import { environment } from '../../../../../environments/environment.prod';
+import {OHLC} from '../../../../type/ohlc';
 
 @Component({
   selector: 'labels',

@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {LoaderService} from '../../service/loader.service';
 import {TrailMeta} from '../../type/trail';
-import {getTrailMetaDataById, getTrailsMetaData} from '../../_util/trail';
+import {getTrailMetaDataById, getTrailsMetaData} from '../../_util/trail-meta';
 import {LocalStorageService} from 'ngx-webstorage';
 import {switchMap, take} from 'rxjs/operators';
 import {Observable, of} from 'rxjs';
