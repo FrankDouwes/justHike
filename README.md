@@ -5,6 +5,7 @@ BETA 1 released to first group of testers on: April 10th 2019.
 ----- ----- ----- ----- ----
 
 TODO v1:
+- add: notes
 - add: towns (+info and link towns to nearest trail road/trail junction)
 - add: rating system for water / campsite
 - add: compass heading, all cordova plugins seem to have android issues, iOS only?
@@ -29,8 +30,11 @@ TODO v1:
 - iOS jumping in scroll list (either an event issue or a css issue)
 - iOS (sporadically): (possibly related to ionic webview) - [IPC] Connection::waitForSyncReply: Timed-out while waiting for reply
 - iOS (sporadically): (possibly related to ionic webview) - [LayoutConstraints] Unable to simultaneously satisfy constraints.
-
+<br/><br/>
+- NPM: node-pre-gyp WARN Using request for node-pre-gyp https download (not sure where that came from)
+<br/><br/><br/><br/>
 TODO v2:
+- add: add routes to towns (cached) https://johngravois.com/esri-leaflet-gp/closest-facility.html
 - add: side trails
 - add: comments
 - add: lock/mark locations

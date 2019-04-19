@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="hike.frankdouwes.com" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="hike.frankdouwes.com" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Just Hike</name>
     <description>
       Long Distance Hiking Companion
@@ -20,6 +20,9 @@
     <preference name="ShowSplashScreenSpinner" value="false" />
     <preference name="SplashScreenDelay" value="2000" />
     <preference name="SplashScreen" value="screen" />
+    <edit-config file="AndroidManifest.xml" mode="merge" target="/manifest/application/activity[@android:name='MainActivity']">
+      <activity android:name="MainActivity" android:windowSoftInputMode="adjustPan" />
+    </edit-config>
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="AndroidLaunchMode" value="singleInstance" />
