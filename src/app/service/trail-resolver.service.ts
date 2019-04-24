@@ -41,8 +41,8 @@ export class TrailResolverService implements Resolve<any> {
    * - online data */
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<object> | Observable<never> {
 
-    this._activeTrailId = this._localStorage.retrieve('activeTrailId') | 0;
-    const _direction: number = this._localStorage.retrieve('direction') | 0;
+    this._activeTrailId = this._localStorage.retrieve('activeTrailId') || 0;
+    const _direction: number = this._localStorage.retrieve('direction') || 0;
 
       if (this._cachedTrail && this._cachedTrail.id === this._activeTrailId && this._cachedTrail.direction === _direction) {
 

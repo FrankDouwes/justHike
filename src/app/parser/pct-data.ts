@@ -3,6 +3,7 @@ import { Waypoint } from '../type/waypoint';
 import { Poi } from '../type/poi';
 import {TrailMeta} from '../type/trail';
 import {environment} from '../../environments/environment.prod';
+import {calculateDistance, calculateSectionScale} from '../_util/geolib/distance';
 
 const _identifierList: Array<string> = [];
 const _x2js = new X2JS({
@@ -11,46 +12,57 @@ const _x2js = new X2JS({
 
 // trail specific parser for PCT data
 
-export function parsePCTData (trail: TrailMeta, trailData: string, poiData: string, snow: object): Array<object> {
+export function parsePCTData (trail: TrailMeta, trailData: Array<string>, poiData: string, snow: object): Array<object> {
+
+  console.log('parse pct data');
 
   // TRAIL
   let _waypoints: Array<Waypoint> = [];
 
-  // 1. parse string
-  // fix keys
-  trailData = trailData
-    .split('ele').join('elevation')
-    .split('lat=').join('latitude=')
-    .split('lon=').join('longitude=');
+  trailData.forEach(function(trailString: string) {
 
-  // 2. parser to JSON
-  const trailAsJson: JSON  = _x2js.xml2js(trailData);
+    // 1. convert data
+    trailString = convertToWaypointString(trailString);
 
-  // 3. parse json
-  // get just the main trail data, ignore side-trails
-  trailAsJson['gpx']['trk'].filter(function(track) {
-      return track.extensions.TrackExtension.DisplayColor.__text.includes('Red');
-  }).map(function(track) {
-    _waypoints = _waypoints.concat(track.trkseg.trkpt);
+    // 2. parser to JSON
+    const trailAsJson: JSON  = _x2js.xml2js(trailString);
+
+    // 3. parse json
+    // get just the main trail data, ignore side-trails (for now)
+    if (Array.isArray(trailAsJson['gpx']['trk'])) {
+
+      const _length = trailAsJson['gpx']['trk'].length;
+      for (let i = 0; i < _length; i ++) {
+
+        const _section = trailAsJson['gpx']['trk'][i];
+
+        // 'Red' identifies the main track
+        if (_section.extensions.TrackExtension.DisplayColor.__text.includes('Red')) {
+
+          const _scale = calculateSectionScale(_section.trkseg.trkpt, trail.length[i]);
+
+          const _sectionArray: Array<Waypoint> = addDistanceToWaypoints(_section.trkseg.trkpt, _scale);
+          _waypoints = _waypoints.concat(_sectionArray);
+        }
+      }
+    } else {
+
+      const _track = trailAsJson['gpx']['trk'].trkseg.trkpt;
+      _waypoints = _waypoints.concat(_track);
+    }
   });
 
   // POIS (=points of interest. water sources, campsites etc.)
 
   // 1. parse string
   // fix keys
-  poiData = poiData
-    .split('ele').join('elevation')
-    .split('lat=').join('latitude=')
-    .split('lon=').join('longitude=')
-    .split('desc').join('description')
-    .split('cmt').join('comment')
-    .split('sym').join('icon');
+  poiData = convertToWaypointString(poiData);
 
   // 2. parser to JSON
   const poiAsJson: JSON  = _x2js.xml2js(poiData);
 
   // 3. adjust poi data
-  const _pois: Array<Poi> = parsePois(poiAsJson['gpx']['wpt']);
+  const _pois: Array<Poi> = _parsePois(poiAsJson['gpx']['wpt']);
 
   // adjust individual pois
 
@@ -83,14 +95,26 @@ export function parsePCTData (trail: TrailMeta, trailData: string, poiData: stri
   }
 
   // SNOW (the current snow pack)
+
   const _snow = snow['datasets'][0];
 
   // return
   return [trail, _waypoints, _pois, _snow];
 }
 
+// go from gpx to waypoint before converting to JSON (assuming string manipulation is faster)
+function convertToWaypointString(input: string): string {
+  return input
+    .split('ele').join('elevation')
+    .split('lat=').join('latitude=')
+    .split('lon=').join('longitude=')
+    .split('desc').join('description')
+    .split('cmt').join('comment')
+    .split('sym').join('icon');
+}
+
 // figure out what type of POIS exist in raw data, assign them to poi types TODO
-function parsePois(pois: Array<object>): Array<Poi> {
+function _parsePois(pois: Array<object>): Array<Poi> {
 
   const _poisLength: number = pois.length;     // faster
   const _parsedPois: Array<Poi> = [];
@@ -166,8 +190,6 @@ function parsePois(pois: Array<object>): Array<Poi> {
       _poi['label'] = _descriptionArr.shift();
       _poi['description'] = parseStringUrls(_descriptionArr.join(''));
 
-      console.log(_poi);
-
       _parsedPois.push(_poi as Poi);
     }
   }
@@ -190,4 +212,27 @@ function parseStringUrls(s: string) {
   });
 
   return s;
+}
+
+// set the total distance (the distance on trail) for each waypoint, based on the section scale
+function addDistanceToWaypoints(waypoints: Array<Waypoint>, scale: number): Array<Waypoint> {
+
+  const _length = waypoints.length;
+
+  let _totalDistance = 0;
+
+  for (let i = 0; i < _length; i++) {
+
+    const _waypoint: Waypoint = waypoints[i];
+    let _distance = 0;
+
+    if (i !== 0) {
+      _distance = calculateDistance(waypoints[i - 1], _waypoint) * scale;
+      _totalDistance += _distance;
+    }
+
+    _waypoint.distanceTotal = _totalDistance;
+  }
+
+  return waypoints;
 }

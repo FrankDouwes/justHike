@@ -35,7 +35,7 @@ export class TrailMeta {
   abbr:           string;
   trailVersion:   string;
   tilesVersion:   string;
-  length:         number;
+  length:         number | Array<number>;
 
   // optional params
   utm?:                   Array<number>;
@@ -48,5 +48,8 @@ export class TrailMeta {
   availableForPurchase?:  boolean;
   isFree?:                boolean;
   dataPath?:              string;
-  scrollSegmentSize?:     number;
+  scrollSegmentSize?:     number;         // used from scrollbar
+  waypointsPerMile?:      number;         // the number of interpolated points, used for trail generation only
+  multipart?:             boolean;        // consists of multiple .dat files (generate trail)
+  parts?:                 number;         // the number of parts (generate trail
 }

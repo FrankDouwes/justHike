@@ -65,16 +65,25 @@ export const environment = {
       snowVersion: '1.0',
       length: 109.5,                   // estimated length (first section is 109.5)
       dataPath: 'DEMO/',
-      scrollbarSegmentSize: 100        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles
+      waypointsPerMile: 40,             // the number of interpolated points per mile
+      multipart: false,
+
     }, {
       abbr: 'PCT',
       id: 1,
       trailVersion: '1.1',
       tilesVersion: '1.0',
       snowVersion: '1.0',
-      length: 2661.4,                  // estimated length (including 8mi into Canada) according to halfmile pct data
+      length: [109.5, 100, 132.5, 112.5, 111.9, 85.6, 115, 175.5, 74.4, 75.4,
+        64.8, 38.3, 91.4, 132.2, 82.2, 98.5, 56.2, 63, 54.5, 74.4, 60.1, 75.9,
+        107.9, 55, 148.2, 98.3, 70.9, 127, 70.3],     // estimated length (including 8mi into Canada) according to halfmile pct data
       dataPath: 'PCT/',
-      scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
+      waypointsPerMile: 40,            // the number of interpolated points per mile
+      multipart: true,
+      parts: 29
+
     }, {
       abbr: 'CDT',
       id: 2,
@@ -83,7 +92,10 @@ export const environment = {
       snowVersion: '1.0',
       length: 3011,                    // estimated length
       dataPath: 'CDT/',
-      scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
+      waypointsPerMile: 40,            // the number of interpolated points per mile
+      multipart: false,
+
     }, {
       abbr: 'AT',
       id: 3,
@@ -92,7 +104,9 @@ export const environment = {
       snowVersion: '1.0',
       length: 2199,                    // estimated length
       dataPath: 'AT/',
-      scrollbarSegmentSize: 200        // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
+      waypointsPerMile: 40,            // the number of interpolated points per mile
+      multipart: false,
     }, {
       id: 4,
       trailVersion: '1.0',
@@ -100,7 +114,9 @@ export const environment = {
       abbr: 'SHR',
       length: 215,                      // estimated length
       dataPath: 'SHR/',
-      scrollbarSegmentSize: 100         // one scrollbar segment for every X miles
+      scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles
+      waypointsPerMile: 40,             // the number of interpolated points per mile
+      multipart: false,
     }
   ]
 };

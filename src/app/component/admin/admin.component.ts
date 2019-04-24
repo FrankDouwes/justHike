@@ -13,6 +13,7 @@ import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {OrientationService} from '../../service/orientation.service';
 import {SequentialResolverService} from '../../service/sequential-resolver.service';
 import {cloneData} from '../../_util/generic';
+import {Waypoint} from '../../type/waypoint';
 
 @Component({
   selector: 'app-admin',
@@ -47,7 +48,6 @@ export class AdminComponent implements OnInit {
 
   ngOnInit() {
 
-    const _self = this;
     const _trailMetaObj = getTrailsMetaData();
 
     this.trailMeta = Object.keys(_trailMetaObj).map(function(key) {
@@ -63,18 +63,17 @@ export class AdminComponent implements OnInit {
 
   public genGpxData(): void {
 
-    const _self = this;
     const _trailMeta: TrailMeta = getTrailMetaDataById(Number(this.selectedTrail));
 
     // simplify the track for app: Mobile Atlas Creator
-    let _clone: Array<any> = cloneData(this._trailGeneratorService.flatTrailData) as Array<any>;
+    const _clone: Array<any> = cloneData(this._trailGeneratorService.flatTrailData) as Array<Waypoint>;
 
     // 55 gives roughly 3 points per mile (PCT)
-    _clone = this._trailGeneratorService.simplify(_clone, 80, true);
+    // _clone = this._trailGeneratorService.simplify(_clone, 0.1, true);
 
     alert(this._trailGeneratorService.flatTrailData.length + ' to ' + _clone.length + ' waypoints');
 
-    const _gpx:Array<any> = createGPX(_trailMeta, _clone);
+    const _gpx: Array<any> = createGPX(_trailMeta, _clone);
 
     _gpx.forEach(function(file, index) {
       saveFileAs(file, _trailMeta.abbr + '_' + index + '.gpx');
@@ -88,7 +87,23 @@ export class AdminComponent implements OnInit {
 
     this._getRawData().subscribe( data => {
 
-      const _parsedData = this._trailService.parseTrailData(data[0], data[1], data[2], data[3], Number(this.selectedDirection));
+      const _trailMeta: TrailMeta = data[0];
+      const _dataOffset: number = (_trailMeta.parts) ? _trailMeta.parts - 1 : 0;
+
+      let _waypointData: Array<string> | string;
+      if (_trailMeta.multipart) {
+
+        _waypointData = [];
+
+        for (let i = 0; i <= _dataOffset; i++) {
+          console.log(i);
+          _waypointData.push(data[i + 1]);
+        }
+      } else {
+        _waypointData = data[1];
+      }
+
+      const _parsedData = this._trailService.parseTrailData(data[0], _waypointData, data[2 + _dataOffset], data[3 + _dataOffset], Number(this.selectedDirection));
 
       this._generatedData = _parsedData;
       this.trailDataStateClassName = 'generated';

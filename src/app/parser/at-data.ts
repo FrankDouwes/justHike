@@ -14,11 +14,9 @@ export function parseATData (trail: TrailMeta, trailData: string, poiData: strin
   const _waypoints: Array<Waypoint> = [];
 
   // 1. parser to JSON
-  const _trailAsJson: JSON  = _x2js.xml2js(trailData);
+  const _trailAsJson: JSON  = _x2js.xml2js(trailData[0]);
 
   const _coordinates = _trailAsJson['kml'].Document.Folder.Placemark;
-
-  console.log(_coordinates);
 
   //
   // const _coordArray = _coordinates.split(' ');

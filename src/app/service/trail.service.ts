@@ -74,9 +74,19 @@ export class TrailService {
 
 
     const _assetsDir: string = 'assets/data/';
-    const _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', {responseType: 'text'});
+
+    if (_trailMeta.multipart) {
+      for(let i = 0; i < _trailMeta.parts; i++) {
+        const _trailDownloader = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail_' + i + '.dat', {responseType: 'text'});
+        _observables.push(_trailDownloader);
+      }
+    } else {
+      const _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', {responseType: 'text'});
+      _observables.push(_trail);
+    }
+
     const _poi = this._http.get(_assetsDir + _trailMeta.dataPath + 'poi.dat', {responseType: 'text'});
-    _observables.push(_trail, _poi);
+    _observables.push(_poi);
 
     // snow is an optional data file
     let _snow: Observable<Object>;
@@ -136,7 +146,7 @@ export class TrailService {
   }
 
   // Parse the raw data (routines for each trail), returns a promise
-  public parseTrailData(trail: TrailMeta, waypoints: string, pois: string, snow: object, direction: number): object {
+  public parseTrailData(trail: TrailMeta, waypoints: Array<string> | string, pois: string, snow: object, direction: number): object {
 
     this._loaderService.showMessage('parsing trail data');
 

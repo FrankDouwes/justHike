@@ -21,7 +21,7 @@ export function parseSHRData (trail: TrailMeta, trailData: string, poiData: stri
     .split('lon=').join('longitude=')
 
   // 2. parser to JSON
-  const trailAsJson: JSON  = _x2js.xml2js(trailData);
+  const trailAsJson: JSON  = _x2js.xml2js(trailData[0]);
 
   // 3. parse json
   // combine all track segments in a single array

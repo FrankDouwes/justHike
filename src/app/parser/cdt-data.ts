@@ -14,7 +14,7 @@ export function parseCDTData (trail: TrailMeta, trailData: string, poiData: stri
   const _waypoints: Array<Waypoint> = [];
 
   // 1. parser to JSON
-  const _trailAsJson: JSON  = _x2js.xml2js(trailData);
+  const _trailAsJson: JSON  = _x2js.xml2js(trailData[0]);
 
   // 2. convert coordinates (flat string to lat/lon/ele)
   const _coordinates = _trailAsJson['kml'].Document.Folder.Placemark.MultiGeometry.LineString.coordinates;

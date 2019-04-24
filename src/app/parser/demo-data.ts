@@ -12,6 +12,8 @@ const _x2js = new X2JS({
 
 export function parseDEMOData (trail: TrailMeta, trailData: string, poiData: string, snow: object): Array<object> {
 
+  console.log(poiData, snow);
+
   // TRAIL
   let _waypoints: Array<Waypoint> = [];
 
@@ -27,12 +29,15 @@ export function parseDEMOData (trail: TrailMeta, trailData: string, poiData: str
 
   // 3. parse json
   // get just the main trail data, ignore side-trails
-  trailAsJson['gpx']['trk'].filter(function(track) {
-    return track.extensions.TrackExtension.DisplayColor.__text.includes('Red');
-  }).map(function(track) {
-    _waypoints = _waypoints.concat(track.trkseg.trkpt);
-  });
-
+  if (Array.isArray(trailAsJson['gpx']['trk'])) {
+    trailAsJson['gpx']['trk'].filter(function(track) {
+      return track.extensions.TrackExtension.DisplayColor.__text.includes('Red');
+    }).map(function(track) {
+      _waypoints = _waypoints.concat(track.trkseg.trkpt);
+    });
+  } else {
+    _waypoints = _waypoints.concat(trailAsJson['gpx']['trk'].trkseg.trkpt);
+  }
 
 
   // POIS (=points of interest. water sources, campsites etc.)
