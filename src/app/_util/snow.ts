@@ -99,18 +99,21 @@ export function parseSnow(snow: Array<SnowLocation>, trailId: number, abbr: stri
 }
 
 export function reverseSnow(snow: Snow, trailLength: number): Snow {
-
   // sobo reverse snow
   // snow.snowMiles.reverse();
   const _newSnowArray: Array<any> = [];
 
   snow.snowMiles.forEach(function (snowMile: Array<Snowpoint>, index: number) {
-    snowMile.reverse();
-    snowMile.forEach(function (point: Snowpoint) {
-      if (point) {
-        point.distance = Math.abs(point.distance - 1);
-      }
-    });
+
+    if (snowMile) {
+      snowMile.reverse();
+
+      snowMile.forEach(function (point: Snowpoint) {
+        if (point) {
+          point.distance = Math.abs(point.distance - 1);
+        }
+      });
+    }
     _newSnowArray[trailLength - index] = snowMile;
   });
 

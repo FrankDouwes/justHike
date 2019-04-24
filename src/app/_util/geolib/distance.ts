@@ -27,17 +27,38 @@ export class Distance {
   }
 }
 
-export function calculateDistance(p1: any, p2: any): number {
+// calculate the distance between 2 points
+export function calculateDistance(point1: Waypoint, point2: Waypoint): number {
+
   return geolib.getDistance(
-    {latitude: p1.latitude, longitude: p1.longitude} as geolib.PositionAsDecimal,
-    {latitude: p2.latitude, longitude: p2.longitude} as geolib.PositionAsDecimal
-    , 0, 4);
+    {latitude: point1.latitude, longitude: point1.longitude},
+    {latitude: point2.latitude, longitude: point2.longitude}, 1, 4);
 }
 
 // calculate the scale factor of a section (array of waypoints), using the provided length (by author) and the calculated length
-export function calculateSectionScale(section: Array<Waypoint>, length: number): number {
+export function calculateSectionScale(section: Array<Waypoint>, length: number, useMile: boolean = true): number {
 
-  const _calculatedLength = geolib.getPathLength(section) / environment.MILE;
+  let _calcSectionLength = 0;
+  let _prevPoint: Waypoint;
 
-  return _calculatedLength / length;
+  const _length: number = section.length;
+  for (let i = 0; i < _length; i++) {
+
+    const _point: Waypoint = section[i];
+
+    if (_prevPoint) {
+      _calcSectionLength += calculateDistance(_prevPoint, _point);
+    }
+
+    _prevPoint = _point;
+  }
+
+  // convert to mile
+  if (useMile) {
+    _calcSectionLength = _calcSectionLength / environment.MILE;
+  }
+
+  const _scale = length / _calcSectionLength;
+
+  return _scale;
 }

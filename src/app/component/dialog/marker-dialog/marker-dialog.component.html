@@ -8,6 +8,8 @@
   <h1 mat-dialog-title>{{data.label}}</h1>
   <h3 *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</h3>
 
+  <small *ngIf="data.identifier">{{data.identifier}}</small>
+
   <div *ngIf="data.description">
     <p [innerHTML]="data.description"></p>
     <hr />

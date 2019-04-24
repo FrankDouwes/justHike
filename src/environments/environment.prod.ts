@@ -22,9 +22,6 @@ export const environment = {
 
     activeTrailId: 0,               // the ID of the current trail
     purchasedTrails: [],            // IDs of purchased trails
-
-    useMiles: true,                 // miles (true), km (false) (TODO UNUSED)
-    useFeet: true,                  // feet (true), meters (false) for elevation gain/loss (TODO UNUSED)
     direction: 0,                   // northbound (0) or southbound (1)
     showSnow: true,                 // draw the snowpack
     showMiniMap: true,              // show mini map in elevation profile
@@ -66,7 +63,6 @@ export const environment = {
       length: 109.5,                   // estimated length (first section is 109.5)
       dataPath: 'DEMO/',
       scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles
-      waypointsPerMile: 40,             // the number of interpolated points per mile
       multipart: false,
 
     }, {
@@ -80,7 +76,6 @@ export const environment = {
         107.9, 55, 148.2, 98.3, 70.9, 127, 70.3],     // estimated length (including 8mi into Canada) according to halfmile pct data
       dataPath: 'PCT/',
       scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
-      waypointsPerMile: 40,            // the number of interpolated points per mile
       multipart: true,
       parts: 29
 
@@ -93,7 +88,6 @@ export const environment = {
       length: 3011,                    // estimated length
       dataPath: 'CDT/',
       scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
-      waypointsPerMile: 40,            // the number of interpolated points per mile
       multipart: false,
 
     }, {
@@ -105,17 +99,15 @@ export const environment = {
       length: 2199,                    // estimated length
       dataPath: 'AT/',
       scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
-      waypointsPerMile: 40,            // the number of interpolated points per mile
       multipart: false,
     }, {
+      abbr: 'SHR',
       id: 4,
       trailVersion: '1.0',
       tilesVersion: '1.0',
-      abbr: 'SHR',
       length: 215,                      // estimated length
       dataPath: 'SHR/',
       scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles
-      waypointsPerMile: 40,             // the number of interpolated points per mile
       multipart: false,
     }
   ]

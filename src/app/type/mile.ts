@@ -9,7 +9,6 @@ export interface Mile {
   elevationLoss:      number;             // the elevation loss
   waypoints:          Array<Waypoint>;    // all the trail waypoints that make up this mile (first and last point of array are outside of mile due to overlap)
   elevationRange:     OHLC;               // the elevation range (open/high/low/close)
-  scale:              number;             // scale factor (the calculated trail length does not match the provided trail length)
   centerpoint:        object;             // calculated centerpoint of waypoints array, for leaflet
 
   // OPTIONAL

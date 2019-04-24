@@ -57,8 +57,6 @@ export class TrailResolverService implements Resolve<any> {
 
             if (data) {
 
-              console.log(data);
-
               // cache trail
               this._cachedTrail = data[0] as Trail;
               this._trailGenerator.setTrailData(this._cachedTrail);

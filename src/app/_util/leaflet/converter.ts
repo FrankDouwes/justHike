@@ -6,7 +6,8 @@ const _converters = {
   flat_waypoint: flatToWaypoint,
   latlng_waypoint: latLngToWaypoint,
   waypoint_latlng: waypointToLatLng,
-  waypoint_flat: waypointToFlat
+  waypoint_flat: waypointToFlat,
+  waypoint_waypoint: waypointToWaypoint
 };
 
 // convert an array of Waypoints in a specified format to another format)
@@ -75,4 +76,17 @@ export function waypointToFlat(waypoint: Waypoint): Array<number> {
   }
 
   return _flat;
+}
+
+
+// convert waypoint to waypoint, turns string to numbers
+export function waypointToWaypoint(waypoint: Waypoint): Waypoint {
+
+  const _waypoint: any = {};
+
+  for (const key in waypoint) {
+    _waypoint[key] = Number(waypoint[key]);
+  }
+
+  return _waypoint as Waypoint;
 }

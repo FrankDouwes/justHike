@@ -96,7 +96,6 @@ export class AdminComponent implements OnInit {
         _waypointData = [];
 
         for (let i = 0; i <= _dataOffset; i++) {
-          console.log(i);
           _waypointData.push(data[i + 1]);
         }
       } else {

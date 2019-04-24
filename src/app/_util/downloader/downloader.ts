@@ -21,7 +21,6 @@ class FileReference {
 /* file downloader
 sets type using file extension, currently supports json & blob (zip)
 supports multiple files for a single downloader (zip parts, due to size limitations/freezing on mobile)
-TODO: FIX has caching (for large files)
 has save / unzip / delete file (for zips)
 has resume download function (for multipart files)
 TODO: should probably be an uploader too... */

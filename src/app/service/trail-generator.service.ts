@@ -9,24 +9,22 @@ import {environment} from '../../environments/environment.prod';
 import {LoaderService} from './loader.service';
 import {getPoiTypeByType} from '../_util/poi';
 import {cloneData, sortByKey} from '../_util/generic';
-import {Distance} from '../_util/geolib/distance';
-import {pointArrayTypeConversion} from '../_util/leaflet/converter';
+import {calculateDistance, Distance} from '../_util/geolib/distance';
+import {pointArrayTypeConversion, waypointToWaypoint} from '../_util/leaflet/converter';
 import {getClosestPointOnLine} from '../_util/math';
+import PositionAsDecimal = geolib.PositionAsDecimal;
 
 @Injectable({
   providedIn: 'root'
 })
 
+// TODO: generating multiple trails causes enourmous slowdown in poiToMiles, I'm assuming I'm not clearing something...
 export class TrailGeneratorService {
 
   public flatTrailData: Array<Waypoint>;              // the loaded raw waypoints
-  public flatInterpolatedData: Array<Waypoint>;        // the interpolated waypoints
-
   private _trailData: Trail;
 
-  private _tolerance = 0.0001;
   private _mileCenterpointTree: Array<Array<Waypoint>>;
-  private _interpolatedWaypointsTree: Array<Array<Waypoint>>;
 
   constructor(
     private _loaderService: LoaderService,
@@ -72,85 +70,49 @@ export class TrailGeneratorService {
   // TODO: move this to a webworker, not a priority as it's rarely used (trail data won't update often)
   public generateMiles(trail: TrailMeta, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number): Trail {
 
-    console.log(waypoints);
-
-    return;
-
     this._trailData = cloneData(trail) as Trail;
     this._trailData.version = trail.trailVersion;
 
-    const _ppm: number = (trail.waypointsPerMile) ? trail.waypointsPerMile : 30;
-
-    // remove unused trail meta
+    // remove unneeded trail meta
     delete this._trailData['trailVersion'];
     delete this._trailData['tilesVersion'];
     delete this._trailData['snowVersion'];
+    delete this._trailData['dataPath'];
     delete this._trailData['dataPath'];
     delete this._trailData['waypointsPerMile'];
 
     this._trailData.direction = direction;
 
     // // sobo reversal
-    if (direction === 1) {
-      waypoints.reverse();
-      pois.reverse();
-    }
+    // if (direction === 1) {
+    //   waypoints.reverse();
+    //   pois.reverse();
+    // }
 
     this._trailData.pois = pois;
 
     // 1. optimise waypoints
-    this.flatTrailData = waypoints;
-
-    const _optimizedWaypoints: Array<Waypoint> = this.simplify(waypoints, this._tolerance);
-
-    this._trailData.calcLength = geolib.getPathLength(_optimizedWaypoints) / environment.MILE;
-
-    console.log(this._trailData.calcLength);
+    // const _optimisedWaypoints: Array<Waypoint> = this.simplify(waypoints, this._tolerance);
+    this.flatTrailData = pointArrayTypeConversion(waypoints, 'waypoint', 'waypoint');
 
     this._loaderService.showMessage('optimised waypoints');
 
-    // TODO: move to seperate function (if working)
-    /* 2a. convert to interpolated points (creating an even distribution of points)
-    variable spaced waypoints could potentially give an inaccurate trail length in the situation where
-    different sections of the trail are generated using different settings (which seems to be the case for PCT A-F)
-    this extra step guarantees an een distribution of points for the length calculation */
-    const _flatArray: Array<Array<number>> = pointArrayTypeConversion(_optimizedWaypoints, 'waypoint', 'flat');
+    // 2. calculate trail properties
+    const flatPoints: Array<object> = [];
 
-    // create interpolated (evenly spaced) points
-    // const _interpolated = interpolateLineRange(_flatArray, (trail.length * _ppm));
-
-    this.flatInterpolatedData = pointArrayTypeConversion(_interpolated, 'flat', 'waypoint');
-    this._trailData.calcLength = geolib.getPathLength(this.flatInterpolatedData) / environment.MILE;
-
-    this._trailData.scale = (this._trailData.length / this._trailData.calcLength);
-
-    this._interpolatedWaypointsTree = this._createWaypointTree(this.flatInterpolatedData);
-
-    this.flatInterpolatedData[0].distanceTotal = 0;
-
-    let _distanceTotal = 0;
-
-    for (let t = 1; t < this.flatInterpolatedData.length; t ++) {
-
-      const _curPoint: Waypoint = this.flatInterpolatedData[t];
-      const _prevPoint: Waypoint = this.flatInterpolatedData[t - 1];
-
-      const _distance = geolib.getDistance(_curPoint, _prevPoint, 0, 4);
-
-      _distanceTotal += _distance;
-      _curPoint.distanceTotal = _distanceTotal;
+    // remove elevation, causes errors
+    for (let i = 0; i < this.flatTrailData.length; i++) {
+      flatPoints.push({latitude: this.flatTrailData[i].latitude, longitude: this.flatTrailData[i].longitude});
     }
 
-
-    // 2b. elevation range
-
-    this._trailData.elevationRange = calculateOHLC(_optimizedWaypoints, {start: 0, end: waypoints.length - 1});
+    this._trailData.calcLength = geolib.getPathLength(flatPoints as Array<PositionAsDecimal>) / environment.MILE;
+    this._trailData.scale = (this._trailData.length / this._trailData.calcLength);
+    this._trailData.elevationRange = calculateOHLC(this.flatTrailData, {start: 0, end: waypoints.length - 1});
 
     this._loaderService.showMessage('calculated trail properties');
 
-
     // 3. split waypoints into miles
-    this._trailData.miles = this._createMiles(_optimizedWaypoints, this._trailData.scale);
+    this._trailData.miles = this._createMiles(this.flatTrailData);
 
     this._loaderService.showMessage('created miles');
 
@@ -188,14 +150,14 @@ export class TrailGeneratorService {
   //                                      */------/*                          (mile)
   //                                            */------/*                    (mile)
   //                                                       x             (/arr)
-  private _createMiles(waypoints: Array<Waypoint>, scale: number): Array<Mile> {
+  private _createMiles(waypoints: Array<Waypoint>): Array<Mile> {
 
     this._loaderService.showMessage('create miles');
 
     const _miles:           Array<Mile>     = [];
 
     let _prevPoint:         Waypoint;
-    let _prevInterPoint:    Waypoint;
+    let _prevOffset         = 0;
 
     // distances
     let _distance           = 0;
@@ -214,35 +176,22 @@ export class TrailGeneratorService {
 
     for (let i = 0; i < _wayPointsLength; i++) {
 
-      const _waypoint: Waypoint = waypoints[i];
+      const _waypoint: Waypoint = waypoints[i] as Waypoint;
+
 
       // elevation
       if (!_waypoint.elevation) {
         _waypoint.elevation = 0;
       }
 
-      let _elevationChange = 0;
-
       _waypoint.elevation = _waypoint.elevation / environment.FOOT;
 
-      // distance
-      // find nearest interpolated waypoints
-      const _nearestPoints: Array<Waypoint> = this._findNearestInterpolatedPoints(_waypoint).slice(0, 2);
-
-      // generate a new point within the line segment of interpolated points that is the real nearest point (location)
-      const _ipTrailPoint: Waypoint = getClosestPointOnLine(_waypoint, _nearestPoints);
-
-      _ipTrailPoint.distanceTotal = _nearestPoints[0].distanceTotal * scale;
+      let _elevationChange = 0;
 
       // calucalte distance between points
-      if (_prevInterPoint && _prevPoint) {
+      if (_prevPoint) {
 
-        // _distance = geolib.getDistance(
-        //   {latitude: _prevInterPoint.latitude, longitude: _prevInterPoint.longitude},
-        //   {latitude: _ipTrailPoint.latitude, longitude: _ipTrailPoint.longitude}
-        //   , 1, 4);
-
-        _distance = (_ipTrailPoint.distanceTotal - _prevInterPoint.distanceTotal);
+        _distance = _waypoint.distanceTotal - _prevPoint.distanceTotal;
 
         _totalDistance += _distance;
         _bridgedDistance += _distance;
@@ -256,8 +205,7 @@ export class TrailGeneratorService {
         }
       }
 
-      _waypoint.distance = _totalDistance - (_miles.length * environment.MILE);                   // the mile distance
-      _waypoint.distanceTotal = _totalDistance;                                                   // the total distance = NOBO
+      _waypoint.distance = _totalDistance - (_miles.length * environment.MILE);     // the mile distance
 
       _mileWaypoints.push(_waypoint);
 
@@ -275,8 +223,7 @@ export class TrailGeneratorService {
           waypoints:        cloneData(_mileWaypoints) as Array<Waypoint>,
           elevationGain:    Math.round(_totalGain),
           elevationLoss:    Math.round(_totalLoss),
-          scale:            scale,
-          centerpoint:      geolib.getCenter(_mileWaypoints),
+          centerpoint:      waypointToWaypoint(geolib.getCenter(_mileWaypoints)),
           isCurrent:        false,
           hasMajorPoi:      false,
           hasMinorPoi:      false,
@@ -288,6 +235,7 @@ export class TrailGeneratorService {
         _totalGain = _totalLoss = 0;
         _mileWaypoints.splice(0, _mileWaypoints.length - 2);    // keep last 2
         _poisWaypoints = [];
+        // _hasEscape = _hasCamp = _hasOther = false;
 
         // adjust offset for the last 2 (which are now the first 2)
         for (const wp of _mileWaypoints) {
@@ -297,18 +245,11 @@ export class TrailGeneratorService {
 
       // set the previous point for next distance calc.
       _prevPoint = _waypoint;
-      _prevInterPoint = _ipTrailPoint;
+      _prevOffset = _distance;
 
     }
 
     return _miles;
-  }
-
-  private _findNearestInterpolatedPoints(waypoint:Waypoint): Array<Waypoint> {
-
-    //const _nearest = this._findNearestPointFlat(waypoint, _optimizedWaypoints);
-    const _nearest = this._findNearestWaypointInTree(waypoint, this._interpolatedWaypointsTree);
-    return _nearest;
   }
 
   /* create data tree, a sorting mechanism to quickly figure out where the user is in relation to the trail,
@@ -434,6 +375,8 @@ export class TrailGeneratorService {
   // links points of interest to miles, this is a slow loop
   private _linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
 
+    console.log(pois);
+
     const _self = this;
 
     this._loaderService.showMessage('linking pois to miles');
@@ -442,6 +385,9 @@ export class TrailGeneratorService {
     for (let p = 0; p < _poisLength; p++) {
 
       const _poi = pois[p];
+
+      // fix string points
+      _poi.waypoint = waypointToWaypoint(_poi.waypoint);
 
       _poi.id = p; // to prevent mismatching ids in raw data
 
@@ -516,25 +462,28 @@ export class TrailGeneratorService {
   // distance calculation
   private _anchorDistanceCalculation(location: Waypoint, nearestMile: Mile, nearestWaypoints: object) {
 
+    // console.log(location, nearestMile, nearestWaypoints);
+
     const _nearestWaypoint = nearestMile.waypoints[nearestWaypoints[0].key];
     const _2ndNearestWaypoint = nearestMile.waypoints[nearestWaypoints[1].key];
 
+    console.log(_nearestWaypoint, _2ndNearestWaypoint);
+
     // create an anchor waypoint (an on trail point nearest to the poi (simple triangulation)
     const _diffDistPercentage = (nearestWaypoints[0].distance / nearestWaypoints[1].distance);
-    const _lat = _nearestWaypoint.latitude + ((_2ndNearestWaypoint.latitude - _nearestWaypoint.latitude) * _diffDistPercentage);
-    const _lon = _nearestWaypoint.longitude + ((_2ndNearestWaypoint.longitude - _nearestWaypoint.longitude) * _diffDistPercentage);
-    const _ele = _nearestWaypoint.elevation + ((_2ndNearestWaypoint.elevation - _nearestWaypoint.elevation) * _diffDistPercentage);
-    const _dist = _nearestWaypoint.distance + ((_2ndNearestWaypoint.distance - _nearestWaypoint.distance) * _diffDistPercentage);
-    const _distT = _nearestWaypoint.distanceTotal + ((_2ndNearestWaypoint.distanceTotal - _nearestWaypoint.distanceTotal) * _diffDistPercentage);
+    const _lat = _nearestWaypoint.latitude + (((_2ndNearestWaypoint.latitude - _nearestWaypoint.latitude) * _diffDistPercentage) || 0);
+    const _lon = _nearestWaypoint.longitude + (((_2ndNearestWaypoint.longitude - _nearestWaypoint.longitude) * _diffDistPercentage) || 0);
+    const _ele = _nearestWaypoint.elevation + (((_2ndNearestWaypoint.elevation - _nearestWaypoint.elevation) * _diffDistPercentage) || 0);
+    const _dist = _nearestWaypoint.distance + (((_2ndNearestWaypoint.distance - _nearestWaypoint.distance) * _diffDistPercentage) || 0);
+    const _distT = _nearestWaypoint.distanceTotal + (((_2ndNearestWaypoint.distanceTotal - _nearestWaypoint.distanceTotal) * _diffDistPercentage) || 0);
+
+    console.log({latitude: _lat, longitude: _lon}, {latitude: location.latitude, longitude: location.longitude});
 
     // return data
     return {
       anchorPoint: {latitude: _lat, longitude: _lon, elevation: _ele, distance: _dist, distanceTotal: _distT},
       nearestWaypoint: _nearestWaypoint,
-      distance: geolib.getDistance(
-        {latitude: _lat, longitude: _lon} as geolib.PositionAsDecimal,
-        {latitude: location.latitude, longitude: location.longitude} as geolib.PositionAsDecimal
-        , 0, 4)
+      distance: calculateDistance({latitude: _lat, longitude: _lon}, {latitude: location.latitude, longitude: location.longitude})
     };
   }
 

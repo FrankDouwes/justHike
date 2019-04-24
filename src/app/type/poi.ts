@@ -14,6 +14,7 @@ export interface Poi {
   comment?:           string;             // optional comment
   distanceFromUser?:  number;             // distance from user in meters
   distanceFromPoi?:   number;             // distance from another poi in meters
+  identifier?:       string;             // corresponding identifier for map system (for example halfmiles waypoint codes)
 }
 
 export interface PoiType {

@@ -8,7 +8,7 @@ const _x2js = new X2JS({
 });
 
 // trail specific parser for CDT data
-export function parseCDTData (trail: TrailMeta, trailData: string, poiData: string, snow: object): Array<object> {
+export function parseCDTData (trail: TrailMeta, trailData: string, poiData: string, snow: object, direction: any): Array<object> {
 
   // TRAIL (trail is a KML)
   const _waypoints: Array<Waypoint> = [];

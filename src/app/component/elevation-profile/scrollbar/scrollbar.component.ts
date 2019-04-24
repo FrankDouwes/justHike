@@ -76,10 +76,15 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
     // show 100 miles
     this._sectionLength = this.trailData.scrollbarSegmentSize;
+
     this._segments = (Math.ceil(this.trailData.length) / this._sectionLength < 1) ? 1 : Math.ceil(this.trailData.length) / this._sectionLength;
+
+    console.log(this._segments, this.main.nativeElement.clientWidth);
 
     this._svgWidth =  this._segments * this.main.nativeElement.clientWidth;
     this._svgHeight =  this.main.nativeElement.clientHeight;
+
+    console.log('set', this._svgWidth, this._svgHeight);
 
     this._svgCanvas = SVG('scroll-map')
       .size(this._svgWidth, this._svgHeight)
@@ -160,6 +165,8 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
     const l = (this._svgWidth / this._flatWaypoints.length);
 
+    console.log(this._svgWidth, this._flatWaypoints.length)
+
     // start points
     drawPoints.push([0, max]);
     elevation = this._invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
@@ -176,7 +183,9 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
 
       // calculate distance, starting at 2nd point
       if (counter > 0) {
+        console.log('HIERRRR?');
         totalDistancePerc = (waypoint.distanceTotal / environment.MILE) / this.trailData.length;
+        console.log(waypoint.distanceTotal, this.trailData.length);
       }
 
       elevation = this._invertValue(normalizeElevation(this._svgHeight - (this._verticalPadding * 2)
@@ -190,6 +199,8 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
     // fill til end, back down to 0
     drawPoints.push([this._svgWidth, elevation]);
     drawPoints.push([this._svgWidth, max]);
+
+    console.log(drawPoints);
 
     if (this._svgCanvas) {
       this._svgCanvas.clear();

@@ -52,7 +52,7 @@ export function shadeColor(color: string, percent: number): string {
   B = (B < 255) ? B : 255;
 
   // create a hex value, both values of the different channels are always the same value 77 CC FF etc,
-  // as the shade does not affect the color, TODO: remove some color, don't just change the shade
+  // as the shade does not affect the color
   const RR = ((R.toString(16).length === 1) ? '0' + R.toString(16) : R.toString(16));
   const GG = ((G.toString(16).length === 1) ? '0' + G.toString(16) : G.toString(16));
   const BB = ((B.toString(16).length === 1) ? '0' + B.toString(16) : B.toString(16));

@@ -8,7 +8,7 @@ const _x2js = new X2JS({
 });
 
 // trail specific parser for AT data
-export function parseSHRData (trail: TrailMeta, trailData: string, poiData: string, snow: object): Array<object> {
+export function parseSHRData (trail: TrailMeta, trailData: string, poiData: string, snow: object, direction: any): Array<object> {
 
   // TRAIL
   let _waypoints: Array<Waypoint> = [];

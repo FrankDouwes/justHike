@@ -50,6 +50,7 @@ export class TrailService {
 
   // Get raw trail data, for parsing (dev mode)
   // this generates the preparsed data files to be used by regular users (stored online for download + default version in assets)
+  // supports trails that consist of multiple files (sections)
   public getRawTrailData(trailId: number): Observable<object> {
 
     let _trailMeta: TrailMeta;
