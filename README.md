@@ -5,11 +5,11 @@ BETA 1 released to first group of testers on: April 10th 2019.
 ----- ----- ----- ----- ----
 
 TODO v1:
-- add: notes
-- add: towns (+info and link towns to nearest trail road/trail junction)
-- add: rating system for water / campsite
+- (wip) add: towns (+info and link towns to nearest trail road/trail junction)
+- (wip) add: rating system for water / campsite
 - add: compass heading, all cordova plugins seem to have android issues, iOS only?
 - add: purchase routines (app store / google play)
+- export personal notes (as csv?)
 <br/><br/>
 - fix: improve elevation profile scrollbar accuracy
 - fix: back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
@@ -34,11 +34,12 @@ TODO v1:
 - NPM: node-pre-gyp WARN Using request for node-pre-gyp https download (not sure where that came from)
 <br/><br/><br/><br/>
 TODO v2:
-- add: add routes to towns (cached) https://johngravois.com/esri-leaflet-gp/closest-facility.html
 - add: side trails
-- add: comments
+- add: online backup of comments
+- add: share location on map (with comments)
 - add: lock/mark locations
-- add: personal notes
+- (could) add: add routes to towns (cached) https://johngravois.com/esri-leaflet-gp/closest-facility.html
+
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
