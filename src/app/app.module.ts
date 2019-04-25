@@ -82,6 +82,7 @@ import { PopupComponent } from './component/leaflet-map/elements/popup/popup.com
 import {createCustomElement} from '@angular/elements';
 import { NoteDialogComponent } from './component/dialog/note-dialog/note-dialog.component';
 import { BaseComponent } from './base/base/base.component';
+import { UserSettingsComponent } from './component/dialog/settings-dialog/panels/user-settings/user-settings.component';
 
 @NgModule({
   declarations: [
@@ -125,7 +126,8 @@ import { BaseComponent } from './base/base/base.component';
     RatingComponent,
     PopupComponent,
     NoteDialogComponent,
-    BaseComponent
+    BaseComponent,
+    UserSettingsComponent
   ],
   entryComponents: [
     SettingsDialogComponent,

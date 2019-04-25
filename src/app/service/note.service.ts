@@ -6,13 +6,15 @@ import {Poi} from '../type/poi';
 import {share} from 'rxjs/operators';
 import {Trail} from '../type/trail';
 import {cloneData} from '../_util/generic';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {ConnectionService} from './connection.service';
 
 @Injectable({
   providedIn: 'root'
 })
 
 /* there are 2 types of notes:
-- notes that belong to a mile
+- notes that belong to a mile (TODO: not implemented yet)
 - notes that belong to a poi
 
 structure of notes library object:
@@ -28,33 +30,32 @@ notes.poi
             123: [Poi]
 */
 
+// keeps track of new notes that should be uploaded (shared with developer)
 export class NoteService implements OnDestroy {
-
-  private _notesSubscription: Subscription;
-  private _notesLibrary: object;
-  private _notes: Array<Poi>;
-
-  private _lastNote: Poi;         // this is the last note an operation was performed on (will also hold the last deleted note)
 
   public noteUpdateObserver: Observable<string>;
   public noteSubject: BehaviorSubject<string>;
 
+  private _notesSubscription: Subscription;
+  private _connectionSubscription: Subscription;
+
+  private _notesLibrary: object;
+  private _notes: Array<Poi>;
+  private _lastNote: Poi;         // this is the last note an operation was performed on (will also hold the last deleted note)
+  private _uploadObserver: Observable<string>;
+  private _uploadSubscription: Subscription;
+  private _previouslyOffline = false;
+
   constructor(
     private _localStorage: LocalStorageService,
-    private _trailGenerator: TrailGeneratorService)
+    private _trailGenerator: TrailGeneratorService,
+    private _http: HttpClient,
+    private _connectionService: ConnectionService)
   {
-
-    const _self = this;
-    const _trail: Trail = this._trailGenerator.getTrailData();
-    const _directionString: string = (_trail.direction === 1) ? 'sobo' : 'nobo';
-
     this.noteSubject = new BehaviorSubject('initialize');
     this.noteUpdateObserver = this.noteSubject.asObservable().pipe(share());
 
-    this._notesSubscription = this._localStorage.observe( _trail.abbr + '-' + _directionString + '_notes').subscribe(function(result) {
-      _self.noteSubject.next('storage changed');
-    });
-
+    this._setupSubscriptions();
     this._loadFromStorage();
   }
 
@@ -65,9 +66,33 @@ export class NoteService implements OnDestroy {
       this._notesSubscription = null;
     }
 
+    if (this._connectionSubscription) {
+      this._connectionSubscription.unsubscribe();
+      this._connectionSubscription = null;
+    }
+
     // just to be safe
     this.noteSubject = null;
     this.noteUpdateObserver = null;
+  }
+
+  private _setupSubscriptions(): void {
+
+    const _self = this;
+
+    const _trail: Trail = this._trailGenerator.getTrailData();
+    const _directionString: string = (_trail.direction === 1) ? 'sobo' : 'nobo';
+
+    this._notesSubscription = this._localStorage.observe( _trail.abbr + '-' + _directionString + '_notes').subscribe(function(result) {
+      _self.noteSubject.next('storage changed');
+      _self._shareNotes();
+    });
+
+    this._connectionSubscription = this._connectionService.connectionObserver.subscribe(function(result: boolean) {
+      if (result === true) {
+        _self._shareNotes();
+      }
+    });
   }
 
   // notes are added 1 at a time, unless there are no notes (initial run)
@@ -195,14 +220,92 @@ export class NoteService implements OnDestroy {
       this._notes = [];
     }
 
-    this._notes.push(note)
+    this._notes.push(note);
 
     this._parseNotes([note]);
+
+    if (note.share) {
+      this._localStorage.store('shareNotes', true);
+    }
+
     this._updateStorage();
   }
 
   // easier to sort by distance (poi list)
   public getFlatNotesArray(): Array<Poi> {
     return this._notes;
+  }
+
+  /* share notes (upload notes to server), runs when internet becomes available
+  - TODO: currently used to share notes with developer, will eventually be shared to a personal online map */
+  private _shareNotes(): void {
+
+    const _self = this;
+
+    // check connection
+    if (this._connectionService.state !== 'online') {
+      this._previouslyOffline = true;
+      return;
+    }
+
+    if (this._localStorage.retrieve('shareNotes') && this._notes) {
+
+      const _shareableNotes: Array<object> = [];
+      // run through all data and collect notes that need sharing (duplicates)
+      this._notes.forEach(function(note: Poi) {
+
+        if (note.share) {
+
+          const _clone: object = cloneData(note);
+          _shareableNotes.push(_clone);
+        }
+      });
+
+      // upload
+      if (_shareableNotes.length > 0) {
+        const _url = 'https://hike.frankdouwes.com/scripts/mailto.php';
+
+        const _params = new FormData();
+        _params.append('data', JSON.stringify(_shareableNotes));
+        _params.append('user', _self._localStorage.retrieve('userName'));
+
+        this._uploadObserver = this._http.post(_url, _params, {responseType: 'text'});
+
+        this._uploadSubscription = this._uploadObserver.subscribe(function(result: string) {
+
+          if (result === 'success') {
+
+            // only show an alert if data didn't send before because user was online
+            if (_self._previouslyOffline) {
+              _self._previouslyOffline = false;
+              alert('Successfully shared backed-up note(s) with developer, thanks!');
+            }
+
+            _self._clearShareableNotes();
+          } else {
+            alert('Error while sending note(s) to developer!');
+          }
+
+          _self._uploadSubscription.unsubscribe();
+          _self._uploadSubscription = null;
+        }, function(error) {
+          alert('Error while sending note(s) to developer!');
+        });
+      }
+    }
+  }
+
+  private _clearShareableNotes(): void {
+
+    this._notes.forEach(function(note: Poi) {
+      if (note.share) {
+        note.share = false;
+      }
+    });
+
+    // write to storage
+    this._updateStorage();
+
+    this._localStorage.clear('shareNotes');
   }
 }

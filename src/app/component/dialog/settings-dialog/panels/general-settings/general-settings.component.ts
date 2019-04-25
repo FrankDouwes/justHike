@@ -19,13 +19,9 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
   public highContrast: boolean;
   public showMiniMap: boolean;
   public detectRetina: boolean;
-  public direction: number;       // 0: NOBO, 1: SOBO
   public majorPoiTypes: Array<string>;
-  public userName: string = 'test';
   public showMileGrid: boolean;
   public animateMap: boolean;
-
-  public directionList: Array<object> = [{id: 0, label: 'Northbound (NOBO)'}, {id: 1, label: 'Southbound (SOBO)'}];
   public screenModes: Array<any> = [
     {value: 'default', label: 'Default'},
     {value: 'highContrast', label: 'High Contrast'},
@@ -47,7 +43,6 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
     this.parallaxEnabled = this._localStorage.retrieve('parallaxEnabled');
     this.screenMode = this._localStorage.retrieve('screenMode');
     this.showMiniMap = this._localStorage.retrieve('showMiniMap');
-    this.direction = this._localStorage.retrieve('direction');
     this.showMileGrid = this._localStorage.retrieve('showMileGrid');
     this.animateMap = this._localStorage.retrieve('animateMap');
     this.detectRetina = this._localStorage.retrieve('detectRetina');
@@ -70,32 +65,6 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
 
   public onRadioClick(radioValue): void {
     this._localStorage.store('screenMode', radioValue);
-  }
-
-  public onDirectionSelect(event: MatSelectChange): void {
-
-    this._localStorage.store('direction', event.value);
-
-    if (event.value !== this.direction) {
-      this.invalidate();
-    }
-  }
-
-  public onUserNameChange(username): void {
-
-    // enable god mode (admin panel)
-    if (username.toLowerCase() === 'iddqd') {
-
-      const _isAdmin = this._localStorage.retrieve('isAdmin');
-
-      if (!_isAdmin) {
-        this._localStorage.store('isAdmin', true);
-        alert('God mode enabled!');
-      } else {
-        this._localStorage.clear('isAdmin');
-        alert('Just a regular mortal.');
-      }
-    }
   }
 
   public createCamelCaseName(name: string, prepend?: string, append?: string): string {

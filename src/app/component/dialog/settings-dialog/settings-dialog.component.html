@@ -13,7 +13,7 @@
     </div>
 
     <mat-action-list id="settings-menu">
-      <button *ngFor="let item of listItems" mat-list-item (click)="onClick(item)"> <h2>{{item.title}}</h2><span><fa-icon icon="angle-right" size="lg"></fa-icon></span></button>
+      <button [disableRipple]="true" *ngFor="let item of listItems" mat-list-item (click)="onClick(item)"> <h2>{{item.title}}</h2><span><fa-icon icon="angle-right" size="lg"></fa-icon></span></button>
     </mat-action-list>
   </div>
 
@@ -28,6 +28,9 @@
 
     <!-- trail data -->
     <trail-settings *ngIf="activePanel === 'trail'" (onSettingsChanged)="onSettingsChanged($event)"></trail-settings>
+
+    <!-- trail data -->
+    <user-settings *ngIf="activePanel === 'user'" (onSettingsChanged)="onSettingsChanged($event)"></user-settings>
 
     <!-- general settings panel -->
     <general-settings *ngIf="activePanel === 'general'" (onSettingsChanged)="onSettingsChanged($event)"></general-settings>

@@ -4,7 +4,18 @@ import 'node_modules/leaflet-geometryutil/src/leaflet.geometryutil.js';
 import 'node_modules/leaflet.Geodesic/Leaflet.Geodesic.js';
 import '../../_util/leaflet/plugins/grid.js';
 import '../../_util/leaflet/marker.js';
-import {Component, OnInit, AfterViewInit, OnChanges, Input, SimpleChanges, ElementRef, ViewChild, OnDestroy} from '@angular/core';
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  OnChanges,
+  Input,
+  SimpleChanges,
+  ElementRef,
+  ViewChild,
+  OnDestroy,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import {Mile} from '../../type/mile';
 import {ActivatedRoute} from '@angular/router';
 import {Poi} from '../../type/poi';
@@ -34,7 +45,8 @@ declare const SVG: any;    // fixes SVGjs bug
 @Component({
   selector: 'leaflet-map',
   templateUrl: './leaflet-map.component.html',
-  styleUrls: ['./leaflet-map.component.sass']
+  styleUrls: ['./leaflet-map.component.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 // uses basic for loops for performance
@@ -353,7 +365,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         belongsTo: this._popupBelongsTo
       }, this._clearOverlayElements.bind(this));
 
-    this._overlayElements = this._createGuide(anchor, waypoint, false, false, 'rgb(180, 163, 146)', 3);
+    this._overlayElements = this._createGuide(anchor, waypoint, false, false, 'rgba(255, 0, 0, 0.75)', 3);
   }
 
   // activate a tooltip (component)
@@ -485,6 +497,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
           // remove miles/markers/snow data/notes
           for (const key in _self._renderedData[_mileId]) {
+
+            // clear from trailLayers
+            if (key === 'trail') {
+              _self._trailLayers.removeLayer(_self._renderedData[_mileId].trail);
+            }
+
             _self._map.removeLayer(_self._renderedData[_mileId][key]);
 
             if (key === 'markers' || key === 'notes') {
@@ -500,7 +518,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
           delete _self._renderedData[_mileId];
           _self._visibleMiles.splice(_self._visibleMiles.indexOf(_mileId), 1);
 
-          // this leaves the array structure in plac (it'll be the length of the trail, as we're using the index for reference)
+          // this leaves the array structure in place (it'll be the length of the trail, as we're using the index for reference)
         }
       } catch (e) {
         console.log(e);
@@ -602,9 +620,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     this._markerFactory.setupMarker(_svg, poi, null);
 
-    const _poiTypeClassses  = poi.type.split(',').join('');
+    const _poiTypeClasses  = poi.type.split(',').join('');
 
-    const _icon = htmlIcon({className: 'marker ' + _poiTypeClassses, html: _element});
+    const _icon = htmlIcon({className: 'marker ' + _poiTypeClasses, html: _element});
     let _options = {icon: _icon , poi: poi};
 
     // add additional params to marker

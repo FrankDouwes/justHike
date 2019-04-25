@@ -5,11 +5,12 @@ export const environment = {
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
 
-  appDomain: 'https://storage.googleapis.com/',
-  fileBaseUrl: 'just-hike/',
+  // appDomain: 'https://storage.googleapis.com/',
+  // fileBaseUrl: 'just-hike/',
 
-  // appDomain: 'https://hike.frankdouwes.com/',
-  // fileBaseUrl: 'files/',
+  appDomain: 'https://hike.frankdouwes.com/',
+  fileBaseUrl: 'files/',
+
   onlineTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
   updateCheckInterval: 86400000,      // the time between (online) data update check
 
@@ -49,6 +50,7 @@ export const environment = {
     parallaxEnabled: false,         // parallax effect in elevation profile
     screenMode: 'default',          // 'default', 'highContrast' or 'nighHike'
     showExtraDesign: true,          // TODO: unused, show extra design features in elevation profile (trees)
+    detectRetina: false             // disable retina by default (battery saving)
   },
 
 

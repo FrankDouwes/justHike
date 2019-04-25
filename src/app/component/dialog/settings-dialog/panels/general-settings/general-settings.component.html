@@ -4,24 +4,6 @@
 
   <mat-card-content>
 
-    <h3>User</h3>
-
-    <section>
-
-      <!--<mat-form-field>-->
-        <!--<input type="text" matInput placeholder="username" (input)="onUserNameChange($event.target.value)">-->
-      <!--</mat-form-field>-->
-
-      <mat-form-field class="direction">
-        <mat-select [value]="direction" (selectionChange)="onDirectionSelect($event)">
-          <mat-option *ngFor="let direction of directionList" [value]="direction.id">
-            {{direction.label}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-
-    </section>
-
     <h3>Display Mode</h3>
 
     <section>

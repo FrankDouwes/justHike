@@ -12,25 +12,22 @@ export class ConnectionService {
   private _connection: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   public connectionObserver: Observable<boolean>;
+  public state: string = 'unknown';
 
   constructor() {
     this.connectionObserver = this._connection.asObservable();
   }
 
   public startTracking(): void {
-
-    if (hasConnection()) {
-      document.addEventListener('online', this._isOnline.bind(this), true);
-      document.addEventListener('offline', this._isOffline.bind(this), true);
-    }
+    window.addEventListener('online', this._toggleConnection.bind(this), true);
+    window.addEventListener('offline', this._toggleConnection.bind(this), true);
+    this._toggleConnection();
   }
 
   public stopTracking(): void {
-    if (hasConnection()) {
-      document.removeEventListener('online', this._isOnline.bind(this), true);
-      document.removeEventListener('offline', this._isOffline.bind(this), true);
-      this._connection.next(null);
-    }
+    window.removeEventListener('online', this._toggleConnection.bind(this), true);
+    window.removeEventListener('offline', this._toggleConnection.bind(this), true);
+    this._connection.next(null);
   }
 
   public getConnectionInfo(): object {
@@ -64,6 +61,7 @@ export class ConnectionService {
       return 'unknown';
     }
 
+    // cordova navigator
     const _connection = getConnection();
     const _navigator: any = navigator;
     const _networkState = _navigator.connection.type;
@@ -71,35 +69,13 @@ export class ConnectionService {
     return (_networkState === _connection.NONE || _networkState === _connection.UNKNOWN)? 'offline' : 'online';
   }
 
-  private _isOnline(event): void {
+  private _toggleConnection(event?: Event): void {
 
-    // console.log('on', navigator.onLine);
+    const _isOnline: boolean = navigator.onLine;
 
-    // console.log('online');
-    //
-    // // Handle the online event
-    // const _navigator: any = navigator;
-    // const _connection = getConnection();
-    // var _networkState = _navigator.connection.type;
-    //
-    // if (_networkState !== _connection.NONE) {
-      this._connection.next(true);
-    // }
-  }
-
-  private _isOffline(event): void {
-
-    // console.log('off', navigator.onLine);
-
-    // console.log('offline');
-    //
-    // // Handle the online event
-    // const _navigator: any = navigator;
-    // const _connection = getConnection();
-    // const _networkState = _navigator.connection.type;
-    //
-    // if (_networkState === _connection.NONE) {
-      this._connection.next(false);
-    // }
+    if (this._connection.getValue() !== _isOnline) {
+      this.state = (_isOnline) ? 'online' : 'offline';
+      this._connection.next(_isOnline);
+    }
   }
 }

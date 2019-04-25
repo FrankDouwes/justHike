@@ -8,6 +8,7 @@ import {getTrailMetaDataById} from '../../../../../../_util/trail-meta';
 import {TrailMeta} from '../../../../../../type/trail';
 import {environment} from '../../../../../../../environments/environment.prod';
 import {DownloaderStatus} from '../../../../../../_util/downloader/status-manager';
+import {ConnectionService} from '../../../../../../service/connection.service';
 
 @Component({
   selector: 'downloader',
@@ -46,7 +47,8 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
   constructor(
     private _changeDetector:        ChangeDetectorRef,
     private _downloadService:       DownloadService,
-    private _fileSystemService:     FilesystemService
+    private _fileSystemService:     FilesystemService,
+    private _connectionService:     ConnectionService
   ) {
   }
 
@@ -196,6 +198,11 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
   private _download(): void {
 
+    if (!this._connectionService.currentState) {
+      alert('You\'re currently offline!');
+      return;
+    }
+
     let _url;
 
     if (typeof this._url === 'string') {
@@ -214,7 +221,6 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
   // clear all data
   private _clear(): void {
-
     this._downloader.cancelDownload();
     this._downloader.clearFile();
     this.hasFile = false;

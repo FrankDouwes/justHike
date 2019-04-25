@@ -3,7 +3,6 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {Waypoint} from '../../../type/waypoint';
 import {Poi, PoiType} from '../../../type/poi';
 import {NoteService} from '../../../service/note.service';
-import {environment} from '../../../../environments/environment.prod';
 import {Settings} from '../../../settings';
 
 export class NoteProperties {
@@ -24,7 +23,7 @@ export class NoteDialogComponent implements OnInit {
 
   @ViewChild('titleField') titleField: ElementRef;
 
-  public poiTypes: Array<string> = ['note', 'water', 'camp'];
+  public defaultType: string;
   private _notes: Array<Poi>;
 
   constructor(
@@ -35,6 +34,8 @@ export class NoteDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+
+    this.defaultType = this.data.type;
     this.titleField.nativeElement.focus();
   }
 
@@ -42,9 +43,15 @@ export class NoteDialogComponent implements OnInit {
 
     // add missing properties to data object so we can convert it to a Poi
     this.data['id'] = new Date().getTime();
-    this.data['type'] = 'note';
+
+    // only add to type if it differs
+    if (formData['type'] !== this.data['type']) {
+      this.data['type'] += ', ' + formData['type'];
+    }
+
     this.data['label'] = formData['title'];
     this.data['description'] = formData['note'];
+    this.data['share'] = formData['share'];
 
     const _notePoi: Poi = this.data as Poi;
 

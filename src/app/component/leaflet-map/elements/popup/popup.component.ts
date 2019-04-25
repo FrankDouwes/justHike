@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import * as L from 'leaflet';
 import {DialogService} from '../../../../factory/dialog.service';
 import {latLngToWaypoint} from '../../../../_util/leaflet/converter';
@@ -11,7 +11,7 @@ import {environment} from '../../../../../environments/environment.prod';
   templateUrl: './popup.component.html',
   styleUrls: ['./popup.component.sass']
 })
-export class PopupComponent implements OnInit, OnChanges {
+export class PopupComponent implements OnInit {
 
   @Input() waypoint?:       L.latlng;
   @Input() anchorPoint?:    L.latlng;
@@ -36,10 +36,6 @@ export class PopupComponent implements OnInit, OnChanges {
     if (!this.description) {
       this.position = 'inline';
     }
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
   }
 
   public tag(): void {
@@ -68,8 +64,6 @@ export class PopupComponent implements OnInit, OnChanges {
       _waypoint.distance = this.distance || 0;
       _waypoint.distanceTotal = this.distanceTotal || 0;
     }
-
-    console.log(_waypoint);
 
     const _anchorPoint = (this.anchorPoint) ? latLngToWaypoint(this.anchorPoint) : undefined;
     if (_anchorPoint) {

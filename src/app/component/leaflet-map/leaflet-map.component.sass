@@ -94,12 +94,10 @@
 
       backdrop-filter: blur(3px)    // safari/iOS only, causes glitching...
 
+  // fix for iOS notch
   .leaflet-control-scale
     padding: 0 0 10px 10px !important
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left) !important
-
-  .note
-    color: rgba(95, 83, 73, 0.85) !important
 
   .pin-marker
     margin: 0 !important
@@ -134,7 +132,7 @@
     width: 6px
     height: 6px
     margin-top: -4px
-    background-color: rgb(180, 163, 146) !important
+    background-color: rgb(95, 83, 73) !important
 
   .leaflet-popup-tip-container
     height: 7px
@@ -152,9 +150,9 @@
       color: white !important
 
   .leaflet-tooltip-left:before
-    border-left-color: rgb(180, 163, 146) !important
+    border-left-color: rgb(95, 83, 73) !important
   .leaflet-tooltip-right:before
-    border-right-color: rgb(180, 163, 146) !important
+    border-right-color: rgb(95, 83, 73) !important
 
 
 @keyframes pulse

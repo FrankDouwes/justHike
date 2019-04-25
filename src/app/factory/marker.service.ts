@@ -62,6 +62,7 @@ export class MarkerService {
     }
 
     if ( _poiTypesLength > 1) {
+      _marker.addClass('multiple');
       _iconSize = 14;
       _extraOffset = (_iconSize / 2);
     }
