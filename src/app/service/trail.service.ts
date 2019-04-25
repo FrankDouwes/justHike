@@ -15,29 +15,30 @@ import { getTrailMetaDataById } from '../_util/trail-meta';
 import { FilesystemService } from './filesystem.service';
 
 // dynamically called
-import { parsePCTData } from '../parser/pct-data';
-import { parseDEMOData } from '../parser/demo-data';
-import { parseCDTData } from '../parser/cdt-data';
-import { parseATData } from '../parser/at-data';
-import {parseSHRData} from '../parser/shr-data';
-
+// import { parseCDTData } from '../parser/cdt-data';
+// import { parseATData } from '../parser/at-data';
+import {PCTData} from '../parser/pct-data';
+import {SHRData} from '../parser/shr-data';
 
 @Injectable({
   providedIn: 'root'
 })
 
-/* 2 options
-- get the locally stored (user downloaded) combined trail file (that includes trail & poi), 2 separate JSONs, trail has nobo/sobo versions
-- get the default combined file (from assets, baked into the app), 2 separate JSONs, trail has nobo/sobo versions*/
+/* trail generating, trail parsing, trail loading:
+trail:
+- consists of trail waypoints (can be multiple files)
+- contists poi data (points of interest), can be multiple files (TODO: multi poi files, when needed)
+- consists of snow data (single file)
+ */
 export class TrailService {
 
   // prevent removal of dynamically used imports (tree shaking), see: https://github.com/Microsoft/TypeScript/issues/9191
   // since each dataset has a different source, they all have their own parsing routine, before step 2 (generateMiles() / parseSnow())
-  private _parseDEMOData:   Function = parseDEMOData;
-  private _parsePCTData:    Function = parsePCTData;
-  private _parseCDTData:    Function = parseCDTData;
-  private _parseATData:     Function = parseATData;
-  private _parseSHRData:    Function = parseSHRData;
+  private _DEMOParser: PCTData = new PCTData();
+  private _PCTParser: PCTData = new PCTData();
+  private _SHRParser: SHRData = new SHRData();
+  // private _parseCDTData:    Function = parseCDTData;
+  // private _parseATData:     Function = parseATData;
 
   constructor(
     private _http: HttpClient,
@@ -99,7 +100,10 @@ export class TrailService {
     return forkJoin(_observables);
   }
 
-  // Get the pre parsed trail data (regular user), returns a promise
+  /* Get the pre parsed trail data (regular user), returns a promise
+  2 options
+  - get the locally stored (user downloaded) combined trail file (that includes trail & poi), 2 separate JSONs, trail has nobo/sobo versions
+  - get the default combined file (from assets, baked into the app), 2 separate JSONs, trail has nobo/sobo versions */
   public getPreParsedTrailData(trailId: number, direction: number): Observable<object> {
 
     const _self = this;
@@ -152,7 +156,7 @@ export class TrailService {
     this._loaderService.showMessage('parsing trail data');
 
     // dynamic function call
-    const _parsed = this['_parse' + trail.abbr + 'Data'](trail, waypoints, pois, snow, direction);
+    const _parsed = this['_' + trail.abbr + 'Parser'].parse(trail, waypoints, pois, snow, direction);
 
     const _trail = this._trailGenerator.generateMiles(
       _parsed[0] as TrailMeta,

@@ -5,7 +5,7 @@ import {environment} from '../../../environments/environment.prod';
 
 // create the main map tile layer, based on the custom fallback tile.
 // if there's an internet connection use arcGis, else use locally stored tiles (or default error tile)
-export function createMapTileLayer(url: string): any {
+export function createMapTileLayer(url: string, detectRetina: boolean): any {
 
   const _fallbackUrl = environment.onlineTileUrl;
 
@@ -18,7 +18,8 @@ export function createMapTileLayer(url: string): any {
       errorTileUrl: './assets/images/missing.png',
       keepBuffer: 0,    // small buffer means faster scrolling
       updateWhenIdle: false,
-      updateWhenZooming: false
+      updateWhenZooming: false,
+      detectRetina: detectRetina
     });
 
   return _fallbackLayer;

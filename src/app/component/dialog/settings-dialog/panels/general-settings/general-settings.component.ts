@@ -18,6 +18,7 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
   public parallaxEnabled: boolean;
   public highContrast: boolean;
   public showMiniMap: boolean;
+  public detectRetina: boolean;
   public direction: number;       // 0: NOBO, 1: SOBO
   public majorPoiTypes: Array<string>;
   public userName: string = 'test';
@@ -49,6 +50,7 @@ export class GeneralSettingsComponent extends SettingsPanelComponent implements 
     this.direction = this._localStorage.retrieve('direction');
     this.showMileGrid = this._localStorage.retrieve('showMileGrid');
     this.animateMap = this._localStorage.retrieve('animateMap');
+    this.detectRetina = this._localStorage.retrieve('detectRetina');
 
     // dynamic poi type properties
     this.majorPoiTypes = getMajorPoiTypes();

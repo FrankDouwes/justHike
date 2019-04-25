@@ -375,8 +375,6 @@ export class TrailGeneratorService {
   // links points of interest to miles, this is a slow loop
   private _linkPoisToMiles(pois: Array<Poi>, miles: Array<Mile>): void {
 
-    console.log(pois);
-
     const _self = this;
 
     this._loaderService.showMessage('linking pois to miles');

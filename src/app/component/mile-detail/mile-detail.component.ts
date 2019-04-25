@@ -45,6 +45,8 @@ export class MileDetailComponent implements OnInit, OnDestroy {
     // get miles data based on route id
     this.routedMile = (this._route.snapshot) ? Number(this._route.snapshot.paramMap.get('id')) : 0;
 
+    console.log(this.routedMile);
+
     this._route.data.subscribe(result => {
         this.trailData = result.data['trail'];
         this._setMapData(this.routedMile);
@@ -76,6 +78,8 @@ export class MileDetailComponent implements OnInit, OnDestroy {
 
   // EVENTS
   public onScrollTo(data: any): void {
+
+    console.log('on scroll to', data.mileId);
     this._setMapData(data.mileId, data.renderedPoiRange, data.renderedMileRange);
     this.routedMile = data.mileId;
 

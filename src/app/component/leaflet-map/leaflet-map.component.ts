@@ -188,7 +188,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // create the tile layer (deals with online / offline / missing tiles)
     if (this.showMapTiles) {
       const _url = this._generateTileUrl();
-      this._tileLayers.push(createMapTileLayer(_url));
+      this._tileLayers.push(createMapTileLayer(_url, this._localStorageService.retrieve('detectRetina')));
     }
 
     // grid layer is only shown on the full map, not the mini map)

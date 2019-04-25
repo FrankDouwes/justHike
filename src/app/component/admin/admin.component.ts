@@ -8,7 +8,7 @@ import {Observable, of} from 'rxjs';
 import {TrailService} from '../../service/trail.service';
 import {saveFileAs} from '../../_util/save';
 import {FilesystemService} from '../../service/filesystem.service';
-import {createGPX} from '../../parser/gpx-tools';
+import {createGPX} from '../../_util/admin/gpx-tools';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {OrientationService} from '../../service/orientation.service';
 import {SequentialResolverService} from '../../service/sequential-resolver.service';
