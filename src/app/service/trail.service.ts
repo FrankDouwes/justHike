@@ -19,6 +19,7 @@ import { FilesystemService } from './filesystem.service';
 // import { parseATData } from '../parser/at-data';
 import {PCTData} from '../parser/pct-data';
 import {SHRData} from '../parser/shr-data';
+import {Town} from '../type/town';
 
 @Injectable({
   providedIn: 'root'
@@ -72,29 +73,35 @@ export class TrailService {
     // SHR http://onthetrail.org/trekking/shr/ (unofficial)
     // TODO: snow data ripped from postholer (not very nice, I know)
 
-    // .dat is an xml structured file (so .gpx or .kml)
-
+    // .dat is an xml structured file (so a .gpx or .kml)
 
     const _assetsDir: string = 'assets/data/';
 
     if (_trailMeta.multipart) {
       for(let i = 0; i < _trailMeta.parts; i++) {
         const _trailDownloader = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail_' + i + '.dat', {responseType: 'text'});
-        _observables.push(_trailDownloader);
+        _observables[0] = _trailDownloader;
       }
     } else {
       const _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', {responseType: 'text'});
-      _observables.push(_trail);
+      _observables[1] = _trail;
     }
 
     const _poi = this._http.get(_assetsDir + _trailMeta.dataPath + 'poi.dat', {responseType: 'text'});
-    _observables.push(_poi);
+    _observables [2] = _poi;
 
     // snow is an optional data file
     let _snow: Observable<Object>;
     if (_trailMeta.snowVersion) {
       _snow = this._http.get(_assetsDir + _trailMeta.dataPath + 'snow.json', {responseType: 'json'});
-      _observables.push(_snow);
+      _observables[3] = _snow;
+    }
+
+    // towns is an optional data file
+    let _towns: Observable<Object>;
+    if (_trailMeta.hasTowns) {
+      _towns = this._http.get(_assetsDir + _trailMeta.dataPath + 'towns.json', {responseType: 'json'});
+      _observables[4] = _towns;
     }
 
     return forkJoin(_observables);
@@ -151,18 +158,19 @@ export class TrailService {
   }
 
   // Parse the raw data (routines for each trail), returns a promise
-  public parseTrailData(trail: TrailMeta, waypoints: Array<string> | string, pois: string, snow: object, direction: number): object {
+  public parseTrailData(trail: TrailMeta, waypoints: Array<string> | string, pois: string, snow: object, towns: object, direction: number): object {
 
     this._loaderService.showMessage('parsing trail data');
 
     // dynamic function call
-    const _parsed = this['_' + trail.abbr + 'Parser'].parse(trail, waypoints, pois, snow, direction);
+    const _parsed = this['_' + trail.abbr + 'Parser'].parse(trail, waypoints, pois, snow, towns, direction);
 
     const _trail = this._trailGenerator.generateMiles(
       _parsed[0] as TrailMeta,
       _parsed[1] as  Array<Waypoint>,
       _parsed[2] as Array<Poi>,
-      direction
+      direction,
+      _parsed[4] as Array<Town>
     );
 
     let _snow;

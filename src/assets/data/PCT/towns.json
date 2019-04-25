@@ -1,0 +1,191 @@
+[
+  {
+    "id": 0,
+    "name": "Campo",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 1,
+    "name": "Lake Morena",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }},
+  {
+    "id": 2,
+    "name": "Mt. Laguna",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 3,
+    "name": "Stagecoach Trails RV Park",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 4,
+    "name": "Julian",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 5,
+    "name": "Warner Springs",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  }
+]
+
+//Lake Henshaw Resort
+//Santa Ysabel, CA
+//Paradise Valley Café
+//Idyllwild, CA
+//Cabazon, CA
+//Ziggy and the Bear (trail angels)
+//Big Bear City, CA
+//Big Bear City, CA
+//Cajon Pass / Interstate
+//Wrightwood, CA
+//Wrightwood, CA
+//Acton KOA
+//Acton CA
+//Agua Dulce, CA
+//Andersons (trail angels)
+//Lake Hughes
+//Hikertown
+//Iberdrola Wind Farm
+//Mojave, CA
+//Mojave, CA
+//Tehachapi, CA
+//Tehachapi, CA
+//Onyx, CA
+//Weldon, CA
+//Lake Isabella
+//Kennedy Meadows, CA
+//Lone Pine, CA
+//Lone Pine, CA
+//Mt. Whitney
+//Independence, CA
+//Bishop, CA
+//Muir Trail Ranch
+//Vermilion Valley Resort
+//Mono Hot Springs
+//Reds Meadows, CA
+//Mammoth Lakes, CA
+//Tuolumne Meadows, CA
+//Lee Vining, CA
+//Kennedy Meadows Resort
+//Bridgeport, CA
+//Walker, CA
+//Markleeville, CA
+//Echo Lake, CA
+//South Lake Tahoe
+//Tahoe City, CA
+//Truckee, CA (interstate 80, Exit 158)
+//Truckee, CA (Old Towne)
+//Soda Springs, CA
+//Sierra City, CA
+//Bucks Lake (on alternate)
+//Braatens (trail angels) (Belden, CA)
+//Caribou Crossroads (Belden, CA)
+//Belden Town Resort
+//Quincy, CA
+//Chester, CA
+//Drakesbad Guest Ranch
+//Old Station PO and Hat Creek Store
+//Old Station Fill-Up / Rim Rock Ranch
+//Burney Mountain Guest Ranch
+//Burney, CA
+//Burney Falls State Park
+//Castella, CA
+//Dunsmuir, CA
+//Mt. Shasta, CA
+//Callahan, CA
+//Etna, CA
+//Seiad Valley, CA
+//Callahan's Lodge
+//Ashland, OR
+//Green Springs Inn
+//Hyatt Lake Resort
+//Fish Lake Resort
+//Lake in the Woods Resort
+//Crater Lake Mazama Village
+//Crater Lake Post Office
+//Crater Lake Rim Village
+//Diamond Lake Resort
+//Sherter Cove Resort
+//Crescent Lake, OR
+//Elk Lake Resort
+//Bend, OR
+//Bend, OR
+//Sisters, OR
+//Sisters, OR
+//Big Lake Youth Camp
+//Olallie Lake Resort
+//Government Camp, OR
+//Sandy, OR
+//Timberline Lodge
+//Cascade Locks, OR
+//Stevenson, WA
+//Hood River, OR
+//Trout Lake, WA
+//White Pass, WA
+//Packwood, WA
+//Snoqualmie Pass, WA
+//Stevens Pass Ski Area
+//Skykomish, WA
+//Dinsmores (trail angels)
+//Leavenworth, WA
+//Stehekin, WA
+//Chelan, WA
+//Winthrop, WA
+//Mazama, WA
+//PCT NORTERN TERMINUS (Manning park)

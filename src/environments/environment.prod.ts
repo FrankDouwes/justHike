@@ -62,17 +62,18 @@ export const environment = {
       trailVersion: '1.1',
       tilesVersion: '1.0',
       snowVersion: '1.0',
-      length: 109.5,                   // estimated length (first section is 109.5)
+      hasTowns: true,                   // has a seperate file for towns
+      length: 109.5,                    // estimated length (first section is 109.5)
       dataPath: 'DEMO/',
       scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles
-      multipart: false,
-
+      multipart: false
     }, {
       abbr: 'PCT',
       id: 1,
       trailVersion: '1.1',
       tilesVersion: '1.0',
       snowVersion: '1.0',
+      hasTowns: true,                   // has a seperate file for towns
       length: [109.5, 100, 132.5, 112.5, 111.9, 85.6, 115, 175.5, 74.4, 75.4,
         64.8, 38.3, 91.4, 132.2, 82.2, 98.5, 56.2, 63, 54.5, 74.4, 60.1, 75.9,
         107.9, 55, 148.2, 98.3, 70.9, 127, 70.3],     // estimated length (including 8mi into Canada) according to halfmile pct data
@@ -80,7 +81,6 @@ export const environment = {
       scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
       multipart: true,
       parts: 29
-
     }, {
       abbr: 'CDT',
       id: 2,

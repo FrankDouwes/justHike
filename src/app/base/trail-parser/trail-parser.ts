@@ -4,6 +4,7 @@ import {Poi} from '../../type/poi';
 import {Snowpoint} from '../../type/snow';
 import {TrailMeta} from '../../type/trail';
 import {calculateDistance} from '../../_util/geolib/distance';
+import {Town} from '../../type/town';
 
 export interface FindReplace {
   find:       string;
@@ -28,7 +29,7 @@ export class TrailParser {
   constructor() {}
 
   // the main entry point
-  public parse(trail: TrailMeta, trailData: Array<string> | string, poiData: Array<string> | string, snow: object, direction: any): void {
+  public parse(trail: TrailMeta, trailData: Array<string> | string, poiData: Array<string> | string, snow: object, towns: Array<Town>, direction: any): void {
 
     // set
     this.trail = trail;

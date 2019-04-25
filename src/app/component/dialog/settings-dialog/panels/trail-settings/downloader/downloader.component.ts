@@ -198,7 +198,7 @@ export class DownloaderComponent implements OnInit, OnChanges, OnDestroy {
 
   private _download(): void {
 
-    if (!this._connectionService.currentState) {
+    if (this._connectionService.state !== 'online') {
       alert('You\'re currently offline!');
       return;
     }

@@ -5,6 +5,7 @@ import {environment} from '../../environments/environment.prod';
 import {calculateSectionScale} from '../_util/geolib/distance';
 import {pointArrayTypeConversion} from '../_util/leaflet/converter';
 import {TrailParser} from '../base/trail-parser/trail-parser';
+import {Town} from '../type/town';
 
 /* Sierra High Route, only app that supports it! */
 export class SHRData extends TrailParser {
@@ -14,9 +15,9 @@ export class SHRData extends TrailParser {
   }
 
   // parses the entire PCT as well as the DEMO trail (the first section of the PCT)
-  parse(trail: TrailMeta, trailData: string, poiData: string, snow: object, direction: any): any {
+  parse(trail: TrailMeta, trailData: string, poiData: string, snow: object, towns: Array<Town>, direction: any): any {
 
-    super.parse(trail, trailData, poiData, snow, direction);
+    super.parse(trail, trailData, poiData, snow, towns, direction);
 
     // set waypoint string property conversion values
     this.findReplaceArray = [
@@ -39,7 +40,7 @@ export class SHRData extends TrailParser {
     const poiAsJson: JSON = this.x2js.xml2js(poiData);
     const _pois: Array<Poi> = this.directionReverse(this.parsePois(poiAsJson['gpx']['wpt']));
 
-    return [trail, _trailData, _pois, snow];
+    return [trail, _trailData, _pois, snow, towns];
   }
 
   parseTrail(trailData: string): Array<Waypoint> {

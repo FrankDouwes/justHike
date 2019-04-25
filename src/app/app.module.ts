@@ -11,7 +11,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView, faPenAlt, faHouseDamage,
   faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock, faParking,
   faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload, faMapPin, faHotel, faShoePrints,
-  faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle, faGem,
+  faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle, faGem, faCity,
   faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp
   } from '@fortawesome/free-solid-svg-icons';
 import { faCompass, faDotCircle, faArrowAltCircleDown} from '@fortawesome/free-regular-svg-icons';
@@ -184,7 +184,7 @@ export class AppModule {
     // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faHotel, faStreetView, faPenAlt,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt, faHouseDamage,
-      faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload,
+      faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload, faCity,
       faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake, faGem, faMapPin,
       faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faTimes, faParking, faShoePrints, faLock);
   }

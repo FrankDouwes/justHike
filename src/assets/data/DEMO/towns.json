@@ -1,0 +1,79 @@
+[{
+    "id": 0,
+    "name": "Campo",
+    "radius": 1,
+    "centerPoint": {
+      "latitude":  32.607580,
+      "longitude": -116.469728
+    },
+    "pois": []
+  },
+  {
+    "id": 1,
+    "name": "Lake Morena",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }},
+  {
+    "id": 2,
+    "name": "Mt. Laguna",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 3,
+    "name": "Stagecoach Trails RV Park",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 4,
+    "name": "Julian",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 5,
+    "name": "Warner Springs",
+    "radius": 1,
+    "centerPoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  }]

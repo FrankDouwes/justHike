@@ -5,6 +5,7 @@ import {environment} from '../../environments/environment.prod';
 import {calculateSectionScale} from '../_util/geolib/distance';
 import {pointArrayTypeConversion} from '../_util/leaflet/converter';
 import {TrailParser} from '../base/trail-parser/trail-parser';
+import {Town} from '../type/town';
 
 /* Pacific Crest Trail www.pcta.org */
 export class PCTData extends TrailParser {
@@ -14,9 +15,9 @@ export class PCTData extends TrailParser {
   }
 
   // parses the entire PCT as well as the DEMO trail (the first section of the PCT)
-  parse(trail: TrailMeta, trailData: Array<string> | string, poiData: string, snow: object, direction: any): any {
+  parse(trail: TrailMeta, trailData: Array<string> | string, poiData: string, snow: object, towns: Array<Town>, direction: any): any {
 
-    super.parse(trail, trailData, poiData, snow, direction);
+    super.parse(trail, trailData, poiData, snow, towns, direction);
 
     // set waypoint string property conversion values
     this.findReplaceArray = [
@@ -41,7 +42,6 @@ export class PCTData extends TrailParser {
 
     trail.length = this.totalDistance / environment.MILE;
 
-    console.log('TRAILLLLLLL', trail.length);
 
 
     // POIS (=points of interest. water sources, campsites etc.)
@@ -50,13 +50,7 @@ export class PCTData extends TrailParser {
     const poiAsJson: JSON = this.x2js.xml2js(poiData);
     const _pois: Array<Poi> = this.directionReverse(this.parsePois(poiAsJson['gpx']['wpt']));
 
-
-
-    // SNOW (the current snow pack)
-
-    const _snow = snow['datasets'][0];
-
-    return [trail, _trailData, _pois, _snow];
+    return [trail, _trailData, _pois, snow['datasets'][0], towns];
   }
 
   parseTrail(trailData: Array<string>): Array<Waypoint> {

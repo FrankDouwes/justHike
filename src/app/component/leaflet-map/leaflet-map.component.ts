@@ -39,6 +39,7 @@ import {clearTimeOut, setTimeOut, TimerObj} from '../../_util/timer';
 import {Subscription} from 'rxjs';
 import {Distance} from '../../_util/geolib/distance';
 import {DynamicComponentManager} from './elements/dynamic-component-manager';
+import {Town} from '../../type/town';
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -228,7 +229,52 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // set an initial location
     this._map.setView([0, 0], 15);
+
+    // TODO: temp
+    // draw campo
+    this._drawCampo(this._trailGenerator.getTrailData().towns[0]);
   }
+
+
+
+
+
+  // draw pois
+  private _drawCampo(town: Town): void {
+
+    const _towns: Array<any> = [];
+
+    _towns.push(this._assembleTownMarker(town));
+
+    const _markerGroup = L.featureGroup(_towns);
+    _markerGroup.addTo(this._map);
+  }
+
+  private _assembleTownMarker(town: Town): void {
+
+    const _element = document.createElement('div');
+    const _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
+    this._markerFactory.createSvgCircleMarker(_svg, '#FF0000', 0.787878);
+    _svg.use(this._markerFactory.sampleFaIcon('town')).width(24).height(24).move(-12, -12);
+
+    const _icon = htmlIcon({className: 'marker town', html: _element});
+    const _options = {icon: _icon , town: town};
+    const _poiMarker = L.marker(waypointToLatLng(town.centerPoint), _options);
+    return _poiMarker;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   private _setMapInteractionProperties(): void {
 

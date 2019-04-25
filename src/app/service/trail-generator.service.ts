@@ -13,6 +13,7 @@ import {calculateDistance, Distance} from '../_util/geolib/distance';
 import {pointArrayTypeConversion, waypointToWaypoint} from '../_util/leaflet/converter';
 import {getClosestPointOnLine} from '../_util/math';
 import PositionAsDecimal = geolib.PositionAsDecimal;
+import {Town} from '../type/town';
 
 @Injectable({
   providedIn: 'root'
@@ -68,7 +69,7 @@ export class TrailGeneratorService {
 
   // called to generate new trail data files (json), only used by admin, not for users)
   // TODO: move this to a webworker, not a priority as it's rarely used (trail data won't update often)
-  public generateMiles(trail: TrailMeta, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number): Trail {
+  public generateMiles(trail: TrailMeta, waypoints: Array<Waypoint>, pois: Array<Poi>, direction: number, towns?: Array<Town>): Trail {
 
     this._trailData = cloneData(trail) as Trail;
     this._trailData.version = trail.trailVersion;
@@ -136,6 +137,9 @@ export class TrailGeneratorService {
     } else {
       this._loaderService.showMessage('no pois');
     }
+
+    // 5. Towns
+    this._trailData.towns = this._calculateTownsAnchorPoints(towns);
 
     return this._trailData;
   }
@@ -355,7 +359,7 @@ export class TrailGeneratorService {
     _nearestPoints = sortByKey(_nearestPoints, 'distance');
 
     _nearestPoints.filter(function(point) {
-      return point.belongsTo === _nearestPoints[0].belongsTo
+      return point.belongsTo === _nearestPoints[0].belongsTo;
     }).map(function(point) {
       _nearestMileNearestPoints.push(point);
     });
@@ -457,6 +461,29 @@ export class TrailGeneratorService {
     }
   }
 
+  private _calculateTownsAnchorPoints(towns: Array<Town>): Array<Town> {
+
+    if (!towns) {
+      return;
+    }
+
+    const _length = towns.length;
+    for (var t = 0; t < _length; t++) {
+      const _town: Town = towns[t];
+
+      // only calculate the towns anchorpoint if it doesn't have any
+      if (!_town.anchorPoint) {
+        const _nearestMileWaypoints = this.findNearestPointInMileTree(_town.centerPoint, 2);
+        const _nearestMile = this._trailData.miles[_nearestMileWaypoints[0].belongsTo];
+        const _anchorData = this._anchorDistanceCalculation(_town.centerPoint, _nearestMile, _nearestMileWaypoints);
+        _town.anchorPoint = _anchorData.anchorPoint;
+      }
+    }
+
+
+    return towns;
+  }
+
   // distance calculation
   private _anchorDistanceCalculation(location: Waypoint, nearestMile: Mile, nearestWaypoints: object) {
 
@@ -464,8 +491,6 @@ export class TrailGeneratorService {
 
     const _nearestWaypoint = nearestMile.waypoints[nearestWaypoints[0].key];
     const _2ndNearestWaypoint = nearestMile.waypoints[nearestWaypoints[1].key];
-
-    console.log(_nearestWaypoint, _2ndNearestWaypoint);
 
     // create an anchor waypoint (an on trail point nearest to the poi (simple triangulation)
     const _diffDistPercentage = (nearestWaypoints[0].distance / nearestWaypoints[1].distance);
@@ -475,7 +500,7 @@ export class TrailGeneratorService {
     const _dist = _nearestWaypoint.distance + (((_2ndNearestWaypoint.distance - _nearestWaypoint.distance) * _diffDistPercentage) || 0);
     const _distT = _nearestWaypoint.distanceTotal + (((_2ndNearestWaypoint.distanceTotal - _nearestWaypoint.distanceTotal) * _diffDistPercentage) || 0);
 
-    console.log({latitude: _lat, longitude: _lon}, {latitude: location.latitude, longitude: location.longitude});
+    // console.log({latitude: _lat, longitude: _lon}, {latitude: location.latitude, longitude: location.longitude});
 
     // return data
     return {

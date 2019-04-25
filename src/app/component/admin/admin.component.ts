@@ -102,7 +102,9 @@ export class AdminComponent implements OnInit {
         _waypointData = data[1];
       }
 
-      const _parsedData = this._trailService.parseTrailData(data[0], _waypointData, data[2 + _dataOffset], data[3 + _dataOffset], Number(this.selectedDirection));
+      console.log(data);
+
+      const _parsedData = this._trailService.parseTrailData(data[0], _waypointData, data[2 + _dataOffset], data[3 + _dataOffset], data[4 + _dataOffset], Number(this.selectedDirection));
 
       this._generatedData = _parsedData;
       this.trailDataStateClassName = 'generated';

@@ -1,6 +1,7 @@
 import { Mile } from './mile';
 import { OHLC } from './ohlc';
 import { Poi } from './poi';
+import {Town} from './town';
 
 // the current trail data
 export interface Trail {
@@ -21,6 +22,7 @@ export interface Trail {
   scale?:             number;             // scale, calculated length vs. length
   miles?:             Array<Mile>;        // the calculated miles
   pois:               Array<Poi>;         // all points of interest
+  towns?:             Array<Town>;        // all trail towns
   sortedPoiIds?:      any;
   poiTypes?:          Array<object>;      // the poiTypes available for this trail (used for icons / labels)
 }
@@ -41,6 +43,7 @@ export class TrailMeta {
   utm?:                   Array<number>;
   name?:                  string;
   snowVersion?:           string;           // not all trails have snow
+  hasTowns?:              boolean;          // not all trails have towns
   trailFileSize?:         number;
   tileFileSize?:          number;
   tilesFileCount?:        number;

@@ -7,7 +7,7 @@ const _x2js = new X2JS({
   attributePrefix : ''    // no attribute prefix
 });
 
-// trail specific parser for AT data
+// trail specific parser for AT data TODO: needs to extend the default parser
 export function parseATData (trail: TrailMeta, trailData: string, poiData: string, snow: object, direction: any): Array<object> {
 
   // TRAIL (trail is KML)

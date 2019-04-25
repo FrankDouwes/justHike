@@ -182,6 +182,13 @@ export class Settings {
       rateable: true,
       rateBy: ['amenities', 'price'],
       userEnabled: true
+    }, {
+      type: 'town',
+      label: 'town / city',
+      isMajor: true,
+      color: '#ff0000',
+      iconType: 'fa',
+      icon: 'city'
     },
 
     // warning
