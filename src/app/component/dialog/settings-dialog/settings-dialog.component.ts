@@ -13,8 +13,8 @@ export class SettingsDialogComponent implements OnInit {
   public listItems: Array<object> = [
     {title: 'Purchase', panel: 'purchase'},
     {title: 'Download', panel: 'trail'},
-    {title: 'Settings', panel: 'general'},
     {title: 'User', panel: 'user'},
+    {title: 'Application', panel: 'general'},
     {title: 'About', panel: 'about'}
   ];
 

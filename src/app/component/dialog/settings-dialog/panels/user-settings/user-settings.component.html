@@ -11,7 +11,7 @@
       </mat-form-field>
 
       <mat-form-field class="direction">
-        <mat-select [value]="direction" (selectionChange)="onDirectionSelect($event)">
+        <mat-select placeholder="direction" [value]="direction" (selectionChange)="onDirectionSelect($event)">
           <mat-option *ngFor="let direction of directionList" [value]="direction.id">
             {{direction.label}}
           </mat-option>

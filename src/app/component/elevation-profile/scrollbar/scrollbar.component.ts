@@ -46,7 +46,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
   // LIFECYCLE HOOKS
 
   ngOnInit(): void {
-    let sliderManager = new Hammer.Manager(this.main.nativeElement);
+    const sliderManager = new Hammer.Manager(this.main.nativeElement);
     sliderManager.add(new Hammer.Pan({threshold: 0, pointers: 0, direction: Hammer.DIRECTION_HORIZONTAL}));
     sliderManager.on('pan', this._onSlide.bind(this));
   }
@@ -170,7 +170,7 @@ export class ScrollbarComponent implements OnInit, AfterViewInit, OnChanges {
     let prevPoint: object;
     let totalDistancePerc = 0;
 
-    for (let i = 0; i < this._flatWaypoints.length; i += this.trailData.scrollbarSegmentSize) {
+    for (let i = 0; i < this._flatWaypoints.length; i += Math.round(this.trailData.scrollbarSegmentSize / 10)) {
 
       const waypoint: Waypoint = this._flatWaypoints[i];
 

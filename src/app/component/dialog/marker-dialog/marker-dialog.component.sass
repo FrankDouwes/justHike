@@ -1,55 +1,69 @@
-\:host /deep/ .mat-list-item-content
-  padding: 0 12px !important
-  margin: 0 !important
+\:host
 
-#center-icon
-  position: absolute
-  left: 50%
-  margin: -3.5vw 0 0 -3.5vw
-  z-index: 1000
+  #center-icon
+    position: absolute
+    left: 50%
+    margin: -3.5vw 0 0 -3.5vw
+    z-index: 1000
 
-  button
-    user-focus: none
+    button
+      user-focus: none
 
-#left-panel, #right-panel
-  box-sizing: border-box
-  display: inline-block
-  width: 50%
-  height: 100%
-  padding: 0 12px 12px 12px
-
-#left-panel
-  height: 98%
-  vertical-align: bottom
-  overflow-y: scroll
-
-  h1, h2
-    display: block
-    text-align: left
-    width: 90%
-    overflow: hidden
-
-  h1
-    font-size: 4.2vh
-    line-height: 5.5vh
-
-  h2
-    font-size: 3.4vh
-    font-weight: 300
-
-#right-panel
-  background-color: #AAAAAA
-  padding-top: 10px
-  vertical-align: top
-
-  #scroll-container
+  #left-panel, #right-panel
+    box-sizing: border-box
+    display: inline-block
+    width: 50%
     height: 100%
+
+  #left-panel
+    height: 98%
+    vertical-align: bottom
     overflow-y: scroll
 
-    h3
-      text-align: center
+    #information-container
+      margin-top: 12px
 
-    .related-poi-list
-      height: calc((100vh / 7) * 3.75)
+      #mileage, h1, h2, small
+        padding: 0 12px
 
+      #description, #comment
+        padding: 6px 12px
+
+      h1, h2
+        display: block
+        text-align: left
+        width: 90%
+        overflow: hidden
+
+      h1
+        font-size: 4.2vh
+        line-height: 5.5vh
+        margin-bottom: 0 !important
+
+      h2
+        font-size: 3.8vh
+        line-height: 4.4vh
+
+  #right-panel
+    background-color: #AAAAAA
+    vertical-align: top
+    padding: 0 12px 12px 12px
+
+    #scroll-container
+      height: 100%
+      overflow-y: scroll
+
+      h3
+        text-align: center
+
+      .related-poi-list
+        height: calc((100vh / 7) * 3.75)
+
+
+
+\:host /deep/
+
+  .mat-list-item-content
+    padding: 0 12px !important
+    margin: 0 !important
 

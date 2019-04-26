@@ -232,7 +232,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // TODO: temp
     // draw campo
-    this._drawCampo(this._trailGenerator.getTrailData().towns[0]);
+    if (this._trailGenerator.getTrailData().towns) {
+      this._drawCampo(this._trailGenerator.getTrailData().towns[0]);
+    }
   }
 
 
@@ -326,7 +328,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (this._overlayElements && this._overlayElements.length > 0) {
       this._overlayElements.forEach(function(element) {
-        _self._map.removeLayer(element); // remove
+        if (_self._map && element) {
+          _self._map.removeLayer(element); // remove
+        }
       });
     }
 

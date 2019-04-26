@@ -73,15 +73,26 @@ export class TrailParser {
   // CONVERTERS
 
   // converts urls in strings to html hrefs
-  public convertStringUrls(s: string) {
+  public convertStringUrls(input: string) {
 
     const _regex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
 
-    s = s.replace(_regex, function (match, offset, string) {
-      return '<a href="http://' + match.toLowerCase() + '" target="_blank">' + match.toLowerCase() + '</a>';
-    });
+    return input.replace(_regex, function (match, offset, string) {
 
-    return s;
+      match = match.split(' ').join('');      // remove spaces
+      return '<a href="http://' + match.toLowerCase() + '" target="_blank">' + match.toLowerCase() + '</a> ';
+    });
+  }
+
+
+  public convertStringTel(input: string): string {
+
+    const _regex = /(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?/img;
+
+    return input.replace(_regex, function (match, offset, string) {
+      const _digits = match.split('-').join('');
+      return '<a href="tel:+1' + _digits + '">+1-' + match + '</a>';
+    });
   }
 
   // go from gpx to waypoint before converting to JSON (assuming string manipulation is faster)
@@ -134,6 +145,13 @@ export class TrailParser {
     } else {
       return input;
     }
+  }
+
+  // letting the browser parse it, returning the contents
+  public stripHtmlTags(input: string): string {
+    const _div = document.createElement('');
+    _div.innerHTML = input;
+    return _div.textContent || _div.innerText || '';
   }
 
   // helper class to generate a list of possible identifiers

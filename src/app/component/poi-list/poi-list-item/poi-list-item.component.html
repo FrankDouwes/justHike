@@ -2,7 +2,7 @@
   <display-icon [data]="this.poiTypes" [name]="timeStamp"></display-icon>
 </div>
 <div class="mat-list-text">
-  <h2 matLine> {{data.label}} </h2>
+  <h2 matLine [innerHTML]="data.label"></h2>
   <p matLine *ngIf="data.anchorPoint">
     <span *ngIf="status !== 'tracking'"> {{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} </span>
     <span *ngIf="status === 'tracking' && data.distanceFromUser"> {{data.distanceFromUser | distance:'meters':'miles':false:2:true:true}} </span>

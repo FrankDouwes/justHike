@@ -6,8 +6,9 @@ import {Poi} from '../type/poi';
 import {share} from 'rxjs/operators';
 import {Trail} from '../type/trail';
 import {cloneData} from '../_util/generic';
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {ConnectionService} from './connection.service';
+import {environment} from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -250,27 +251,22 @@ export class NoteService implements OnDestroy {
 
     if (this._localStorage.retrieve('shareNotes') && this._notes) {
 
-      const _shareableNotes: Array<object> = [];
-      // run through all data and collect notes that need sharing (duplicates)
-      this._notes.forEach(function(note: Poi) {
-
-        if (note.share) {
-
-          const _clone: object = cloneData(note);
-          _shareableNotes.push(_clone);
-        }
-      });
+      const _shareableNotes: Array<Poi> = this._gatherShareableNotes();
 
       // upload
       if (_shareableNotes.length > 0) {
-        const _url = 'https://hike.frankdouwes.com/scripts/mailto.php';
 
+        const _trail: Trail = _self._trailGenerator.getTrailData();
+        const _directionString: string = (_trail.direction === 1) ? 'sobo' : 'nobo';
+
+        // params to send in post object
         const _params = new FormData();
-        _params.append('data', JSON.stringify(_shareableNotes));
+        _params.append('trail', _trail.abbr);
+        _params.append('direction', _directionString);
         _params.append('user', _self._localStorage.retrieve('userName'));
+        _params.append('data', JSON.stringify(_shareableNotes));
 
-        this._uploadObserver = this._http.post(_url, _params, {responseType: 'text'});
-
+        this._uploadObserver = this._http.post(environment.mailto, _params, {responseType: 'text'});
         this._uploadSubscription = this._uploadObserver.subscribe(function(result: string) {
 
           if (result === 'success') {
@@ -289,6 +285,8 @@ export class NoteService implements OnDestroy {
           _self._uploadSubscription.unsubscribe();
           _self._uploadSubscription = null;
         }, function(error) {
+
+          // error handling
           alert('Error while sending note(s) to developer!');
         });
       }
@@ -307,5 +305,22 @@ export class NoteService implements OnDestroy {
     this._updateStorage();
 
     this._localStorage.clear('shareNotes');
+  }
+
+  private _gatherShareableNotes(): Array<Poi> {
+
+    const _shareableNotes: Array<object> = [];
+
+    // run through all data and collect notes that need sharing (duplicates)
+    this._notes.forEach(function(note: Poi) {
+
+      if (note.share) {
+
+        const _clone: object = cloneData(note);
+        _shareableNotes.push(_clone);
+      }
+    });
+
+    return _shareableNotes as Array<Poi>;
   }
 }

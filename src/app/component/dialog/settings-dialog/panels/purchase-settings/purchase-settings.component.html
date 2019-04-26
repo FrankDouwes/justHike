@@ -1,11 +1,11 @@
 <mat-card id="purchase-trails">
 
-  <h2>Purchase Trail Data</h2>
+  <!--<h2>Purchase Trail Data</h2>-->
 
   <mat-card-content>
     <section class="purchase">
-      <div id="purchase-container">
-        <div class="sign" *ngFor="let trail of availableTrailList">
+      <div *ngFor="let trail of availableTrailList" class="purchase-container sign-{{trail.abbr}}" >
+        <div class="sign">
           <img class="cap" src="../assets/images/sign-post/post-cap.png"/>
           <div class="post">
             <button mat-raised-button
@@ -16,7 +16,7 @@
               <!--<div class="unavailable" *ngIf="!trail.availableForPurchase">Unavailable</div>-->
               <!--<div class="free" *ngIf="trail.isFree">Free</div>-->
               <p>{{trail.name}}
-                <!--<small>({{trail.length}} mi)</small>-->
+                <!--<small>({{trail.length}} mi.)</small>-->
               </p>
               <div>•</div>
             </button>

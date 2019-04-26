@@ -1,0 +1,12 @@
+<span id="label">{{label}}:</span>
+
+<span id="star-container">
+    <fa-icon
+      *ngFor="let score of scoreArray(score.getScore(), false); let i = index"
+      [id]="i"
+      icon="star"
+      [ngClass]="(score === 'x') ? 'active' : 'inactive'" class="fa-icon-star"
+      [fixedWidth]="true">
+    </fa-icon>
+    <!--<span>({{score.getScore()}})</span>-->
+</span>

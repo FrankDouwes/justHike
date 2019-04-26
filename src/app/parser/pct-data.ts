@@ -178,17 +178,33 @@ export class PCTData extends TrailParser {
         }
 
         // title & description
-        const _descriptionArr = _poi['description'].split('---').join('').split(',');
-        _poi['label'] = _descriptionArr.shift();
-        _poi['description'] = this.convertStringUrls(_descriptionArr.join(''));
-        _poi['identifier'] = 'Halfmile abbr. ' + _poi['name'];
+
+        console.log(JSON.stringify(_poi['description']));
+
+        const _textArray = this._splitCleanStrings(_poi['description'], [', ', '---', '<br/>']);
+        const _labelArray = _textArray.shift().split('. ');
+
+        _poi['label'] = _labelArray.shift();
+
+        _textArray.unshift(_labelArray.join('. '));
+
+        // filter out blank elements
+        var _descriptionArray = _textArray.filter(function (element: string) {
+          return element != '';
+        });
+
+        const _description: string = _descriptionArray.join(' ').split('. ').join('<br/><br/>');
+
+        _poi['description'] = this._convertDescription(_description);
+        _poi['identifier'] = 'HM: ' + _poi['name'];
 
         delete _poi['name'];
+
+        console.log(_poi['description']);
 
         _parsedPois.push(_poi as Poi);
       }
     }
-
 
     // 4. adjust individual pois
 
@@ -221,5 +237,37 @@ export class PCTData extends TrailParser {
     }
 
     return _parsedPois;
+  }
+
+  private _convertDescription(input: string): string {
+
+    let _description = this.convertStringUrls(input);     // a href tag
+    _description = this.convertStringTel(_description);   // a tel tag
+    _description = this._capFirstLetter(_description);    // capitalize
+
+    return _description;
+  }
+
+  // does not support ~ (tilde), this is slow...
+  private _splitCleanStrings(input: string, remove: Array<string>): Array<string> {
+
+    remove.push('~');
+    let _input: any = input;
+
+    const _length = remove.length;
+    for (let i = 0; i < _length; i++) {
+
+      _input = _input.split(remove[i]);
+
+      if (i !== _length - 1) {
+        _input = _input.join('~');
+      }
+    }
+
+    return _input;
+  }
+
+  private _capFirstLetter(input: string): string {
+    return input.charAt(0).toUpperCase() + input.slice(1);
   }
 }

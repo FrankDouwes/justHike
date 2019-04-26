@@ -13,7 +13,7 @@
     </mat-form-field>
 
     <mat-form-field class="select-form-field">
-      <mat-select [(ngModel)]="defaultType" name="type" ngModel>
+      <mat-select placeholder="type" [(ngModel)]="defaultType" name="type" ngModel>
         <mat-option *ngFor="let poiType of getTypes()" [value]="poiType.type">
           {{poiType.label}}
         </mat-option>

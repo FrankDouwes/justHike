@@ -1,0 +1,16 @@
+<div id="wrapper" (click)="setScore($event)">
+
+  <span id="label" (click)="cycleScore($event)">{{label}}:</span>
+
+  <span id="star-container">
+    <fa-icon
+      *ngFor="let score of scoreArray; let i = index"
+      [id]="i"
+      [icon]="(score === '/') ? 'star-half-alt' : ((score === 'o') ? ['far', 'star'] : 'star')"
+      [ngClass]="(score !== 'o') ? 'active' : 'inactive'" class="fa-icon-star"
+      [fixedWidth]="true">
+    </fa-icon>
+  </span>
+
+</div>
+

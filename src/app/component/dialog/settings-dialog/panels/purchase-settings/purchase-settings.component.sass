@@ -10,18 +10,38 @@
     border: unset
     box-shadow: unset
     padding-bottom: 0
-    background: darkseagreen
     border-radius: unset
 
-    #purchase-container
-      display: flex
-      flex-wrap: wrap
-      align-items: flex-end
+    .sign-PCT
+      background-image: url("../../../../../../assets/images/panel-backgrounds/pct.jpg")
+
+    .sign-CDT
+      background-image: url("../../../../../../assets/images/panel-backgrounds/cdt.jpg")
+
+    .sign-SHR
+      background-image: url("../../../../../../assets/images/panel-backgrounds/shr.jpg")
+
+    .purchase-container
+      perspective: 1000px
+      background-size: cover
+      height: 200px
+      overflow-y: hidden
+      border-radius: 12px
+      margin-bottom: 6px
+      border: 1px solid #CCC
+      //display: flex
+      //flex-wrap: wrap
+      //align-items: flex-end
 
       .sign
-        width: 30%
-        max-width: 50%
+        max-width: 75%
         height: 100%
+        margin: 0 5% 0 auto
+        padding-top: 12px
+
+        -ms-transform: rotate(1deg) skewY(3deg) skewX(-3deg) rotateX(-10deg) /* IE 9 */
+        -webkit-transform: rotate(1deg) skewY(3deg) skewX(-3deg) rotateX(-10deg) /* Safari 3-8 */
+        transform: rotate(1deg) skewY(3deg) skewX(-3deg) rotateX(-10deg)
 
         .cap
           display: block
@@ -32,11 +52,12 @@
           background-image: url("../../../../../../assets/images/sign-post/post-backgound.jpg")
           background-position: center top
           background-repeat: repeat-y
-          padding: 24px 0 120px 0
+          padding: 24px 0 48px 0
           width: 100%
+          text-align: center
 
           button
-            width: 100%
+            width: auto
             box-sizing: border-box
             padding: 20px 12px 0px 12px
             text-align: center
@@ -46,6 +67,10 @@
             font-size: 18px
             text-shadow: 1px 1px 1px rgba(255,255,255,0.25)
             border-radius: 6px
+
+            -ms-transform: rotate(-1deg) skewY(1deg) /* IE 9 */
+            -webkit-transform: rotate(-1deg) skewY(1deg) /* Safari 3-8 */
+            transform: rotate(-1deg) skewY(1deg)
 
             .unavailable
               color: red
@@ -89,14 +114,14 @@
 
 
 
-    #purchase-container .sign:not(:first-child)
-      margin-left: 5%
-
-    /* one item */
-    #purchase-container .sign:first-child:nth-last-child(1)
-      width: 100%
-
-    /* two items */
-    #purchase-container .sign:first-child:nth-last-child(2),
-    #purchase-container .sign:first-child:nth-last-child(2) ~ .sign
-      width: 47.5%
+    //.purchase-container .sign:not(:first-child)
+    //  margin-left: 5%
+    //
+    ///* one item */
+    //.purchase-container .sign:first-child:nth-last-child(1)
+    //  width: 100%
+    //
+    ///* two items */
+    //.purchase-container .sign:first-child:nth-last-child(2),
+    //.purchase-container .sign:first-child:nth-last-child(2) ~ .sign
+    //  width: 47.5%

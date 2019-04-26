@@ -1,27 +1,31 @@
 <div id="center-icon" >
-  <display-button class="button" label="" [poiTypes]="this.poiTypes" routerLink=""></display-button>
+  <display-button class="button" label="" [poiTypes]="poiTypes" routerLink=""></display-button>
 </div>
 
 <!-- left -->
 <div id="left-panel">
   <button *ngIf="data.type.includes('note')" (click)="deletePoi()">delete</button>
-  <h1 mat-dialog-title>{{data.label}}</h1>
-  <h3 *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</h3>
 
-  <small *ngIf="data.identifier">{{data.identifier}}</small>
+  <!-- information -->
+  <div id="information-container">
 
-  <div *ngIf="data.description">
-    <p [innerHTML]="data.description"></p>
-    <hr />
+    <h1 mat-dialog-title [innerHTML]="data.label"></h1>
+    <h2 id="mileage" *ngIf="data.anchorPoint && data.waypoint">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</h2>
+    <small *ngIf="data.identifier">{{data.identifier}}</small>
+
+    <div id="description" *ngIf="data.description">
+      <p [innerHTML]="data.description"></p>
+    </div>
+
+    <div id="comment" *ngIf="data.comment">
+      <p [innerHTML]="data.comment"></p>
+    </div>
+
   </div>
 
-  <div *ngIf="data.comment">
-    <p [innerHTML]="data.comment"></p>
-    <hr />
-  </div>
-  <div *ngFor="let type of poiTypes">
-    <rating-form *ngIf="type.rateable" [poiType]="type" [waypoint]="data.waypoint"></rating-form>
-  </div>
+  <!-- rating -->
+  <rating *ngIf="rateable" [waypoint]="data.waypoint" [poiTypes]="poiTypes"></rating>
+
 </div>
 
 <!-- right -->

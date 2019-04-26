@@ -12,9 +12,10 @@ import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationAr
   faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock, faParking,
   faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload, faMapPin, faHotel, faShoePrints,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle, faGem, faCity,
-  faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp
+  faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faStarHalfAlt
   } from '@fortawesome/free-solid-svg-icons';
 import { faCompass, faDotCircle, faArrowAltCircleDown} from '@fortawesome/free-regular-svg-icons';
+import { faStar as fasStar } from '@fortawesome/free-regular-svg-icons';
 
 // material
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -83,6 +84,8 @@ import {createCustomElement} from '@angular/elements';
 import { NoteDialogComponent } from './component/dialog/note-dialog/note-dialog.component';
 import { BaseComponent } from './base/base/base.component';
 import { UserSettingsComponent } from './component/dialog/settings-dialog/panels/user-settings/user-settings.component';
+import { CurrentScoreComponent } from './component/dialog/marker-dialog/rating/elements/current-score/current-score.component';
+import { AddScoreComponent } from './component/dialog/marker-dialog/rating/elements/add-score/add-score.component';
 
 @NgModule({
   declarations: [
@@ -127,7 +130,9 @@ import { UserSettingsComponent } from './component/dialog/settings-dialog/panels
     PopupComponent,
     NoteDialogComponent,
     BaseComponent,
-    UserSettingsComponent
+    UserSettingsComponent,
+    CurrentScoreComponent,
+    AddScoreComponent
   ],
   entryComponents: [
     SettingsDialogComponent,
@@ -184,8 +189,8 @@ export class AppModule {
     // font awesome library
     library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faHotel, faStreetView, faPenAlt,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt, faHouseDamage,
-      faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload, faCity,
-      faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake, faGem, faMapPin,
+      faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload, faCity, faStarHalfAlt,
+      faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake, faGem, faMapPin, fasStar,
       faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faTimes, faParking, faShoePrints, faLock);
   }
 }

@@ -5,14 +5,20 @@ export const environment = {
 
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
 
-  // appDomain: 'https://storage.googleapis.com/',
-  // fileBaseUrl: 'just-hike/',
+  // FILES
+    // PRODUCTION SERVER:
+    // appDomain: 'https://storage.googleapis.com/',
+    // fileBaseUrl: 'just-hike/',
 
-  appDomain: 'https://hike.frankdouwes.com/',
-  fileBaseUrl: 'files/',
+    // TEST SERVER:
+    appDomain: 'https://hike.frankdouwes.com/',
+    fileBaseUrl: 'files/',
 
+  mailto: 'https://hike.frankdouwes.com/scripts/mailto.php',       // TODO: BETA only
+
+
+  updateCheckInterval: 86400000,      // the time between (online) data update checks
   onlineTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-  updateCheckInterval: 86400000,      // the time between (online) data update check
 
   MILE: 1609.344,    // mile in meters
   FOOT: 0.3048,      // foot in meters
@@ -32,7 +38,7 @@ export const environment = {
     poiDistanceOffTrail: 250,       // distance (in feet?) that a water source has to be off trail to be rendered as such
     poiMaxDistance: 1000,           // the maximum distance before a poi is ignored (and not rendered), eliminates side trail poi
     userDistanceOffTrail: 10,       // the distance (in feet?) that a user has to be off trail for marker to change
-    autoUpdate: true,               // auto update (only used for snow data) (TODO UNUSED)
+    autoUpdate: true,               // auto download updates (only used for snow data) (TODO UNUSED v1)
 
     // major markers visibility (elevation profile)
     showWater: true,
@@ -49,7 +55,6 @@ export const environment = {
     // elevationProfile
     parallaxEnabled: false,         // parallax effect in elevation profile
     screenMode: 'default',          // 'default', 'highContrast' or 'nighHike'
-    showExtraDesign: true,          // TODO: unused, show extra design features in elevation profile (trees)
     detectRetina: false             // disable retina by default (battery saving)
   },
 

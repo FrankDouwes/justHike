@@ -4,7 +4,7 @@ import {Rating} from '../type/rating';
 import {Observable, Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
 import {getTrailMetaDataById} from '../_util/trail-meta';
-// import {AngularFirestore} from '@angular/fire/firestore';
+import {TrailGeneratorService} from './trail-generator.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,8 +27,8 @@ export class RateService implements OnDestroy {
   private _activeTrailAbbr: string;
 
   constructor(
-    // private _fireStore: AngularFirestore,
-    private _localStorage: LocalStorageService) {
+    private _localStorage: LocalStorageService,
+    private _trailGenerator: TrailGeneratorService) {
 
     // const items = _fireStore.collection('ratings').valueChanges().subscribe(response => {
     //   console.log(response);
@@ -113,23 +113,27 @@ export class RateService implements OnDestroy {
   // there's no need to make a separate online call here
   // as the app mostly runs in offline mode and syncRatingsForTrail() is called once the app goes online
   // this way the ratings stay reasonably up to date.
-  public getRating(type: string, waypoint: Waypoint): Rating {
+  public getRatingById(type: string, location: Waypoint, create: boolean = true): Rating {
 
-    console.log(waypoint)
+    const _trailAbbr: string = this._trailGenerator.getTrailData().abbr;
 
-    const _id = type + '-' + Number(waypoint.latitude).toFixed(4) + '_' + Number(waypoint.longitude).toFixed(4);
+    const _id = type + '_' + Number(location.latitude).toFixed(4) + '_' + Number(location.longitude).toFixed(4);
 
-    console.log(this._localRatings);
+    let _rating: Rating;
 
     const _length = this._localRatings.length;
     for (let i = 0; i < _length; i++) {
-
       if (this._localRatings[i].id === _id) {
-        return this._localRatings[i];
+        _rating = this._localRatings[i];
+        break;
       }
     }
 
-    return;
+    if (!_rating && create) {
+      _rating = new Rating(type, location);
+    }
+
+    return _rating;
   }
 
   // get all updated/new ratings online for trail
@@ -154,7 +158,6 @@ export class RateService implements OnDestroy {
       }
 
       this._setRatingLocally(_rating);
-      console.log(i);
       // progress
     }
 
