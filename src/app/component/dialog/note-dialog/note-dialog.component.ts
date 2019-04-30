@@ -1,9 +1,10 @@
 import {Component, ElementRef, Inject, OnInit, ViewChild} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {Waypoint} from '../../../type/waypoint';
-import {Poi, PoiType} from '../../../type/poi';
+import {PoiType} from '../../../type/poi';
 import {NoteService} from '../../../service/note.service';
 import {Settings} from '../../../settings';
+import {Note} from '../../../type/note';
 
 export class NoteProperties {
   type: string;
@@ -24,7 +25,7 @@ export class NoteDialogComponent implements OnInit {
   @ViewChild('titleField') titleField: ElementRef;
 
   public defaultType: string;
-  private _notes: Array<Poi>;
+  private _notes: Array<Note>;
 
   constructor(
     private _dialogRef: MatDialogRef<NoteDialogComponent>,
@@ -41,7 +42,7 @@ export class NoteDialogComponent implements OnInit {
 
   public submitNote(formData: object): void {
 
-    // add missing properties to data object so we can convert it to a Poi
+    // add missing properties to data object so we can convert it to a Note
     this.data['id'] = new Date().getTime();
 
     // only add to type if it differs
@@ -53,9 +54,9 @@ export class NoteDialogComponent implements OnInit {
     this.data['description'] = formData['note'];
     this.data['share'] = formData['share'];
 
-    const _notePoi: Poi = this.data as Poi;
+    const _noteObj: Note = this.data as Note;
 
-    this._noteService.saveNote(_notePoi);
+    this._noteService.saveNote(_noteObj);
     this._dialogRef.close('success');
   }
 

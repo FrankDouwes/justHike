@@ -1,22 +1,22 @@
 import {Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
-import { LoaderService } from './service/loader.service';
-import { MatDialog } from '@angular/material';
-import { SettingsDialogComponent } from './component/dialog/settings-dialog/settings-dialog.component';
-import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
-import { LocationService } from './service/location.service';
-import { OfftrailDialogComponent } from './component/dialog/offtrail-dialog/offtrail-dialog.component';
-import { LocalStorageService } from 'ngx-webstorage';
+import {LoaderService} from './service/loader.service';
+import {MatDialog} from '@angular/material';
+import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
+import {MarkerDialogComponent} from './component/dialog/marker-dialog/marker-dialog.component';
+import {LocationService} from './service/location.service';
+import {OfftrailDialogComponent} from './component/dialog/offtrail-dialog/offtrail-dialog.component';
+import {LocalStorageService} from 'ngx-webstorage';
 import {FilesystemService} from './service/filesystem.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConnectionService} from './service/connection.service';
-import {Subscription} from 'rxjs-observable';
+import {BaseComponent} from './base/base/base.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.sass']
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
 
   @ViewChild('loader', { read: ViewContainerRef }) loader: ViewContainerRef;
 
@@ -26,8 +26,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private _offtrailDialog: any;
   private _markerDialog: any;
-  private _markerDialogCloseSubscription: Subscription;
-
   
   constructor(
     private _route: ActivatedRoute,
@@ -37,8 +35,10 @@ export class AppComponent implements OnInit, OnDestroy {
     private _element: ElementRef,
     private _injector: Injector,
     private _localStorage: LocalStorageService,
-    private _connectionService: ConnectionService,
-  ) {
+    private _connectionService: ConnectionService) {
+
+    super();
+
     // makes constructor props accessible through LocationService, needed for inheritance
     LocationService.injector = this._injector;
   }
@@ -47,24 +47,28 @@ export class AppComponent implements OnInit, OnDestroy {
 
     const _self = this;
 
-    // check user agent
     if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
+
       console.log('running on mobile device:', navigator.userAgent);
-      document.addEventListener('deviceready', function() {
+
+      this.addEventListener(document, 'deviceready', function() {
         _self._onReady();
+        _self.removeEventListener(document, 'deviceready');
       });
+
     } else {
-      console.log('running in browser');
+
+      console.log('debugging in browser');
       this._onReady();
     }
 
     // loader (spinner)
-    this._loaderService.observe.subscribe((obj: object) => {
+    this.addSubscription('loaderService', this._loaderService.observe.subscribe((obj: object) => {
       this.showLoader = (obj['type'] === 'self') ? (obj['action'] === 'show') : this.showLoader;
       if (obj['action'] === 'hide') {
         this.initialized = true;
       }
-    });
+    }));
 
     // show settings on first load
     const _firstRun = this._localStorage.retrieve('firstRun');
@@ -76,24 +80,21 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     this._connectionService.startTracking();
-    this._element.nativeElement.addEventListener('markerClick', this._onDialogEvent.bind(this), false);
-    this._element.nativeElement.addEventListener('offtrail', this._onDialogEvent.bind(this), false);
+    this.addEventListener(this._element.nativeElement, ['markerClick', 'offtrail'] , this._onDialogEvent.bind(this), false);
   }
 
   ngOnDestroy(): void {
+    super.ngOnDestroy();
     this._connectionService.stopTracking();
-    this._element.nativeElement.removeEventListener('markerClick', this._onDialogEvent.bind(this));
-    this._element.nativeElement.removeEventListener('offtrail', this._onDialogEvent.bind(this), false);
   }
 
   // STARTUP
 
   private _onReady(): void {
-
     // reload on storage timestamp change (user settings changed that require a reload)
-    this._localStorage.observe('timestamp').subscribe((value) => {
+    this.addSubscription('reload', this._localStorage.observe('timestamp').subscribe((value) => {
       window.location.reload();
-    });
+    }));
   }
 
 
@@ -115,6 +116,8 @@ export class AppComponent implements OnInit, OnDestroy {
     event.stopImmediatePropagation();
     event.stopPropagation();
 
+    this._forceHideNavigation();
+
     if (event.type === 'offtrail') {
       this._openOfftrailDialog(event);
     } else {
@@ -129,48 +132,23 @@ export class AppComponent implements OnInit, OnDestroy {
   // marker dialog
   private _openMarkerDialog(event): void {
 
-    // get marker poi data
-    if (this.navIsVisible) {
-      this._toggleNavigationVisibility(false);
-    }
-
-    if (this._markerDialog) {
-      this._dialog.closeAll();
-      this._markerDialogCloseSubscription.unsubscribe();
-      this._markerDialogCloseSubscription = null;
-      this._markerDialog = null;
-    }
-
     this._markerDialog = this._dialog.open(MarkerDialogComponent, {
-      autoFocus: false,
-      width: '85%',
-      height: '75%',
-      data: event.detail
+      autoFocus: false, width: '85%', height: '75%', data: event.detail
     });
 
-    this._markerDialogCloseSubscription = this._markerDialog.afterClosed().subscribe(result => {
-      this._toggleNavigationVisibility(true);
-      this._markerDialogCloseSubscription.unsubscribe();
-      this._markerDialogCloseSubscription = null;
-      this._markerDialog = null;
-    });
+    this._onDialogClose(this._markerDialog, 'markerClosed');
   }
 
   // settings dialog
   private _openSettingsDialog(): void {
 
-    if (this.navIsVisible) {
-      this._toggleNavigationVisibility(false);
-    }
+    this._forceHideNavigation();
+
     const _settingsDialog = this._dialog.open(SettingsDialogComponent, {
-      autoFocus: false,
-      width: '85%',
-      height: '75%',
-      data: {icon: 'cog'}
+      autoFocus: false, width: '85%', height: '75%', data: {icon: 'cog'}
     });
 
-    _settingsDialog.afterClosed().subscribe(result => {
-      this._toggleNavigationVisibility(true);
+    this._onDialogClose(_settingsDialog, 'settingsClosed', result => {
       if (result) {
         this._loaderService.showOverlay();
         this._localStorage.store('timestamp', new Date().getTime());
@@ -179,27 +157,13 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   // off trail dialog (mile simulator)
-  // TODO replace with native dialog for mobile?
   private _openOfftrailDialog(event): void {
-    if (this.navIsVisible) {
-      this._toggleNavigationVisibility(false);
-    }
-
-    if (this._offtrailDialog) {
-      return;
-    }
 
     this._offtrailDialog = this._dialog.open(OfftrailDialogComponent, {
-      panelClass: 'offtrail-dialog',
-      autoFocus: false,
-      width: '50%',
-      height: '75%%',
-      data: event.detail
+      panelClass: 'offtrail-dialog', autoFocus: false, width: '50%', height: '75%%', data: event.detail
     });
 
-    this._offtrailDialog.afterClosed().subscribe(result => {
-
-      this._toggleNavigationVisibility(true);
+    this._onDialogClose(this._offtrailDialog, 'offtrailClosed', result => {
 
       if (result) {
         this._localStorage.store('simulatedMile', Number(result.simulatedMile));
@@ -208,8 +172,27 @@ export class AppComponent implements OnInit, OnDestroy {
       const _simulate = !!(result);
       this._injector.get(LocationService).toggleTracking(_simulate);
 
-      this._offtrailDialog = null;
     });
+  }
+
+  private _onDialogClose(dialog: any, name: string, callback?: Function): void {
+
+    this.addSubscription(name, dialog.afterClosed().subscribe(result => {
+      this._toggleNavigationVisibility(true);
+
+      if (callback) {
+        callback(result);
+      }
+
+      this.removeSubscription(name);
+      dialog = null;
+    }));
+  }
+
+  private _forceHideNavigation(): void {
+    if (this.navIsVisible) {
+      this._toggleNavigationVisibility(false);
+    }
   }
 
   private _toggleNavigationVisibility(visible: boolean): void {

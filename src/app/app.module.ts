@@ -1,41 +1,41 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import {BrowserModule} from '@angular/platform-browser';
+import {HttpClientModule} from '@angular/common/http';
+import {FormsModule} from '@angular/forms';
 import {Injector, isDevMode, NgModule} from '@angular/core';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
 
 // font awesome
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView, faPenAlt, faHouseDamage,
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
+import {library} from '@fortawesome/fontawesome-svg-core';
+import {faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView, faPenAlt, faHouseDamage,
   faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock, faParking,
   faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload, faMapPin, faHotel, faShoePrints,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle, faGem, faCity,
   faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faStarHalfAlt
-  } from '@fortawesome/free-solid-svg-icons';
-import { faCompass, faDotCircle, faArrowAltCircleDown} from '@fortawesome/free-regular-svg-icons';
-import { faStar as fasStar } from '@fortawesome/free-regular-svg-icons';
+} from '@fortawesome/free-solid-svg-icons';
+import {faCompass, faDotCircle, faArrowAltCircleDown} from '@fortawesome/free-regular-svg-icons';
+import {faStar as fasStar} from '@fortawesome/free-regular-svg-icons';
 
 // material
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ScrollingModule } from '@angular/cdk/scrolling';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatListModule } from '@angular/material/list';
-import { MatSelectModule } from '@angular/material/select';
-import { MatRadioModule } from '@angular/material/radio';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatCardModule } from '@angular/material/card';
-import { MatButtonModule } from '@angular/material/button';
-import { MatRippleModule } from '@angular/material/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatCarouselModule } from '@ngmodule/material-carousel';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { NgxWebstorageModule } from 'ngx-webstorage';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {ScrollingModule} from '@angular/cdk/scrolling';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatListModule} from '@angular/material/list';
+import {MatSelectModule} from '@angular/material/select';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatCardModule} from '@angular/material/card';
+import {MatButtonModule} from '@angular/material/button';
+import {MatRippleModule} from '@angular/material/core';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatCarouselModule} from '@ngmodule/material-carousel';
+import {MatIconModule} from '@angular/material/icon';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
+import {NgxWebstorageModule} from 'ngx-webstorage';
 
 // component
 import { LocationBasedComponent } from './base/location-based/location-based.component';
@@ -71,21 +71,21 @@ import { AdminComponent } from './component/admin/admin.component';
 import { UserIndicatorComponent } from './component/poi-list/user-indicator/user-indicator.component';
 
 // dialog
-import { MarkerDialogComponent } from './component/dialog/marker-dialog/marker-dialog.component';
-import { SettingsDialogComponent } from './component/dialog/settings-dialog/settings-dialog.component';
+import {MarkerDialogComponent} from './component/dialog/marker-dialog/marker-dialog.component';
+import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
 
 // pipes
-import { PoiSortingPipe } from './pipe/poi-sorting.pipe';
-import { DistancePipe } from './pipe/distance.pipe';
-import { FilesizePipe } from './pipe/filesize.pipe';
-import { RatingComponent } from './component/dialog/marker-dialog/rating/rating.component';
-import { PopupComponent } from './component/leaflet-map/elements/popup/popup.component';
+import {PoiSortingPipe} from './pipe/poi-sorting.pipe';
+import {DistancePipe} from './pipe/distance.pipe';
+import {FilesizePipe} from './pipe/filesize.pipe';
+import {RatingComponent} from './component/dialog/marker-dialog/rating/rating.component';
+import {PopupComponent} from './component/leaflet-map/elements/popup/popup.component';
 import {createCustomElement} from '@angular/elements';
-import { NoteDialogComponent } from './component/dialog/note-dialog/note-dialog.component';
-import { BaseComponent } from './base/base/base.component';
-import { UserSettingsComponent } from './component/dialog/settings-dialog/panels/user-settings/user-settings.component';
-import { CurrentScoreComponent } from './component/dialog/marker-dialog/rating/elements/current-score/current-score.component';
-import { AddScoreComponent } from './component/dialog/marker-dialog/rating/elements/add-score/add-score.component';
+import {NoteDialogComponent} from './component/dialog/note-dialog/note-dialog.component';
+import {BaseComponent} from './base/base/base.component';
+import {UserSettingsComponent} from './component/dialog/settings-dialog/panels/user-settings/user-settings.component';
+import {CurrentScoreComponent} from './component/dialog/marker-dialog/rating/elements/current-score/current-score.component';
+import {AddScoreComponent} from './component/dialog/marker-dialog/rating/elements/add-score/add-score.component';
 
 @NgModule({
   declarations: [
@@ -174,7 +174,7 @@ export class AppModule {
 
   constructor(private _injector: Injector) {
 
-    // Register the custom element(s)
+    // Register custom element(s)
     const _popupElement = createCustomElement(PopupComponent, {injector: _injector});
     customElements.define('leaflet-element-popup', _popupElement);
 

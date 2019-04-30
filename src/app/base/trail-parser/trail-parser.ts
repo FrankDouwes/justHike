@@ -77,7 +77,7 @@ export class TrailParser {
 
     const _regex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
 
-    return input.replace(_regex, function (match, offset, string) {
+    return input.replace(_regex, function (match) {
 
       match = match.split(' ').join('');      // remove spaces
       return '<a href="http://' + match.toLowerCase() + '" target="_blank">' + match.toLowerCase() + '</a> ';
@@ -89,19 +89,19 @@ export class TrailParser {
 
     const _regex = /(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?/img;
 
-    return input.replace(_regex, function (match, offset, string) {
+    return input.replace(_regex, function (match) {
       const _digits = match.split('-').join('');
       return '<a href="tel:+1' + _digits + '">+1-' + match + '</a>';
     });
   }
 
-  // go from gpx to waypoint before converting to JSON (assuming string manipulation is faster)
+  // go from gpx to waypoint before converting to JSON (string manipulation is faster?)
   public convertToWaypointString(input: string): string {
 
     const _length = this.findReplaceArray.length;
 
     for (let i = 0; i < _length; i++) {
-      input = input.split(this.findReplaceArray[i].find).join(this.findReplaceArray[i].replace);
+      input = input.replace(this.findReplaceArray[i].find, this.findReplaceArray[i].replace);
     }
 
     return input;

@@ -189,8 +189,8 @@ export class PCTData extends TrailParser {
         _textArray.unshift(_labelArray.join('. '));
 
         // filter out blank elements
-        var _descriptionArray = _textArray.filter(function (element: string) {
-          return element != '';
+        const _descriptionArray = _textArray.filter(function (element: string) {
+          return element !== '';
         });
 
         const _description: string = _descriptionArray.join(' ').split('. ').join('<br/><br/>');
@@ -199,8 +199,6 @@ export class PCTData extends TrailParser {
         _poi['identifier'] = 'HM: ' + _poi['name'];
 
         delete _poi['name'];
-
-        console.log(_poi['description']);
 
         _parsedPois.push(_poi as Poi);
       }

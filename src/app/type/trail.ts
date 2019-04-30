@@ -2,18 +2,18 @@ import { Mile } from './mile';
 import { OHLC } from './ohlc';
 import { Poi } from './poi';
 import {Town} from './town';
+import {TrailBase} from './base';
 
 // the current trail data
-export interface Trail {
+export interface Trail extends TrailBase {
+
+  length:                 number;             // always a number
 
   // STATIC
-  id:                     number;
   utm:                    Array<number>;      // utm zones (for grid generation)
   version:                string;             // version of trail data (for updating)
   name:                   string;
-  abbr:                   string;
-  length:                 number;             // the given length of the trail (so not calculated with available waypoints)
-  scrollbarSegmentSize:   number;       // one scrollbar segment for every X miles
+  scrollbarSegmentSize:   number;             // one scrollbar segment for every X miles
 
   // CALCULATED
   direction?:         number;             // 0 for NOBO, 1 for SOBO
@@ -32,12 +32,10 @@ export interface Trail {
 /* the data that is always available regardless of the currently selected trail. (provided by version.json)
 TrailMeta represents the most recent available data for a given trail, meaning the version data is what is available online,
 not what it downloaded. TrailMeta is used for Trail generation as well as version checking */
-export class TrailMeta {
-  id:             number;
-  abbr:           string;
+export interface TrailMeta extends TrailBase {
+
   trailVersion:   string;
   tilesVersion:   string;
-  length:         number | Array<number>;
 
   // optional params
   utm?:                   Array<number>;
@@ -51,8 +49,8 @@ export class TrailMeta {
   availableForPurchase?:  boolean;
   isFree?:                boolean;
   dataPath?:              string;
-  scrollSegmentSize?:     number;         // used from scrollbar
-  waypointsPerMile?:      number;         // the number of interpolated points, used for trail generation only
-  multipart?:             boolean;        // consists of multiple .dat files (generate trail)
-  parts?:                 number;         // the number of parts (generate trail
+  scrollSegmentSize?:     number;           // used from scrollbar
+  waypointsPerMile?:      number;           // the number of interpolated points, used for trail generation only
+  multipart?:             boolean;          // consists of multiple .dat files (generate trail)
+  parts?:                 number;           // the number of parts (generate trail
 }

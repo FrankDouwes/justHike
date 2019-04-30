@@ -1,17 +1,15 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
-  Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+  Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
+import {BaseComponent} from '../../../../base/base/base.component';
 import 'seedrandom/seedrandom';
 import {svgPath} from '../../../../_util/smooth-line';
-import {isPrime, normalizeElevation} from '../../../../_util/math';
+import {isPrime} from '../../../../_util/math';
 import {getMajorPoiTypes} from '../../../../_util/poi';
 import {environment} from '../../../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
-import {Subscription} from 'rxjs';
 import {TrailGeneratorService} from '../../../../service/trail-generator.service';
 import {SnowGeneratorService} from '../../../../service/snow-generator.service';
 import {MarkerService} from '../../../../factory/marker.service';
-
-declare const SVG: any;    // fixes SVGjs bug
 import {Mile} from '../../../../type/mile';
 import {User} from '../../../../type/user';
 import {Poi} from '../../../../type/poi';
@@ -19,6 +17,9 @@ import {Snowpoint} from '../../../../type/snow';
 import {Waypoint} from '../../../../type/waypoint';
 import {NoteService} from '../../../../service/note.service';
 import {OHLC} from '../../../../type/ohlc';
+import {normalizeElevation} from '../../../../_util/trail';
+
+declare const SVG: any;    // fixes SVGjs bug
 
 @Component({
   selector: 'display-list-item',
@@ -29,7 +30,7 @@ import {OHLC} from '../../../../type/ohlc';
 
 // uses basic for loops for performance
 // TODO: iOS scroll performance issues (jumps backwards during scroll event)
-export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+export class ListItemComponent extends BaseComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('map') map: ElementRef;
 
@@ -53,7 +54,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
   public hasNotes:            boolean;
 
   private _snowData:            Array<Array<Snowpoint>>;
-  private _dynamicSubscriptions: object           = {};
   public settings:              object            = {};
   private _initialized:         boolean;          // can only draw after initialization
 
@@ -77,13 +77,13 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     private _changeDetectorRef: ChangeDetectorRef,
     private _markerFactory: MarkerService,
     private _noteService: NoteService
-  ) {}
+  ) {
+    super();
+  }
 
 
 
-
-
-// LIFECYCLE HOOKS
+  // LIFECYCLE HOOKS
 
   ngOnInit(): void {
 
@@ -176,29 +176,18 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
     }
   }
 
-  ngOnDestroy(): void {
-    for (const key in this._dynamicSubscriptions) {
-      this._removeSubscription(key);
-    }
-  }
-
-
-
-
   // add a poi type subscription to the subscriptionsObject
   private _addSubscription(name: string): void {
 
     const _camelName =  this.createCamelCaseName(name, 'show');
 
-    const _subscription = this._localStorage.observe(_camelName).subscribe(result => {
+    this.addSubscription(_camelName, this._localStorage.observe(_camelName).subscribe(result => {
       this.settings[_camelName] = result;
       if (this._majorPoiTypes.indexOf(name) !== -1) {
         this._hasInvisiblePoi();
       }
       this._drawMap();
-    });
-
-    this._dynamicSubscriptions[name] = _subscription;
+    }));
   }
 
   // get initial poi type saved values, as subscriptions only listen to updates
@@ -206,15 +195,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnChanges, OnDe
 
     const _camelName =  this.createCamelCaseName(name, 'show');
     this.settings[_camelName] = this._localStorage.retrieve(_camelName);
-  }
-
-  private _removeSubscription(name: string): void {
-
-    const _subscription: Subscription = this._dynamicSubscriptions[name];
-
-    if (_subscription) {
-      _subscription.unsubscribe();
-    }
   }
 
   // used to indicate that this mile has more pois than are being shown in elevation profile

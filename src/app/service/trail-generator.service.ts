@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import * as geolib from 'geolib';
-import {OHLC, calculateOHLC} from '../type/ohlc';
+import {OHLC} from '../type/ohlc';
 import {Waypoint} from '../type/waypoint';
 import {Mile} from '../type/mile';
 import {Poi} from '../type/poi';
@@ -14,6 +14,7 @@ import {pointArrayTypeConversion, waypointToWaypoint} from '../_util/leaflet/con
 import {getClosestPointOnLine} from '../_util/math';
 import PositionAsDecimal = geolib.PositionAsDecimal;
 import {Town} from '../type/town';
+import {calculateOHLC} from '../_util/trail';
 
 @Injectable({
   providedIn: 'root'

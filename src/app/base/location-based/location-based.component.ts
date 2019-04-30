@@ -1,5 +1,4 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Subscription} from 'rxjs';
 import {LocationService} from '../../service/location.service';
 import {User} from '../../type/user';
 import {Waypoint} from '../../type/waypoint';
@@ -8,15 +7,17 @@ import {environment} from '../../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
 import {FilesystemService} from '../../service/filesystem.service';
-import {cloneData, sortByKey} from '../../_util/generic';
+import {cloneData} from '../../_util/generic';
 import {Distance} from '../../_util/geolib/distance';
+import {BaseComponent} from '../base/base.component';
 
 @Component({
   selector: 'app-location-based',
   templateUrl: './location-based.component.html',
   styleUrls: ['./location-based.component.sass']
 })
-export class LocationBasedComponent implements OnInit, OnDestroy {
+
+export class LocationBasedComponent extends BaseComponent implements OnInit {
 
   @ViewChild('container') container;
 
@@ -28,13 +29,11 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
   public status:                            string;
   public user:                              User;
   public timestamp:                         number;
-
-  private _locationSubscription:            Subscription;
-  private _locationStatusSubscription:      Subscription;
-  private _centerUserSubscription:          Subscription;
   private _user:                            User;
 
   constructor() {
+
+    super();
 
     // since we're extending this class, we shouldn't inject through the constructor props
     if (LocationService.injector) {
@@ -101,34 +100,27 @@ export class LocationBasedComponent implements OnInit, OnDestroy {
     }
 
     // set up subscriptions
-    this._locationSubscription = this.locationService.location.subscribe(
+    this.addSubscription('location', this.locationService.location.subscribe(
       location => {
         if (location) {
           // this._hikeMile(2);
           this._onLocationChange(location as Position);
         }
-      });
+      }));
 
-    this._locationStatusSubscription = this.locationService.locationStatus.subscribe(
+    this.addSubscription('locationStatus', this.locationService.locationStatus.subscribe(
       status => {
         this.status = status;
         this.onStatusChange(status);
-      });
+      }));
 
-    this._centerUserSubscription = this.locationService.centerUser.subscribe(trigger => {
+    this.addSubscription('centerUser', this.locationService.centerUser.subscribe(trigger => {
       if (trigger !== 0) {
         this.centerOnUser();
       }
-    })
+    }));
+
   }
-
-  ngOnDestroy() {
-
-    this._locationSubscription.unsubscribe();
-    this._locationStatusSubscription.unsubscribe();
-    this._centerUserSubscription.unsubscribe();
-  }
-
 
 
 

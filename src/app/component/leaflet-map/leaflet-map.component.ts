@@ -35,8 +35,7 @@ import {latLngToWaypoint, waypointToLatLng} from '../../_util/leaflet/converter'
 import {distanceInMilesFeet} from '../../_util/math';
 import {NoteService} from '../../service/note.service';
 import {createGridLayer, createMapTileLayer} from '../../_util/leaflet/layer';
-import {clearTimeOut, setTimeOut, TimerObj} from '../../_util/timer';
-import {Subscription} from 'rxjs';
+import {clearTimeOut, TimerObj} from '../../_util/timer';
 import {Distance} from '../../_util/geolib/distance';
 import {DynamicComponentManager} from './elements/dynamic-component-manager';
 import {Town} from '../../type/town';
@@ -100,7 +99,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _tooltipTimer: TimerObj;
 
   private _overlayElements: Array<any>;
-  private _notesSubscription: Subscription;
 
   constructor(
     private _route:                 ActivatedRoute,
@@ -128,7 +126,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._animateMap = this._localStorageService.retrieve('animateMap');
     this._trailLength = this._trailGenerator.getTrailData().miles.length;
 
-    this._notesSubscription = this._noteService.noteUpdateObserver.subscribe(function(update) {
+    this.addSubscription('notes', this._noteService.noteUpdateObserver.subscribe(function(update) {
 
       if (update === 'added') {
 
@@ -144,7 +142,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         const _deletedNote: Poi = _self._noteService.getLastNote();
         _self._removeMarkerByPoiId(_deletedNote.id);
       }
-    });
+    }));
   }
 
   ngOnChanges(changes: SimpleChanges): void {

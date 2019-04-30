@@ -6,13 +6,13 @@ export const environment = {
   version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
 
   // FILES
-    // PRODUCTION SERVER:
-    // appDomain: 'https://storage.googleapis.com/',
-    // fileBaseUrl: 'just-hike/',
+  // PRODUCTION SERVER:
+  // appDomain: 'https://storage.googleapis.com/',
+  // fileBaseUrl: 'just-hike/',
 
-    // TEST SERVER:
-    appDomain: 'https://hike.frankdouwes.com/',
-    fileBaseUrl: 'files/',
+  // TEST SERVER:
+  appDomain: 'https://hike.frankdouwes.com/',
+  fileBaseUrl: 'files/',
 
   mailto: 'https://hike.frankdouwes.com/scripts/mailto.php',       // TODO: BETA only
 

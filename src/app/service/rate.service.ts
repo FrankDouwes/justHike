@@ -1,4 +1,4 @@
-import {Injectable, OnDestroy, OnInit} from '@angular/core';
+import {Injectable, OnDestroy} from '@angular/core';
 import {Waypoint} from '../type/waypoint';
 import {Rating} from '../type/rating';
 import {Observable, Subscription} from 'rxjs';
@@ -91,7 +91,7 @@ export class RateService implements OnDestroy {
 
     if (this._hasInternet) {
 
-      // http
+      // TODO: http
       // should probably use a downloader for this...
 
       // result = updated rating

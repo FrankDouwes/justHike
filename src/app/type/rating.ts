@@ -4,6 +4,7 @@ import {getPoiTypeByType} from '../_util/poi';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {share} from 'rxjs/operators';
 
+// TODO: split interfaces from classes for JSON stringify/parsing
 export class Score {
 
   private _score: Array<number>  = [];      // max. the last 10 ratings

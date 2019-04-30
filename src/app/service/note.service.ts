@@ -2,13 +2,13 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from './trail-generator.service';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
-import {Poi} from '../type/poi';
 import {share} from 'rxjs/operators';
 import {Trail} from '../type/trail';
 import {cloneData} from '../_util/generic';
 import {HttpClient} from '@angular/common/http';
 import {ConnectionService} from './connection.service';
 import {environment} from '../../environments/environment.prod';
+import {Note} from '../type/note';
 
 @Injectable({
   providedIn: 'root'
@@ -41,8 +41,8 @@ export class NoteService implements OnDestroy {
   private _connectionSubscription: Subscription;
 
   private _notesLibrary: object;
-  private _notes: Array<Poi>;
-  private _lastNote: Poi;         // this is the last note an operation was performed on (will also hold the last deleted note)
+  private _notes: Array<Note>;
+  private _lastNote: Note;         // this is the last note an operation was performed on (will also hold the last deleted note)
   private _uploadObserver: Observable<string>;
   private _uploadSubscription: Subscription;
   private _previouslyOffline = false;
@@ -97,7 +97,7 @@ export class NoteService implements OnDestroy {
   }
 
   // notes are added 1 at a time, unless there are no notes (initial run)
-  private _parseNotes(notes: Array<Poi>): void {
+  private _parseNotes(notes: Array<Note>): void {
 
     if (!notes || notes.length < 1) {
       return;
@@ -119,12 +119,12 @@ export class NoteService implements OnDestroy {
     }
   }
 
-  private _addNotesToLib(notes: Array<Poi>): void {
+  private _addNotesToLib(notes: Array<Note>): void {
 
     const _length = notes.length;
     for (let i = 0; i < _length; i++) {
 
-      const _note: Poi = notes[i];
+      const _note: Note = notes[i];
       const _typeLib: object = this._notesLibrary[_note.belongsToType];
 
       if (_typeLib) {
@@ -147,7 +147,7 @@ export class NoteService implements OnDestroy {
   }
 
   // get notes based on a given type and id (of that type)
-  public getNotes(type: string, id: number): Array<Poi> {
+  public getNotes(type: string, id: number): Array<Note> {
 
     if (!this._notesLibrary) {
       return;
@@ -157,22 +157,22 @@ export class NoteService implements OnDestroy {
   }
 
   // get the Poi that was last added to the library
-  public getLastNote(): Poi {
+  public getLastNote(): Note {
     return this._lastNote;
   }
 
   // TODO: double loop, a fetch of new data might be faster with lots of notes?
   public deleteNote(noteId: number, type: string, id: number): void {
 
-    const _group: Array<Poi> = this._notesLibrary[type][id];
+    const _group: Array<Note> = this._notesLibrary[type][id];
     let _length = _group.length;
     for (let i = 0; i < _length; i++) {
 
-      const _note: Poi = _group[i];
+      const _note: Note = _group[i];
 
       if (_note.id === noteId) {
 
-        this._lastNote = cloneData(_note) as Poi;
+        this._lastNote = cloneData(_note) as Note;
 
         this._notesLibrary[type][id].splice(i, 1);
         break;
@@ -182,7 +182,7 @@ export class NoteService implements OnDestroy {
     _length = this._notes.length;
     for (let j = 0; j < _length; j++) {
 
-      const _note: Poi = this._notes[j];
+      const _note: Note = this._notes[j];
 
       if (_note.id === noteId) {
         this._notes.splice(j, 1);
@@ -215,7 +215,7 @@ export class NoteService implements OnDestroy {
     this._parseNotes(this._notes);
   }
 
-  public saveNote(note: Poi): void {
+  public saveNote(note: Note): void {
 
     if (!this._notes) {
       this._notes = [];
@@ -233,7 +233,7 @@ export class NoteService implements OnDestroy {
   }
 
   // easier to sort by distance (poi list)
-  public getFlatNotesArray(): Array<Poi> {
+  public getFlatNotesArray(): Array<Note> {
     return this._notes;
   }
 
@@ -251,7 +251,7 @@ export class NoteService implements OnDestroy {
 
     if (this._localStorage.retrieve('shareNotes') && this._notes) {
 
-      const _shareableNotes: Array<Poi> = this._gatherShareableNotes();
+      const _shareableNotes: Array<Note> = this._gatherShareableNotes();
 
       // upload
       if (_shareableNotes.length > 0) {
@@ -295,7 +295,7 @@ export class NoteService implements OnDestroy {
 
   private _clearShareableNotes(): void {
 
-    this._notes.forEach(function(note: Poi) {
+    this._notes.forEach(function(note: Note) {
       if (note.share) {
         note.share = false;
       }
@@ -307,20 +307,20 @@ export class NoteService implements OnDestroy {
     this._localStorage.clear('shareNotes');
   }
 
-  private _gatherShareableNotes(): Array<Poi> {
+  private _gatherShareableNotes(): Array<Note> {
 
-    const _shareableNotes: Array<object> = [];
+    const _shareableNotes: Array<Note> = [];
 
     // run through all data and collect notes that need sharing (duplicates)
-    this._notes.forEach(function(note: Poi) {
+    this._notes.forEach(function(note: Note) {
 
       if (note.share) {
 
-        const _clone: object = cloneData(note);
+        const _clone: Note = cloneData(note) as Note;
         _shareableNotes.push(_clone);
       }
     });
 
-    return _shareableNotes as Array<Poi>;
+    return _shareableNotes as Array<Note>;
   }
 }

@@ -1,23 +1,15 @@
-import {
-  Component,
-  Input,
-  OnInit,
-  ViewChild,
-  OnChanges,
-  SimpleChanges,
-  Output,
-  EventEmitter,
+import {Component, Input, OnInit, ViewChild, OnChanges, SimpleChanges, Output, EventEmitter,
   ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy
 } from '@angular/core';
-import { LocationBasedComponent } from '../../base/location-based/location-based.component';
+import {LocationBasedComponent} from '../../base/location-based/location-based.component';
 
-import {BehaviorSubject, Subscription} from 'rxjs';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import {BehaviorSubject} from 'rxjs';
+import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 
-import { Mile } from '../../type/mile';
-import { Poi } from '../../type/poi';
-import { User } from '../../type/user';
-import { LocalStorageService } from 'ngx-webstorage';
+import {Mile} from '../../type/mile';
+import {Poi} from '../../type/poi';
+import {User} from '../../type/user';
+import {LocalStorageService} from 'ngx-webstorage';
 import {NoteService} from '../../service/note.service';
 
 @Component({
@@ -52,8 +44,6 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   private _staticPoisArray:           Array<any>  = [];
   private _userIndex:                 number;
-  private _notesSubscription: Subscription;
-  private _dataSubscription: Subscription;
 
   constructor(
     private _localStorage: LocalStorageService,
@@ -72,12 +62,12 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     this.itemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / this._visibleItemCount);
 
-    this._dataSubscription = this.combinedData.subscribe(
+    this.addSubscription('data', this.combinedData.subscribe(
       data => {
         this._dataLength = data.length;
-      });
+      }));
 
-    this._notesSubscription = this._noteService.noteUpdateObserver.subscribe(function(update) {
+    this.addSubscription('note', this._noteService.noteUpdateObserver.subscribe(function(update) {
       if (update === 'added') {
 
         const _lastAddedNote: Poi = _self._noteService.getLastNote();
@@ -99,7 +89,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
           }
         }
       }
-    });
+    }));
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -116,16 +106,6 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   ngOnDestroy() {
     super.ngOnDestroy();
-
-    if (this._dataSubscription) {
-      this._dataSubscription.unsubscribe();
-      this._dataSubscription = null;
-    }
-
-    if (this._notesSubscription) {
-      this._notesSubscription.unsubscribe();
-      this._notesSubscription = null;
-    }
   }
 
   private setup(): void {

@@ -14,13 +14,14 @@ import {OrientationService} from '../../service/orientation.service';
 import {SequentialResolverService} from '../../service/sequential-resolver.service';
 import {cloneData} from '../../_util/generic';
 import {Waypoint} from '../../type/waypoint';
+import {BaseComponent} from '../../base/base/base.component';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.sass']
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent extends BaseComponent implements OnInit {
 
   // public compass: number;
 
@@ -44,7 +45,9 @@ export class AdminComponent implements OnInit {
     private _loaderService: LoaderService,
     // private _orientationService: OrientationService,
     private _sequentialResolver: SequentialResolverService
-  ) { }
+  ) {
+    super();
+  }
 
   ngOnInit() {
 
@@ -85,7 +88,7 @@ export class AdminComponent implements OnInit {
 
     this.trailDataStateClassName = '';
 
-    this._getRawData().subscribe( data => {
+    this.addSubscription('rawTrailData', this._getRawData().subscribe( data => {
 
       const _trailMeta: TrailMeta = data[0];
       const _dataOffset: number = (_trailMeta.parts) ? _trailMeta.parts - 1 : 0;
@@ -102,13 +105,11 @@ export class AdminComponent implements OnInit {
         _waypointData = data[1];
       }
 
-      console.log(data);
-
       const _parsedData = this._trailService.parseTrailData(data[0], _waypointData, data[2 + _dataOffset], data[3 + _dataOffset], data[4 + _dataOffset], Number(this.selectedDirection));
 
       this._generatedData = _parsedData;
       this.trailDataStateClassName = 'generated';
-    });
+    }));
   }
 
   private _getRawData(): Observable<any> {
@@ -211,6 +212,7 @@ export class AdminComponent implements OnInit {
     this._localStorageService.store('disableSimulation', !(_current))
   }
 
+  // TODO: does not work on all devices...
   public sendAllNotes(): void {
     const _notes = this._localStorageService.retrieve(this._trailGeneratorService.getTrailData().abbr + '_notes');
     window.open('mailto:frankdouwes@gmail.com?subject=Hello there&body=' + _notes);

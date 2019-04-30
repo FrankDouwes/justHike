@@ -11,6 +11,7 @@ import {NoteService} from '../../../service/note.service';
   styleUrls: ['./marker-dialog.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class MarkerDialogComponent implements OnInit, OnDestroy {
 
   public poiTypes:  Array<PoiType> = [];

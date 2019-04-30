@@ -10,7 +10,7 @@ import {Component, EventEmitter, OnDestroy, OnInit, Output} from '@angular/core'
 // used for forms that require an app reload on change
 export class SettingsPanelComponent implements OnInit, OnDestroy {
 
-  @Output() onSettingsChanged: EventEmitter<boolean> = new EventEmitter()
+  @Output() onSettingsChanged: EventEmitter<boolean> = new EventEmitter();
 
   public settingsChanged: boolean = false;
 
@@ -19,7 +19,8 @@ export class SettingsPanelComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   ngOnDestroy(): void {
-   this.validate();
+    this.onSettingsChanged = null;
+    this.validate();
   }
 
   protected invalidate(): void {

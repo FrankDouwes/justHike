@@ -52,7 +52,7 @@ export class TrailResolverService implements Resolve<any> {
 
         return this._trailService.getPreParsedTrailData(this._activeTrailId, _direction).pipe(
 
-          take(1),
+          take(1),                // closes subscription
           switchMap(data => {
 
             if (data) {

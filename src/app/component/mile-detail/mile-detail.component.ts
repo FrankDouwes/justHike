@@ -4,7 +4,7 @@ import {Trail} from '../../type/trail';
 import {Waypoint} from '../../type/waypoint';
 import {LocalStorageService} from 'ngx-webstorage';
 import {LocationService} from '../../service/location.service';
-import {Subscription} from 'rxjs';
+import {BaseComponent} from '../../base/base/base.component';
 
 @Component({
   selector: 'app-mile-detail',
@@ -12,7 +12,7 @@ import {Subscription} from 'rxjs';
   styleUrls: ['./mile-detail.component.sass']
 })
 
-export class MileDetailComponent implements OnInit, OnDestroy {
+export class MileDetailComponent extends BaseComponent implements OnInit {
 
   public routedMile:              number;
   public trailData:               Trail;
@@ -24,14 +24,13 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   public visibleMileRange:        any;          // the visible mile range (in the poi list)
   public drawRange:               any;          // the range thats actually rendered
 
-  private _locationSubscription:  Subscription;
-
   constructor(
     private _localStorage: LocalStorageService,
     private _locationService: LocationService,
     private _route: ActivatedRoute,
     private _router: Router,
   ) {
+    super();
   }
 
 
@@ -39,44 +38,36 @@ export class MileDetailComponent implements OnInit, OnDestroy {
   // LIFECYCLE HOOKS
 
   ngOnInit(): void {
+    this.isNobo = (this._localStorage.retrieve('direction') === 0);
+    this._addSubscriptions();
+  }
+
+
+
+  // SUBSCRIPTIONS
+
+  private _addSubscriptions(): void {
 
     const _self = this;
 
     // get miles data based on route id
     this.routedMile = (this._route.snapshot) ? Number(this._route.snapshot.paramMap.get('id')) : 0;
 
-    console.log(this.routedMile);
-
-    this._route.data.subscribe(result => {
+    this.addSubscription('routeData', this._route.data.subscribe(result => {
         this.trailData = result.data['trail'];
         this._setMapData(this.routedMile);
       }
-    );
+    ));
 
-    this._locationSubscription = this._locationService.locationStatus.subscribe(function(result) {
+    this.addSubscription('location', this._locationService.locationStatus.subscribe(function(result) {
       _self.isTracking = (result === 'tracking');
-    })
-
-    this.isNobo = (this._localStorage.retrieve('direction') === 0);
-    //
-    // this._screenModeSubscription = this._screenModeService.screenModeChangeObserver.subscribe(function(screenMode) {
-    //
-    //   if (_self._screenMode !== screenMode) {
-    //     console.log('screenmode changed');
-    //     _self._screenMode = screenMode;
-    //     _self._changeDetector.markForCheck();
-    //   }
-    // })
+    }));
   }
 
-  ngOnDestroy(): void {
-    if (this._locationSubscription) {
-      this._locationSubscription.unsubscribe();
-    }
-  }
 
 
   // EVENTS
+
   public onScrollTo(data: any): void {
 
     console.log('on scroll to', data.mileId);

@@ -1,16 +1,16 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
 import {Snow} from '../../type/snow';
 import {LoaderService} from '../../service/loader.service';
-import {LocalStorageService} from 'ngx-webstorage';
+import {BaseComponent} from '../../base/base/base.component';
 
 @Component({
   selector: 'app-elevation-profile',
   templateUrl: './elevation-profile.component.html',
   styleUrls: ['./elevation-profile.component.sass']
 })
-export class ElevationProfileComponent implements OnInit {
+export class ElevationProfileComponent extends BaseComponent implements OnInit {
 
   public visibleRange:  object;
   public resize:        object;
@@ -22,15 +22,17 @@ export class ElevationProfileComponent implements OnInit {
   constructor(
     private _route: ActivatedRoute,
     private _loaderOverlay: LoaderService)
-  {}
+  {
+    super();
+  }
 
   ngOnInit(): void {
-    this._route.data.subscribe(result => {
+    this.addSubscription('routeData', this._route.data.subscribe(result => {
         this.trailData = result.data['trail'];
         this.snowData = result.data['snow'];
         this._loaderOverlay.hideOverlay();
       }
-    );
+    ));
   }
 
   // EVENT HANDLERS

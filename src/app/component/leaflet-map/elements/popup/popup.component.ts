@@ -78,7 +78,7 @@ export class PopupComponent implements OnInit {
       anchorPoint:      _anchorPoint,
       belongsTo:        this.belongsTo,
       belongsToType:    'mile'
-    }
+    };
 
     this._dialogFactory.openDialog('note', _dialogProperties, _callback);
   }

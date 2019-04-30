@@ -1,9 +1,8 @@
-import { Component, OnInit, AfterViewInit, OnChanges, OnDestroy, Input, ViewChild,
+import { Component, OnInit, AfterViewInit, OnChanges, Input, ViewChild,
   SimpleChanges, EventEmitter, Output, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
 
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {ActivatedRoute, Router} from '@angular/router';
-import {Subscription} from 'rxjs';
 import {LocationBasedComponent} from '../../../base/location-based/location-based.component';
 import {LocalStorageService} from 'ngx-webstorage';
 import {ScreenModeService} from '../../../service/screen-mode.service';
@@ -21,7 +20,7 @@ import {Trail} from '../../../type/trail';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
+export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('background') background: ElementRef;
   @ViewChild('backgroundFlat') backgroundFlat: ElementRef;
@@ -50,11 +49,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   private _initialIndex       = 0;
   private _isCentered:        boolean;
   private _status             = 'idle';
-
-  private _parallaxSubscription: Subscription;
   private _parallaxEnabled: boolean;
-
-  private _screenModeSubscription: Subscription;
 
   constructor(
     private _router:                    Router,
@@ -83,7 +78,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     this.cacheSize = Math.floor(this.trailData.miles.length / 10);
 
-    this._setupEventListeners();
+    this._setupSubscriptions();
   }
 
   ngAfterViewInit() {
@@ -106,24 +101,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
           this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
         }
       }
-    }
-  }
-
-  ngOnDestroy() {
-    super.ngOnDestroy();
-
-    if (this._parallaxEnabled) {
-      window.removeEventListener('scroll', this._onScrollEvent.bind(this), true);
-    }
-
-    if (this._parallaxSubscription) {
-      this._parallaxSubscription.unsubscribe();
-      this._parallaxSubscription = null;
-    }
-
-    if (this._screenModeSubscription) {
-      this._screenModeSubscription.unsubscribe();
-      this._screenModeSubscription = null;
     }
   }
 
@@ -167,21 +144,21 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
 // EVENTS & HANDLERS
 
-  private _setupEventListeners(): void {
+  private _setupSubscriptions(): void {
 
     const _self = this;
-    this.toggleParallax(this._localStorageService.retrieve('parallaxEnabled'));
-    this._parallaxSubscription = this._localStorageService.observe('parallaxEnabled').subscribe(function(result) {
-      _self.toggleParallax(result);
-    });
 
-    // redraw on highContrast or nightHike mode
-    this._screenModeSubscription = this._screenMode.screenModeChangeObserver.subscribe(function(result) {
+    this.toggleParallax(this._localStorageService.retrieve('parallaxEnabled'));
+    this.addSubscription('parallax', this._localStorageService.observe('parallaxEnabled').subscribe(function(result) {
+      _self.toggleParallax(result);
+    }));
+
+    this.addSubscription('screenMode', this._screenMode.screenModeChangeObserver.subscribe(function(result) {
       if (_self.scrollViewport) {
         _self.update = new Date().getTime();
         _self._changeDetector.markForCheck();
       }
-    });
+    }));
   }
 
   // parralax effect seems to slow down iOS a lot, optional,
@@ -312,9 +289,9 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     // Listen for scroll events (angular "events" will not do!), needs to run on window for ios
     if (this._parallaxEnabled && !enable) {
-      window.removeEventListener('scroll', this._onScrollEvent.bind(this), true);
+      this.removeEventListener(window, 'scroll');
     } else if (!this._parallaxEnabled && enable) {
-      window.addEventListener('scroll', this._onScrollEvent.bind(this), true);
+      this.addEventListener(window, 'scroll', this._onScrollEvent.bind(this), true);
     }
 
     this._parallaxEnabled = enable;
