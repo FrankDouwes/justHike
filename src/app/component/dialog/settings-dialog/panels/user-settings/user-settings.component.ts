@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {MatSelectChange} from '@angular/material';
 import {SettingsPanelComponent} from '../../../../../base/settings-panel/settings-panel.component';
 import {LocalStorageService} from 'ngx-webstorage';
+import {getUUID} from '../../../../../_util/cordova';
 
 @Component({
   selector: 'user-settings',
@@ -13,6 +14,7 @@ export class UserSettingsComponent extends SettingsPanelComponent implements OnI
   public direction: number;       // 0: NOBO, 1: SOBO
   public userName: string;
   public directionList: Array<object> = [{id: 0, label: 'Northbound (NOBO)'}, {id: 1, label: 'Southbound (SOBO)'}];
+  public UUID: string;
 
   constructor(
     private _localStorage: LocalStorageService
@@ -22,6 +24,8 @@ export class UserSettingsComponent extends SettingsPanelComponent implements OnI
 
   ngOnInit() {
     this.direction = this._localStorage.retrieve('direction');
+
+    this.UUID = getUUID();
 
     const _savedName: string = this._localStorage.retrieve('userName');
     if (_savedName) {

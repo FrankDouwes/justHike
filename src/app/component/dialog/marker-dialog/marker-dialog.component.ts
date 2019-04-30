@@ -38,6 +38,11 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
 
       const _poiData = getPoiTypeByType(poi);
 
+      if (!_poiData) {
+        // TODO: a bug in cottonwood creek below lake morena (PCT), seems to be a blank poi in data...
+        return;
+      }
+
       if(_poiData.rateable && !_self.rateable) {
         _self.rateable = true;
       }

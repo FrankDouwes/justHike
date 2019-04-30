@@ -10,9 +10,10 @@
     "author": "Apache Cordova Team",
     "license": "Apache-2.0",
     "dependencies": {
-        "cordova-android": "^7.1.4",
+        "cordova-android": "^8.0.0",
         "cordova-browser": "^5.0.4",
         "cordova-ios": "^5.0.0",
+        "cordova-plugin-device": "^2.0.2",
         "cordova-plugin-device-orientation": "^2.0.1",
         "cordova-plugin-dialogs": "^2.0.1",
         "cordova-plugin-downloader": "0.0.4",
@@ -37,12 +38,13 @@
             "cordova-plugin-dialogs": {},
             "cordova-plugin-ionic-webview": {
                 "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
-            }
+            },
+            "cordova-plugin-device": {}
         },
         "platforms": [
-            "android",
             "ios",
-            "browser"
+            "browser",
+            "android"
         ]
     }
 }

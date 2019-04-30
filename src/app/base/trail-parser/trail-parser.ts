@@ -101,9 +101,8 @@ export class TrailParser {
     const _length = this.findReplaceArray.length;
 
     for (let i = 0; i < _length; i++) {
-      input = input.replace(this.findReplaceArray[i].find, this.findReplaceArray[i].replace);
+      input = input.split(this.findReplaceArray[i].find).join(this.findReplaceArray[i].replace);
     }
-
     return input;
   }
 

@@ -63,8 +63,12 @@ export class PCTData extends TrailParser {
     trailData.forEach(function(trailString: string, index: number) {
 
       trailString = _self.convertToWaypointString(trailString);
-      const trailAsJson: JSON  = _self.x2js.xml2js(trailString);
 
+      console.log(trailString);
+
+      const trailAsJson: JSON = _self.x2js.xml2js(trailString);
+
+      console.log(trailAsJson);
       // get just the main trail data, ignore side-trails (for now)
       if (!Array.isArray(trailAsJson['gpx']['trk'])) {
         // convert to array with 1 track

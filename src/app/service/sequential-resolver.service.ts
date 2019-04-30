@@ -6,13 +6,14 @@ import {FilesystemService} from './filesystem.service';
 import {environment} from '../../environments/environment.prod';
 import {LocalStorageService} from 'ngx-webstorage';
 import {getMajorPoiTypes} from '../_util/poi';
-import {getCordova, setConnection, setCordova, setDialogs, setScreen, setZip} from '../_util/cordova';
+import {getCordova, setConnection, setCordova, setDevice, setDialogs, setScreen, setZip} from '../_util/cordova';
 
 // cordova plugins
 declare let cordova: any;
 declare let screen: any;
 declare let zip: any;
 declare let Connection: any;
+declare let device: any;
 
 @Injectable({
   providedIn: 'root'
@@ -100,6 +101,7 @@ export class SequentialResolverService implements Resolve<any> {
       // setup cordova helpers
       if (cordova && !getCordova()) {
         setCordova(cordova);
+        setDevice(device);
         setScreen(screen);
         setConnection(Connection);
         setZip(zip);

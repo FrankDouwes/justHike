@@ -39,6 +39,7 @@ import {clearTimeOut, TimerObj} from '../../_util/timer';
 import {Distance} from '../../_util/geolib/distance';
 import {DynamicComponentManager} from './elements/dynamic-component-manager';
 import {Town} from '../../type/town';
+import * as geolib from "geolib";
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -190,6 +191,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _setupMap(): void {
 
+    const _self = this;
+
     // no data, no map
     if (!this.trailGenerator.getTrailData()) {
       console.log('no map data');
@@ -231,8 +234,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // TODO: temp
     // draw campo
     if (this._trailGenerator.getTrailData().towns) {
-      this._drawCampo(this._trailGenerator.getTrailData().towns[0]);
+      this._drawTown(this._trailGenerator.getTrailData().towns[0]);
     }
+
+    this._trailGenerator.getTrailData().towns.forEach(function(town: Town) {
+      _self._drawTown(town);
+    })
   }
 
 
@@ -240,7 +247,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
 
   // draw pois
-  private _drawCampo(town: Town): void {
+  private _drawTown(town: Town): void {
 
     const _towns: Array<any> = [];
 
@@ -248,6 +255,31 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _markerGroup = L.featureGroup(_towns);
     _markerGroup.addTo(this._map);
+
+    // draw line from anchor point in direction of town
+    if (town.anchorPoint) {
+
+
+      let _distance: number = geolib.getDistance(waypointToLatLng(town.centerPoint), waypointToLatLng(town.anchorPoint))
+
+      // only draw guide if trail is over a mile away
+      // max guide length is 0.2mi
+      if (_distance < environment.MILE) {
+        return;
+      } else {
+        _distance = ((_distance / 8) > environment.MILE) ? environment.MILE : _distance / 8;
+      }
+
+      const _heading = Math.atan2(town.centerPoint.longitude - town.anchorPoint.longitude, town.centerPoint.latitude - town.anchorPoint.latitude) * 180 / Math.PI;
+
+      const _point: Waypoint = this._createPoint(town.anchorPoint, _heading, _distance);
+
+      console.log(_point, town.anchorPoint);
+
+      const _guide = this._createGuide(waypointToLatLng(town.anchorPoint), waypointToLatLng(_point), false, true, 'rgb(0, 255, 0)');
+      _guide[0].addTo(this._map);
+      _guide[1].addTo(this._map);
+    }
   }
 
   private _assembleTownMarker(town: Town): void {
@@ -1041,6 +1073,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _distance = (environment.MILE / 8) * _distancePerc;
 
+    console.log(_distance);
+
     const _point: Waypoint = this._createPoint(_xPoint, _angle, _distance);
 
     const _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + (mile.id - 1) + '</div>'});
@@ -1056,7 +1090,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   }
 
   // create a point based on distance/angle of another point
-  private _createPoint(point: Waypoint, angle: number, kms: number): Waypoint {
+  private _createPoint(point: Waypoint, angle: number, meters: number): Waypoint {
 
     const toRad = function(deg: number) {
       return deg * Math.PI / 180;
@@ -1066,7 +1100,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       return rad * 180 / Math.PI;
     }
 
-    const dist = (kms / 1000) / 6371;
+    const dist = (meters / 1000) / 6371;
     angle = toRad(angle);
 
     const lat1 = toRad(point.latitude), lon1 = toRad(point.longitude);

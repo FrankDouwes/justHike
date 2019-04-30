@@ -45,7 +45,6 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-
 <b>ng build</b> > <b>cd mobile</b> > <b>cordova build android</b> (might have to add platform first (<b>cordova platform add</b>))
 
 or

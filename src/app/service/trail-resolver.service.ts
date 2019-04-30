@@ -12,6 +12,7 @@ import { SnowGeneratorService } from './snow-generator.service';
 import { Snow } from '../type/snow';
 import { reverseSnow } from '../_util/snow';
 import { DownloadService } from './download.service';
+import {RateService} from './rate.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +32,8 @@ export class TrailResolverService implements Resolve<any> {
     private _loaderService: LoaderService,
     private _downloadService: DownloadService,
     private _trailGenerator: TrailGeneratorService,
-    private _snowGenerator: SnowGeneratorService
+    private _snowGenerator: SnowGeneratorService,
+    private _rateService: RateService
   ) {}
 
 
@@ -64,7 +66,7 @@ export class TrailResolverService implements Resolve<any> {
               // if there's snow data, there might not be
               if (data[1]) {
 
-                // parse snow data individually (as it's a seperate update/download)
+                // parse snow data individually (as it's a separate update/download)
                 this._cachedSnow = data[1] as Snow;
                 this._snowGenerator.setSnowData(this._cachedSnow);
 
@@ -83,6 +85,11 @@ export class TrailResolverService implements Resolve<any> {
 
               this._trailGenerator.createMileTree(flatMileCoordinates);
               this._loaderService.showMessage('created mile tree');
+
+              // set up the rating system (requires active trail data)
+              this._rateService.setup();
+              this._loaderService.showMessage('initialized rating system');
+
               this._loaderService.hideOverlay();
 
               return of({trail: this._cachedTrail, snow: this._cachedSnow});

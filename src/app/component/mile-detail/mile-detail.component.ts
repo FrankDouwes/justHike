@@ -5,6 +5,8 @@ import {Waypoint} from '../../type/waypoint';
 import {LocalStorageService} from 'ngx-webstorage';
 import {LocationService} from '../../service/location.service';
 import {BaseComponent} from '../../base/base/base.component';
+import {ConnectionService} from '../../service/connection.service';
+import {RateService} from '../../service/rate.service';
 
 @Component({
   selector: 'app-mile-detail',
@@ -28,7 +30,7 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
     private _localStorage: LocalStorageService,
     private _locationService: LocationService,
     private _route: ActivatedRoute,
-    private _router: Router,
+    private _router: Router
   ) {
     super();
   }

@@ -55,6 +55,8 @@ export class RatingComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
 
+    this._saveRating();
+
     // clear subscriptions
     this._ratingSubscriptions.forEach(function(subscription: Subscription) {
       subscription.unsubscribe();
@@ -67,6 +69,7 @@ export class RatingComponent implements OnInit, OnDestroy {
     for (const key in this._ratings) {
       this._ratings[key].destroy();
     }
+
     this._ratings = null;
   }
 
@@ -98,5 +101,17 @@ export class RatingComponent implements OnInit, OnDestroy {
 
   public getRating(type: string): Rating {
     return this._ratings[type];
+  }
+
+  // when a user switches from 'your rating' to 'ratings', save the users rating
+  private _saveRating(): void {
+
+    const _ratingArray: Array<Rating> = [];
+
+    for (const key in this._ratings) {
+      _ratingArray.push(this._ratings[key]);
+    }
+
+    this._rateService.saveRatings(_ratingArray);
   }
 }

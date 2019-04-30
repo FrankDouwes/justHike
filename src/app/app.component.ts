@@ -10,6 +10,7 @@ import {FilesystemService} from './service/filesystem.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConnectionService} from './service/connection.service';
 import {BaseComponent} from './base/base/base.component';
+import {RateService} from './service/rate.service';
 
 @Component({
   selector: 'app-root',
@@ -132,11 +133,15 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   // marker dialog
   private _openMarkerDialog(event): void {
 
+    if (this._markerDialog) {
+      this._markerDialog.close();
+    }
+
     this._markerDialog = this._dialog.open(MarkerDialogComponent, {
       autoFocus: false, width: '85%', height: '75%', data: event.detail
     });
 
-    this._onDialogClose(this._markerDialog, 'markerClosed');
+    this._onDialogClose(this._markerDialog, 'markerClosed_' + event.detail.id);
   }
 
   // settings dialog
@@ -178,6 +183,9 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   private _onDialogClose(dialog: any, name: string, callback?: Function): void {
 
     this.addSubscription(name, dialog.afterClosed().subscribe(result => {
+
+      console.log('close');
+
       this._toggleNavigationVisibility(true);
 
       if (callback) {

@@ -4,40 +4,50 @@ import {getPoiTypeByType} from '../_util/poi';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {share} from 'rxjs/operators';
 
-// TODO: split interfaces from classes for JSON stringify/parsing
+
+// maintains a score based on the last 10 inputs
 export class Score {
 
-  private _score: Array<number>  = [];      // max. the last 10 ratings
-  private _count: number = 0;               // max. 10
-  private _date: number;                    // if date is set, user has added a score.
+  // need to be public for database POST
+  public timestamp: number;               // if date is set, user has added a score
+  public score: Array<number>  = [];      // max. the last 10 ratings
+  public count = 0;                       // max. 10
+  public aspect: string;                  // the 'aspect' (scoreable property within rating. 'flow', 'quality' etc.)
+  public belongsTo: string;               // the ID (waypoint) of a rating this score belongs to
+  public userId?: string;                 // UUID (TODO: v2, accounts)
 
-  constructor(category: string, score: number = 0) {
+  constructor(belongsTo: string, aspect: string, score: number = 0) {
+
+    this.belongsTo = belongsTo;
+    this.aspect = aspect;
 
     // set initial score
     if (score !== 0) {
-      this._score.push(score);
-      this._count = 1;
+      this.score.push(score);
+      this.count = 1;
     }
+
+    this.timestamp = 0;
   }
 
   public addToScore(rating: number, force: boolean = false) {
 
     // remove old user score
-    if (this._date && !force) {
+    if (this.timestamp && !force) {
       this.removeFromScore();
     }
 
     // insert
-    this._date = new Date().getTime();
+    this.timestamp = new Date().getTime();
 
-    if (this._count < 10) {
-      this._count ++;
+    if (this.count < 10) {
+      this.count ++;
     }
 
-    this._score.push(rating);
+    this.score.push(rating);
 
-    if (this._score.length > 10) {
-      this._score.shift();
+    if (this.score.length > 10) {
+      this.score.shift();
     }
   }
 
@@ -46,11 +56,11 @@ export class Score {
     let _total = 0;
     let _count = 0;
 
-    for (let i = 0; i < this._score.length; i++) {
+    for (let i = 0; i < this.score.length; i++) {
 
       const _multiplier = (1 + (i * 0.5));    // make more recent scores count more
 
-      _total += (this._score[i] * _multiplier);
+      _total += (this.score[i] * _multiplier);
       _count += _multiplier;
     }
 
@@ -59,18 +69,18 @@ export class Score {
 
   public getUserScore(): number {
 
-    if (this._date) {
-      return this._score[this._score.length - 1];
+    if (this.timestamp) {
+      return this.score[this.score.length - 1];
     } else {
       return 0;
     }
   }
 
   public removeFromScore(): void {
-    if (this._date) {
-      this._score.pop();
-      this._count --;
-      this._date = null;
+    if (this.timestamp) {
+      this.score.pop();
+      this.count --;
+      this.timestamp = 0;
     }
   }
 }
@@ -93,10 +103,11 @@ export class Rating {
 
   constructor(type: string, location: Waypoint) {
 
+    const _self = this;
+
     this._type = type;
     this.id = type + '_' + Number(location.latitude).toFixed(4) + '_' + Number(location.longitude).toFixed(4);
 
-    const _self = this;
     const _poiType: PoiType = getPoiTypeByType(this._type);
 
     if (!_poiType.rateable) {
@@ -105,7 +116,7 @@ export class Rating {
     }
 
     _poiType.rateBy.forEach(function(aspect: string) {
-      _self._aspects[aspect] = new Score(aspect);
+      _self._aspects[aspect] = new Score(_self.id, aspect);
       console.log('setup aspect', aspect);
     });
 
@@ -162,5 +173,20 @@ export class Rating {
 
   public getAspect(name: string): Score {
     return this._aspects[name];
+  }
+
+  public getAspects(): Array<Score> {
+
+    const _returnArray: Array<Score> = [];
+
+    for (const key in this._aspects) {
+
+      const _score: Score = this._aspects[key];
+      if (_score.timestamp !== 0) {
+        _returnArray.push(this._aspects[key])
+      }
+    }
+
+    return _returnArray;
   }
 }

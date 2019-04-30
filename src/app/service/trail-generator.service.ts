@@ -371,7 +371,6 @@ export class TrailGeneratorService {
   // Get the nearest point (this simply sorts a miles waypoints on distance and returns an array.
   // Not very efficient for larger data sets.
   public findNearestWaypointInMile(waypoint: Waypoint, nearestMile: Mile): Array<Distance> {
-
     return geolib.orderByDistance({latitude: waypoint.latitude, longitude: waypoint.longitude} as geolib.PositionAsDecimal,
       nearestMile.waypoints);
   }

@@ -1,10 +1,11 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {Waypoint} from '../type/waypoint';
-import {Rating} from '../type/rating';
-import {Observable, Subscription} from 'rxjs';
+import {Rating, Score} from '../type/rating';
+import {concat, Observable, of, Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
-import {getTrailMetaDataById} from '../_util/trail-meta';
 import {TrailGeneratorService} from './trail-generator.service';
+import {HttpClient} from '@angular/common/http';
+import {getUUID} from '../_util/cordova';
 
 @Injectable({
   providedIn: 'root'
@@ -13,12 +14,12 @@ import {TrailGeneratorService} from './trail-generator.service';
 
 // Ratings for ratable poi types
 // ratings are stored on local storage and online
-// TODO: check the actual filesize of the data stored locally, if large, possibly save to filesystem instead / or use mongodb?
+// TODO: check the actual filesize of the data stored locally, if large, possibly save to filesystem instead
 // TODO: very much WIP!
 
 export class RateService implements OnDestroy {
 
-  private _lastUpdated: number = new Date().getTime();      // TODO: needs to be stored/fetched
+  private _lastUpdated = 0;               // TODO: needs to be stored/fetched
   private _hasInternet = true;
 
   private _localRatings: Array<Rating>;      // all ratings for the current trail
@@ -28,22 +29,8 @@ export class RateService implements OnDestroy {
 
   constructor(
     private _localStorage: LocalStorageService,
-    private _trailGenerator: TrailGeneratorService) {
-
-    // const items = _fireStore.collection('ratings').valueChanges().subscribe(response => {
-    //   console.log(response);
-    // });
-
-    this._activeTrailSubscription = this._localStorage.observe('activeTrailId').subscribe(trailId => {
-      this._activeTrailAbbr = getTrailMetaDataById(trailId).abbr;
-      this.syncRatingsForTrail(this._activeTrailAbbr, this._lastUpdated);
-    });
-
-    // initial values
-    const _id = this._localStorage.retrieve('activeTrailId');
-    this._activeTrailAbbr = getTrailMetaDataById(_id).abbr;
-    this.syncRatingsForTrail(this._activeTrailAbbr, this._lastUpdated);
-  }
+    private _trailGenerator: TrailGeneratorService,
+    private _http: HttpClient) {}
 
   // LIFECYCLE
 
@@ -52,64 +39,103 @@ export class RateService implements OnDestroy {
     this._activeTrailSubscription = null;
   }
 
+  // requires active trail meta data (runs after loading/parsing trail
+  // - 1. upload all data that needs uploading (offline mode etc.)
+  // - 2. download all new data since last update (TODO: this needs to be limited to the last 10 scores per belongsTo)
+  public setup(): void {
+
+    const _self = this;
+
+    this._activeTrailAbbr = this._trailGenerator.getTrailData().abbr;
+    this._lastUpdated = this._localStorage.retrieve(this._activeTrailAbbr + '_ratings' + '-lastUpdated') || 0;
+
+    this._lastUpdated -= 1000000;
+
+    let runCount = 0;
+
+    const _scoreUpdateObservables = this.syncRatingsForTrail();
+    let _scoreUpdateLength = 1;
+    if (Array.isArray(_scoreUpdateObservables)) {
+      _scoreUpdateLength = _scoreUpdateObservables['length'];
+    }
+
+    // run in sequence
+    concat(
+      _scoreUpdateObservables,
+      this._getRatingsOnline()
+    ).subscribe(function(result) {
+
+      if (runCount === _scoreUpdateLength) {
+
+        _self._lastUpdated = new Date().getTime();
+        _self._localStorage.store(_self._activeTrailAbbr + '_ratings-lastUpdated', _self._lastUpdated);
+      } else {
+        runCount ++;
+      }
+    });
+  }
+
+
   // gets/sets all ratings, since it's a (mostly) offline app, deals with both online/offline files and syncs everything
-  public syncRatingsForTrail(trailAbbr: string, since: number): void {
+  public syncRatingsForTrail(): Array<Observable<Object>> | Observable<Object> {
 
     // get locally stored data
     this._localRatings = this._localStorage.retrieve(this._activeTrailAbbr + '_ratings') || [];
 
-    // if there is no data, it's the first online run (or previously empty db), so we'll fetch all records
-    if (this._localRatings.length === -1) {
-      since = 0;
-    }
+    if (this._hasInternet && this._localRatings.length !== -1) {
 
-    if (this._hasInternet) {
+      const _localUpdates = this._checkForUnsynced();
 
-      if (since !== 0) {
+      if (_localUpdates) {
 
-        const _localUpdates = this._checkForUnsynced();
+        const _postArray: Array<Observable<Object>> = [];
 
-        if (_localUpdates) {
-          // TODO: http update _localUpdates;
+        const _url: string = 'https://just-hike.firebaseio.com/rating/' + this._activeTrailAbbr + '.json';
+        const _length = _localUpdates.length;
+        for (let i = 0; i < _length; i++) {
+          _postArray.push(this._http.post(_url, {test: 'test123'}));
         }
-      }
 
-      const _result = this._getRatingsOnline(trailAbbr, since);
-      if (_result && _result !== 'error') {
-        this._saveRatingsLocally(_result);
-      }
-    }
-  }
+        return _postArray;
 
+      } else {
 
-  // update a single rating, ratings are location and type based
-  public updateRating(type:string, waypoint: Waypoint, data:object): boolean {
-
-    const _rating = data as Rating;
-
-    _rating.id = type + '-' + waypoint.latitude.toFixed(4) + '_' + waypoint.longitude.toFixed(4);
-
-    if (this._hasInternet) {
-
-      // TODO: http
-      // should probably use a downloader for this...
-
-      // result = updated rating
-      const _result: any = '';
-
-      if (_result !== 'error') {
-        this._saveRatingsLocally(_result);
+        return of(null);
       }
 
     } else {
-      this._saveRatingsLocally(_rating, true);
+
+      return of(null);
+    }
+  }
+
+  // whenever a user rates something
+  public saveRatings(ratings: Rating | Array<Rating>): void {
+
+    if (!Array.isArray(ratings)) {
+      ratings = [ratings];
     }
 
-    return true;
+    const _length = ratings.length;
+
+    for (let i = 0; i < _length; i++) {
+
+      const _rating: Rating = ratings[i];
+      const _aspects: Array<Score> = _rating.getAspects();
+
+      const _aspectLength = _aspects.length;
+      for (let j = 0; j < _aspectLength; j++) {
+
+        // incorportae a UUID
+        const _UUID = getUUID();
+        _aspects[j].userId = _UUID;
+        this._saveScoreOnline(_aspects[j]);
+      }
+    }
   }
 
 
-  // gets a rating from local storage (and id = lat_lng)
+  // gets a rating from local storage
   // there's no need to make a separate online call here
   // as the app mostly runs in offline mode and syncRatingsForTrail() is called once the app goes online
   // this way the ratings stay reasonably up to date.
@@ -137,8 +163,17 @@ export class RateService implements OnDestroy {
   }
 
   // get all updated/new ratings online for trail
-  private _getRatingsOnline(trailAbbr: string, since: number): any {
-    return;
+  // this will fetch 'Score' objects that have a 'belongTo' field with a waypointId
+  private _getRatingsOnline(): Observable<Object> {
+
+    const _since = this._lastUpdated;
+    const _trailAbbr = this._activeTrailAbbr;
+
+    const _url: string = 'https://just-hike.firebaseio.com/score/' + _trailAbbr + '.json' +
+      '?orderBy="timestamp"' +
+      '&startAt=' + _since + '';
+
+    return this._http.get(_url);
   }
 
   // markForUpdate means the data still has to be pushed online (but can't be as there is currently no internet)
@@ -208,9 +243,18 @@ export class RateService implements OnDestroy {
     }
   }
 
-  private _setRatingsOnline(ratings: Array<Rating>): void {
+  private _saveScoreOnline(score: Score): void {
 
-    // TODO: save online
+    console.log('WRITING TO ONLINE DB!');
+
+    const _trailAbbr: string = this._trailGenerator.getTrailData().abbr;
+    const _url: string = 'https://just-hike.firebaseio.com/score/' + _trailAbbr + '.json';
+
+    this._http.post(_url, score).subscribe(
+      function(test) {
+        console.log(test);
+      }
+    );
   }
 
   private _writeToLocalStorage(): void {

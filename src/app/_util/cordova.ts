@@ -19,6 +19,22 @@ export function cordovaEnabled(): boolean {
 
 
 
+/* device (general device info) */
+let _device: any
+export function setDevice(device: any): void {
+  _device = device
+}
+
+export function getUUID(): string {
+  if (cordovaEnabled()) {
+    return _device.uuid;
+  } else {
+    return '1234567890';
+  }
+}
+
+
+
 /* screen is used to lock orientation using cordova-plugin-screen-orientation */
 let _screen: any;
 

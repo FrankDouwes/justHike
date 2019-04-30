@@ -48,6 +48,7 @@
     "leaflet.BounceMarker": "git+https://github.com/maximeh/leaflet.bouncemarker.git",
     "leaflet.awesome-markers": "^2.0.5",
     "leaflet.functionaltilelayer": "git+https://github.com/ismyrnow/Leaflet.functionaltilelayer.git",
+    "line-interpolate-points": "^1.0.5",
     "ngx-web-worker": "^7.0.0",
     "ngx-webstorage": "^3.0.2",
     "proj4": "^2.5.0",

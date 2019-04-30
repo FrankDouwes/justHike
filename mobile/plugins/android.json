@@ -7,10 +7,23 @@
     "files": {}
   },
   "installed_plugins": {
+    "cordova-plugin-device": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-device-orientation": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-dialogs": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
     "cordova-plugin-downloader": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
     "cordova-plugin-geolocation": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-ionic-webview": {
+      "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+",
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
     "cordova-plugin-network-information": {
@@ -20,16 +33,6 @@
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
     "cordova-plugin-whitelist": {
-      "PACKAGE_NAME": "hike.frankdouwes.com"
-    },
-    "cordova-plugin-device-orientation": {
-      "PACKAGE_NAME": "hike.frankdouwes.com"
-    },
-    "cordova-plugin-dialogs": {
-      "PACKAGE_NAME": "hike.frankdouwes.com"
-    },
-    "cordova-plugin-ionic-webview": {
-      "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+",
       "PACKAGE_NAME": "hike.frankdouwes.com"
     }
   },
@@ -41,6 +44,9 @@
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
     "es6-promise-plugin": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-splashscreen": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     }
   }

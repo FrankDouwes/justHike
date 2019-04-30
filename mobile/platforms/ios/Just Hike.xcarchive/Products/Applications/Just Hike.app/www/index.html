@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Just Hike</title>
+  <base href="/">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- TODO: not sure if/how much of this is still needed... -->
+  <!--<meta http-equiv="Content-Security-Policy" content="default-src * 'self' file:///*; style-src 'unsafe-inline' 'self' file:///*; script-src 'self' 'unsafe-eval' file:///*">-->
+  <meta name="HandheldFriendly" content="true">
+  <meta name="MobileOptimized" content="width">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="minimum-scale=1, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, target-densitydpi=device-dpi">
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- TODO: NEEDS TO BE LOCAL -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" rel="stylesheet">
+
+</head>
+<body>
+  <app-root></app-root>
+<script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="scripts.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body>
+<!-- Include Cordova script only when needed -->
+<script>
+    console.log(location.protocol);
+    window.addEventListener = function () {
+      EventTarget.prototype.addEventListener.apply(this, arguments);
+    };
+    window.removeEventListener = function () {
+      EventTarget.prototype.removeEventListener.apply(this, arguments);
+    };
+    document.addEventListener = function () {
+      EventTarget.prototype.addEventListener.apply(this, arguments);
+    };
+    document.removeEventListener = function () {
+      EventTarget.prototype.removeEventListener.apply(this, arguments);
+    };
+    document.write('<script src="cordova.js"><\/script>');
+    document.write('<script src="js/index.js"><\/script>');
+</script>
+</html>
