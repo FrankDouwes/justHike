@@ -8,17 +8,19 @@
 
   <div id="rating-panel" *ngFor="let type of rateablePoiTypes">
 
-    <!--<button (click)="score()">test score</button>-->
-
     <h4 *ngIf="(rateablePoiTypes.length > 1)">{{type.label}}</h4>
 
     <!-- toggle between current / add (form)-->
 
-    <div id="rating" *ngFor="let name of type.rateBy">
+    <div id="rating" *ngFor="let name of type.rateBy" #ratingPanel>
 
       <rating-current-score *ngIf="state === 'current'" [label]="name" [score]="getAspect(type.type, name)" [update]="timestamp"></rating-current-score>
       <rating-add-score *ngIf="state === 'add'" [label]="name" [type]="type.type" [rating]="getRating(type.type)"></rating-add-score>
+    </div>
 
+    <div id="warning-overlay">
+      warning
+      <button>click</button>
     </div>
 
   </div>

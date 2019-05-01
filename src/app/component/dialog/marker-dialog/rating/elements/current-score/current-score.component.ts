@@ -43,6 +43,8 @@ export class CurrentScoreComponent implements OnInit, OnChanges {
       }
     }
 
+    console.log(_scoreArray);
+
     return _scoreArray;
   }
 }

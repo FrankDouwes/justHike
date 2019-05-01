@@ -13,3 +13,12 @@ export function sortByKey(array, key) {
 export function cloneData(input: object): object{
   return JSON.parse(JSON.stringify(input));
 }
+
+export function isObjectEmpty(obj:object): boolean {
+  for(const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      return false;
+    }
+  }
+  return true;
+}

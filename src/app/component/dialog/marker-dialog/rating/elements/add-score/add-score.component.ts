@@ -1,5 +1,5 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import {Rating, Score} from '../../../../../../type/rating';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Rating, Score, TotalScore} from '../../../../../../type/rating';
 
 @Component({
   selector: 'rating-add-score',
@@ -14,7 +14,7 @@ export class AddScoreComponent implements OnInit {
   @Input() label: string;
   @Input() rating: Rating;
 
-  public score: Score;
+  public score: TotalScore;
   public scoreArray: Array<string>;
 
   constructor(private _changeDetector: ChangeDetectorRef) {}
@@ -35,11 +35,7 @@ export class AddScoreComponent implements OnInit {
     }
 
     // change score
-    if (_newScore > 0) {
-      this.rating.setAspectRating(this.label, _newScore);
-    } else {
-      this.rating.removeAspectRating(this.label);
-    }
+    this.rating.setAspectRating(this.label, _newScore);
 
     this.setScoreArray();
     this._changeDetector.markForCheck();
@@ -59,7 +55,7 @@ export class AddScoreComponent implements OnInit {
       this.rating.setAspectRating(this.label, _floorScore);
 
     } else {
-      this.rating.removeAspectRating(this.label);
+      this.rating.setAspectRating(this.label, 0);
     }
 
     this.setScoreArray();

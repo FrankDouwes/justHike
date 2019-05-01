@@ -35,7 +35,7 @@ export class TrailService {
 
   // prevent removal of dynamically used imports (tree shaking), see: https://github.com/Microsoft/TypeScript/issues/9191
   // since each dataset has a different source, they all have their own parsing routine, before step 2 (generateMiles() / parseSnow())
-  private _DEMOParser: PCTData = new PCTData();
+  private _DEMOParser: PCTData = new PCTData();   // demo is the first section of the PCT
   private _PCTParser: PCTData = new PCTData();
   private _SHRParser: SHRData = new SHRData();
   // private _parseCDTData:    Function = parseCDTData;
@@ -65,6 +65,7 @@ export class TrailService {
     }
 
     const _metaAsObservable = of(_trailMeta);     // so it can be passed into the forkjoin
+
     _observables.push(_metaAsObservable);
 
     // AT data from the ATC
@@ -78,30 +79,31 @@ export class TrailService {
     const _assetsDir: string = 'assets/data/';
 
     if (_trailMeta.multipart) {
+
       for(let i = 0; i < _trailMeta.parts; i++) {
         const _trailDownloader = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail_' + i + '.dat', {responseType: 'text'});
-        _observables[0] = _trailDownloader;
+        _observables.push(_trailDownloader);
       }
     } else {
       const _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', {responseType: 'text'});
-      _observables[1] = _trail;
+      _observables.push(_trail);
     }
 
     const _poi = this._http.get(_assetsDir + _trailMeta.dataPath + 'poi.dat', {responseType: 'text'});
-    _observables [2] = _poi;
+    _observables.push(_poi);
 
     // snow is an optional data file
     let _snow: Observable<Object>;
     if (_trailMeta.snowVersion) {
       _snow = this._http.get(_assetsDir + _trailMeta.dataPath + 'snow.json', {responseType: 'json'});
-      _observables[3] = _snow;
+      _observables.push(_snow);
     }
 
     // towns is an optional data file
     let _towns: Observable<Object>;
     if (_trailMeta.hasTowns) {
       _towns = this._http.get(_assetsDir + _trailMeta.dataPath + 'towns.json', {responseType: 'json'});
-      _observables[4] = _towns;
+      _observables.push(_towns);
     }
 
     return forkJoin(_observables);

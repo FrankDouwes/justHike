@@ -149,6 +149,10 @@ export class BaseComponent implements OnDestroy {
   }
 
   private _isDOMElement(element: any): boolean {
-    return element instanceof Element || element instanceof HTMLDocument;
+    if (element === window) {
+      return true;
+    } else {
+      return element instanceof Element || element instanceof HTMLDocument;
+    }
   }
 }

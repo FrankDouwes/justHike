@@ -6,23 +6,23 @@ import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from './trail-generator.service';
 import {HttpClient} from '@angular/common/http';
 import {getUUID} from '../_util/cordova';
+import {cloneData, isObjectEmpty} from '../_util/generic';
+import {BaseComponent} from '../base/base/base.component';
+import {ConnectionService} from './connection.service';
 
 @Injectable({
   providedIn: 'root'
 })
 
 
-// Ratings for ratable poi types
-// ratings are stored on local storage and online
-// TODO: check the actual filesize of the data stored locally, if large, possibly save to filesystem instead
-// TODO: very much WIP!
+// Ratings are combined Scores, a water-source (rateable) can be rated on multiple aspects (providing Scores)
+export class RateService extends BaseComponent implements OnDestroy {
 
-export class RateService implements OnDestroy {
+  private _lastUpdated = 0;
+  private _hasInternet = false;
 
-  private _lastUpdated = 0;               // TODO: needs to be stored/fetched
-  private _hasInternet = true;
-
-  private _localRatings: Array<Rating>;      // all ratings for the current trail
+  private _localScores: Array<Score>;         // all scores (aspects of rating)
+  private _localRatings: Array<Rating> = [];  // all ratings for the current trail
 
   private _activeTrailSubscription: Subscription;
   private _activeTrailAbbr: string;
@@ -30,45 +30,83 @@ export class RateService implements OnDestroy {
   constructor(
     private _localStorage: LocalStorageService,
     private _trailGenerator: TrailGeneratorService,
-    private _http: HttpClient) {}
+    private _connectionService: ConnectionService,
+    private _http: HttpClient) {
+    super();
+  }
 
   // LIFECYCLE
 
   ngOnDestroy(): void {
+    super.ngOnDestroy();
     this._activeTrailSubscription.unsubscribe();
     this._activeTrailSubscription = null;
   }
 
   // requires active trail meta data (runs after loading/parsing trail
   // - 1. upload all data that needs uploading (offline mode etc.)
-  // - 2. download all new data since last update (TODO: this needs to be limited to the last 10 scores per belongsTo)
+  // - 2. download all new data since last update
+  // (TODO: this needs to be limited to the last 10 scores per belongsTo, firebase cloud functions...)
   public setup(): void {
 
     const _self = this;
 
     this._activeTrailAbbr = this._trailGenerator.getTrailData().abbr;
-    this._lastUpdated = this._localStorage.retrieve(this._activeTrailAbbr + '_ratings' + '-lastUpdated') || 0;
+    this._lastUpdated = this._localStorage.retrieve(this._activeTrailAbbr + '_scores-lastUpdated') || 0;
 
-    this._lastUpdated -= 1000000;
+    this.addSubscription('connection', this._connectionService.connectionObserver.subscribe(function(result) {
 
+      // internet just became available
+      if (result !== _self._hasInternet && result === true) {
+        _self._hasInternet = result;
+        _self._syncData();
+      } else {
+        _self._hasInternet = result;
+      }
+
+    }))
+  }
+
+  private _syncData(): void {
+
+    const _self = this;
     let runCount = 0;
 
-    const _scoreUpdateObservables = this.syncRatingsForTrail();
+    const _scoreUpdateObservables = this.sendAllScores();
     let _scoreUpdateLength = 1;
     if (Array.isArray(_scoreUpdateObservables)) {
       _scoreUpdateLength = _scoreUpdateObservables['length'];
     }
 
     // run in sequence
-    concat(
+    let _updateSubscription = concat(
       _scoreUpdateObservables,
       this._getRatingsOnline()
     ).subscribe(function(result) {
 
       if (runCount === _scoreUpdateLength) {
 
+        // if new scores have been downloaded, parse them
+        if (result && !isObjectEmpty(result)) {
+
+          const resultArray: Array<Score> = Object.keys(result).map(function(key) {
+
+            if (!result[key].dbId && result[key].userId) {
+              result[key].dbId = key;     // set the firebase id so we can PUT instead of POST to update a users comment
+            }
+
+            return result[key];
+          });
+
+          _self._localScores = _self._localScores.concat(resultArray);
+          _self._writeToLocalStorage();
+        }
+
+        // done getting updates / save timestamp & self destruct
         _self._lastUpdated = new Date().getTime();
-        _self._localStorage.store(_self._activeTrailAbbr + '_ratings-lastUpdated', _self._lastUpdated);
+        _self._localStorage.store(_self._activeTrailAbbr + '_scores-lastUpdated', _self._lastUpdated);
+        _updateSubscription.unsubscribe();
+        _updateSubscription = null;
       } else {
         runCount ++;
       }
@@ -77,12 +115,12 @@ export class RateService implements OnDestroy {
 
 
   // gets/sets all ratings, since it's a (mostly) offline app, deals with both online/offline files and syncs everything
-  public syncRatingsForTrail(): Array<Observable<Object>> | Observable<Object> {
+  public sendAllScores(): Array<Observable<Object>> | Observable<Object> {
 
     // get locally stored data
-    this._localRatings = this._localStorage.retrieve(this._activeTrailAbbr + '_ratings') || [];
+    this._localScores = this._localStorage.retrieve(this._activeTrailAbbr + '_scores') || [];
 
-    if (this._hasInternet && this._localRatings.length !== -1) {
+    if (this._hasInternet && this._localScores.length !== -1) {
 
       const _localUpdates = this._checkForUnsynced();
 
@@ -90,10 +128,16 @@ export class RateService implements OnDestroy {
 
         const _postArray: Array<Observable<Object>> = [];
 
-        const _url: string = 'https://just-hike.firebaseio.com/rating/' + this._activeTrailAbbr + '.json';
+        const _url: string = 'https://just-hike.firebaseio.com/' + this._activeTrailAbbr + '/score.json';
         const _length = _localUpdates.length;
+
         for (let i = 0; i < _length; i++) {
-          _postArray.push(this._http.post(_url, {test: 'test123'}));
+          const _updateObservable: Observable<object> = this._http.post(_url, _localUpdates[i]);
+          _updateObservable.subscribe(function(result) {
+            _localUpdates[i].unsynced = null;
+          });
+
+          _postArray.push(_updateObservable);
         }
 
         return _postArray;
@@ -110,38 +154,40 @@ export class RateService implements OnDestroy {
   }
 
   // whenever a user rates something
-  public saveRatings(ratings: Rating | Array<Rating>): void {
+  public saveRatings(scores: Score | Array<Score>): void {
 
-    if (!Array.isArray(ratings)) {
-      ratings = [ratings];
-    }
+    if (this._hasInternet) {
+      const _scoreObservers: Array<Observable<object>> = [];
 
-    const _length = ratings.length;
-
-    for (let i = 0; i < _length; i++) {
-
-      const _rating: Rating = ratings[i];
-      const _aspects: Array<Score> = _rating.getAspects();
-
-      const _aspectLength = _aspects.length;
-      for (let j = 0; j < _aspectLength; j++) {
-
-        // incorportae a UUID
-        const _UUID = getUUID();
-        _aspects[j].userId = _UUID;
-        this._saveScoreOnline(_aspects[j]);
+      if (!Array.isArray(scores)) {
+        scores = [scores];
       }
+
+      const _length = scores.length;
+
+      for (let i = 0; i < _length; i++) {
+        _scoreObservers.push(this._saveScoreOnline(scores[i]));
+      }
+
+      let count = 0;
+      concat(_scoreObservers).subscribe((result) => {
+
+        count++;
+        if (count === _scoreObservers.length) {
+          this._writeToLocalStorage();
+        }
+      })
+    } else {
+      this._writeToLocalStorage();
     }
   }
 
 
-  // gets a rating from local storage
+  // creates a Rating object, which houses aspects (Scores) that are locally/externally saved.
   // there's no need to make a separate online call here
   // as the app mostly runs in offline mode and syncRatingsForTrail() is called once the app goes online
   // this way the ratings stay reasonably up to date.
   public getRatingById(type: string, location: Waypoint, create: boolean = true): Rating {
-
-    const _trailAbbr: string = this._trailGenerator.getTrailData().abbr;
 
     const _id = type + '_' + Number(location.latitude).toFixed(4) + '_' + Number(location.longitude).toFixed(4);
 
@@ -151,113 +197,138 @@ export class RateService implements OnDestroy {
     for (let i = 0; i < _length; i++) {
       if (this._localRatings[i].id === _id) {
         _rating = this._localRatings[i];
+        _rating.setupObserver();    // important as they're being destroyed
         break;
       }
     }
 
     if (!_rating && create) {
-      _rating = new Rating(type, location);
+      this._getScoresForRating(type, location);
+      _rating = new Rating(type, location, this._getScoresForRating(type, location));
+      this._localRatings.push(_rating);
     }
 
     return _rating;
+  }
+
+  private _getScoresForRating(type: string, location: Waypoint): Array<Score> {
+
+    const id = type + '_' + Number(location.latitude).toFixed(4) + '_' + Number(location.longitude).toFixed(4);
+
+    let _ratingScoresArray: Array<Score>;
+
+    const _length = this._localScores.length;
+    for (let i = 0; i < _length; i++) {
+
+      const _score: Score = this._localScores[i];
+      if (_score.belongsTo === id) {
+
+        if (!_ratingScoresArray) {
+          _ratingScoresArray = [];
+        }
+        _ratingScoresArray.push(_score);
+      }
+    }
+
+    return _ratingScoresArray;
   }
 
   // get all updated/new ratings online for trail
   // this will fetch 'Score' objects that have a 'belongTo' field with a waypointId
   private _getRatingsOnline(): Observable<Object> {
 
-    const _since = this._lastUpdated;
+    let _since = this._lastUpdated || 0;
     const _trailAbbr = this._activeTrailAbbr;
 
-    const _url: string = 'https://just-hike.firebaseio.com/score/' + _trailAbbr + '.json' +
+    const _url: string = 'https://just-hike.firebaseio.com/' + _trailAbbr + '/score.json' +
       '?orderBy="timestamp"' +
       '&startAt=' + _since + '';
 
     return this._http.get(_url);
   }
 
-  // markForUpdate means the data still has to be pushed online (but can't be as there is currently no internet)
-  private _saveRatingsLocally(ratings: Rating | Array<Rating>, markForUpdate: boolean = false): Observable<string> {
+  /* cleans up scores:
+  - filter out duplicates based on timestamp/id
+  - maximum of 10 scores per Rating */
+  private _scoresAsRating(): void {
 
-    if (ratings instanceof Rating) {
-      ratings = [ratings as Rating];
+    const _filteredScores: Array<Score> = [];
+
+    const _length = this._localScores.length;
+    for (let i = 0; i < _length; i++) {
+
     }
-
-    const _length = (ratings as Array<Rating>).length;
-    for (let i = 0; i < _length ; i++) {
-
-      const _rating = ratings[i];
-
-      if (markForUpdate) {
-        _rating.unsynced = true;
-      }
-
-      this._setRatingLocally(_rating);
-      // progress
-    }
-
-    // write everything to local storage
-    this._writeToLocalStorage();
-
-    // done
-    return new Observable();
   }
 
-  // check if there are local updates that need to be synced online
-  private _checkForUnsynced(): Array<Rating> {
+  // check if there are local Scores that need to be synced online (marked unsynced)
+  private _checkForUnsynced(): Array<Score> {
 
-    if (!this._localRatings || this._localRatings.length === -1) {
+    if (!this._localScores || this._localScores.length === -1) {
       return;
     }
 
-    const _ratings = [];
-    const _length = this._localRatings.length;
+    const _scores = [];
+    const _length = this._localScores.length;
     for (let i = 0; i < _length; i++) {
-      if (this._localRatings[i].unsynced) {
-        _ratings.push(this._localRatings[i]);
+      if (this._localScores[i].unsynced) {
+        _scores.push(this._localScores[i]);
       }
     }
 
-    return (_ratings.length > 0) ? _ratings : undefined;
+    return (_scores.length > 0) ? _scores : undefined;
   }
 
-  // sets or updates local rating
-  private _setRatingLocally(rating: Rating): void {
 
-    let _ratingIndex = -1;
+  private _saveScoreOnline(score: Score): Observable<object> {
 
-    // check if rating already exists
-    const _length = this._localRatings.length;
-    for (let i = 0; i < _length; i++) {
-      if (this._localRatings[i].id === rating.id) {
-        _ratingIndex = i;
-        break;
-      }
-    }
-
-    // change rating in local ratings
-    if (_ratingIndex !== -1) {
-      this._localRatings[_ratingIndex] = rating;
-    } else {
-      this._localRatings.push(rating);
-    }
-  }
-
-  private _saveScoreOnline(score: Score): void {
-
-    console.log('WRITING TO ONLINE DB!');
+    const _self = this;
+    let _duplicate: Score = cloneData(score) as Score;
+    _duplicate.unsynced = null;
 
     const _trailAbbr: string = this._trailGenerator.getTrailData().abbr;
-    const _url: string = 'https://just-hike.firebaseio.com/score/' + _trailAbbr + '.json';
+    const _url: string = 'https://just-hike.firebaseio.com/' + _trailAbbr + '/score';
+    const _urlEnd: string = '.json';
 
-    this._http.post(_url, score).subscribe(
-      function(test) {
-        console.log(test);
+    let _scoreQuery: Observable<object>;
+
+    if (_duplicate.dbId && _duplicate.score > 0) {
+
+      // we're updating
+      _scoreQuery = this._http.put(_url + '/' + _duplicate.dbId + _urlEnd, _duplicate);
+    } else if (_duplicate.dbId) {
+
+      // deleting 0 score
+      _scoreQuery = this._http.delete(_url + '/' + _duplicate.dbId + _urlEnd);
+    } else {
+
+      // posting new
+      _scoreQuery = this._http.post(_url + _urlEnd, _duplicate);
+    }
+
+    let _sub = _scoreQuery.subscribe(
+      function(result) {
+
+        score.unsynced = false;
+
+        if (!score.dbId) {
+          score.dbId = result['name'];
+        }
+
+        if (result === null) {
+          _self._localScores.splice(_self._localScores.indexOf(score), 1);
+          score = null;
+        }
+
+        _sub.unsubscribe();
+        _sub = null;
       }
     );
+
+    _duplicate = null;
+    return _scoreQuery;
   }
 
   private _writeToLocalStorage(): void {
-    this._localStorage.store(this._activeTrailAbbr + '_ratings', this._localRatings);
+    this._localStorage.store(this._activeTrailAbbr + '_scores', this._localScores);
   }
 }
