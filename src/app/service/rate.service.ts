@@ -52,6 +52,7 @@ export class RateService implements OnDestroy {
     this._activeTrailAbbr = this._trailGenerator.getTrailData().abbr;
     this._lastUpdated = this._localStorage.retrieve(this._activeTrailAbbr + '_scores-lastUpdated') || 0;
 
+    this._localScores = this._localStorage.retrieve(this._activeTrailAbbr + '_scores')
     this._connectionSubscription = this._connectionService.connectionObserver.subscribe(function(result) {
 
       // internet just became available
@@ -201,7 +202,6 @@ export class RateService implements OnDestroy {
     }
 
     if (!_rating && create) {
-      this._getScoresForRating(type, location);
       _rating = new Rating(type, location, this._getScoresForRating(type, location));
       this._localRatings.push(_rating);
     }

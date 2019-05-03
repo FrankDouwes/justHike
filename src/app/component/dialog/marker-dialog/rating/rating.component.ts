@@ -50,6 +50,7 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
         const _rating: Rating = _self._rateService.getRatingById(type.type, _self.waypoint);
 
         _self._ratings[type.type] = _rating;
+
         _self._ratingSubscriptions.push(_rating.ratingChangedObserver.subscribe(function(update: number){
           if (update !== -1) {
             _self.calculateTotalRating();
@@ -86,22 +87,22 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
   public onToggleClick(state: 'current' | 'add'): void {
 
     // you're only allowed to rate if you're nearby (4.5 miles)
-    // if (state === 'add') {
-    //   if (this.status !== 'tracking' && !this.user) {
-    //     this.ratingPanel.nativeElement.classList.add('warn');
-    //     this.ratingPanel.nativeElement.classList.add('warn-gps');
-    //   } else {
-    //     const _distance = geolib.getDistance(waypointToLatLng(this.waypoint), waypointToLatLng(this.user.waypoint));
-    //     if (_distance > (environment.MILE * 4.5)) {
-    //       this.ratingPanel.nativeElement.classList.add('warn');
-    //       this.ratingPanel.nativeElement.classList.add('warn-distance');
-    //     }
-    //   }
-    // } else {
-    //   this.ratingPanel.nativeElement.classList.remove('warn');
-    //   this.ratingPanel.nativeElement.classList.remove('warn-gps');
-    //   this.ratingPanel.nativeElement.classList.remove('warn-distance');
-    // }
+    if (state === 'add') {
+      if (this.status !== 'tracking' && !this.user) {
+        this.ratingPanel.nativeElement.classList.add('warn');
+        this.ratingPanel.nativeElement.classList.add('warn-gps');
+      } else {
+        const _distance = geolib.getDistance(waypointToLatLng(this.waypoint), waypointToLatLng(this.user.waypoint));
+        if (_distance > (environment.MILE * 4.5)) {
+          this.ratingPanel.nativeElement.classList.add('warn');
+          this.ratingPanel.nativeElement.classList.add('warn-distance');
+        }
+      }
+    } else {
+      this.ratingPanel.nativeElement.classList.remove('warn');
+      this.ratingPanel.nativeElement.classList.remove('warn-gps');
+      this.ratingPanel.nativeElement.classList.remove('warn-distance');
+    }
     this.state = state;
   }
 
@@ -120,6 +121,10 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
   }
 
   public getAspect(type: string, aspect: string): TotalScore {
+
+    console.log(this._ratings);
+    console.log(this.getRating(type));
+
     return this.getRating(type).getAspect(aspect);
   }
 
