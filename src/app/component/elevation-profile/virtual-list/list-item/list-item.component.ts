@@ -547,6 +547,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
     this._userMarker.attr('onTrail', _onTrail);
 
     this._userMarker.click(this._onUserClick.bind(this));
+
   }
 
   private _clearUserMarker(): void {
@@ -559,7 +560,10 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
 // EVENT HANDLERS
 
+  // TODO: add tooltip/overlay, same as leaflet map
   private _onUserClick(event: MouseEvent): void {
+
+    console.log('clicked on user');
     event.stopPropagation();
     event.stopImmediatePropagation();
   }

@@ -106,22 +106,6 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       ]
     },
     {
-      "id": "cordova-plugin-ionic-webview.IonicWebView",
-      "file": "plugins/cordova-plugin-ionic-webview/src/www/util.js",
-      "pluginId": "cordova-plugin-ionic-webview",
-      "clobbers": [
-        "Ionic.WebView"
-      ]
-    },
-    {
-      "id": "cordova-plugin-ionic-webview.ios-wkwebview-exec",
-      "file": "plugins/cordova-plugin-ionic-webview/src/www/ios/ios-wkwebview-exec.js",
-      "pluginId": "cordova-plugin-ionic-webview",
-      "clobbers": [
-        "cordova.exec"
-      ]
-    },
-    {
       "id": "cordova-plugin-file.DirectoryEntry",
       "file": "plugins/cordova-plugin-file/www/DirectoryEntry.js",
       "pluginId": "cordova-plugin-file",
@@ -307,6 +291,30 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "file": "plugins/es6-promise-plugin/www/promise.js",
       "pluginId": "es6-promise-plugin",
       "runs": true
+    },
+    {
+      "id": "cordova-plugin-device.device",
+      "file": "plugins/cordova-plugin-device/www/device.js",
+      "pluginId": "cordova-plugin-device",
+      "clobbers": [
+        "device"
+      ]
+    },
+    {
+      "id": "cordova-plugin-ionic-webview.IonicWebView",
+      "file": "plugins/cordova-plugin-ionic-webview/src/www/util.js",
+      "pluginId": "cordova-plugin-ionic-webview",
+      "clobbers": [
+        "Ionic.WebView"
+      ]
+    },
+    {
+      "id": "cordova-plugin-ionic-webview.ios-wkwebview-exec",
+      "file": "plugins/cordova-plugin-ionic-webview/src/www/ios/ios-wkwebview-exec.js",
+      "pluginId": "cordova-plugin-ionic-webview",
+      "clobbers": [
+        "cordova.exec"
+      ]
     }
   ];
   module.exports.metadata = {
@@ -318,9 +326,10 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-whitelist": "1.3.3",
     "cordova-plugin-device-orientation": "2.0.1",
     "cordova-plugin-dialogs": "2.0.1",
-    "cordova-plugin-ionic-webview": "4.0.1",
     "cordova-plugin-file": "6.0.1",
     "cordova-plugin-zip": "3.1.0",
-    "es6-promise-plugin": "4.2.2"
+    "es6-promise-plugin": "4.2.2",
+    "cordova-plugin-device": "2.0.2",
+    "cordova-plugin-ionic-webview": "4.0.1"
   };
 });

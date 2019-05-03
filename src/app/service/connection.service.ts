@@ -1,34 +1,32 @@
 import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {getConnection, hasConnection} from '../_util/cordova';
-import {BaseComponent} from '../base/base/base.component';
 
 @Injectable({
   providedIn: 'root'
 })
 
 // TODO: online / offline doesn't seem to work reliably (and is slow), consider using another method/package
-export class ConnectionService extends BaseComponent {
+export class ConnectionService {
 
   private _connection: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   public connectionObserver: Observable<boolean>;
-  public state: string = 'unknown';
+  public state = 'unknown';
 
   constructor() {
-    super();
     this.connectionObserver = this._connection.asObservable();
   }
 
   public startTracking(): void {
-
-    console.log(window);
-    this.addEventListener(window, ['online', 'offline'], this._toggleConnection.bind(this), true);
+    window.addEventListener('online', this._toggleConnection.bind(this), true);
+    window.addEventListener('offline', this._toggleConnection.bind(this), true);
     this._toggleConnection();
   }
 
   public stopTracking(): void {
-    this.removeEventListener(window, ['online', 'offline']);
+    window.removeEventListener('online', this._toggleConnection.bind(this), true);
+    window.removeEventListener('offline', this._toggleConnection.bind(this), true);
     this._connection.next(null);
   }
 

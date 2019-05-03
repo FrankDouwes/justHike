@@ -28,13 +28,13 @@
     "cordova-plugin-splashscreen": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
-    "cordova-plugin-ionic-webview": {
-      "PACKAGE_NAME": "hike.frankdouwes.com"
-    },
     "cordova-plugin-dialogs": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
     "cordova-plugin-device": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-ionic-webview": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     }
   },

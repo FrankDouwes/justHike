@@ -79,18 +79,18 @@
     "is_top_level": true,
     "variables": {}
   },
-  "cordova-plugin-ionic-webview": {
-    "source": {
-      "type": "registry",
-      "id": "cordova-plugin-ionic-webview@latest"
-    },
-    "is_top_level": true,
-    "variables": {}
-  },
   "cordova-plugin-device": {
     "source": {
       "type": "registry",
       "id": "cordova-plugin-device@^2.0.2"
+    },
+    "is_top_level": true,
+    "variables": {}
+  },
+  "cordova-plugin-ionic-webview": {
+    "source": {
+      "type": "registry",
+      "id": "https://github.com/ionic-team/cordova-plugin-ionic-webview.git"
     },
     "is_top_level": true,
     "variables": {}

@@ -12,6 +12,8 @@
 \:host /deep/
 
   fa-icon
+    display: inline-block       // needed for Safari/iOS click events
+    pointer-events: all !important
 
     svg
       pointer-events: none

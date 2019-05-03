@@ -23,6 +23,55 @@ webpackEmptyAsyncContext.id = "./src/$$_lazy_route_resource lazy recursive";
 
 /***/ }),
 
+/***/ "./src/app/_util/admin/gpx-tools.ts":
+/*!******************************************!*\
+  !*** ./src/app/_util/admin/gpx-tools.ts ***!
+  \******************************************/
+/*! exports provided: createGPX */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createGPX", function() { return createGPX; });
+/* harmony import */ var gps_to_gpx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! gps-to-gpx */ "./node_modules/gps-to-gpx/lib/index.js");
+/* harmony import */ var gps_to_gpx__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(gps_to_gpx__WEBPACK_IMPORTED_MODULE_0__);
+
+/* dev only class for creating clean GPX data (for use with mobile atlas creator to generate tile sets) */
+function createGPX(trailMeta, flatTrailData) {
+    var _gpxOptions = {
+        activityName: trailMeta.abbr + 'simplified',
+        creator: 'Frank Douwes',
+        startTime: null,
+        timeKey: 'time',
+    };
+    flatTrailData.forEach(function (waypoint) {
+        delete waypoint.distanceTotal;
+        delete waypoint.nearestToPois;
+        delete waypoint.distance;
+        waypoint['time'] = null;
+    });
+    // split in 3
+    // const _fileLength = Math.ceil(flatTrailData.length / 3);
+    // const _arrays = _splitArray(flatTrailData, _fileLength);
+    var _files = [];
+    //
+    // _arrays.forEach(function(fileData) {
+    //   _files.push(createGpx(fileData, _gpxOptions));
+    // });
+    _files.push(gps_to_gpx__WEBPACK_IMPORTED_MODULE_0___default()(flatTrailData, _gpxOptions));
+    return _files;
+}
+function _splitArray(array, count) {
+    var _res = [];
+    while (array.length) {
+        _res.push(array.splice(0, count));
+    }
+    return _res;
+}
+
+
+/***/ }),
+
 /***/ "./src/app/_util/color.ts":
 /*!********************************!*\
   !*** ./src/app/_util/color.ts ***!
@@ -62,19 +111,24 @@ function shadeColor(color, percent) {
         console.log('color is not HEX', color);
         color = '#F00';
     }
+    // hex values
     var R = parseInt(color.substring(1, 3), 16);
     var G = parseInt(color.substring(3, 5), 16);
     var B = parseInt(color.substring(5, 7), 16);
-    R = parseInt(String(R * (100 + percent) / 100));
-    G = parseInt(String(G * (100 + percent) / 100));
-    B = parseInt(String(B * (100 + percent) / 100));
+    // decimal values
+    R = parseInt(String(R * (100 + percent) / 100), 10);
+    G = parseInt(String(G * (100 + percent) / 100), 10);
+    B = parseInt(String(B * (100 + percent) / 100), 10);
+    // take care of max values
     R = (R < 255) ? R : 255;
     G = (G < 255) ? G : 255;
     B = (B < 255) ? B : 255;
-    var RR = ((R.toString(16).length == 1) ? "0" + R.toString(16) : R.toString(16));
-    var GG = ((G.toString(16).length == 1) ? "0" + G.toString(16) : G.toString(16));
-    var BB = ((B.toString(16).length == 1) ? "0" + B.toString(16) : B.toString(16));
-    return "#" + RR + GG + BB;
+    // create a hex value, both values of the different channels are always the same value 77 CC FF etc,
+    // as the shade does not affect the color
+    var RR = ((R.toString(16).length === 1) ? '0' + R.toString(16) : R.toString(16));
+    var GG = ((G.toString(16).length === 1) ? '0' + G.toString(16) : G.toString(16));
+    var BB = ((B.toString(16).length === 1) ? '0' + B.toString(16) : B.toString(16));
+    return '#' + RR + GG + BB;
 }
 
 
@@ -84,7 +138,7 @@ function shadeColor(color, percent) {
 /*!**********************************!*\
   !*** ./src/app/_util/cordova.ts ***!
   \**********************************/
-/*! exports provided: getCordova, setCordova, cordovaEnabled, getScreen, setScreen, getConnection, setConnection, hasConnection, setZip, getZip, hasZip, setDialogs, getDialogs, hasDialogs */
+/*! exports provided: getCordova, setCordova, cordovaEnabled, setDevice, getUUID, getScreen, setScreen, getConnection, setConnection, hasConnection, setZip, getZip, hasZip, setDialogs, getDialogs, hasDialogs */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -92,6 +146,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getCordova", function() { return getCordova; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setCordova", function() { return setCordova; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cordovaEnabled", function() { return cordovaEnabled; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setDevice", function() { return setDevice; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getUUID", function() { return getUUID; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getScreen", function() { return getScreen; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setScreen", function() { return setScreen; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getConnection", function() { return getConnection; });
@@ -116,6 +172,19 @@ function setCordova(c) {
 }
 function cordovaEnabled() {
     return !!(_cordova);
+}
+/* device (general device info) */
+var _device;
+function setDevice(device) {
+    _device = device;
+}
+function getUUID() {
+    if (cordovaEnabled()) {
+        return _device.uuid;
+    }
+    else {
+        return '1234567890';
+    }
 }
 /* screen is used to lock orientation using cordova-plugin-screen-orientation */
 var _screen;
@@ -163,48 +232,53 @@ function hasDialogs() {
 
 /***/ }),
 
-/***/ "./src/app/_util/downloader.ts":
-/*!*************************************!*\
-  !*** ./src/app/_util/downloader.ts ***!
-  \*************************************/
-/*! exports provided: DownloaderStatus, Downloader */
+/***/ "./src/app/_util/downloader/downloader.ts":
+/*!************************************************!*\
+  !*** ./src/app/_util/downloader/downloader.ts ***!
+  \************************************************/
+/*! exports provided: Downloader */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DownloaderStatus", function() { return DownloaderStatus; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Downloader", function() { return Downloader; });
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
-/* harmony import */ var _file__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./file */ "./src/app/_util/file.ts");
+/* harmony import */ var _file__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../file */ "./src/app/_util/file.ts");
+/* harmony import */ var _status_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./status-manager */ "./src/app/_util/downloader/status-manager.ts");
+/* harmony import */ var _parser__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./parser */ "./src/app/_util/downloader/parser.ts");
 
 
 
 
-// file downloader
-// sets type using file extension, currently supports json & blob (zip)
-// supports multiple files for a single downloader (zip parts, due to size limitations on mobile)
-// has caching (for large files)
-// has save / unzip / delete file (for zips)
-// has resume download function (for multipart files)
-var DownloaderStatus = /** @class */ (function () {
-    function DownloaderStatus() {
+
+
+var FileReference = /** @class */ (function () {
+    function FileReference(url, path) {
+        this.url = url;
+        this.path = path;
     }
-    return DownloaderStatus;
+    return FileReference;
 }());
-
+/* file downloader
+sets type using file extension, currently supports json & blob (zip)
+supports multiple files for a single downloader (zip parts, due to size limitations/freezing on mobile)
+has save / unzip / delete file (for zips)
+has resume download function (for multipart files)
+TODO: should probably be an uploader too... */
 var Downloader = /** @class */ (function () {
     function Downloader(_name, _filesystemService, _httpClient, _localStorageService) {
         this._name = _name;
         this._filesystemService = _filesystemService;
         this._httpClient = _httpClient;
         this._localStorageService = _localStorageService;
-        this.isActiveSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](false);
-        this._meta = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](new DownloaderStatus());
         this._completedFiles = 0;
-        // setup status subscription
-        this.meta = this._meta.asObservable().pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["share"])());
+        // setup meta subscription
+        this._metaSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](null);
+        this.meta = this._metaSubject.asObservable().pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["share"])());
+        this.status = new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatusManager"](this._metaSubject);
+        this._parser = new _parser__WEBPACK_IMPORTED_MODULE_5__["DownloadParser"](_filesystemService, this.status);
     }
     // allows multipart file downloading
     Downloader.prototype._sequencer = function () {
@@ -223,9 +297,10 @@ var Downloader = /** @class */ (function () {
             if (this._hasParts) {
                 this._localStorageService.clear(this._name + '_filesDownloaded');
             }
-            this._setStatus('downloader', 'complete', null, false);
+            this.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('downloader', 'complete', null), false);
         }
     };
+    // returns the first/next file reference to download based on completed downloads (for multipart)
     // converts string to array if needed
     Downloader.prototype._setupPaths = function (urls, paths) {
         var _storedCompletedCount = this._localStorageService.retrieve(this._name + '_filesDownloaded');
@@ -244,7 +319,7 @@ var Downloader = /** @class */ (function () {
                 this._urls = urls;
             }
         }
-        return { url: this._urls[this._completedFiles], path: this._paths[this._completedFiles] };
+        return new FileReference(this._urls[this._completedFiles], this._paths[this._completedFiles]);
     };
     // savePath is the location to save the file, blank == no save, allows renaming (so 'download.zip' can be saved as 'DEMO/test-file.zip')
     // zips will always be unzipped, .zip will be deleted afterwards.
@@ -252,57 +327,64 @@ var Downloader = /** @class */ (function () {
     Downloader.prototype.downloadFile = function (urls, cache, path) {
         var _this = this;
         if (cache === void 0) { cache = true; }
-        if (path === void 0) { path = null; }
-        var _paths = this._setupPaths(urls, path);
+        var _self = this;
+        var _path = this._setupPaths(urls, path);
         this._cache = cache;
-        this._setStatus('http', 'initialize', null, true);
-        var _extension = Object(_file__WEBPACK_IMPORTED_MODULE_3__["getExtensionFromString"])(_paths.url);
+        this.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('http', 'initialize', null), true);
+        var _extension = Object(_file__WEBPACK_IMPORTED_MODULE_3__["getExtensionFromString"])(_path.url);
         this._fileType = (_extension === 'json') ? _extension : 'blob';
-        var _headers = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpHeaders"]();
-        // TODO: research on cloud storage caching/ headers
-        if (_extension === 'json') {
-            // _headers = _headers.append('Content-Type', 'application/json; charset=utf-8');
-        }
-        else {
-            // _headers = _headers.append('Content-Type', 'application/zip;');
-        }
-        if (!cache) {
-            // _headers = _headers.append('Cache-Control', 'no-cache');
-            // _headers = _headers.append('Pragma', 'no-cache');
-            // _paths.url += '?' + (Math.random() * Number.MAX_VALUE);
-        }
+        // TODO: research on cloud storage caching/headers
+        // https://cloud.google.com/storage/docs/gsutil/addlhelp/WorkingWithObjectMetadata
+        // let _headers = new HttpHeaders();
+        // if (_extension === 'json') {
+        //   _headers = _headers.append('Content-Type', 'application/json; charset=utf-8');
+        // } else {
+        //   _headers = _headers.append('Content-Type', 'application/zip;');
+        // }
+        //
+        // if (!cache) {
+        //   _headers = _headers.append('Cache-Control', 'no-cache');
+        //   _headers = _headers.append('Pragma', 'no-cache');
+        //   _paths.url += '?' + (Math.random() * Number.MAX_VALUE);
+        // }
         // download file
-        var req = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpRequest"]('GET', _paths.url, {
+        var req = new _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpRequest"]('GET', _path.url, {
             reportProgress: true,
             // headers: _headers,
             responseType: this._fileType
         });
         this.downloadedFile = null;
-        var downloadObservable = this._httpClient.request(req);
-        this._downloadRequest = downloadObservable.subscribe(function (event) {
+        var _downloadObservable = this._httpClient.request(req);
+        this._downloadRequest = _downloadObservable.subscribe(function (event) {
             if (event.type === _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpEventType"].DownloadProgress) {
                 var _downloadPercentage = (event.loaded / event.total) * 100;
                 var _completedPerc = (_this._completedFiles / _this._urls.length) * 100;
                 _downloadPercentage = Number((_completedPerc + (_downloadPercentage / _this._urls.length)).toFixed(2));
                 var _fileSize = Number(event.total);
-                _this._setStatus('http', 'progress', { percentage: _downloadPercentage, fileSize: _fileSize }, true);
+                _this.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('http', 'progress', { percentage: _downloadPercentage, fileSize: _fileSize }), true);
             }
             else if (event instanceof _angular_common_http__WEBPACK_IMPORTED_MODULE_0__["HttpResponse"]) {
                 _this.downloadedFile = event.body;
-                _this._setStatus('http', 'complete', { file: _this.downloadedFile }, (_paths.path !== null));
-                if (_paths.path) {
-                    _this._saveFile(event.body, _paths.path);
-                }
-                else {
+                _this.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('http', 'complete', { file: _this.downloadedFile }), (_path.path !== null));
+                if (!_path.path) {
+                    // downloader complete
                     _this._sequencer();
                     console.log('downloaded file available');
+                }
+                else {
+                    // save
+                    _this._parser.saveFile(event.body, _path.path, _this._hasParts, _this._fileType, function (result) {
+                        // filesystem complete
+                        _self.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('filesystem', result, null), true);
+                        _self._sequencer();
+                    });
                 }
             }
         }, function (error) {
             _this.cancelDownload();
-            _this._setStatus('downloader', 'error', error, false);
+            _this.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('downloader', 'error', error), false);
         });
-        return downloadObservable;
+        return _downloadObservable;
     };
     Downloader.prototype.cancelDownload = function () {
         if (this._downloadRequest) {
@@ -313,85 +395,144 @@ var Downloader = /** @class */ (function () {
         if (this._hasParts) {
             this._localStorageService.clear(this._name + '_filesDownloaded');
         }
-        this._setStatus('downloader', '', null, false);
+        // blank status
+        this.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('downloader', '', null), false);
     };
     // clear all files related to this downloader (including unzipped multipart files)
     Downloader.prototype.clearFile = function () {
-        var _self = this;
         if (this.downloadedFile) {
             this.downloadedFile = null;
         }
-        if (this._paths && this._completedFiles > 0) {
+        this._parser.clearFile(this._paths, this._completedFiles, this._hasParts);
+        this._completedFiles = 0;
+        this.status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_4__["DownloaderStatus"]('downloader', 'cleared', null), false);
+    };
+    return Downloader;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/_util/downloader/parser.ts":
+/*!********************************************!*\
+  !*** ./src/app/_util/downloader/parser.ts ***!
+  \********************************************/
+/*! exports provided: DownloadParser */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DownloadParser", function() { return DownloadParser; });
+/* harmony import */ var _status_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./status-manager */ "./src/app/_util/downloader/status-manager.ts");
+/* harmony import */ var _file__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../file */ "./src/app/_util/file.ts");
+
+
+var DownloadParser = /** @class */ (function () {
+    function DownloadParser(_filesystemService, _status) {
+        this._filesystemService = _filesystemService;
+        this._status = _status;
+    }
+    // FILE SAVING
+    DownloadParser.prototype.saveFile = function (data, pathName, hasParts, fileType, onComplete) {
+        var _self = this;
+        this._onComplete = onComplete;
+        if (!this._filesystemService.root) {
+            alert('No file system available, unable to save files.');
+            onComplete('error');
+        }
+        this._status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_0__["DownloaderStatus"]('filesystem', 'initialize', null), true);
+        this._filesystemService.saveFile(data, null, pathName, function (result) {
+            if (fileType !== 'blob') {
+                onComplete('complete');
+            }
+            else {
+                // continue unzipping
+                return _self._unzipFile(pathName, hasParts);
+            }
+        });
+    };
+    // UNZIPPING (happens after saving)
+    DownloadParser.prototype._unzipFile = function (pathName, hasParts) {
+        var _self = this;
+        var _observer = this._filesystemService.unzip(pathName, hasParts).subscribe(function (result) {
+            if (result['state'] === 'complete' || result['message'] === 'error') {
+                // success / error
+                _self._onComplete(result['message']);
+            }
+            else if (result['state'] === 'progress') {
+                // progress
+                _self._status.setStatus(new _status_manager__WEBPACK_IMPORTED_MODULE_0__["DownloaderStatus"]('filesystem', 'progress', { percentage: (result['percentage'] * 0.33) + 66 }), true);
+            }
+            _observer.unsubscribe();
+        });
+    };
+    // CLEAR FILE
+    DownloadParser.prototype.clearFile = function (paths, completedFiles, hasParts) {
+        var _self = this;
+        if (paths && completedFiles > 0) {
             // multiple parts are all extracted in the same directory, therefor this will only have to run once
-            var _extension = Object(_file__WEBPACK_IMPORTED_MODULE_3__["getExtensionFromString"])(this._paths[0]);
+            var _extension = Object(_file__WEBPACK_IMPORTED_MODULE_1__["getExtensionFromString"])(paths[0]);
             // if we're dealing with a zip, we'll have to remove the unzipped directory
             if (_extension === 'zip') {
-                var _seperator = (_self._hasParts) ? '_' : '.';
-                var _directory = this._paths[0].split(_seperator)[0] + '/';
+                var _separator = (hasParts) ? '_' : '.';
+                var _directory = paths[0].split(_separator)[0] + '/';
                 _self._filesystemService.deleteDirectory(_directory, function (result) {
-                    console.log('delete dir', result);
+                    // nothing here... dead end
+                    return;
                 });
             }
         }
-        else if (this._paths) {
-            // TODO: untested, not sure if this is needed as files are generally overwritten..?
-            _self._filesystemService.deleteFile(this._paths[0]);
+        else if (paths) {
+            _self._filesystemService.deleteFile(paths[0]);
         }
-        this._completedFiles = 0;
-        this._setStatus('downloader', 'cleared', null, false);
     };
-    // STATUS
-    Downloader.prototype._setStatus = function (type, message, data, active) {
-        // console.log(type, message, data, active);
+    return DownloadParser;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/_util/downloader/status-manager.ts":
+/*!****************************************************!*\
+  !*** ./src/app/_util/downloader/status-manager.ts ***!
+  \****************************************************/
+/*! exports provided: DownloaderStatus, DownloaderStatusManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DownloaderStatus", function() { return DownloaderStatus; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DownloaderStatusManager", function() { return DownloaderStatusManager; });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
+
+var DownloaderStatus = /** @class */ (function () {
+    function DownloaderStatus(type, label, data) {
+        this.type = type;
+        this.label = label;
+        this.data = data;
+    }
+    return DownloaderStatus;
+}());
+
+var DownloaderStatusManager = /** @class */ (function () {
+    function DownloaderStatusManager(meta) {
+        this.isActiveSubject = new rxjs__WEBPACK_IMPORTED_MODULE_0__["BehaviorSubject"](false);
+        this._meta = meta;
+    }
+    DownloaderStatusManager.prototype.setStatus = function (downloaderStatus, active) {
         if (this.isActiveSubject.getValue() !== active) {
             this.isActiveSubject.next(active);
         }
-        if (message !== '') {
-            this._meta.next({ type: type, label: message, data: data });
+        if (downloaderStatus.label !== '') {
+            this._meta.next(downloaderStatus);
         }
         else {
-            this._meta.next(new DownloaderStatus());
+            this._meta.next(null);
         }
     };
-    // FILE SAVING
-    Downloader.prototype._saveFile = function (data, pathName) {
-        var _self = this;
-        if (!this._filesystemService.root) {
-            alert('No file system available, unable to save files.');
-            this._setStatus('filesystem', 'error', null, false);
-            return;
-        }
-        this._setStatus('filesystem', 'initialize', null, true);
-        this._filesystemService.saveFile(data, null, pathName, function (result) {
-            _self._setStatus('filesystem', 'complete', null, true);
-            if (_self._fileType === 'blob') {
-                _self._unzipFile(pathName);
-            }
-            else {
-                _self._setStatus('filesystem', 'complete', null, true);
-                _self._sequencer();
-            }
-        });
-    };
-    Downloader.prototype._unzipFile = function (pathName) {
-        var _self = this;
-        var _observer = this._filesystemService.unzip(pathName, this._hasParts).subscribe(function (result) {
-            if (result['state'] === 'complete') {
-                _observer.unsubscribe();
-                _self._sequencer();
-            }
-            else if (result['state'] === 'progress') {
-                _self._setStatus('filesystem', 'progress', { percentage: (result['percentage'] * 0.33) + 66 }, true);
-            }
-            else if (result['message'] === 'error') {
-                // error, clear
-                _self._setStatus('filesystem', 'error', null, false);
-                _observer.unsubscribe();
-                _self.cancelDownload();
-            }
-        });
-    };
-    return Downloader;
+    return DownloaderStatusManager;
 }());
 
 
@@ -418,14 +559,14 @@ function getExtensionFromString(filename) {
     }
     return _urlSplit[_urlSplit.length - 1];
 }
-// converts file:// urls to something a local server url
-// poorly documented nonsense
-// https://github.com/ionic-team/capacitor/issues/448
-// https://stackoverflow.com/questions/52141085/file-uri-path-for-camera-not-working-on-ionic-4
-// https://forum.ionicframework.com/t/normalizeurl-depricated-cannot-get-webview-convertfilesrc-to-work/136329
+/* Converts file:// urls to something a local server url, poorly documented nonsense!
+https://github.com/ionic-team/capacitor/issues/448
+https://stackoverflow.com/questions/52141085/file-uri-path-for-camera-not-working-on-ionic-4
+https://forum.ionicframework.com/t/normalizeurl-depricated-cannot-get-webview-convertfilesrc-to-work/136329
+this is an IONIC webview specific implementation (iOS cordova plugin) */
 function convertToIonicUrl(fileUrl) {
     var _window = window;
-    //window.Ionic.normalizeURL
+    //window.Ionic.normalizeURL... does not exist
     if (!_window.Ionic || !_window.Ionic.WebView.convertFileSrc) {
         alert('Unsupported filesystem.');
         return;
@@ -442,13 +583,15 @@ function convertToIonicUrl(fileUrl) {
 /*!**********************************!*\
   !*** ./src/app/_util/generic.ts ***!
   \**********************************/
-/*! exports provided: sortByKey, cloneData */
+/*! exports provided: sortByKey, cloneData, isObjectEmpty */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sortByKey", function() { return sortByKey; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cloneData", function() { return cloneData; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObjectEmpty", function() { return isObjectEmpty; });
+// sort an array of objects by a key (in each object)
 function sortByKey(array, key) {
     return array.sort(function (a, b) {
         var x = a[key];
@@ -460,6 +603,83 @@ function sortByKey(array, key) {
 function cloneData(input) {
     return JSON.parse(JSON.stringify(input));
 }
+function isObjectEmpty(obj) {
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+/***/ }),
+
+/***/ "./src/app/_util/geolib/distance.ts":
+/*!******************************************!*\
+  !*** ./src/app/_util/geolib/distance.ts ***!
+  \******************************************/
+/*! exports provided: Distance, calculateDistance, calculateSectionScale */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Distance", function() { return Distance; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculateDistance", function() { return calculateDistance; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculateSectionScale", function() { return calculateSectionScale; });
+/* harmony import */ var geolib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! geolib */ "./node_modules/geolib/dist/geolib.js");
+/* harmony import */ var geolib__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(geolib__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+// Adjustments to geoLibs Distance class:
+// - key value for Distance is a string, converting that to a number
+// - added belongsTo, in case points belong to different sources
+
+
+var Distance = /** @class */ (function () {
+    function Distance() {
+    }
+    Object.defineProperty(Distance.prototype, "key", {
+        get: function () {
+            return this._key;
+        },
+        set: function (key) {
+            if (typeof key === 'string') {
+                this._key = Number(key);
+            }
+            else {
+                this._key = key;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Distance;
+}());
+
+// calculate the distance between 2 points
+function calculateDistance(point1, point2) {
+    return geolib__WEBPACK_IMPORTED_MODULE_0__["getDistance"]({ latitude: point1.latitude, longitude: point1.longitude }, { latitude: point2.latitude, longitude: point2.longitude }, 1, 4);
+}
+// calculate the scale factor of a section (array of waypoints), using the provided length (by author) and the calculated length
+function calculateSectionScale(section, length, useMile) {
+    if (useMile === void 0) { useMile = true; }
+    var _calcSectionLength = 0;
+    var _prevPoint;
+    var _length = section.length;
+    for (var i = 0; i < _length; i++) {
+        var _point = section[i];
+        if (_prevPoint) {
+            _calcSectionLength += calculateDistance(_prevPoint, _point);
+        }
+        _prevPoint = _point;
+    }
+    // convert to mile
+    if (useMile) {
+        _calcSectionLength = _calcSectionLength / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__["environment"].MILE;
+    }
+    var _scale = length / _calcSectionLength;
+    return _scale;
+}
 
 
 /***/ }),
@@ -468,15 +688,41 @@ function cloneData(input) {
 /*!********************************************!*\
   !*** ./src/app/_util/leaflet/calculate.ts ***!
   \********************************************/
-/*! exports provided: calclatePointBasedOnDistance, calculateTrailAnchorPoint */
+/*! exports provided: calculateTrailAnchorPoint */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calclatePointBasedOnDistance", function() { return calclatePointBasedOnDistance; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculateTrailAnchorPoint", function() { return calculateTrailAnchorPoint; });
 /* harmony import */ var _converter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./converter */ "./src/app/_util/leaflet/converter.ts");
 
+/* calculate the nearest point on trail for a given location */
+function calculateTrailAnchorPoint(mile, nearestPoints) {
+    var _nearestPoint = mile.waypoints[Number(nearestPoints[0].key)];
+    var _2ndNearestPoint = mile.waypoints[Number(nearestPoints[1].key)];
+    var _location = calculatePointBasedOnDistance(nearestPoints, [_nearestPoint, _2ndNearestPoint]);
+    /* found a loop/bend, which causes the _nearestPoint keys to not be in a consecutive order.
+    1. figure out the trailDistance between the 2 nearest points
+    2. find a point within all points that's closest to that trailDistance
+    3. do the distance calculation again with 2 points based on that centerpoint.
+    *. this is 'good enough', a trade-off between performance and slightly less optimal overlay/popup locations. */
+    if (Number(nearestPoints[1].key) !== Number(nearestPoints[0].key) + 1
+        && Number(nearestPoints[1].key) !== Number(nearestPoints[0].key) - 1) {
+        var _selectionWaypoints = void 0;
+        if (nearestPoints[0].key < nearestPoints[1].key) {
+            _selectionWaypoints = mile.waypoints.slice(nearestPoints[0].key, nearestPoints[1].key + 1);
+        }
+        else {
+            _selectionWaypoints = mile.waypoints.slice(nearestPoints[1].key, nearestPoints[0].key + 1);
+        }
+        // sorting the selection based on the distance of the locations distance
+        _selectionWaypoints.sort(function (a, b) {
+            return Math.abs(_location.distance - a.distance) - Math.abs(_location.distance - b.distance);
+        });
+        _location = calculatePointBasedOnDistance(nearestPoints, [_selectionWaypoints[0], _selectionWaypoints[1]]);
+    }
+    return _location;
+}
 /* calculate a new waypoint based on the distance from 2 waypoints (using a distance sorted array (from GeoLib)
 * calculates a point (x) inline (between p1 & p2), based on the distance of p1 and p2 from y (labeled d1 and d2)
 *
@@ -487,7 +733,7 @@ __webpack_require__.r(__webpack_exports__);
 *             .     .
 *                y
 *                                   */
-function calclatePointBasedOnDistance(distancePoints, waypoints, returnAsLatlng) {
+function calculatePointBasedOnDistance(distancePoints, waypoints, returnAsLatlng) {
     if (returnAsLatlng === void 0) { returnAsLatlng = false; }
     // get the waypoints from a mile
     var _point1 = waypoints[0];
@@ -508,33 +754,6 @@ function calclatePointBasedOnDistance(distancePoints, waypoints, returnAsLatlng)
         return _waypoint;
     }
 }
-/* calculate the nearest point on trail for a given location */
-function calculateTrailAnchorPoint(mile, nearestPoints) {
-    var _nearestPoint = mile.waypoints[Number(nearestPoints[0].key)];
-    var _2ndNearestPoint = mile.waypoints[Number(nearestPoints[1].key)];
-    var _location = calclatePointBasedOnDistance(nearestPoints, [_nearestPoint, _2ndNearestPoint]);
-    /* found a loop/bend, which causes the _nearestPoint keys to not be in a consecutive order.
-    figure out the trailDistance between the 2 nearest points
-    find a point within all points that's closest to that trailDistance
-    after that do the above calculation with 2 points based on that centerpoint.
-    this is 'good enough, a trade-off between performance and slightly less optimal overlay/popup locations. */
-    if (Number(nearestPoints[1]['key']) !== Number(nearestPoints[0]['key']) + 1
-        && Number(nearestPoints[1]['key']) !== Number(nearestPoints[0]['key']) - 1) {
-        var _selectionWaypoints = void 0;
-        if ((nearestPoints[0]['key'] < nearestPoints[1]['key'])) {
-            _selectionWaypoints = mile.waypoints.slice(nearestPoints[0]['key'], nearestPoints[1]['key'] + 1);
-        }
-        else {
-            _selectionWaypoints = mile.waypoints.slice(nearestPoints[1]['key'], nearestPoints[0]['key'] + 1);
-        }
-        // sorting the selection based on the distance of the locations distance
-        _selectionWaypoints.sort(function (a, b) {
-            return Math.abs(_location.distance - a.distance) - Math.abs(_location.distance - b.distance);
-        });
-        _location = calclatePointBasedOnDistance(nearestPoints, [_selectionWaypoints[0], _selectionWaypoints[1]]);
-    }
-    return _location;
-}
 
 
 /***/ }),
@@ -543,39 +762,388 @@ function calculateTrailAnchorPoint(mile, nearestPoints) {
 /*!********************************************!*\
   !*** ./src/app/_util/leaflet/converter.ts ***!
   \********************************************/
-/*! exports provided: waypointsToLatLng, waypointToLatLng, latLngToWaypoint */
+/*! exports provided: pointArrayTypeConversion, waypointToLatLng, latLngToWaypoint, flatToWaypoint, waypointToFlat, waypointToWaypoint */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "waypointsToLatLng", function() { return waypointsToLatLng; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pointArrayTypeConversion", function() { return pointArrayTypeConversion; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "waypointToLatLng", function() { return waypointToLatLng; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "latLngToWaypoint", function() { return latLngToWaypoint; });
-// convert an array of Waypoints (that my app is built on) to and array of LatLngs (that leaflet uses)
-function waypointsToLatLng(waypoints) {
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "flatToWaypoint", function() { return flatToWaypoint; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "waypointToFlat", function() { return waypointToFlat; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "waypointToWaypoint", function() { return waypointToWaypoint; });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+
+// define the seperate converter functions for easier referencing
+var _converters = {
+    flat_waypoint: flatToWaypoint,
+    latlng_waypoint: latLngToWaypoint,
+    waypoint_latlng: waypointToLatLng,
+    waypoint_flat: waypointToFlat,
+    waypoint_waypoint: waypointToWaypoint
+};
+// convert an array of Waypoints in a specified format to another format)
+function pointArrayTypeConversion(waypoints, from, to) {
     var _length = waypoints.length;
     var _returnArr = [];
+    var _converter = _converters[from + '_' + to];
+    if (!_converter) {
+        console.warn('No converter for ' + from + ' to ' + to);
+    }
     for (var i = 0; i < _length; i++) {
-        _returnArr.push(waypointToLatLng(waypoints[i]));
+        _returnArr.push(_converter(waypoints[i]));
     }
     return _returnArr;
 }
-// convert a single Waypoint to a Latlng (that leaflet uses)
+// convert a single Waypoint to a Latlng (that leaflet uses), optional elevation
 function waypointToLatLng(waypoint) {
-    return { lat: waypoint.latitude, lng: waypoint.longitude, alt: waypoint.elevation };
+    return leaflet__WEBPACK_IMPORTED_MODULE_0__["latLng"](waypoint.latitude, waypoint.longitude, waypoint.elevation);
 }
-// convert a latlng to a waypoint
+// convert a latlng to a waypoint, optional elevation
 function latLngToWaypoint(latlng) {
-    return { latitude: latlng.lat, longitude: latlng.lng, elevation: latlng.alt };
+    var _waypoint = {
+        latitude: latlng.lat,
+        longitude: latlng.lng
+    };
+    if (latlng.alt) {
+        _waypoint.elevation = latlng.alt;
+    }
+    return _waypoint;
+}
+// convert flat data to waypoint (assuming an array with structure [latitude:number, longitude: number, elevation?:number]
+function flatToWaypoint(flat) {
+    var _waypoint = {
+        latitude: flat[0],
+        longitude: flat[1]
+    };
+    if (flat[2]) {
+        _waypoint.elevation = flat[2];
+    }
+    return _waypoint;
+}
+// convert flat data to waypoint (assuming an array with structure [latitude:number, longitude: number, elevation?:number]
+function waypointToFlat(waypoint) {
+    var _flat = [waypoint.latitude, waypoint.longitude];
+    if (waypoint.elevation) {
+        _flat.push(waypoint.elevation);
+    }
+    return _flat;
+}
+// convert waypoint to waypoint, turns string to numbers
+function waypointToWaypoint(waypoint) {
+    var _waypoint = {};
+    for (var key in waypoint) {
+        _waypoint[key] = Number(waypoint[key]);
+    }
+    return _waypoint;
 }
 
 
 /***/ }),
 
-/***/ "./src/app/_util/leaflet/grid.js":
+/***/ "./src/app/_util/leaflet/icon.ts":
 /*!***************************************!*\
-  !*** ./src/app/_util/leaflet/grid.js ***!
+  !*** ./src/app/_util/leaflet/icon.ts ***!
   \***************************************/
+/*! exports provided: htmlIcon */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "htmlIcon", function() { return htmlIcon; });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var node_modules_leaflet_src_geometry_Point__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! node_modules/leaflet/src/geometry/Point */ "./node_modules/leaflet/src/geometry/Point.js");
+
+
+/* creates a leaflet icon out of an html element
+the default divIcon class (that's being extended) uses innerHTML() which breaks svg href links in iOS/Safari*/
+var _htmlIcon = leaflet__WEBPACK_IMPORTED_MODULE_0__["DivIcon"].extend({
+    createIcon: function (oldIcon) {
+        var _div = (oldIcon && oldIcon.tagName === 'DIV') ? oldIcon : this.options.html, options = this.options;
+        if (options.bgPos) {
+            var bgPos = Object(node_modules_leaflet_src_geometry_Point__WEBPACK_IMPORTED_MODULE_1__["toPoint"])(options.bgPos);
+            _div.style.backgroundPosition = (-bgPos.x) + 'px ' + (-bgPos.y) + 'px';
+        }
+        this._setIconStyles(_div, 'icon');
+        return _div;
+    }
+});
+function htmlIcon(options) {
+    return new _htmlIcon(options);
+}
+
+
+/***/ }),
+
+/***/ "./src/app/_util/leaflet/layer.ts":
+/*!****************************************!*\
+  !*** ./src/app/_util/leaflet/layer.ts ***!
+  \****************************************/
+/*! exports provided: createMapTileLayer, createGridLayer */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createMapTileLayer", function() { return createMapTileLayer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createGridLayer", function() { return createGridLayer; });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _tiles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tiles */ "./src/app/_util/leaflet/tiles.ts");
+/* harmony import */ var _trail_meta__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../trail-meta */ "./src/app/_util/trail-meta.ts");
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+
+
+
+
+// create the main map tile layer, based on the custom fallback tile.
+// if there's an internet connection use arcGis, else use locally stored tiles (or default error tile)
+function createMapTileLayer(url, detectRetina) {
+    var _fallbackUrl = _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].onlineTileUrl;
+    var _fallbackLayer = Object(_tiles__WEBPACK_IMPORTED_MODULE_1__["fallbackLayer"])(url, {
+        // regular min & max zoom prop causes flickering
+        minNativeZoom: 15,
+        maxNativeZoom: 15,
+        fallbackTileUrl: _fallbackUrl,
+        errorTileUrl: './assets/images/missing.png',
+        keepBuffer: 0,
+        updateWhenIdle: false,
+        updateWhenZooming: false,
+        detectRetina: detectRetina
+    });
+    return _fallbackLayer;
+}
+/* grid (TODO: overlapping grid issues, investigate UTM grids)
+considering rewriting this: https://github.com/ggolikov/Leaflet.gmxIndexGrid for leafelt 1.x
+creates a square mile grid layer array (currently they're sliced into UTM zones, would prefer a single layer) */
+function createGridLayer(trailAbbr) {
+    var _gridLayers = [];
+    var _trailUtm = Object(_trail_meta__WEBPACK_IMPORTED_MODULE_2__["getTrailMetaDataByAbbr"])(trailAbbr).utm;
+    if (_trailUtm) {
+        _trailUtm.forEach(function (zone) {
+            var _utmGrid = leaflet__WEBPACK_IMPORTED_MODULE_0__["utmGrid"](zone, false, {
+                color: '#AAA',
+                showAxis100km: false,
+                weight: 1,
+                minInterval: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE,
+                maxInterval: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE,
+                opacity: 1,
+            });
+            _gridLayers.push(_utmGrid);
+        });
+    }
+    return _gridLayers;
+}
+
+
+/***/ }),
+
+/***/ "./src/app/_util/leaflet/marker.js":
+/*!*****************************************!*\
+  !*** ./src/app/_util/leaflet/marker.js ***!
+  \*****************************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+
+/* simple mixin to force a z-index for a marker
+this overrides the default index sorting leaflet has.
+used for the User marker (always on top) */
+(function (global) {
+    var MarkerMixin = {
+        _updateZIndex: function (offset) {
+            this._icon.style.zIndex = this.options.forceZIndex ? (this.options.forceZIndex + (this.options.zIndexOffset || 0)) : (this._zIndex + offset);
+        },
+        setForceZIndex: function (forceZIndex) {
+            console.log('force');
+            this.options.forceZIndex = forceZIndex ? forceZIndex : null;
+        }
+    };
+    if (global)
+        global.include(MarkerMixin);
+})(leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"]);
+/**
+ * Copyright (C) 2013 Maxime Hadjinlian <maxime.hadjinlian@gmail.com>
+ * All Rights Reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * - Redistributions of source code must retain the above copyright notice,
+ *   this list of conditions and the following disclaimer.
+ *
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ *   this list of conditions and the following disclaimer in the documentation
+ *   and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+(function () {
+    // Retain the value of the original onAdd and onRemove functions
+    var originalOnAdd = leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].prototype.onAdd;
+    var originalOnRemove = leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].prototype.onRemove;
+    // Add bounceonAdd options
+    leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].mergeOptions({
+        bounceOnAdd: false,
+        bounceOnAddOptions: {
+            duration: 1000,
+            height: -1,
+            loop: 1,
+        },
+        bounceOnAddCallback: function () { },
+    });
+    leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].include({
+        _toPoint: function (latlng) {
+            return this._map.latLngToContainerPoint(latlng);
+        },
+        _toLatLng: function (point) {
+            return this._map.containerPointToLatLng(point);
+        },
+        _motionStep: function (opts) {
+            var self = this;
+            var timePassed = new Date().getTime() - opts.start;
+            var progress = timePassed / opts.duration;
+            if (progress > 1) {
+                progress = 1;
+            }
+            var delta = self._easeOutBounce(progress);
+            opts.step(delta);
+            if (progress === 1) {
+                opts.start = new Date().getTime();
+                progress = 0;
+                if (opts.loop > 0)
+                    opts.loop = opts.loop - 1;
+                if (opts.loop === 0) {
+                    opts.end();
+                    return;
+                }
+            }
+            self._animationId = leaflet__WEBPACK_IMPORTED_MODULE_0__["Util"].requestAnimFrame(function (timestamp) {
+                self._motionStep(opts);
+            });
+        },
+        _bounceMotion: function (opts, callback) {
+            var original = leaflet__WEBPACK_IMPORTED_MODULE_0__["latLng"](this._origLatlng);
+            var start_y = this._dropPoint.y;
+            var start_x = this._dropPoint.x;
+            var distance = this._point.y - start_y;
+            var self = this;
+            self._animationId = leaflet__WEBPACK_IMPORTED_MODULE_0__["Util"].requestAnimFrame(function () {
+                self._motionStep({
+                    duration: opts.duration || 1000,
+                    loop: opts.loop || 1,
+                    start: new Date(),
+                    step: function (delta) {
+                        self._dropPoint.y =
+                            start_y
+                                + (distance * delta)
+                                - (self._map.project(self._map.getCenter()).y - self._origMapCenter.y);
+                        self._dropPoint.x =
+                            start_x
+                                - (self._map.project(self._map.getCenter()).x - self._origMapCenter.x);
+                        self.setLatLng(self._toLatLng(self._dropPoint));
+                    },
+                    end: function () {
+                        self.setLatLng(original);
+                        if (typeof callback === 'function')
+                            callback();
+                    },
+                });
+            });
+        },
+        // Many thanks to Robert Penner for this function
+        _easeOutBounce: function (pos) {
+            if ((pos) < (1 / 2.75)) {
+                return (7.5625 * pos * pos);
+            }
+            else if (pos < (2 / 2.75)) {
+                return (7.5625 * (pos -= (1.5 / 2.75)) * pos + 0.75);
+            }
+            else if (pos < (2.5 / 2.75)) {
+                return (7.5625 * (pos -= (2.25 / 2.75)) * pos + 0.9375);
+            }
+            else {
+                return (7.5625 * (pos -= (2.625 / 2.75)) * pos + 0.984375);
+            }
+        },
+        // Bounce : if options.height in pixels is not specified, drop from top.
+        // If options.duration is not specified animation is 1s long.
+        bounce: function (options, endCallback) {
+            if (typeof options === 'function') {
+                endCallback = options;
+                options = null;
+            }
+            options = options || { duration: 1000, height: -1, loop: 1 };
+            // backward compatibility
+            if (typeof options === 'number') {
+                options['duration'] = arguments[0];
+                options['height'] = arguments[1];
+            }
+            // Keep original map center
+            this._origMapCenter = this._map.project(this._map.getCenter());
+            this._dropPoint = this._getDropPoint(options.height);
+            this._bounceMotion(options, endCallback);
+        },
+        stopBounce: function () {
+            // We may have modified the marker; so we need to place it where it
+            // belongs so next time its coordinates are not changed.
+            this.setLatLng(this._origLatlng);
+            leaflet__WEBPACK_IMPORTED_MODULE_0__["Util"].cancelAnimFrame(this._animationId);
+        },
+        // This will get you a drop point given a height.
+        // If no height is given, the top y will be used.
+        _getDropPoint: function (height) {
+            // Get current coordidates in pixel
+            this._point = this._toPoint(this._origLatlng);
+            var top_y;
+            if (height === undefined || height < 0) {
+                top_y = this._toPoint(this._map.getBounds()._northEast).y;
+            }
+            else {
+                top_y = this._point.y - height;
+            }
+            return new leaflet__WEBPACK_IMPORTED_MODULE_0__["Point"](this._point.x, top_y);
+        },
+        onAdd: function (map) {
+            this._map = map;
+            // Call leaflet original method to add the Marker to the map.
+            originalOnAdd.call(this, map);
+            // Keep original latitude and longitude
+            this._origLatlng = this.getLatLng();
+            if (this.options.bounceOnAdd === true) {
+                this.bounce(this.options.bounceOnAddOptions, this.options.bounceOnAddCallback);
+            }
+        },
+        onRemove: function (map) {
+            this.stopBounce();
+            originalOnRemove.call(this, map);
+        },
+    });
+})();
+//# sourceMappingURL=marker.js.map
+
+/***/ }),
+
+/***/ "./src/app/_util/leaflet/plugins/grid.js":
+/*!***********************************************!*\
+  !*** ./src/app/_util/leaflet/plugins/grid.js ***!
+  \***********************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -1480,302 +2048,6 @@ L.utmGrid = function (zone, bSouth, options) {
 
 /***/ }),
 
-/***/ "./src/app/_util/leaflet/icon.ts":
-/*!***************************************!*\
-  !*** ./src/app/_util/leaflet/icon.ts ***!
-  \***************************************/
-/*! exports provided: htmlIcon */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "htmlIcon", function() { return htmlIcon; });
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var node_modules_leaflet_src_geometry_Point__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! node_modules/leaflet/src/geometry/Point */ "./node_modules/leaflet/src/geometry/Point.js");
-
-
-/* creates a leaflet icon out of an html element
-the default divIcon class (that's being extended) uses innerHTML() which breaks svg href links in iOS/Safari*/
-var _htmlIcon = leaflet__WEBPACK_IMPORTED_MODULE_0__["DivIcon"].extend({
-    createIcon: function (oldIcon) {
-        var _div = (oldIcon && oldIcon.tagName === 'DIV') ? oldIcon : this.options.html, options = this.options;
-        if (options.bgPos) {
-            var bgPos = Object(node_modules_leaflet_src_geometry_Point__WEBPACK_IMPORTED_MODULE_1__["toPoint"])(options.bgPos);
-            _div.style.backgroundPosition = (-bgPos.x) + 'px ' + (-bgPos.y) + 'px';
-        }
-        this._setIconStyles(_div, 'icon');
-        return _div;
-    }
-});
-function htmlIcon(options) {
-    return new _htmlIcon(options);
-}
-
-
-/***/ }),
-
-/***/ "./src/app/_util/leaflet/layer.ts":
-/*!****************************************!*\
-  !*** ./src/app/_util/leaflet/layer.ts ***!
-  \****************************************/
-/*! exports provided: createMapTileLayer, createGridLayer */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createMapTileLayer", function() { return createMapTileLayer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createGridLayer", function() { return createGridLayer; });
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _tiles__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./tiles */ "./src/app/_util/leaflet/tiles.ts");
-/* harmony import */ var _trail__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../trail */ "./src/app/_util/trail.ts");
-/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-
-
-
-
-// create the main map tile layer, based on the custom fallback tile.
-// if there's an internet connection use arcGis, else use locally stored tiles (or default error tile)
-function createMapTileLayer(url) {
-    var _fallbackUrl = _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].onlineTileUrl;
-    var _fallbackLayer = Object(_tiles__WEBPACK_IMPORTED_MODULE_1__["fallbackLayer"])(url, {
-        // regular min & max zoom prop causes flickering
-        minNativeZoom: 15,
-        maxNativeZoom: 15,
-        fallbackTileUrl: _fallbackUrl,
-        errorTileUrl: './assets/images/missing.png',
-        keepBuffer: 0,
-        updateWhenIdle: false,
-        updateWhenZooming: false
-    });
-    return _fallbackLayer;
-}
-/* grid (TODO: overlapping grid issues, investigate UTM grids)
-considering rewriting this: https://github.com/ggolikov/Leaflet.gmxIndexGrid for leafelt 1.x
-creates a square mile grid layer array (currently they're sliced into UTM zones, would prefer a single layer) */
-function createGridLayer(trailAbbr) {
-    var _gridLayers = [];
-    var _trailUtm = Object(_trail__WEBPACK_IMPORTED_MODULE_2__["getTrailMetaDataByAbbr"])(trailAbbr).utm;
-    if (_trailUtm) {
-        _trailUtm.forEach(function (zone) {
-            var _utmGrid = leaflet__WEBPACK_IMPORTED_MODULE_0__["utmGrid"](zone, false, {
-                color: '#AAA',
-                showAxis100km: false,
-                weight: 1,
-                minInterval: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE,
-                maxInterval: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE,
-                opacity: 1,
-            });
-            _gridLayers.push(_utmGrid);
-        });
-    }
-    return _gridLayers;
-}
-
-
-/***/ }),
-
-/***/ "./src/app/_util/leaflet/marker.js":
-/*!*****************************************!*\
-  !*** ./src/app/_util/leaflet/marker.js ***!
-  \*****************************************/
-/*! no exports provided */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
-/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
-
-/* simple mixin to force a z-index for a marker
-this overrides the default index sorting leaflet has.
-used for the User marker (always on top) */
-(function (global) {
-    var MarkerMixin = {
-        _updateZIndex: function (offset) {
-            this._icon.style.zIndex = this.options.forceZIndex ? (this.options.forceZIndex + (this.options.zIndexOffset || 0)) : (this._zIndex + offset);
-        },
-        setForceZIndex: function (forceZIndex) {
-            console.log('force');
-            this.options.forceZIndex = forceZIndex ? forceZIndex : null;
-        }
-    };
-    if (global)
-        global.include(MarkerMixin);
-})(leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"]);
-/**
- * Copyright (C) 2013 Maxime Hadjinlian <maxime.hadjinlian@gmail.com>
- * All Rights Reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice,
- *   this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *   this list of conditions and the following disclaimer in the documentation
- *   and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-(function () {
-    // Retain the value of the original onAdd and onRemove functions
-    var originalOnAdd = leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].prototype.onAdd;
-    var originalOnRemove = leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].prototype.onRemove;
-    // Add bounceonAdd options
-    leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].mergeOptions({
-        bounceOnAdd: false,
-        bounceOnAddOptions: {
-            duration: 1000,
-            height: -1,
-            loop: 1,
-        },
-        bounceOnAddCallback: function () { },
-    });
-    leaflet__WEBPACK_IMPORTED_MODULE_0__["Marker"].include({
-        _toPoint: function (latlng) {
-            return this._map.latLngToContainerPoint(latlng);
-        },
-        _toLatLng: function (point) {
-            return this._map.containerPointToLatLng(point);
-        },
-        _motionStep: function (opts) {
-            var self = this;
-            var timePassed = new Date().getTime() - opts.start;
-            var progress = timePassed / opts.duration;
-            if (progress > 1) {
-                progress = 1;
-            }
-            var delta = self._easeOutBounce(progress);
-            opts.step(delta);
-            if (progress === 1) {
-                opts.start = new Date().getTime();
-                progress = 0;
-                if (opts.loop > 0)
-                    opts.loop = opts.loop - 1;
-                if (opts.loop === 0) {
-                    opts.end();
-                    return;
-                }
-            }
-            self._animationId = leaflet__WEBPACK_IMPORTED_MODULE_0__["Util"].requestAnimFrame(function (timestamp) {
-                self._motionStep(opts);
-            });
-        },
-        _bounceMotion: function (opts, callback) {
-            var original = leaflet__WEBPACK_IMPORTED_MODULE_0__["latLng"](this._origLatlng);
-            var start_y = this._dropPoint.y;
-            var start_x = this._dropPoint.x;
-            var distance = this._point.y - start_y;
-            var self = this;
-            self._animationId = leaflet__WEBPACK_IMPORTED_MODULE_0__["Util"].requestAnimFrame(function () {
-                self._motionStep({
-                    duration: opts.duration || 1000,
-                    loop: opts.loop || 1,
-                    start: new Date(),
-                    step: function (delta) {
-                        self._dropPoint.y =
-                            start_y
-                                + (distance * delta)
-                                - (self._map.project(self._map.getCenter()).y - self._origMapCenter.y);
-                        self._dropPoint.x =
-                            start_x
-                                - (self._map.project(self._map.getCenter()).x - self._origMapCenter.x);
-                        self.setLatLng(self._toLatLng(self._dropPoint));
-                    },
-                    end: function () {
-                        self.setLatLng(original);
-                        if (typeof callback === 'function')
-                            callback();
-                    },
-                });
-            });
-        },
-        // Many thanks to Robert Penner for this function
-        _easeOutBounce: function (pos) {
-            if ((pos) < (1 / 2.75)) {
-                return (7.5625 * pos * pos);
-            }
-            else if (pos < (2 / 2.75)) {
-                return (7.5625 * (pos -= (1.5 / 2.75)) * pos + 0.75);
-            }
-            else if (pos < (2.5 / 2.75)) {
-                return (7.5625 * (pos -= (2.25 / 2.75)) * pos + 0.9375);
-            }
-            else {
-                return (7.5625 * (pos -= (2.625 / 2.75)) * pos + 0.984375);
-            }
-        },
-        // Bounce : if options.height in pixels is not specified, drop from top.
-        // If options.duration is not specified animation is 1s long.
-        bounce: function (options, endCallback) {
-            if (typeof options === 'function') {
-                endCallback = options;
-                options = null;
-            }
-            options = options || { duration: 1000, height: -1, loop: 1 };
-            // backward compatibility
-            if (typeof options === 'number') {
-                options['duration'] = arguments[0];
-                options['height'] = arguments[1];
-            }
-            // Keep original map center
-            this._origMapCenter = this._map.project(this._map.getCenter());
-            this._dropPoint = this._getDropPoint(options.height);
-            this._bounceMotion(options, endCallback);
-        },
-        stopBounce: function () {
-            // We may have modified the marker; so we need to place it where it
-            // belongs so next time its coordinates are not changed.
-            this.setLatLng(this._origLatlng);
-            leaflet__WEBPACK_IMPORTED_MODULE_0__["Util"].cancelAnimFrame(this._animationId);
-        },
-        // This will get you a drop point given a height.
-        // If no height is given, the top y will be used.
-        _getDropPoint: function (height) {
-            // Get current coordidates in pixel
-            this._point = this._toPoint(this._origLatlng);
-            var top_y;
-            if (height === undefined || height < 0) {
-                top_y = this._toPoint(this._map.getBounds()._northEast).y;
-            }
-            else {
-                top_y = this._point.y - height;
-            }
-            return new leaflet__WEBPACK_IMPORTED_MODULE_0__["Point"](this._point.x, top_y);
-        },
-        onAdd: function (map) {
-            this._map = map;
-            // Call leaflet original method to add the Marker to the map.
-            originalOnAdd.call(this, map);
-            // Keep original latitude and longitude
-            this._origLatlng = this.getLatLng();
-            if (this.options.bounceOnAdd === true) {
-                this.bounce(this.options.bounceOnAddOptions, this.options.bounceOnAddCallback);
-            }
-        },
-        onRemove: function (map) {
-            this.stopBounce();
-            originalOnRemove.call(this, map);
-        },
-    });
-})();
-//# sourceMappingURL=marker.js.map
-
-/***/ }),
-
 /***/ "./src/app/_util/leaflet/tiles.ts":
 /*!****************************************!*\
   !*** ./src/app/_util/leaflet/tiles.ts ***!
@@ -1855,39 +2127,28 @@ function fallbackLayer(url, options) {
 /*!*******************************!*\
   !*** ./src/app/_util/math.ts ***!
   \*******************************/
-/*! exports provided: isPrime, normalizeElevation, distanceInMilesFeet */
+/*! exports provided: isPrime, distanceInMilesFeet, getClosestPointOnLine */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isPrime", function() { return isPrime; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "normalizeElevation", function() { return normalizeElevation; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "distanceInMilesFeet", function() { return distanceInMilesFeet; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getClosestPointOnLine", function() { return getClosestPointOnLine; });
 /* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
 // is a number a prime number?
 
-function isPrime(num) {
-    for (var i = 2; i < num; i++) {
-        if (num % i === 0)
+function isPrime(number) {
+    for (var i = 2; i < number; i++) {
+        if (number % i === 0) {
             return false;
+        }
     }
-    return num !== 1 && num !== 0;
-}
-// normalizes elevation within a range (converts a value in feet to a y position in pixels)
-function normalizeElevation(containerHeight, elevation, min, range, padding) {
-    if (range < 700) {
-        var _difference = 700 - range;
-        range = 700;
-        elevation += _difference / 3;
-    }
-    elevation = (elevation - (min - padding)) / (range + (padding * 2));
-    // invert as svg draws from top left
-    elevation = Math.abs(elevation - 1);
-    return Math.round(elevation * containerHeight);
+    return number !== 1 && number !== 0;
 }
 // convert meters to miles/feet
 function distanceInMilesFeet(distanceMeters, force) {
-    if (force === void 0) { force = ""; }
+    if (force === void 0) { force = ''; }
     var _distance;
     var _unit;
     if (distanceMeters / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_0__["environment"].MILE >= 0.1 && force !== 'ft' || force === 'mi') {
@@ -1901,6 +2162,64 @@ function distanceInMilesFeet(distanceMeters, force) {
         _unit = 'ft.';
     }
     return { distance: _distance, unit: _unit };
+}
+/* find a point on a line segment nearest to a point */
+// based on: https://stackoverflow.com/questions/32281168/find-a-point-on-a-line-closest-to-a-third-point-javascript
+function getClosestPointOnLine(point, lineSegment) {
+    var minDist;
+    var fTo;
+    var fFrom;
+    var latitude;
+    var longitude;
+    var i;
+    var dist;
+    if (lineSegment.length > 1) {
+        for (var n = 1; n < lineSegment.length; n++) {
+            if (lineSegment[n].latitude !== lineSegment[n - 1].latitude) {
+                var a = (lineSegment[n].longitude - lineSegment[n - 1].longitude) / (lineSegment[n].latitude - lineSegment[n - 1].latitude);
+                var b = lineSegment[n].longitude - a * lineSegment[n].latitude;
+                dist = Math.abs(a * point.latitude + b - point.longitude) / Math.sqrt(a * a + 1);
+            }
+            else {
+                dist = Math.abs(point.latitude - lineSegment[n].latitude);
+            }
+            var rl2 = Math.pow(lineSegment[n].longitude - lineSegment[n - 1].longitude, 2) + Math.pow(lineSegment[n].latitude - lineSegment[n - 1].latitude, 2);
+            var ln2 = Math.pow(lineSegment[n].longitude - point.longitude, 2) + Math.pow(lineSegment[n].latitude - point.latitude, 2);
+            var lnm12 = Math.pow(lineSegment[n - 1].longitude - point.longitude, 2) + Math.pow(lineSegment[n - 1].latitude - point.latitude, 2);
+            var dist2 = Math.pow(dist, 2);
+            // calculated length^2 of line segment
+            var calcrl2 = ln2 - dist2 + lnm12 - dist2;
+            // redefine minimum distance to line segment (not infinite line) if necessary
+            if (calcrl2 > rl2) {
+                dist = Math.sqrt(Math.min(ln2, lnm12));
+            }
+            if (minDist == null || minDist > dist) {
+                if (calcrl2 > rl2) {
+                    if (lnm12 < ln2) {
+                        fTo = 0; //nearer to previous point
+                        fFrom = 1;
+                    }
+                    else {
+                        fFrom = 0; //nearer to current point
+                        fTo = 1;
+                    }
+                }
+                else {
+                    // perpendicular from point intersects line segment
+                    fTo = ((Math.sqrt(lnm12 - dist2)) / Math.sqrt(rl2));
+                    fFrom = ((Math.sqrt(ln2 - dist2)) / Math.sqrt(rl2));
+                }
+                minDist = dist;
+                i = n;
+            }
+        }
+        var dx = lineSegment[i - 1].latitude - lineSegment[i].latitude;
+        var dy = lineSegment[i - 1].longitude - lineSegment[i].longitude;
+        latitude = lineSegment[i - 1].latitude - (dx * fTo);
+        longitude = lineSegment[i - 1].longitude - (dy * fTo);
+    }
+    // console.log({'latitude': latitude, 'longitude': longitude, 'i': i, 'fTo': fTo, 'fFrom': fFrom});
+    return { latitude: latitude, longitude: longitude };
 }
 
 
@@ -1976,7 +2295,7 @@ function saveFileAs(data, filename) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "svgPath", function() { return svgPath; });
-// UNUSED XXX TODO ?
+// TODO: currently unused, would add another calculation
 // The smoothing ratio
 var smoothing = 0.025;
 // Properties of a line
@@ -2039,6 +2358,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "reverseSnow", function() { return reverseSnow; });
 /* harmony import */ var _type_snow__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../type/snow */ "./src/app/type/snow.ts");
 
+var SnowPivot = /** @class */ (function () {
+    function SnowPivot() {
+    }
+    return SnowPivot;
+}());
+// from source file
+var SnowLocation = /** @class */ (function () {
+    function SnowLocation() {
+    }
+    return SnowLocation;
+}());
 function parseSnow(snow, trailId, abbr, version) {
     if (!snow || snow.length === 0) {
         return;
@@ -2048,6 +2378,7 @@ function parseSnow(snow, trailId, abbr, version) {
     _returnObj.version = version;
     _returnObj.abbr = abbr;
     var _snowPivots = [];
+    // starting at 1 for a comparison with the previous point
     for (var i = 1; i < snow.length; i++) {
         // get pivots (no snow/snow & snow/no-snow)
         if (i === 0 && snow[i].y > 0) {
@@ -2095,8 +2426,8 @@ function parseSnow(snow, trailId, abbr, version) {
         }
         // set start / end point for end mile
         _snowMiles[Math.floor(_snowPivots[s + 1].location.x)] = [
-            { distance: 0, elevation: _snowPivots[s].location.elev + (((_miles) / _distance) * _levelChange) },
-            { distance: Number((_distance - _miles).toFixed(2)), elevation: _snowPivots[s + 1].location.elev }
+            new _type_snow__WEBPACK_IMPORTED_MODULE_0__["Snowpoint"](0, _snowPivots[s].location.elev + (((_miles) / _distance) * _levelChange)),
+            new _type_snow__WEBPACK_IMPORTED_MODULE_0__["Snowpoint"](Number((_distance - _miles).toFixed(2)), _snowPivots[s + 1].location.elev)
         ];
     }
     _returnObj.snowMiles = _snowMiles;
@@ -2107,12 +2438,14 @@ function reverseSnow(snow, trailLength) {
     // snow.snowMiles.reverse();
     var _newSnowArray = [];
     snow.snowMiles.forEach(function (snowMile, index) {
-        Array(snowMile).reverse();
-        Array(snowMile).forEach(function (point) {
-            if (point) {
-                point['distance'] = Math.abs(point['distance'] - 1);
-            }
-        });
+        if (snowMile) {
+            snowMile.reverse();
+            snowMile.forEach(function (point) {
+                if (point) {
+                    point.distance = Math.abs(point.distance - 1);
+                }
+            });
+        }
         _newSnowArray[trailLength - index] = snowMile;
     });
     snow.snowMiles = _newSnowArray;
@@ -2136,20 +2469,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pauseTimeOut", function() { return pauseTimeOut; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "resumeTimeOut", function() { return resumeTimeOut; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clearTimeOut", function() { return clearTimeOut; });
-// simple class to add a pause option to setTimeout.
 var TimerObj = /** @class */ (function () {
-    function TimerObj() {
+    function TimerObj(id, runTime, action, startTime, timeRemaining) {
+        this.id = id;
+        this.runTime = runTime;
+        this.action = action;
+        this.startTime = (startTime) ? startTime : new Date().getTime();
+        this.timeRemaining = timeRemaining;
     }
     return TimerObj;
 }());
 
 // timeout in miliseconds, returns id, start-time
 function setTimeOut(runTime, action) {
-    var _startTime = new Date().getTime();
     var _id = setTimeout(function () {
         action();
     }, runTime);
-    return { id: _id, startTime: _startTime, runTime: runTime, action: action };
+    return new TimerObj(_id, runTime, action);
 }
 // clearing the current timeout but setting the remaining time
 function pauseTimeOut(timerObj) {
@@ -2177,10 +2513,10 @@ function clearTimeOut(timerObj) {
 
 /***/ }),
 
-/***/ "./src/app/_util/trail.ts":
-/*!********************************!*\
-  !*** ./src/app/_util/trail.ts ***!
-  \********************************/
+/***/ "./src/app/_util/trail-meta.ts":
+/*!*************************************!*\
+  !*** ./src/app/_util/trail-meta.ts ***!
+  \*************************************/
 /*! exports provided: setTrailMetaData, getTrailsMetaData, getTrailMetaDataById, getTrailMetaDataByAbbr */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -2191,7 +2527,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getTrailMetaDataById", function() { return getTrailMetaDataById; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getTrailMetaDataByAbbr", function() { return getTrailMetaDataByAbbr; });
 var trails;
-// set (once?)
+// set
 function setTrailMetaData(data) {
     trails = data;
 }
@@ -2217,6 +2553,66 @@ function getTrailMetaDataByAbbr(abbr) {
         throw new Error('no trails available!');
     }
     return trails[abbr];
+}
+
+
+/***/ }),
+
+/***/ "./src/app/_util/trail.ts":
+/*!********************************!*\
+  !*** ./src/app/_util/trail.ts ***!
+  \********************************/
+/*! exports provided: normalizeElevation, calculateOHLC */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "normalizeElevation", function() { return normalizeElevation; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculateOHLC", function() { return calculateOHLC; });
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+// TODO: find all usages of this routine (or similar) there are a bunch
+// normalizes elevation within a range (converts a value in feet to a y position in pixels)
+
+// normalize the elevation based on the hieght of the container (so that the max elevation matches the container height)
+function normalizeElevation(containerHeight, elevation, min, range, padding) {
+    var _halfMile = _environments_environment_prod__WEBPACK_IMPORTED_MODULE_0__["environment"].MILE / 2;
+    if (range < _halfMile / 2) {
+        var _difference = _halfMile / 2 - range;
+        range = _halfMile;
+        elevation += _difference / 3;
+    }
+    elevation = (elevation - (min - padding)) / (range + (padding * 2));
+    // invert as svg draws from top left
+    elevation = Math.abs(elevation - 1);
+    return Math.round(elevation * containerHeight);
+}
+// calculate elevation range
+function calculateOHLC(data, range, identifier, nested) {
+    if (identifier === void 0) { identifier = 'elevation'; }
+    if (nested === void 0) { nested = true; }
+    // select sub data set to use for calculations
+    var _subArr = data.slice(range['start'], range['end']);
+    return _ohlc(_subArr);
+}
+// calculate ohlc of single data point?
+function _ohlc(waypoints) {
+    // calculate OHLC
+    var _open = Number(waypoints[0].elevation);
+    var _high = Number(_open);
+    var _low = Number(_open);
+    var _close = Number(waypoints[waypoints.length - 1].elevation);
+    var _length = waypoints.length; // speed
+    for (var i = 0; i < _length; i++) {
+        var _waypoint = waypoints[i];
+        var _elevation = Number(_waypoint.elevation);
+        if (_elevation > _high) {
+            _high = _elevation;
+        }
+        else if (_elevation < _low) {
+            _low = _elevation;
+        }
+    }
+    return { open: _open, high: _high, low: _low, close: _close };
 }
 
 
@@ -2289,6 +2685,7 @@ var AppRoutingModule = /** @class */ (function () {
     // STARTUP
     function AppRoutingModule(_router) {
         this._router = _router;
+        // iOS router error testing
         _router.events.subscribe(function (event) {
             if (event instanceof _angular_router__WEBPACK_IMPORTED_MODULE_2__["NavigationStart"]) {
                 // Show loading indicator
@@ -2336,7 +2733,7 @@ module.exports = "<fa-sampler></fa-sampler>\n<router-outlet>\n  <loader-overlay 
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ":host .showNav {\n  margin-top: 0;\n  visibility: visible;\n  -webkit-transform: scale(1);\n          transform: scale(1);\n  transition: visibility 200ms linear, margin-top 100ms ease-out; }\n\n:host .hideNav {\n  margin-top: -400px;\n  visibility: hidden;\n  transition: visibility 200ms linear, margin-top 100ms ease-in; }\n\n:host .hidden {\n  display: none;\n  visibility: hidden; }\n\n:host::ng-deep .fa-marker {\n  color: white; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2FwcC5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUVHLGFBQWE7RUFDYixtQkFBbUI7RUFDbkIsMkJBQW1CO1VBQW5CLG1CQUFtQjtFQUNuQiw4REFBOEQsRUFBQTs7QUFMakU7RUFRRyxrQkFBa0I7RUFDbEIsa0JBQWtCO0VBQ2xCLDZEQUE2RCxFQUFBOztBQVZoRTtFQWFHLGFBQWE7RUFDYixrQkFBa0IsRUFBQTs7QUFFckI7RUFHRyxZQUFZLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9hcHAuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3Qge1xuICAuc2hvd05hdiB7XG4gICAgbWFyZ2luLXRvcDogMDtcbiAgICB2aXNpYmlsaXR5OiB2aXNpYmxlO1xuICAgIHRyYW5zZm9ybTogc2NhbGUoMSk7XG4gICAgdHJhbnNpdGlvbjogdmlzaWJpbGl0eSAyMDBtcyBsaW5lYXIsIG1hcmdpbi10b3AgMTAwbXMgZWFzZS1vdXQ7IH1cblxuICAuaGlkZU5hdiB7XG4gICAgbWFyZ2luLXRvcDogLTQwMHB4O1xuICAgIHZpc2liaWxpdHk6IGhpZGRlbjtcbiAgICB0cmFuc2l0aW9uOiB2aXNpYmlsaXR5IDIwMG1zIGxpbmVhciwgbWFyZ2luLXRvcCAxMDBtcyBlYXNlLWluOyB9XG5cbiAgLmhpZGRlbiB7XG4gICAgZGlzcGxheTogbm9uZTtcbiAgICB2aXNpYmlsaXR5OiBoaWRkZW47IH0gfVxuXG4gOmhvc3Q6Om5nLWRlZXAge1xuXG4gIC5mYS1tYXJrZXIge1xuICAgIGNvbG9yOiB3aGl0ZTsgfSB9XG4iXX0= */"
+module.exports = ":host .showNav {\n  margin-top: 0;\n  visibility: visible;\n  -webkit-transform: scale(1);\n          transform: scale(1);\n  transition: visibility 200ms linear, margin-top 100ms ease-out; }\n\n:host .hideNav {\n  margin-top: -400px;\n  visibility: hidden;\n  transition: visibility 200ms linear, margin-top 100ms ease-in; }\n\n:host .hidden {\n  display: none;\n  visibility: hidden; }\n\n:host::ng-deep .note:not(.multiple) {\n  color: rgba(95, 83, 73, 0.85); }\n\n:host::ng-deep .fa-marker {\n  color: white; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2FwcC5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUVHLGFBQWE7RUFDYixtQkFBbUI7RUFDbkIsMkJBQW1CO1VBQW5CLG1CQUFtQjtFQUNuQiw4REFBOEQsRUFBQTs7QUFMakU7RUFRRyxrQkFBa0I7RUFDbEIsa0JBQWtCO0VBQ2xCLDZEQUE2RCxFQUFBOztBQVZoRTtFQWFHLGFBQWE7RUFDYixrQkFBa0IsRUFBQTs7QUFFckI7RUFHRyw2QkFBNkIsRUFBQTs7QUFIaEM7RUFNRyxZQUFZLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9hcHAuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3Qge1xuICAuc2hvd05hdiB7XG4gICAgbWFyZ2luLXRvcDogMDtcbiAgICB2aXNpYmlsaXR5OiB2aXNpYmxlO1xuICAgIHRyYW5zZm9ybTogc2NhbGUoMSk7XG4gICAgdHJhbnNpdGlvbjogdmlzaWJpbGl0eSAyMDBtcyBsaW5lYXIsIG1hcmdpbi10b3AgMTAwbXMgZWFzZS1vdXQ7IH1cblxuICAuaGlkZU5hdiB7XG4gICAgbWFyZ2luLXRvcDogLTQwMHB4O1xuICAgIHZpc2liaWxpdHk6IGhpZGRlbjtcbiAgICB0cmFuc2l0aW9uOiB2aXNpYmlsaXR5IDIwMG1zIGxpbmVhciwgbWFyZ2luLXRvcCAxMDBtcyBlYXNlLWluOyB9XG5cbiAgLmhpZGRlbiB7XG4gICAgZGlzcGxheTogbm9uZTtcbiAgICB2aXNpYmlsaXR5OiBoaWRkZW47IH0gfVxuXG4gOmhvc3Q6Om5nLWRlZXAge1xuXG4gIC5ub3RlOm5vdCgubXVsdGlwbGUpIHtcbiAgICBjb2xvcjogcmdiYSg5NSwgODMsIDczLCAwLjg1KTsgfVxuXG4gIC5mYS1tYXJrZXIge1xuICAgIGNvbG9yOiB3aGl0ZTsgfSB9XG4iXX0= */"
 
 /***/ }),
 
@@ -2362,6 +2759,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _service_filesystem_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./service/filesystem.service */ "./src/app/service/filesystem.service.ts");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var _service_connection_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./service/connection.service */ "./src/app/service/connection.service.ts");
+/* harmony import */ var _base_base_base_component__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./base/base/base.component */ "./src/app/base/base/base.component.ts");
 
 
 
@@ -2374,42 +2772,46 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var AppComponent = /** @class */ (function () {
+
+var AppComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](AppComponent, _super);
     function AppComponent(_route, _fileSystemService, _dialog, _loaderService, _element, _injector, _localStorage, _connectionService) {
-        this._route = _route;
-        this._fileSystemService = _fileSystemService;
-        this._dialog = _dialog;
-        this._loaderService = _loaderService;
-        this._element = _element;
-        this._injector = _injector;
-        this._localStorage = _localStorage;
-        this._connectionService = _connectionService;
-        this.showLoader = true; // show loader/spinner by default
-        this.navIsVisible = true; // nav visibility
+        var _this = _super.call(this) || this;
+        _this._route = _route;
+        _this._fileSystemService = _fileSystemService;
+        _this._dialog = _dialog;
+        _this._loaderService = _loaderService;
+        _this._element = _element;
+        _this._injector = _injector;
+        _this._localStorage = _localStorage;
+        _this._connectionService = _connectionService;
+        _this.showLoader = true; // show loader/spinner by default
+        _this.navIsVisible = true; // nav visibility
         // makes constructor props accessible through LocationService, needed for inheritance
-        _service_location_service__WEBPACK_IMPORTED_MODULE_6__["LocationService"].injector = this._injector;
+        _service_location_service__WEBPACK_IMPORTED_MODULE_6__["LocationService"].injector = _this._injector;
+        return _this;
     }
     AppComponent.prototype.ngOnInit = function () {
         var _this = this;
         var _self = this;
-        // check user agent
         if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/)) {
             console.log('running on mobile device:', navigator.userAgent);
-            document.addEventListener('deviceready', function () {
+            this.addEventListener(document, 'deviceready', function () {
                 _self._onReady();
+                _self.removeEventListener(document, 'deviceready');
             });
         }
         else {
-            console.log('running in browser');
+            console.log('debugging in browser');
             this._onReady();
         }
         // loader (spinner)
-        this._loaderService.observe.subscribe(function (obj) {
+        this.addSubscription('loaderService', this._loaderService.observe.subscribe(function (obj) {
             _this.showLoader = (obj['type'] === 'self') ? (obj['action'] === 'show') : _this.showLoader;
             if (obj['action'] === 'hide') {
                 _this.initialized = true;
             }
-        });
+        }));
         // show settings on first load
         var _firstRun = this._localStorage.retrieve('firstRun');
         if (_firstRun) {
@@ -2419,20 +2821,18 @@ var AppComponent = /** @class */ (function () {
             }, 250);
         }
         this._connectionService.startTracking();
-        this._element.nativeElement.addEventListener('markerClick', this._onDialogEvent.bind(this), false);
-        this._element.nativeElement.addEventListener('offtrail', this._onDialogEvent.bind(this), false);
+        this.addEventListener(this._element.nativeElement, ['markerClick', 'offtrail'], this._onDialogEvent.bind(this), false);
     };
     AppComponent.prototype.ngOnDestroy = function () {
+        _super.prototype.ngOnDestroy.call(this);
         this._connectionService.stopTracking();
-        this._element.nativeElement.removeEventListener('markerClick', this._onDialogEvent.bind(this));
-        this._element.nativeElement.removeEventListener('offtrail', this._onDialogEvent.bind(this), false);
     };
     // STARTUP
     AppComponent.prototype._onReady = function () {
         // reload on storage timestamp change (user settings changed that require a reload)
-        this._localStorage.observe('timestamp').subscribe(function (value) {
+        this.addSubscription('reload', this._localStorage.observe('timestamp').subscribe(function (value) {
             window.location.reload();
-        });
+        }));
     };
     // EVENT HANDLERS
     // angular event handler for navEvents (public for aot)
@@ -2446,6 +2846,7 @@ var AppComponent = /** @class */ (function () {
         // destination reached
         event.stopImmediatePropagation();
         event.stopPropagation();
+        this._forceHideNavigation();
         if (event.type === 'offtrail') {
             this._openOfftrailDialog(event);
         }
@@ -2456,44 +2857,22 @@ var AppComponent = /** @class */ (function () {
     // DIALOGS
     // marker dialog
     AppComponent.prototype._openMarkerDialog = function (event) {
-        var _this = this;
-        // get marker poi data
-        if (this.navIsVisible) {
-            this._toggleNavigationVisibility(false);
-        }
         if (this._markerDialog) {
-            this._dialog.closeAll();
-            this._markerDialogCloseSubscription.unsubscribe();
-            this._markerDialogCloseSubscription = null;
-            this._markerDialog = null;
+            this._markerDialog.close();
         }
         this._markerDialog = this._dialog.open(_component_dialog_marker_dialog_marker_dialog_component__WEBPACK_IMPORTED_MODULE_5__["MarkerDialogComponent"], {
-            autoFocus: false,
-            width: '85%',
-            height: '75%',
-            data: event.detail
+            autoFocus: false, width: '85%', height: '75%', data: event.detail
         });
-        this._markerDialogCloseSubscription = this._markerDialog.afterClosed().subscribe(function (result) {
-            _this._toggleNavigationVisibility(true);
-            _this._markerDialogCloseSubscription.unsubscribe();
-            _this._markerDialogCloseSubscription = null;
-            _this._markerDialog = null;
-        });
+        this._onDialogClose(this._markerDialog, 'markerClosed_' + event.detail.id);
     };
     // settings dialog
     AppComponent.prototype._openSettingsDialog = function () {
         var _this = this;
-        if (this.navIsVisible) {
-            this._toggleNavigationVisibility(false);
-        }
+        this._forceHideNavigation();
         var _settingsDialog = this._dialog.open(_component_dialog_settings_dialog_settings_dialog_component__WEBPACK_IMPORTED_MODULE_4__["SettingsDialogComponent"], {
-            autoFocus: false,
-            width: '85%',
-            height: '75%',
-            data: { icon: 'cog' }
+            autoFocus: false, width: '85%', height: '75%', data: { icon: 'cog' }
         });
-        _settingsDialog.afterClosed().subscribe(function (result) {
-            _this._toggleNavigationVisibility(true);
+        this._onDialogClose(_settingsDialog, 'settingsClosed', function (result) {
             if (result) {
                 _this._loaderService.showOverlay();
                 _this._localStorage.store('timestamp', new Date().getTime());
@@ -2501,31 +2880,38 @@ var AppComponent = /** @class */ (function () {
         });
     };
     // off trail dialog (mile simulator)
-    // TODO replace with native dialog for mobile?
     AppComponent.prototype._openOfftrailDialog = function (event) {
         var _this = this;
-        if (this.navIsVisible) {
-            this._toggleNavigationVisibility(false);
-        }
         if (this._offtrailDialog) {
-            return;
+            this._markerDialog.close();
         }
         this._offtrailDialog = this._dialog.open(_component_dialog_offtrail_dialog_offtrail_dialog_component__WEBPACK_IMPORTED_MODULE_7__["OfftrailDialogComponent"], {
-            panelClass: 'offtrail-dialog',
-            autoFocus: false,
-            width: '50%',
-            height: '75%%',
-            data: event.detail
+            panelClass: 'offtrail-dialog', autoFocus: false, width: '50%', height: '75%', data: event.detail
         });
-        this._offtrailDialog.afterClosed().subscribe(function (result) {
-            _this._toggleNavigationVisibility(true);
+        this._onDialogClose(this._offtrailDialog, 'offtrailClosed', function (result) {
+            _this._offtrailDialog = null;
             if (result) {
                 _this._localStorage.store('simulatedMile', Number(result.simulatedMile));
             }
             var _simulate = !!(result);
             _this._injector.get(_service_location_service__WEBPACK_IMPORTED_MODULE_6__["LocationService"]).toggleTracking(_simulate);
-            _this._offtrailDialog = null;
         });
+    };
+    AppComponent.prototype._onDialogClose = function (dialog, name, callback) {
+        var _this = this;
+        this.addSubscription(name, dialog.afterClosed().subscribe(function (result) {
+            _this._toggleNavigationVisibility(true);
+            _this.removeSubscription(name);
+            dialog = null;
+            if (callback) {
+                callback(result);
+            }
+        }));
+    };
+    AppComponent.prototype._forceHideNavigation = function () {
+        if (this.navIsVisible) {
+            this._toggleNavigationVisibility(false);
+        }
     };
     AppComponent.prototype._toggleNavigationVisibility = function (visible) {
         this.navIsVisible = visible;
@@ -2550,7 +2936,7 @@ var AppComponent = /** @class */ (function () {
             _service_connection_service__WEBPACK_IMPORTED_MODULE_11__["ConnectionService"]])
     ], AppComponent);
     return AppComponent;
-}());
+}(_base_base_base_component__WEBPACK_IMPORTED_MODULE_12__["BaseComponent"]));
 
 
 
@@ -2635,6 +3021,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _component_leaflet_map_elements_popup_popup_component__WEBPACK_IMPORTED_MODULE_66__ = __webpack_require__(/*! ./component/leaflet-map/elements/popup/popup.component */ "./src/app/component/leaflet-map/elements/popup/popup.component.ts");
 /* harmony import */ var _angular_elements__WEBPACK_IMPORTED_MODULE_67__ = __webpack_require__(/*! @angular/elements */ "./node_modules/@angular/elements/fesm5/elements.js");
 /* harmony import */ var _component_dialog_note_dialog_note_dialog_component__WEBPACK_IMPORTED_MODULE_68__ = __webpack_require__(/*! ./component/dialog/note-dialog/note-dialog.component */ "./src/app/component/dialog/note-dialog/note-dialog.component.ts");
+/* harmony import */ var _base_base_base_component__WEBPACK_IMPORTED_MODULE_69__ = __webpack_require__(/*! ./base/base/base.component */ "./src/app/base/base/base.component.ts");
+/* harmony import */ var _component_dialog_settings_dialog_panels_user_settings_user_settings_component__WEBPACK_IMPORTED_MODULE_70__ = __webpack_require__(/*! ./component/dialog/settings-dialog/panels/user-settings/user-settings.component */ "./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.ts");
+/* harmony import */ var _component_dialog_marker_dialog_rating_elements_current_score_current_score_component__WEBPACK_IMPORTED_MODULE_71__ = __webpack_require__(/*! ./component/dialog/marker-dialog/rating/elements/current-score/current-score.component */ "./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.ts");
+/* harmony import */ var _component_dialog_marker_dialog_rating_elements_add_score_add_score_component__WEBPACK_IMPORTED_MODULE_72__ = __webpack_require__(/*! ./component/dialog/marker-dialog/rating/elements/add-score/add-score.component */ "./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.ts");
 
 
 
@@ -2643,6 +3033,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // font awesome
+
 
 
 
@@ -2709,10 +3100,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+
+
 var AppModule = /** @class */ (function () {
     function AppModule(_injector) {
         this._injector = _injector;
-        // Register the custom element(s)
+        // Register custom element(s)
         var _popupElement = Object(_angular_elements__WEBPACK_IMPORTED_MODULE_67__["createCustomElement"])(_component_leaflet_map_elements_popup_popup_component__WEBPACK_IMPORTED_MODULE_66__["PopupComponent"], { injector: _injector });
         customElements.define('leaflet-element-popup', _popupElement);
         if (Object(_angular_core__WEBPACK_IMPORTED_MODULE_4__["isDevMode"])()) {
@@ -2723,7 +3118,7 @@ var AppModule = /** @class */ (function () {
             console.log('\n');
         }
         // font awesome library
-        _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_8__["library"].add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLongArrowAltUp"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLongArrowAltDown"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCampground"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCog"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLocationArrow"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faHotel"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faStreetView"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faPenAlt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faArrowLeft"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faRoad"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapMarkerAlt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTint"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTree"], _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_10__["faCompass"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCar"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTrain"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faDoorOpen"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapMarkedAlt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faBolt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faStore"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faBoxOpen"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faUtensils"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faInfo"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapSigns"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faQuestionCircle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faFlag"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faStar"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faDownload"], _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_10__["faDotCircle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faExclamationTriangle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faHiking"], _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_10__["faArrowAltCircleDown"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faAngleRight"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faPlus"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faSnowflake"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faGem"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapPin"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faAtlas"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMountain"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faSpinner"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTrash"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faSkull"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCircle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faChevronDown"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faChevronUp"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTimes"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faParking"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faShoePrints"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLock"]);
+        _fortawesome_fontawesome_svg_core__WEBPACK_IMPORTED_MODULE_8__["library"].add(_fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLongArrowAltUp"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLongArrowAltDown"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCampground"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCog"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLocationArrow"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faHotel"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faStreetView"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faPenAlt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faArrowLeft"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faRoad"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapMarkerAlt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTint"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTree"], _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_10__["faCompass"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCar"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTrain"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faDoorOpen"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapMarkedAlt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faHouseDamage"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faBolt"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faStore"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faBoxOpen"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faUtensils"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faInfo"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapSigns"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faQuestionCircle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faFlag"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faStar"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faDownload"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCity"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faStarHalfAlt"], _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_10__["faDotCircle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faExclamationTriangle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faHiking"], _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_10__["faArrowAltCircleDown"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faAngleRight"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faPlus"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faSnowflake"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faGem"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMapPin"], _fortawesome_free_regular_svg_icons__WEBPACK_IMPORTED_MODULE_10__["faStar"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faAtlas"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faMountain"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faSpinner"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTrash"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faSkull"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faCircle"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faChevronDown"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faChevronUp"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faTimes"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faParking"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faShoePrints"], _fortawesome_free_solid_svg_icons__WEBPACK_IMPORTED_MODULE_9__["faLock"]);
     }
     AppModule = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_4__["NgModule"])({
@@ -2767,7 +3162,11 @@ var AppModule = /** @class */ (function () {
                 _component_poi_list_user_indicator_user_indicator_component__WEBPACK_IMPORTED_MODULE_59__["UserIndicatorComponent"],
                 _component_dialog_marker_dialog_rating_rating_component__WEBPACK_IMPORTED_MODULE_65__["RatingComponent"],
                 _component_leaflet_map_elements_popup_popup_component__WEBPACK_IMPORTED_MODULE_66__["PopupComponent"],
-                _component_dialog_note_dialog_note_dialog_component__WEBPACK_IMPORTED_MODULE_68__["NoteDialogComponent"]
+                _component_dialog_note_dialog_note_dialog_component__WEBPACK_IMPORTED_MODULE_68__["NoteDialogComponent"],
+                _base_base_base_component__WEBPACK_IMPORTED_MODULE_69__["BaseComponent"],
+                _component_dialog_settings_dialog_panels_user_settings_user_settings_component__WEBPACK_IMPORTED_MODULE_70__["UserSettingsComponent"],
+                _component_dialog_marker_dialog_rating_elements_current_score_current_score_component__WEBPACK_IMPORTED_MODULE_71__["CurrentScoreComponent"],
+                _component_dialog_marker_dialog_rating_elements_add_score_add_score_component__WEBPACK_IMPORTED_MODULE_72__["AddScoreComponent"]
             ],
             entryComponents: [
                 _component_dialog_settings_dialog_settings_dialog_component__WEBPACK_IMPORTED_MODULE_61__["SettingsDialogComponent"],
@@ -2814,6 +3213,159 @@ var AppModule = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/app/base/base/base.component.html":
+/*!***********************************************!*\
+  !*** ./src/app/base/base/base.component.html ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ""
+
+/***/ }),
+
+/***/ "./src/app/base/base/base.component.sass":
+/*!***********************************************!*\
+  !*** ./src/app/base/base/base.component.sass ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2Jhc2UvYmFzZS9iYXNlLmNvbXBvbmVudC5zYXNzIn0= */"
+
+/***/ }),
+
+/***/ "./src/app/base/base/base.component.ts":
+/*!*********************************************!*\
+  !*** ./src/app/base/base/base.component.ts ***!
+  \*********************************************/
+/*! exports provided: BaseComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BaseComponent", function() { return BaseComponent; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+
+
+var EventListenerObj = /** @class */ (function () {
+    function EventListenerObj(target, type, listener, options) {
+        if (options === void 0) { options = false; }
+        this.target = target;
+        this.type = type;
+        this.listener = listener;
+        this.options = options;
+    }
+    return EventListenerObj;
+}());
+var SubscriptionObj = /** @class */ (function () {
+    function SubscriptionObj(name, subscription) {
+        this.name = name;
+        this.subscription = subscription;
+    }
+    return SubscriptionObj;
+}());
+var BaseComponent = /** @class */ (function () {
+    function BaseComponent() {
+        this._eventListeners = {};
+        this._subscriptions = {};
+    }
+    BaseComponent.prototype.ngOnDestroy = function () {
+        this._removeAllEventListeners();
+        this._removeAllSubscriptions();
+    };
+    // SUBSCRIPTIONS MANAGER
+    BaseComponent.prototype.addSubscription = function (name, subscription) {
+        if (this._subscriptions.hasOwnProperty(name)) {
+            throw new Error('Subscription with name ' + name + ' already exists!');
+        }
+        this._subscriptions[name] = new SubscriptionObj(name, subscription);
+    };
+    // remove subscription by name
+    BaseComponent.prototype.removeSubscription = function (name) {
+        if (this._subscriptions.hasOwnProperty(name)) {
+            var _subscription = this._subscriptions[name];
+            _subscription.subscription.unsubscribe();
+            _subscription.subscription = null;
+            delete this._subscriptions[name];
+            _subscription = null;
+        }
+    };
+    BaseComponent.prototype._removeAllSubscriptions = function () {
+        for (var key in this._subscriptions) {
+            var _subscriptionObj = this._subscriptions[key];
+            this.removeSubscription(_subscriptionObj.name);
+            _subscriptionObj = null;
+        }
+        this._subscriptions = null;
+    };
+    // EVENTS MANAGER
+    // add an event listener (allows for multiple types per target)
+    BaseComponent.prototype.addEventListener = function (target, type, listener, options) {
+        if (options === void 0) { options = false; }
+        // check if target is DOM element
+        if (!this._isDOMElement(target)) {
+            throw new Error('Can not add event, target is not a DOM element');
+        }
+        if (typeof type === 'string') {
+            type = [type];
+        }
+        for (var i = 0; i < type.length; i++) {
+            var _uniqueName = target.tagName + '_' + type[i];
+            // check if eventlistener already exists
+            if (this._eventListeners.hasOwnProperty(_uniqueName)) {
+                throw new Error('Event listener for ' + type[i] + ' already exists on ' + target.tagName);
+            }
+            this._eventListeners[_uniqueName] = new EventListenerObj(target, type[i], listener, options);
+            target.addEventListener(type[i], listener, options);
+        }
+    };
+    // remove event listers (allows multiple types per target)
+    BaseComponent.prototype.removeEventListener = function (target, type) {
+        var _uniqueName = target.tagName + '_' + type;
+        if (this._eventListeners.hasOwnProperty(_uniqueName)) {
+            var _eventListenerObj = this._eventListeners[_uniqueName];
+            _eventListenerObj.target.removeEventListener(_eventListenerObj.type, _eventListenerObj.listener, _eventListenerObj.options);
+            delete this._eventListeners[_uniqueName];
+            _eventListenerObj = null;
+        }
+    };
+    BaseComponent.prototype._removeAllEventListeners = function () {
+        for (var key in this._eventListeners) {
+            var _eventListenerObj = this._eventListeners[key];
+            this.removeEventListener(_eventListenerObj.target, _eventListenerObj.type);
+            _eventListenerObj = null;
+        }
+        this._eventListeners = null;
+    };
+    BaseComponent.prototype._isDOMElement = function (element) {
+        if (element === window) {
+            return true;
+        }
+        else {
+            return element instanceof Element || element instanceof HTMLDocument;
+        }
+    };
+    BaseComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
+            selector: 'app-base',
+            template: __webpack_require__(/*! ./base.component.html */ "./src/app/base/base/base.component.html"),
+            styles: [__webpack_require__(/*! ./base.component.sass */ "./src/app/base/base/base.component.sass")]
+        })
+        /* base component:
+        - manages subscriptions
+        - manages event listeners */
+        ,
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
+    ], BaseComponent);
+    return BaseComponent;
+}());
+
+
+
+/***/ }),
+
 /***/ "./src/app/base/button/button.component.html":
 /*!***************************************************!*\
   !*** ./src/app/base/button/button.component.html ***!
@@ -2854,8 +3406,6 @@ var ButtonComponent = /** @class */ (function () {
     // simple button with label & font awesome icon
     function ButtonComponent() {
     }
-    ButtonComponent.prototype.ngOnInit = function () {
-    };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", String)
@@ -2890,7 +3440,7 @@ var ButtonComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"icon noselect fa-2x\">\n  <fa-layers id=\"icons\" [fixedWidth]=\"true\">\n    <fa-icon *ngFor=\"let poiType of data\" [icon]=\"[poiType.iconType, poiType.icon]\"></fa-icon>\n  </fa-layers>\n\n  <!-- star rating -->\n  <!--<fa-layers id=\"rating\" [fixedWidth]=\"true\">-->\n    <!--<fa-icon *ngIf=\"rateable\" icon=\"star\" class=\"fa-icon-star\" size=\"sm\"></fa-icon>-->\n    <!--<fa-layers-text *ngIf=\"rateable\" content=\"1\" style=\"color: white;\" transform=\"shrink-8\" class=\"fa-icon-star-label\"></fa-layers-text>-->\n  <!--</fa-layers>-->\n\n  <!-- updates badge -->\n  <!--<fa-layers id=\"update\" [fixedWidth]=\"true\">-->\n    <!--<fa-layers-counter *ngIf=\"showUpdates\" content=\"1\" class=\"fa-icon-counter\"></fa-layers-counter>-->\n  <!--</fa-layers>-->\n</div>\n"
+module.exports = "<div class=\"icon noselect fa-2x\">\n  <fa-layers id=\"icons\" [fixedWidth]=\"true\">\n    <fa-icon *ngFor=\"let poiType of data\" [icon]=\"[poiType.iconType, poiType.icon]\"></fa-icon>\n  </fa-layers>\n\n  <!-- star rating -->\n  <!--<fa-layers *ngIf=\"rateable\" id=\"rating\" [fixedWidth]=\"true\">-->\n    <!--<fa-icon icon=\"star\" class=\"fa-icon-star\" size=\"sm\"></fa-icon>-->\n    <!--<fa-layers-text content=\"1\" transform=\"shrink-8\" class=\"fa-icon-star-label\"></fa-layers-text>-->\n  <!--</fa-layers>-->\n\n</div>\n"
 
 /***/ }),
 
@@ -2901,7 +3451,7 @@ module.exports = "<div class=\"icon noselect fa-2x\">\n  <fa-layers id=\"icons\"
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ".icon {\n  color: #555; }\n  .icon fa-layers {\n    display: block;\n    margin: 0 auto;\n    pointer-events: none; }\n  .icon fa-icon {\n    pointer-events: none; }\n  .icon #icons fa-icon:first-child:nth-last-child(2), .icon #icons fa-icon:first-child:nth-last-child(2) ~ fa-icon {\n    position: absolute;\n    font-size: 2.2vw; }\n  .icon #icons fa-icon:first-child:nth-last-child(2) {\n    text-align: left;\n    top: 35%;\n    left: 20%; }\n  .icon #icons fa-icon:first-child:nth-last-child(2) ~ fa-icon {\n    text-align: right;\n    left: 40%;\n    bottom: 35%; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2Jhc2UvaWNvbi9pY29uLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBVyxFQUFBO0VBRGI7SUFJSSxjQUFjO0lBQ2QsY0FBYztJQUNkLG9CQUFvQixFQUFBO0VBTnhCO0lBVUksb0JBQW9CLEVBQUE7RUFWeEI7SUFnQk0sa0JBQWtCO0lBQ2xCLGdCQUFnQixFQUFBO0VBakJ0QjtJQW9CTSxnQkFBZ0I7SUFDaEIsUUFBUTtJQUNSLFNBQVMsRUFBQTtFQXRCZjtJQXlCTSxpQkFBaUI7SUFDakIsU0FBUztJQUNULFdBQVcsRUFBQSIsImZpbGUiOiJzcmMvYXBwL2Jhc2UvaWNvbi9pY29uLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiLmljb24ge1xuICBjb2xvcjogIzU1NTtcblxuICBmYS1sYXllcnMge1xuICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgIG1hcmdpbjogMCBhdXRvO1xuICAgIHBvaW50ZXItZXZlbnRzOiBub25lOyB9XG5cbiAgZmEtaWNvbiB7XG4gICAgLy9maWx0ZXI6IGRyb3Atc2hhZG93KC0xcHggLTJweCAxcHggcmdiYSgwLDAsMCwwLjEpKSBkcm9wLXNoYWRvdygycHggM3B4IDJweCB3aGl0ZSk7XG4gICAgcG9pbnRlci1ldmVudHM6IG5vbmU7IH1cblxuICAjaWNvbnMge1xuXG4gICAgLy8gaWYgMiBpY29uc1xuICAgIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMiksIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMikgfiBmYS1pY29uIHtcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgIGZvbnQtc2l6ZTogMi4ydnc7IH1cblxuICAgIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMikge1xuICAgICAgdGV4dC1hbGlnbjogbGVmdDtcbiAgICAgIHRvcDogMzUlO1xuICAgICAgbGVmdDogMjAlOyB9XG5cbiAgICBmYS1pY29uOmZpcnN0LWNoaWxkOm50aC1sYXN0LWNoaWxkKDIpIH4gZmEtaWNvbiB7XG4gICAgICB0ZXh0LWFsaWduOiByaWdodDtcbiAgICAgIGxlZnQ6IDQwJTtcbiAgICAgIGJvdHRvbTogMzUlOyB9IH0gfVxuXG4vL1xuLy8gICNpY29uc1xuLy9cbi8vICAgIC8vIGlmIDIgaWNvbnNcbi8vICAgIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMiksIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMikgfiBmYS1pY29uXG4vLyAgICAgIC8vcG9zaXRpb246IGFic29sdXRlXG4vLyAgICAgIGJhc2U6IGJsb2NrXG4vLyAgICAgIGZvbnQtc2l6ZTogMC42NWVtXG4vL1xuLy8gICAgZmEtaWNvbjpmaXJzdC1jaGlsZDpudGgtbGFzdC1jaGlsZCgyKVxuLy8gICAgICB0ZXh0LWFsaWduOiBsZWZ0XG4vLyAgICAgIHRvcDogMjUlXG4vLyAgICAgIGxlZnQ6IDBcbi8vXG4vLyAgICBmYS1pY29uOmZpcnN0LWNoaWxkOm50aC1sYXN0LWNoaWxkKDIpIH4gZmEtaWNvblxuLy8gICAgICB0ZXh0LWFsaWduOiByaWdodFxuLy8gICAgICBib3R0b206IDI1JVxuLy8gICAgICByaWdodDogNjUlXG4vL1xuLy9cbi8vICAvLyNyYXRpbmcsICN1cGRhdGVcbi8vICAvLyAgcG9zaXRpb246IHJlbGF0aXZlXG4vLyAgLy8gIG1hcmdpbi10b3A6IC04MCVcbi8vICAvL1xuLy8gIC8vICAuZmEtaWNvbi1zdGFyLCAuZmEtaWNvbi1jb3VudGVyLCAuZmEtaWNvbi1zdGFyLWxhYmVsXG4vLyAgLy9cbi8vICAvLyAgLmZhLWljb24tc3RhclxuLy8gIC8vICAgIHBvc2l0aW9uOiBhYnNvbHV0ZVxuLy8gIC8vICAgIGNvbG9yOiBvcmFuZ2Vcbi8vICAvLyAgICByaWdodDogNTAlXG4vLyAgLy8gICAgdG9wOiAxMTUlXG4vLyAgLy9cbi8vICAvLyAgLmZhLWljb24tc3Rhci1sYWJlbFxuLy8gIC8vICAgIHBvc2l0aW9uOiBhYnNvbHV0ZVxuLy8gIC8vICAgIHJpZ2h0OiAxMCVcbi8vICAvLyAgICB0b3A6IDEyMCVcbi8vICAvL1xuLy8gIC8vICAuZmEtaWNvbi1jb3VudGVyXG4vLyAgLy8gICAgcG9zaXRpb246IGFic29sdXRlXG4vLyAgLy8gICAgem9vbTogMjAwJVxuLy8gIC8vICAgIHJpZ2h0OiAtMTAlXG4vLyAgLy8gICAgdG9wOiAxMTAlXG4iXX0= */"
+module.exports = ".icon {\n  color: #555; }\n  .icon fa-layers {\n    display: block;\n    margin: 0 auto;\n    pointer-events: none; }\n  .icon fa-icon {\n    pointer-events: none; }\n  .icon #icons fa-icon:first-child:nth-last-child(2), .icon #icons fa-icon:first-child:nth-last-child(2) ~ fa-icon {\n    position: absolute;\n    font-size: 2.2vw; }\n  .icon #icons fa-icon:first-child:nth-last-child(2) {\n    text-align: left;\n    top: 35%;\n    left: 20%; }\n  .icon #icons fa-icon:first-child:nth-last-child(2) ~ fa-icon {\n    text-align: right;\n    left: 40%;\n    bottom: 35%; }\n  .icon #rating {\n    position: absolute;\n    left: 0;\n    bottom: 15%; }\n  .icon #rating .fa-icon-star {\n      color: #e8aa1b !important; }\n  .icon #rating .fa-icon-star-label {\n      color: white !important;\n      font-size: 5vh !important; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2Jhc2UvaWNvbi9pY29uLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBO0VBQ0UsV0FBVyxFQUFBO0VBRGI7SUFJSSxjQUFjO0lBQ2QsY0FBYztJQUNkLG9CQUFvQixFQUFBO0VBTnhCO0lBVUksb0JBQW9CLEVBQUE7RUFWeEI7SUFnQk0sa0JBQWtCO0lBQ2xCLGdCQUFnQixFQUFBO0VBakJ0QjtJQW9CTSxnQkFBZ0I7SUFDaEIsUUFBUTtJQUNSLFNBQVMsRUFBQTtFQXRCZjtJQXlCTSxpQkFBaUI7SUFDakIsU0FBUztJQUNULFdBQVcsRUFBQTtFQTNCakI7SUE4Qkksa0JBQWtCO0lBQ2xCLE9BQU87SUFDUCxXQUFXLEVBQUE7RUFoQ2Y7TUFtQ00seUJBQXlCLEVBQUE7RUFuQy9CO01Bc0NNLHVCQUF1QjtNQUN2Qix5QkFBeUIsRUFBQSIsImZpbGUiOiJzcmMvYXBwL2Jhc2UvaWNvbi9pY29uLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiLmljb24ge1xuICBjb2xvcjogIzU1NTtcblxuICBmYS1sYXllcnMge1xuICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgIG1hcmdpbjogMCBhdXRvO1xuICAgIHBvaW50ZXItZXZlbnRzOiBub25lOyB9XG5cbiAgZmEtaWNvbiB7XG4gICAgLy9maWx0ZXI6IGRyb3Atc2hhZG93KC0xcHggLTJweCAxcHggcmdiYSgwLDAsMCwwLjEpKSBkcm9wLXNoYWRvdygycHggM3B4IDJweCB3aGl0ZSk7XG4gICAgcG9pbnRlci1ldmVudHM6IG5vbmU7IH1cblxuICAjaWNvbnMge1xuXG4gICAgLy8gaWYgMiBpY29uc1xuICAgIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMiksIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMikgfiBmYS1pY29uIHtcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgIGZvbnQtc2l6ZTogMi4ydnc7IH1cblxuICAgIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMikge1xuICAgICAgdGV4dC1hbGlnbjogbGVmdDtcbiAgICAgIHRvcDogMzUlO1xuICAgICAgbGVmdDogMjAlOyB9XG5cbiAgICBmYS1pY29uOmZpcnN0LWNoaWxkOm50aC1sYXN0LWNoaWxkKDIpIH4gZmEtaWNvbiB7XG4gICAgICB0ZXh0LWFsaWduOiByaWdodDtcbiAgICAgIGxlZnQ6IDQwJTtcbiAgICAgIGJvdHRvbTogMzUlOyB9IH1cblxuICAjcmF0aW5nIHtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgbGVmdDogMDtcbiAgICBib3R0b206IDE1JTtcblxuICAgIC5mYS1pY29uLXN0YXIge1xuICAgICAgY29sb3I6ICNlOGFhMWIgIWltcG9ydGFudDsgfVxuXG4gICAgLmZhLWljb24tc3Rhci1sYWJlbCB7XG4gICAgICBjb2xvcjogd2hpdGUgIWltcG9ydGFudDtcbiAgICAgIGZvbnQtc2l6ZTogNXZoICFpbXBvcnRhbnQ7IH0gfSB9XG5cbi8vXG4vLyAgI2ljb25zXG4vL1xuLy8gICAgLy8gaWYgMiBpY29uc1xuLy8gICAgZmEtaWNvbjpmaXJzdC1jaGlsZDpudGgtbGFzdC1jaGlsZCgyKSwgZmEtaWNvbjpmaXJzdC1jaGlsZDpudGgtbGFzdC1jaGlsZCgyKSB+IGZhLWljb25cbi8vICAgICAgLy9wb3NpdGlvbjogYWJzb2x1dGVcbi8vICAgICAgYmFzZTogYmxvY2tcbi8vICAgICAgZm9udC1zaXplOiAwLjY1ZW1cbi8vXG4vLyAgICBmYS1pY29uOmZpcnN0LWNoaWxkOm50aC1sYXN0LWNoaWxkKDIpXG4vLyAgICAgIHRleHQtYWxpZ246IGxlZnRcbi8vICAgICAgdG9wOiAyNSVcbi8vICAgICAgbGVmdDogMFxuLy9cbi8vICAgIGZhLWljb246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMikgfiBmYS1pY29uXG4vLyAgICAgIHRleHQtYWxpZ246IHJpZ2h0XG4vLyAgICAgIGJvdHRvbTogMjUlXG4vLyAgICAgIHJpZ2h0OiA2NSVcbi8vXG4vL1xuLy8gIC8vI3JhdGluZywgI3VwZGF0ZVxuLy8gIC8vICBwb3NpdGlvbjogcmVsYXRpdmVcbi8vICAvLyAgbWFyZ2luLXRvcDogLTgwJVxuLy8gIC8vXG4vLyAgLy8gIC5mYS1pY29uLXN0YXIsIC5mYS1pY29uLWNvdW50ZXIsIC5mYS1pY29uLXN0YXItbGFiZWxcbi8vICAvL1xuLy8gIC8vICAuZmEtaWNvbi1zdGFyXG4vLyAgLy8gICAgcG9zaXRpb246IGFic29sdXRlXG4vLyAgLy8gICAgY29sb3I6IG9yYW5nZVxuLy8gIC8vICAgIHJpZ2h0OiA1MCVcbi8vICAvLyAgICB0b3A6IDExNSVcbi8vICAvL1xuLy8gIC8vICAuZmEtaWNvbi1zdGFyLWxhYmVsXG4vLyAgLy8gICAgcG9zaXRpb246IGFic29sdXRlXG4vLyAgLy8gICAgcmlnaHQ6IDEwJVxuLy8gIC8vICAgIHRvcDogMTIwJVxuLy8gIC8vXG4vLyAgLy8gIC5mYS1pY29uLWNvdW50ZXJcbi8vICAvLyAgICBwb3NpdGlvbjogYWJzb2x1dGVcbi8vICAvLyAgICB6b29tOiAyMDAlXG4vLyAgLy8gICAgcmlnaHQ6IC0xMCVcbi8vICAvLyAgICB0b3A6IDExMCVcbiJdfQ== */"
 
 /***/ }),
 
@@ -2922,26 +3472,29 @@ __webpack_require__.r(__webpack_exports__);
 var IconComponent = /** @class */ (function () {
     function IconComponent() {
     }
-    IconComponent.prototype.ngOnInit = function () {
-        var _self = this;
-        this.data.forEach(function (poiType, index) {
-            if (poiType.rateable === true && _self.showRating) {
-                _self.rateable = true;
+    IconComponent.prototype.ngOnChanges = function (changes) {
+        if (changes.data) {
+            this._setupIcons();
+        }
+    };
+    IconComponent.prototype._setupIcons = function () {
+        var _newRateable;
+        var _length = this.data.length;
+        for (var i = 0; i < _length; i++) {
+            var _poiType = this.data[i];
+            if (_poiType.rateable === true) {
+                _newRateable = true;
             }
-        });
+        }
+        // only update if needed
+        if (_newRateable !== this.rateable) {
+            this.rateable = _newRateable;
+        }
     };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Array)
     ], IconComponent.prototype, "data", void 0);
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Boolean)
-    ], IconComponent.prototype, "showRating", void 0);
-    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Boolean)
-    ], IconComponent.prototype, "showUpdates", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", String)
@@ -2968,7 +3521,7 @@ var IconComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<!-- location based -->\n<div class=\"hidden\" #container></div>\n"
+module.exports = "<!-- needed for event dispatching -->\n<div class=\"hidden\" #container></div>\n"
 
 /***/ }),
 
@@ -3001,6 +3554,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
 /* harmony import */ var _service_filesystem_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../service/filesystem.service */ "./src/app/service/filesystem.service.ts");
 /* harmony import */ var _util_generic__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../_util/generic */ "./src/app/_util/generic.ts");
+/* harmony import */ var _base_base_component__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../base/base.component */ "./src/app/base/base/base.component.ts");
 
 
 
@@ -3009,46 +3563,57 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var LocationBasedComponent = /** @class */ (function () {
+
+var LocationBasedComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](LocationBasedComponent, _super);
     function LocationBasedComponent() {
+        var _this = _super.call(this) || this;
         // since we're extending this class, we shouldn't inject through the constructor props
         if (_service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector) {
-            this.locationService = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(_service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"]);
-            this.localStorage = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(ngx_webstorage__WEBPACK_IMPORTED_MODULE_4__["LocalStorageService"]);
-            this.trailGenerator = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(_service_trail_generator_service__WEBPACK_IMPORTED_MODULE_5__["TrailGeneratorService"]);
-            this.fileSystem = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(_service_filesystem_service__WEBPACK_IMPORTED_MODULE_6__["FilesystemService"]);
+            _this.locationService = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(_service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"]);
+            _this.localStorage = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(ngx_webstorage__WEBPACK_IMPORTED_MODULE_4__["LocalStorageService"]);
+            _this.trailGenerator = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(_service_trail_generator_service__WEBPACK_IMPORTED_MODULE_5__["TrailGeneratorService"]);
+            _this.fileSystem = _service_location_service__WEBPACK_IMPORTED_MODULE_2__["LocationService"].injector.get(_service_filesystem_service__WEBPACK_IMPORTED_MODULE_6__["FilesystemService"]);
         }
-        this.timestamp = new Date().getTime();
+        _this.timestamp = new Date().getTime();
         // create default user
-        this._user = this.createBlankUser();
+        _this._user = _this.createBlankUser();
+        return _this;
     }
     // TEST FUNCTIONS
-    LocationBasedComponent.prototype._hikeMile = function (mileId) {
-        var _self = this;
-        var _steps = this.trailGenerator.getTrailData().miles[mileId].waypoints;
-        var _stepCount = 0;
-        var _interval = setInterval(function () {
-            if (_stepCount < _steps.length) {
-                var _location = {
-                    coords: {
-                        accuracy: 0,
-                        altitude: _steps[_stepCount].elevation,
-                        altitudeAccuracy: 0,
-                        heading: 0,
-                        speed: 0,
-                        latitude: _steps[_stepCount].latitude,
-                        longitude: _steps[_stepCount].longitude
-                    },
-                    timestamp: new Date().getTime()
-                };
-                _stepCount++;
-                _self._onLocationChange(_location);
-            }
-            else {
-                clearInterval(_interval);
-            }
-        }, 4000);
-    };
+    // private _hikeMile(mileId: number): void {
+    //
+    //   const _self = this;
+    //   const _steps = this.trailGenerator.getTrailData().miles[mileId].waypoints;
+    //   let _stepCount = 0;
+    //
+    //   const _interval = setInterval(function() {
+    //
+    //     if (_stepCount < _steps.length) {
+    //
+    //       const _location = {
+    //         coords: {
+    //           accuracy: 0,
+    //           altitude:  _steps[_stepCount].elevation,
+    //           altitudeAccuracy: 0,
+    //           heading: 0,
+    //           speed: 0,
+    //           latitude: _steps[_stepCount].latitude,
+    //           longitude: _steps[_stepCount].longitude
+    //         },
+    //         timestamp: new Date().getTime()
+    //       };
+    //
+    //       _stepCount ++;
+    //
+    //       _self._onLocationChange(_location as Position);
+    //
+    //     } else {
+    //       clearInterval(_interval);
+    //     }
+    //   }, 4000);
+    //
+    // }
     // LIFECYCLE
     LocationBasedComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -3058,26 +3623,21 @@ var LocationBasedComponent = /** @class */ (function () {
             return;
         }
         // set up subscriptions
-        this._locationSubscription = this.locationService.location.subscribe(function (location) {
+        this.addSubscription('location', this.locationService.location.subscribe(function (location) {
             if (location) {
                 // this._hikeMile(2);
                 _this._onLocationChange(location);
             }
-        });
-        this._locationStatusSubscription = this.locationService.locationStatus.subscribe(function (status) {
+        }));
+        this.addSubscription('locationStatus', this.locationService.locationStatus.subscribe(function (status) {
             _this.status = status;
             _this.onStatusChange(status);
-        });
-        this._centerUserSubscription = this.locationService.centerUser.subscribe(function (trigger) {
+        }));
+        this.addSubscription('centerUser', this.locationService.centerUser.subscribe(function (trigger) {
             if (trigger !== 0) {
                 _this.centerOnUser();
             }
-        });
-    };
-    LocationBasedComponent.prototype.ngOnDestroy = function () {
-        this._locationSubscription.unsubscribe();
-        this._locationStatusSubscription.unsubscribe();
-        this._centerUserSubscription.unsubscribe();
+        }));
     };
     // EVENTS
     LocationBasedComponent.prototype._onLocationChange = function (location) {
@@ -3092,14 +3652,12 @@ var LocationBasedComponent = /** @class */ (function () {
             // mile
             var _waypoint = this.trailGenerator.findNearestPointInMileTree(this._user.waypoint, 1)[0];
             var _mile = this.trailGenerator.getTrailData().miles[_waypoint['belongsTo']];
-            console.log(_waypoint);
-            console.log(_waypoint['belongsTo']);
             this._user.nearestMileId = _mile.id;
             // anchorPoint
             var _nearestAnchorPoint = _waypoint;
-            this._user.anchorPoint = _mile.waypoints[_nearestAnchorPoint['key']];
+            this._user.anchorPoint = _mile.waypoints[_nearestAnchorPoint.key];
             // distance
-            this._user.waypoint.distance = _nearestAnchorPoint['distance'];
+            this._user.waypoint.distance = _nearestAnchorPoint.distance;
             //toggle warning / mile simulator
             if (this._user.waypoint.distance > this.localStorage.retrieve('maxPoiDistance')
                 && this.localStorage.retrieve('simulatedMile') === -1 && !this.localStorage.retrieve('disableSimulation')) {
@@ -3158,7 +3716,7 @@ var LocationBasedComponent = /** @class */ (function () {
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
     ], LocationBasedComponent);
     return LocationBasedComponent;
-}());
+}(_base_base_component__WEBPACK_IMPORTED_MODULE_8__["BaseComponent"]));
 
 
 
@@ -3208,6 +3766,7 @@ var SettingsPanelComponent = /** @class */ (function () {
     SettingsPanelComponent.prototype.ngOnInit = function () { };
     SettingsPanelComponent.prototype.ngOnDestroy = function () {
         this.validate();
+        this.onSettingsChanged = null;
     };
     SettingsPanelComponent.prototype.invalidate = function () {
         this.settingsChanged = true;
@@ -3227,10 +3786,128 @@ var SettingsPanelComponent = /** @class */ (function () {
             selector: 'settings-panel',
             template: __webpack_require__(/*! ./settings-panel.component.html */ "./src/app/base/settings-panel/settings-panel.component.html"),
             styles: [__webpack_require__(/*! ./settings-panel.component.sass */ "./src/app/base/settings-panel/settings-panel.component.sass")]
-        }),
+        })
+        // a panel with an invalidate function which triggers a reload of the application
+        // used for forms that require an app reload on change
+        ,
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [])
     ], SettingsPanelComponent);
     return SettingsPanelComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/base/trail-parser/trail-parser.ts":
+/*!***************************************************!*\
+  !*** ./src/app/base/trail-parser/trail-parser.ts ***!
+  \***************************************************/
+/*! exports provided: TrailParser */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TrailParser", function() { return TrailParser; });
+/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! x2js */ "./node_modules/x2js/x2js.js");
+/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(x2js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _util_geolib_distance__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../_util/geolib/distance */ "./src/app/_util/geolib/distance.ts");
+
+
+var TrailParser = /** @class */ (function () {
+    function TrailParser() {
+        this.totalDistance = 0;
+        this.x2js = new x2js__WEBPACK_IMPORTED_MODULE_0__({
+            attributePrefix: '' // no attribute prefix
+        });
+    }
+    // the main entry point
+    TrailParser.prototype.parse = function (trail, trailData, poiData, snow, towns, direction) {
+        // set
+        this.trail = trail;
+        this.trailData = this.directionReverse(trailData);
+        this.poiData = this.directionReverse(poiData);
+        this.snow = snow;
+        this.direction = direction;
+        // defaults
+        this.findReplaceArray = [];
+        this.totalDistance = 0;
+        this._prevPoint = null;
+        // auto reverse input data
+        if (direction === 1 && Array.isArray(trailData)) {
+            trailData.reverse();
+        }
+    };
+    TrailParser.prototype.parseTrail = function (trailData) {
+        // override
+        return;
+    };
+    TrailParser.prototype.parsePois = function (pois) {
+        // override
+        return;
+    };
+    TrailParser.prototype.parseSnow = function () {
+        // override
+        return;
+    };
+    // CONVERTERS
+    // converts urls in strings to html hrefs
+    TrailParser.prototype.convertStringUrls = function (input) {
+        var _regex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
+        return input.replace(_regex, function (match) {
+            match = match.split(' ').join(''); // remove spaces
+            return '<a href="http://' + match.toLowerCase() + '" target="_blank">' + match.toLowerCase() + '</a> ';
+        });
+    };
+    TrailParser.prototype.convertStringTel = function (input) {
+        var _regex = /(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?/img;
+        return input.replace(_regex, function (match) {
+            var _digits = match.split('-').join('');
+            return '<a href="tel:+1' + _digits + '">+1-' + match + '</a>';
+        });
+    };
+    // go from gpx to waypoint before converting to JSON (string manipulation is faster?)
+    TrailParser.prototype.convertToWaypointString = function (input) {
+        var _length = this.findReplaceArray.length;
+        for (var i = 0; i < _length; i++) {
+            input = input.split(this.findReplaceArray[i].find).join(this.findReplaceArray[i].replace);
+        }
+        return input;
+    };
+    // OTHER
+    // set the total distance (the distance on trail) for each waypoint, based on the section scale
+    TrailParser.prototype.addDistanceToWaypoints = function (waypoints, scale) {
+        var _sectionLength = 0;
+        var _length = waypoints.length;
+        for (var i = 0; i < _length; i++) {
+            var _waypoint = waypoints[i];
+            var _distance = 0;
+            if (this._prevPoint) {
+                _distance = (Object(_util_geolib_distance__WEBPACK_IMPORTED_MODULE_1__["calculateDistance"])(_waypoint, this._prevPoint) * scale);
+                _sectionLength += _distance;
+                this.totalDistance += _distance;
+            }
+            _waypoint.distanceTotal = this.totalDistance;
+            this._prevPoint = _waypoint;
+        }
+        return waypoints;
+    };
+    // reverse data if needed, for sobo
+    TrailParser.prototype.directionReverse = function (input) {
+        if (this.direction === 1 && Array.isArray(input)) {
+            return input.reverse();
+        }
+        else {
+            return input;
+        }
+    };
+    // letting the browser parse it, returning the contents
+    TrailParser.prototype.stripHtmlTags = function (input) {
+        var _div = document.createElement('');
+        _div.innerHTML = input;
+        return _div.textContent || _div.innerText || '';
+    };
+    return TrailParser;
 }());
 
 
@@ -3255,7 +3932,7 @@ module.exports = "<div id=\"container\">\n\n  <h2>Generate data</h2>\n\n  <span>
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ":host #container {\n  padding: 10px;\n  text-align: center; }\n  :host #container h1, :host #container h2 {\n    text-align: center; }\n  :host #container button {\n    margin-right: 4px; }\n  :host #container button:focus {\n    outline: 0; }\n  :host #container .generated {\n    background-color: lightgreen; }\n  :host #container .error {\n    background-color: lightcoral; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9hZG1pbi9hZG1pbi5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUdHLGFBQWE7RUFDYixrQkFBa0IsRUFBQTtFQUpyQjtJQU9LLGtCQUFrQixFQUFBO0VBUHZCO0lBVUssaUJBQWlCLEVBQUE7RUFWdEI7SUFhSyxVQUFVLEVBQUE7RUFiZjtJQWdCSyw0QkFBNEIsRUFBQTtFQWhCakM7SUFtQkssNEJBQTRCLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnQvYWRtaW4vYWRtaW4uY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3Qge1xuXG4gICNjb250YWluZXIge1xuICAgIHBhZGRpbmc6IDEwcHg7XG4gICAgdGV4dC1hbGlnbjogY2VudGVyO1xuXG4gICAgaDEsIGgyIHtcbiAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsgfVxuXG4gICAgYnV0dG9uIHtcbiAgICAgIG1hcmdpbi1yaWdodDogNHB4OyB9XG5cbiAgICBidXR0b246Zm9jdXMge1xuICAgICAgb3V0bGluZTogMDsgfVxuXG4gICAgLmdlbmVyYXRlZCB7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiBsaWdodGdyZWVuOyB9XG5cbiAgICAuZXJyb3Ige1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHRjb3JhbDsgfSB9IH1cbiJdfQ== */"
+module.exports = ":host #container > * {\n  margin: 10px; }\n\n:host #container {\n  text-align: center;\n  overflow-y: scroll;\n  min-height: 100%;\n  height: 100%; }\n\n:host #container h1, :host #container h2 {\n    text-align: center; }\n\n:host #container button {\n    margin: 4px; }\n\n:host #container button:focus {\n    outline: 0; }\n\n:host #container .generated {\n    background-color: lightgreen; }\n\n:host #container .error {\n    background-color: lightcoral; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9hZG1pbi9hZG1pbi5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUdHLFlBQVksRUFBQTs7QUFIZjtFQU1HLGtCQUFrQjtFQUNsQixrQkFBa0I7RUFDbEIsZ0JBQWdCO0VBQ2hCLFlBQVksRUFBQTs7QUFUZjtJQVlLLGtCQUFrQixFQUFBOztBQVp2QjtJQWVLLFdBQVcsRUFBQTs7QUFmaEI7SUFrQkssVUFBVSxFQUFBOztBQWxCZjtJQXFCSyw0QkFBNEIsRUFBQTs7QUFyQmpDO0lBd0JLLDRCQUE0QixFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2FkbWluL2FkbWluLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiIDpob3N0IHtcblxuICAjY29udGFpbmVyID4gKiB7XG4gICAgbWFyZ2luOiAxMHB4OyB9XG5cbiAgI2NvbnRhaW5lciB7XG4gICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgIG92ZXJmbG93LXk6IHNjcm9sbDtcbiAgICBtaW4taGVpZ2h0OiAxMDAlO1xuICAgIGhlaWdodDogMTAwJTtcblxuICAgIGgxLCBoMiB7XG4gICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7IH1cblxuICAgIGJ1dHRvbiB7XG4gICAgICBtYXJnaW46IDRweDsgfVxuXG4gICAgYnV0dG9uOmZvY3VzIHtcbiAgICAgIG91dGxpbmU6IDA7IH1cblxuICAgIC5nZW5lcmF0ZWQge1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogbGlnaHRncmVlbjsgfVxuXG4gICAgLmVycm9yIHtcbiAgICAgIGJhY2tncm91bmQtY29sb3I6IGxpZ2h0Y29yYWw7IH0gfSB9XG4iXX0= */"
 
 /***/ }),
 
@@ -3272,17 +3949,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _service_loader_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../service/loader.service */ "./src/app/service/loader.service.ts");
-/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../_util/trail */ "./src/app/_util/trail.ts");
+/* harmony import */ var _util_trail_meta__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../_util/trail-meta */ "./src/app/_util/trail-meta.ts");
 /* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var _service_trail_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../service/trail.service */ "./src/app/service/trail.service.ts");
 /* harmony import */ var _util_save__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../_util/save */ "./src/app/_util/save.ts");
 /* harmony import */ var _service_filesystem_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../service/filesystem.service */ "./src/app/service/filesystem.service.ts");
-/* harmony import */ var _parser_gpx_tools__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../parser/gpx-tools */ "./src/app/parser/gpx-tools.ts");
+/* harmony import */ var _util_admin_gpx_tools__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../_util/admin/gpx-tools */ "./src/app/_util/admin/gpx-tools.ts");
 /* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
 /* harmony import */ var _service_sequential_resolver_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../service/sequential-resolver.service */ "./src/app/service/sequential-resolver.service.ts");
 /* harmony import */ var _util_generic__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../_util/generic */ "./src/app/_util/generic.ts");
+/* harmony import */ var _base_base_base_component__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../base/base/base.component */ "./src/app/base/base/base.component.ts");
 
 
 
@@ -3297,27 +3975,30 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var AdminComponent = /** @class */ (function () {
+
+var AdminComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](AdminComponent, _super);
     function AdminComponent(_fileSystemService, _trailService, _trailGeneratorService, _localStorageService, _loaderService, 
     // private _orientationService: OrientationService,
     _sequentialResolver) {
-        this._fileSystemService = _fileSystemService;
-        this._trailService = _trailService;
-        this._trailGeneratorService = _trailGeneratorService;
-        this._localStorageService = _localStorageService;
-        this._loaderService = _loaderService;
-        this._sequentialResolver = _sequentialResolver;
-        this.selectedTrail = 0;
-        this.selectedDirection = 0;
-        this.trailDataStateClassName = '';
-        this.directions = [
+        var _this = _super.call(this) || this;
+        _this._fileSystemService = _fileSystemService;
+        _this._trailService = _trailService;
+        _this._trailGeneratorService = _trailGeneratorService;
+        _this._localStorageService = _localStorageService;
+        _this._loaderService = _loaderService;
+        _this._sequentialResolver = _sequentialResolver;
+        _this.selectedTrail = 0;
+        _this.selectedDirection = 0;
+        _this.trailDataStateClassName = '';
+        _this.directions = [
             { id: 0, name: 'nobo' },
             { id: 1, name: 'sobo' }
         ];
+        return _this;
     }
     AdminComponent.prototype.ngOnInit = function () {
-        var _self = this;
-        var _trailMetaObj = Object(_util_trail__WEBPACK_IMPORTED_MODULE_3__["getTrailsMetaData"])();
+        var _trailMetaObj = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_3__["getTrailsMetaData"])();
         this.trailMeta = Object.keys(_trailMetaObj).map(function (key) {
             return _trailMetaObj[key];
         });
@@ -3329,14 +4010,13 @@ var AdminComponent = /** @class */ (function () {
         // this._orientationService.startTracking();
     };
     AdminComponent.prototype.genGpxData = function () {
-        var _self = this;
-        var _trailMeta = Object(_util_trail__WEBPACK_IMPORTED_MODULE_3__["getTrailMetaDataById"])(Number(this.selectedTrail));
+        var _trailMeta = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_3__["getTrailMetaDataById"])(Number(this.selectedTrail));
         // simplify the track for app: Mobile Atlas Creator
         var _clone = Object(_util_generic__WEBPACK_IMPORTED_MODULE_13__["cloneData"])(this._trailGeneratorService.flatTrailData);
         // 55 gives roughly 3 points per mile (PCT)
-        _clone = this._trailGeneratorService.simplify(_clone, 80, true);
+        // _clone = this._trailGeneratorService.simplify(_clone, 0.1, true);
         alert(this._trailGeneratorService.flatTrailData.length + ' to ' + _clone.length + ' waypoints');
-        var _gpx = Object(_parser_gpx_tools__WEBPACK_IMPORTED_MODULE_10__["createGPX"])(_trailMeta, _clone);
+        var _gpx = Object(_util_admin_gpx_tools__WEBPACK_IMPORTED_MODULE_10__["createGPX"])(_trailMeta, _clone);
         _gpx.forEach(function (file, index) {
             Object(_util_save__WEBPACK_IMPORTED_MODULE_8__["saveFileAs"])(file, _trailMeta.abbr + '_' + index + '.gpx');
         });
@@ -3344,11 +4024,23 @@ var AdminComponent = /** @class */ (function () {
     AdminComponent.prototype.generateTrailData = function () {
         var _this = this;
         this.trailDataStateClassName = '';
-        this._getRawData().subscribe(function (data) {
-            var _parsedData = _this._trailService.parseTrailData(data[0], data[1], data[2], data[3], Number(_this.selectedDirection));
+        this.addSubscription('rawTrailData', this._getRawData().subscribe(function (data) {
+            var _trailMeta = data[0];
+            var _dataOffset = (_trailMeta.parts) ? _trailMeta.parts - 1 : 0;
+            var _waypointData;
+            if (_trailMeta.multipart) {
+                _waypointData = [];
+                for (var i = 0; i <= _dataOffset; i++) {
+                    _waypointData.push(data[i + 1]);
+                }
+            }
+            else {
+                _waypointData = data[1];
+            }
+            var _parsedData = _this._trailService.parseTrailData(data[0], _waypointData, data[2 + _dataOffset], data[3 + _dataOffset], data[4 + _dataOffset], Number(_this.selectedDirection));
             _this._generatedData = _parsedData;
             _this.trailDataStateClassName = 'generated';
-        });
+        }));
     };
     AdminComponent.prototype._getRawData = function () {
         var _this = this;
@@ -3367,7 +4059,7 @@ var AdminComponent = /** @class */ (function () {
         }));
     };
     AdminComponent.prototype.downloadData = function (type) {
-        var _trailAbbr = Object(_util_trail__WEBPACK_IMPORTED_MODULE_3__["getTrailMetaDataById"])(Number(this.selectedTrail)).abbr;
+        var _trailAbbr = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_3__["getTrailMetaDataById"])(Number(this.selectedTrail)).abbr;
         var _direction = this.directions[Number(this.selectedDirection)].name;
         var _fileName = _trailAbbr + '-' + type;
         if (type === 'trail') {
@@ -3417,6 +4109,7 @@ var AdminComponent = /** @class */ (function () {
         var _current = this._localStorageService.retrieve('disableSimulation');
         this._localStorageService.store('disableSimulation', !(_current));
     };
+    // TODO: does not work on all devices...
     AdminComponent.prototype.sendAllNotes = function () {
         var _notes = this._localStorageService.retrieve(this._trailGeneratorService.getTrailData().abbr + '_notes');
         window.open('mailto:frankdouwes@gmail.com?subject=Hello there&body=' + _notes);
@@ -3438,7 +4131,7 @@ var AdminComponent = /** @class */ (function () {
             _service_sequential_resolver_service__WEBPACK_IMPORTED_MODULE_12__["SequentialResolverService"]])
     ], AdminComponent);
     return AdminComponent;
-}());
+}(_base_base_base_component__WEBPACK_IMPORTED_MODULE_14__["BaseComponent"]));
 
 
 
@@ -3451,7 +4144,7 @@ var AdminComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div id=\"center-icon\" >\n  <display-button class=\"button\" label=\"\" [poiTypes]=\"this.poiTypes\" routerLink=\"\"></display-button>\n</div>\n\n<!-- left -->\n<div id=\"left-panel\">\n  <button *ngIf=\"data.type.includes('note')\" (click)=\"deletePoi()\">delete</button>\n  <h1 mat-dialog-title>{{data.label}}</h1>\n  <h3 *ngIf=\"data.anchorPoint && data.waypoint\">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</h3>\n\n  <div *ngIf=\"data.description\">\n    <p [innerHTML]=\"data.description\"></p>\n    <hr />\n  </div>\n\n  <div *ngIf=\"data.comment\">\n    <p [innerHTML]=\"data.comment\"></p>\n    <hr />\n  </div>\n  <div *ngFor=\"let type of poiTypes\">\n    <rating-form *ngIf=\"type.rateable\" [poiType]=\"type\" [waypoint]=\"data.waypoint\"></rating-form>\n  </div>\n</div>\n\n<!-- right -->\n<div id=\"right-panel\" [ngStyle]=\"{'background-color': poiTypes[0].color} \">\n  <div id=\"scroll-container\">\n    <div class=\"related-poi-list\" *ngFor=\"let poiGroup of poiCollection\">\n      <h3>Next {{relatedLabel(poiGroup.label)}}</h3>\n      <poi-list\n        class=\"poi-list\"\n        [showUser]=\"false\"\n        [masterPoi]=\"data\"\n        [poisData]=\"poiGroup.data\">\n      </poi-list>\n    </div>\n  </div>\n</div>\n"
+module.exports = "<div id=\"center-icon\" >\n  <display-button class=\"button\" label=\"\" [poiTypes]=\"poiTypes\" routerLink=\"\"></display-button>\n</div>\n\n<!-- left -->\n<div id=\"left-panel\">\n  <button *ngIf=\"data.type.includes('note')\" (click)=\"deletePoi()\">delete</button>\n\n  <!-- information -->\n  <div id=\"information-container\">\n\n    <h1 mat-dialog-title [innerHTML]=\"data.label\"></h1>\n    <h2 id=\"mileage\" *ngIf=\"data.anchorPoint && data.waypoint\">{{data.anchorPoint.distanceTotal | distance:'meters':'miles'}} ({{data.waypoint.distance | distance:'meters':'miles':true}})</h2>\n    <small *ngIf=\"data.identifier\">{{data.identifier}}</small>\n\n    <div id=\"description\" *ngIf=\"data.description\">\n      <p [innerHTML]=\"data.description\"></p>\n    </div>\n\n    <div id=\"comment\" *ngIf=\"data.comment\">\n      <p [innerHTML]=\"data.comment\"></p>\n    </div>\n\n  </div>\n\n  <!-- rating -->\n  <rating *ngIf=\"rateable\" [waypoint]=\"data.waypoint\" [poiTypes]=\"poiTypes\"></rating>\n\n</div>\n\n<!-- right -->\n<div id=\"right-panel\" [ngStyle]=\"{'background-color': poiTypes[0].color} \">\n  <div id=\"scroll-container\">\n    <div class=\"related-poi-list\" *ngFor=\"let poiGroup of poiCollection\">\n      <h3>Next {{relatedLabel(poiGroup.label)}}</h3>\n      <poi-list\n        class=\"poi-list\"\n        [showUser]=\"false\"\n        [masterPoi]=\"data\"\n        [poisData]=\"poiGroup.data\">\n      </poi-list>\n    </div>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -3462,7 +4155,7 @@ module.exports = "<div id=\"center-icon\" >\n  <display-button class=\"button\" 
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ":host /deep/ .mat-list-item-content {\n  padding: 0 12px !important;\n  margin: 0 !important; }\n\n#center-icon {\n  position: absolute;\n  left: 50%;\n  margin: -3.5vw 0 0 -3.5vw;\n  z-index: 1000; }\n\n#center-icon button {\n    user-focus: none; }\n\n#left-panel, #right-panel {\n  box-sizing: border-box;\n  display: inline-block;\n  width: 50%;\n  height: 100%;\n  padding: 0 12px 12px 12px; }\n\n#left-panel {\n  height: 98%;\n  vertical-align: bottom;\n  overflow-y: scroll; }\n\n#left-panel h1, #left-panel h2 {\n    display: block;\n    text-align: left;\n    width: 90%;\n    overflow: hidden; }\n\n#left-panel h1 {\n    font-size: 4.2vh;\n    line-height: 5.5vh; }\n\n#left-panel h2 {\n    font-size: 3.4vh;\n    font-weight: 300; }\n\n#right-panel {\n  background-color: #AAAAAA;\n  padding-top: 10px;\n  vertical-align: top; }\n\n#right-panel #scroll-container {\n    height: 100%;\n    overflow-y: scroll; }\n\n#right-panel #scroll-container h3 {\n      text-align: center; }\n\n#right-panel #scroll-container .related-poi-list {\n      height: calc((100vh / 7) * 3.75); }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbWFya2VyLWRpYWxvZy9tYXJrZXItZGlhbG9nLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFDO0VBQ0MsMEJBQTBCO0VBQzFCLG9CQUFvQixFQUFBOztBQUV0QjtFQUNFLGtCQUFrQjtFQUNsQixTQUFTO0VBQ1QseUJBQXlCO0VBQ3pCLGFBQWEsRUFBQTs7QUFKZjtJQU9JLGdCQUFnQixFQUFBOztBQUVwQjtFQUNFLHNCQUFzQjtFQUN0QixxQkFBcUI7RUFDckIsVUFBVTtFQUNWLFlBQVk7RUFDWix5QkFBeUIsRUFBQTs7QUFFM0I7RUFDRSxXQUFXO0VBQ1gsc0JBQXNCO0VBQ3RCLGtCQUFrQixFQUFBOztBQUhwQjtJQU1JLGNBQWM7SUFDZCxnQkFBZ0I7SUFDaEIsVUFBVTtJQUNWLGdCQUFnQixFQUFBOztBQVRwQjtJQVlJLGdCQUFnQjtJQUNoQixrQkFBa0IsRUFBQTs7QUFidEI7SUFnQkksZ0JBQWdCO0lBQ2hCLGdCQUFnQixFQUFBOztBQUVwQjtFQUNFLHlCQUF5QjtFQUN6QixpQkFBaUI7RUFDakIsbUJBQW1CLEVBQUE7O0FBSHJCO0lBTUksWUFBWTtJQUNaLGtCQUFrQixFQUFBOztBQVB0QjtNQVVNLGtCQUFrQixFQUFBOztBQVZ4QjtNQWFNLGdDQUFnQyxFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9tYXJrZXItZGlhbG9nL21hcmtlci1kaWFsb2cuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3QgL2RlZXAvIC5tYXQtbGlzdC1pdGVtLWNvbnRlbnQge1xuICBwYWRkaW5nOiAwIDEycHggIWltcG9ydGFudDtcbiAgbWFyZ2luOiAwICFpbXBvcnRhbnQ7IH1cblxuI2NlbnRlci1pY29uIHtcbiAgcG9zaXRpb246IGFic29sdXRlO1xuICBsZWZ0OiA1MCU7XG4gIG1hcmdpbjogLTMuNXZ3IDAgMCAtMy41dnc7XG4gIHotaW5kZXg6IDEwMDA7XG5cbiAgYnV0dG9uIHtcbiAgICB1c2VyLWZvY3VzOiBub25lOyB9IH1cblxuI2xlZnQtcGFuZWwsICNyaWdodC1wYW5lbCB7XG4gIGJveC1zaXppbmc6IGJvcmRlci1ib3g7XG4gIGRpc3BsYXk6IGlubGluZS1ibG9jaztcbiAgd2lkdGg6IDUwJTtcbiAgaGVpZ2h0OiAxMDAlO1xuICBwYWRkaW5nOiAwIDEycHggMTJweCAxMnB4OyB9XG5cbiNsZWZ0LXBhbmVsIHtcbiAgaGVpZ2h0OiA5OCU7XG4gIHZlcnRpY2FsLWFsaWduOiBib3R0b207XG4gIG92ZXJmbG93LXk6IHNjcm9sbDtcblxuICBoMSwgaDIge1xuICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgIHRleHQtYWxpZ246IGxlZnQ7XG4gICAgd2lkdGg6IDkwJTtcbiAgICBvdmVyZmxvdzogaGlkZGVuOyB9XG5cbiAgaDEge1xuICAgIGZvbnQtc2l6ZTogNC4ydmg7XG4gICAgbGluZS1oZWlnaHQ6IDUuNXZoOyB9XG5cbiAgaDIge1xuICAgIGZvbnQtc2l6ZTogMy40dmg7XG4gICAgZm9udC13ZWlnaHQ6IDMwMDsgfSB9XG5cbiNyaWdodC1wYW5lbCB7XG4gIGJhY2tncm91bmQtY29sb3I6ICNBQUFBQUE7XG4gIHBhZGRpbmctdG9wOiAxMHB4O1xuICB2ZXJ0aWNhbC1hbGlnbjogdG9wO1xuXG4gICNzY3JvbGwtY29udGFpbmVyIHtcbiAgICBoZWlnaHQ6IDEwMCU7XG4gICAgb3ZlcmZsb3cteTogc2Nyb2xsO1xuXG4gICAgaDMge1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyOyB9XG5cbiAgICAucmVsYXRlZC1wb2ktbGlzdCB7XG4gICAgICBoZWlnaHQ6IGNhbGMoKDEwMHZoIC8gNykgKiAzLjc1KTsgfSB9IH1cblxuXG4iXX0= */"
+module.exports = ":host #center-icon {\n  position: absolute;\n  left: 50%;\n  margin: -3.5vw 0 0 -3.5vw;\n  z-index: 1000; }\n  :host #center-icon button {\n    user-focus: none; }\n  :host #left-panel, :host #right-panel {\n  box-sizing: border-box;\n  display: inline-block;\n  width: 50%;\n  height: 100%; }\n  :host #left-panel {\n  height: 98%;\n  vertical-align: bottom;\n  overflow-y: scroll; }\n  :host #left-panel #information-container {\n    margin-top: 12px; }\n  :host #left-panel #information-container #mileage, :host #left-panel #information-container h1, :host #left-panel #information-container h2, :host #left-panel #information-container small {\n      padding: 0 12px; }\n  :host #left-panel #information-container #description, :host #left-panel #information-container #comment {\n      padding: 6px 12px; }\n  :host #left-panel #information-container h1, :host #left-panel #information-container h2 {\n      display: block;\n      text-align: left;\n      width: 90%;\n      overflow: hidden; }\n  :host #left-panel #information-container h1 {\n      font-size: 4.2vh;\n      line-height: 5.5vh;\n      margin-bottom: 0 !important; }\n  :host #left-panel #information-container h2 {\n      font-size: 3.8vh;\n      line-height: 4.4vh; }\n  :host #right-panel {\n  background-color: #AAAAAA;\n  vertical-align: top;\n  padding: 0 12px 12px 12px; }\n  :host #right-panel #scroll-container {\n    height: 100%;\n    overflow-y: scroll; }\n  :host #right-panel #scroll-container h3 {\n      text-align: center; }\n  :host #right-panel #scroll-container .related-poi-list {\n      height: calc((100vh / 7) * 3.75); }\n  :host /deep/ .mat-list-item-content {\n  padding: 0 12px !important;\n  margin: 0 !important; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbWFya2VyLWRpYWxvZy9tYXJrZXItZGlhbG9nLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFDO0VBR0csa0JBQWtCO0VBQ2xCLFNBQVM7RUFDVCx5QkFBeUI7RUFDekIsYUFBYSxFQUFBO0VBTmhCO0lBU0ssZ0JBQWdCLEVBQUE7RUFUckI7RUFZRyxzQkFBc0I7RUFDdEIscUJBQXFCO0VBQ3JCLFVBQVU7RUFDVixZQUFZLEVBQUE7RUFmZjtFQWtCRyxXQUFXO0VBQ1gsc0JBQXNCO0VBQ3RCLGtCQUFrQixFQUFBO0VBcEJyQjtJQXVCSyxnQkFBZ0IsRUFBQTtFQXZCckI7TUEwQk8sZUFBZSxFQUFBO0VBMUJ0QjtNQTZCTyxpQkFBaUIsRUFBQTtFQTdCeEI7TUFnQ08sY0FBYztNQUNkLGdCQUFnQjtNQUNoQixVQUFVO01BQ1YsZ0JBQWdCLEVBQUE7RUFuQ3ZCO01Bc0NPLGdCQUFnQjtNQUNoQixrQkFBa0I7TUFDbEIsMkJBQTJCLEVBQUE7RUF4Q2xDO01BMkNPLGdCQUFnQjtNQUNoQixrQkFBa0IsRUFBQTtFQTVDekI7RUErQ0cseUJBQXlCO0VBQ3pCLG1CQUFtQjtFQUNuQix5QkFBeUIsRUFBQTtFQWpENUI7SUFvREssWUFBWTtJQUNaLGtCQUFrQixFQUFBO0VBckR2QjtNQXdETyxrQkFBa0IsRUFBQTtFQXhEekI7TUEyRE8sZ0NBQWdDLEVBQUE7RUFJdkM7RUFHRywwQkFBMEI7RUFDMUIsb0JBQW9CLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnQvZGlhbG9nL21hcmtlci1kaWFsb2cvbWFya2VyLWRpYWxvZy5jb21wb25lbnQuc2FzcyIsInNvdXJjZXNDb250ZW50IjpbIiA6aG9zdCB7XG5cbiAgI2NlbnRlci1pY29uIHtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgbGVmdDogNTAlO1xuICAgIG1hcmdpbjogLTMuNXZ3IDAgMCAtMy41dnc7XG4gICAgei1pbmRleDogMTAwMDtcblxuICAgIGJ1dHRvbiB7XG4gICAgICB1c2VyLWZvY3VzOiBub25lOyB9IH1cblxuICAjbGVmdC1wYW5lbCwgI3JpZ2h0LXBhbmVsIHtcbiAgICBib3gtc2l6aW5nOiBib3JkZXItYm94O1xuICAgIGRpc3BsYXk6IGlubGluZS1ibG9jaztcbiAgICB3aWR0aDogNTAlO1xuICAgIGhlaWdodDogMTAwJTsgfVxuXG4gICNsZWZ0LXBhbmVsIHtcbiAgICBoZWlnaHQ6IDk4JTtcbiAgICB2ZXJ0aWNhbC1hbGlnbjogYm90dG9tO1xuICAgIG92ZXJmbG93LXk6IHNjcm9sbDtcblxuICAgICNpbmZvcm1hdGlvbi1jb250YWluZXIge1xuICAgICAgbWFyZ2luLXRvcDogMTJweDtcblxuICAgICAgI21pbGVhZ2UsIGgxLCBoMiwgc21hbGwge1xuICAgICAgICBwYWRkaW5nOiAwIDEycHg7IH1cblxuICAgICAgI2Rlc2NyaXB0aW9uLCAjY29tbWVudCB7XG4gICAgICAgIHBhZGRpbmc6IDZweCAxMnB4OyB9XG5cbiAgICAgIGgxLCBoMiB7XG4gICAgICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgICAgICB0ZXh0LWFsaWduOiBsZWZ0O1xuICAgICAgICB3aWR0aDogOTAlO1xuICAgICAgICBvdmVyZmxvdzogaGlkZGVuOyB9XG5cbiAgICAgIGgxIHtcbiAgICAgICAgZm9udC1zaXplOiA0LjJ2aDtcbiAgICAgICAgbGluZS1oZWlnaHQ6IDUuNXZoO1xuICAgICAgICBtYXJnaW4tYm90dG9tOiAwICFpbXBvcnRhbnQ7IH1cblxuICAgICAgaDIge1xuICAgICAgICBmb250LXNpemU6IDMuOHZoO1xuICAgICAgICBsaW5lLWhlaWdodDogNC40dmg7IH0gfSB9XG5cbiAgI3JpZ2h0LXBhbmVsIHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjQUFBQUFBO1xuICAgIHZlcnRpY2FsLWFsaWduOiB0b3A7XG4gICAgcGFkZGluZzogMCAxMnB4IDEycHggMTJweDtcblxuICAgICNzY3JvbGwtY29udGFpbmVyIHtcbiAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgIG92ZXJmbG93LXk6IHNjcm9sbDtcblxuICAgICAgaDMge1xuICAgICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7IH1cblxuICAgICAgLnJlbGF0ZWQtcG9pLWxpc3Qge1xuICAgICAgICBoZWlnaHQ6IGNhbGMoKDEwMHZoIC8gNykgKiAzLjc1KTsgfSB9IH0gfVxuXG5cblxuIDpob3N0IC9kZWVwLyB7XG5cbiAgLm1hdC1saXN0LWl0ZW0tY29udGVudCB7XG4gICAgcGFkZGluZzogMCAxMnB4ICFpbXBvcnRhbnQ7XG4gICAgbWFyZ2luOiAwICFpbXBvcnRhbnQ7IH0gfVxuXG4iXX0= */"
 
 /***/ }),
 
@@ -3479,11 +4172,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/material */ "./node_modules/@angular/material/esm5/material.es5.js");
-/* harmony import */ var _type_poi__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../type/poi */ "./src/app/type/poi.ts");
-/* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../_util/poi */ "./src/app/_util/poi.ts");
-/* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
-/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../service/note.service */ "./src/app/service/note.service.ts");
-
+/* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../_util/poi */ "./src/app/_util/poi.ts");
+/* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
+/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../service/note.service */ "./src/app/service/note.service.ts");
 
 
 
@@ -3502,22 +4193,29 @@ var MarkerDialogComponent = /** @class */ (function () {
     MarkerDialogComponent.prototype.ngOnInit = function () {
         var _self = this;
         // generate poiTypes (icons)
-        var _poiStrArr = this.data.type.split(", ");
+        var _poiStrArr = this.data.type.split(', ');
         _poiStrArr.forEach(function (poi, index) {
-            var _poiData = Object(_util_poi__WEBPACK_IMPORTED_MODULE_4__["getPoiTypeByType"])(poi);
+            var _poiData = Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])(poi);
+            if (!_poiData) {
+                // TODO: a bug in cottonwood creek below lake morena (PCT), seems to be a blank poi in data...
+                return;
+            }
+            if (_poiData.rateable && !_self.rateable) {
+                _self.rateable = true;
+            }
             if (_poiData !== undefined) {
                 if (_poiStrArr.length > 2 && index === 1) {
-                    _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_4__["getPoiTypeByType"])('unknown'));
+                    _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])('unknown'));
                 }
                 _self.poiTypes.push(_poiData);
             }
             else {
-                _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_4__["getPoiTypeByType"])('unknown'));
+                _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])('unknown'));
             }
         });
         // if no types
         if (this.poiTypes.length === 0) {
-            this.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_4__["getPoiTypeByType"])('unknown'));
+            this.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])('unknown'));
         }
         if (this.data.type.includes('water')) {
             this.showRelated = true;
@@ -3530,32 +4228,269 @@ var MarkerDialogComponent = /** @class */ (function () {
     };
     MarkerDialogComponent.prototype.ngOnDestroy = function () {
     };
+    MarkerDialogComponent.prototype.deletePoi = function () {
+        this._noteService.deleteNote(this.data.id, this.data.belongsToType, this.data.belongsTo);
+        this.dialogRef.close();
+    };
+    // only show individual rating labels if there is more than 1 poitype that allows rating
+    MarkerDialogComponent.prototype.showRatingLabel = function () {
+        if (this.poiTypes.length < 2) {
+            return false;
+        }
+        else {
+            // check if there are multiple rateable types)
+            var _rateableCount = 0;
+            for (var i = 0; i < this.poiTypes.length; i++) {
+                if (this.poiTypes[i].rateable) {
+                    _rateableCount++;
+                }
+            }
+            return (_rateableCount > 1);
+        }
+    };
+    MarkerDialogComponent.prototype.relatedLabel = function (type) {
+        return Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])(type).label;
+    };
+    // get related pois (by type) to display
     MarkerDialogComponent.prototype._getRelatedPois = function (poiType) {
         var _relatedPois = this._trailGeneratorService.getTrailData().sortedPoiIds[poiType];
         var _poiIndex = _relatedPois.indexOf(this.data.id);
         var _poiIds = _relatedPois.slice(_poiIndex + 1, _poiIndex + 4);
         this.poiCollection.push({ label: poiType, data: _poiIds });
     };
-    MarkerDialogComponent.prototype.relatedLabel = function (type) {
-        return Object(_util_poi__WEBPACK_IMPORTED_MODULE_4__["getPoiTypeByType"])(type).label;
-    };
-    MarkerDialogComponent.prototype.deletePoi = function () {
-        this._noteService.deleteNote(this.data.id, this.data.belongsToType, this.data.belongsTo);
-        this.dialogRef.close();
-    };
     MarkerDialogComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
             selector: 'marker-dialog',
             template: __webpack_require__(/*! ./marker-dialog.component.html */ "./src/app/component/dialog/marker-dialog/marker-dialog.component.html"),
+            changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectionStrategy"].OnPush,
             styles: [__webpack_require__(/*! ./marker-dialog.component.sass */ "./src/app/component/dialog/marker-dialog/marker-dialog.component.sass")]
         }),
         tslib__WEBPACK_IMPORTED_MODULE_0__["__param"](3, Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Inject"])(_angular_material__WEBPACK_IMPORTED_MODULE_2__["MAT_DIALOG_DATA"])),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_service_trail_generator_service__WEBPACK_IMPORTED_MODULE_5__["TrailGeneratorService"],
-            _service_note_service__WEBPACK_IMPORTED_MODULE_6__["NoteService"],
-            _angular_material__WEBPACK_IMPORTED_MODULE_2__["MatDialogRef"],
-            _type_poi__WEBPACK_IMPORTED_MODULE_3__["Poi"]])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_service_trail_generator_service__WEBPACK_IMPORTED_MODULE_4__["TrailGeneratorService"],
+            _service_note_service__WEBPACK_IMPORTED_MODULE_5__["NoteService"],
+            _angular_material__WEBPACK_IMPORTED_MODULE_2__["MatDialogRef"], Object])
     ], MarkerDialogComponent);
     return MarkerDialogComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.html":
+/*!***************************************************************************************************!*\
+  !*** ./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.html ***!
+  \***************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<div id=\"wrapper\" (click)=\"setScore($event)\">\n\n  <span id=\"label\" (click)=\"cycleScore($event)\">{{label}}:</span>\n\n  <span id=\"star-container\">\n    <fa-icon\n      *ngFor=\"let score of scoreArray; let i = index\"\n      [id]=\"i\"\n      [icon]=\"(score === '/') ? 'star-half-alt' : ((score === 'o') ? ['far', 'star'] : 'star')\"\n      [ngClass]=\"(score !== 'o') ? 'active' : 'inactive'\" class=\"fa-icon-star\"\n      [fixedWidth]=\"true\">\n    </fa-icon>\n  </span>\n\n</div>\n\n"
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.sass":
+/*!***************************************************************************************************!*\
+  !*** ./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.sass ***!
+  \***************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ":host #wrapper #label {\n  text-transform: capitalize; }\n\n:host #star-container {\n  float: right;\n  color: #e8aa1b !important; }\n\n:host /deep/ fa-icon {\n  display: inline-block;\n  pointer-events: all !important; }\n\n:host /deep/ fa-icon svg {\n    pointer-events: none; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbWFya2VyLWRpYWxvZy9yYXRpbmcvZWxlbWVudHMvYWRkLXNjb3JlL2FkZC1zY29yZS5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUtLLDBCQUEwQixFQUFBOztBQUwvQjtFQVFHLFlBQVk7RUFDWix5QkFBeUIsRUFBQTs7QUFFNUI7RUFHRyxxQkFBcUI7RUFDckIsOEJBQThCLEVBQUE7O0FBSmpDO0lBT0ssb0JBQW9CLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnQvZGlhbG9nL21hcmtlci1kaWFsb2cvcmF0aW5nL2VsZW1lbnRzL2FkZC1zY29yZS9hZGQtc2NvcmUuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3Qge1xuXG4gICN3cmFwcGVyIHtcblxuICAgICNsYWJlbCB7XG4gICAgICB0ZXh0LXRyYW5zZm9ybTogY2FwaXRhbGl6ZTsgfSB9XG5cbiAgI3N0YXItY29udGFpbmVyIHtcbiAgICBmbG9hdDogcmlnaHQ7XG4gICAgY29sb3I6ICNlOGFhMWIgIWltcG9ydGFudDsgfSB9XG5cbiA6aG9zdCAvZGVlcC8ge1xuXG4gIGZhLWljb24ge1xuICAgIGRpc3BsYXk6IGlubGluZS1ibG9jazsgICAgICAgLy8gbmVlZGVkIGZvciBTYWZhcmkvaU9TIGNsaWNrIGV2ZW50c1xuICAgIHBvaW50ZXItZXZlbnRzOiBhbGwgIWltcG9ydGFudDtcblxuICAgIHN2ZyB7XG4gICAgICBwb2ludGVyLWV2ZW50czogbm9uZTsgfSB9IH1cbiJdfQ== */"
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.ts":
+/*!*************************************************************************************************!*\
+  !*** ./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.ts ***!
+  \*************************************************************************************************/
+/*! exports provided: AddScoreComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AddScoreComponent", function() { return AddScoreComponent; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _type_rating__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../type/rating */ "./src/app/type/rating.ts");
+
+
+
+var AddScoreComponent = /** @class */ (function () {
+    function AddScoreComponent(_changeDetector) {
+        this._changeDetector = _changeDetector;
+    }
+    AddScoreComponent.prototype.ngOnInit = function () {
+        this.score = this.rating.getAspect(this.label);
+        this.setScoreArray();
+    };
+    AddScoreComponent.prototype.setScore = function (event) {
+        var _newScore = (event.target.id !== 'wrapper') ? Number(event.target.id) + 1 : 0;
+        var _currentScore = this.score.getUserScore();
+        // toggle
+        if (_newScore === _currentScore) {
+            _newScore--;
+        }
+        // change score
+        this.rating.setAspectRating(this.label, _newScore);
+        this.setScoreArray();
+        this._changeDetector.markForCheck();
+    };
+    // +1 the score
+    AddScoreComponent.prototype.cycleScore = function (event) {
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        var _floorScore = Math.floor(this.score.getUserScore());
+        if (_floorScore < 5) {
+            _floorScore++;
+            this.rating.setAspectRating(this.label, _floorScore);
+        }
+        else {
+            this.rating.setAspectRating(this.label, 0);
+        }
+        this.setScoreArray();
+        this._changeDetector.detectChanges();
+    };
+    // turns 3.7 into ['x', 'x', 'x', '/', 'o'], can round to the nearest number
+    AddScoreComponent.prototype.setScoreArray = function () {
+        var _scoreArray = [];
+        var _score = this.score.getUserScore();
+        _score = (this.round) ? Math.round(_score) : _score;
+        for (var i = 0; i < 5; i++) {
+            if (_score > i) {
+                if (_score - i >= 1) {
+                    _scoreArray.push('x');
+                }
+                else {
+                    _scoreArray.push('/');
+                }
+            }
+            else {
+                _scoreArray.push('o');
+            }
+        }
+        this.scoreArray = _scoreArray;
+    };
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", String)
+    ], AddScoreComponent.prototype, "type", void 0);
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Boolean)
+    ], AddScoreComponent.prototype, "round", void 0);
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", String)
+    ], AddScoreComponent.prototype, "label", void 0);
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_rating__WEBPACK_IMPORTED_MODULE_2__["Rating"])
+    ], AddScoreComponent.prototype, "rating", void 0);
+    AddScoreComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
+            selector: 'rating-add-score',
+            template: __webpack_require__(/*! ./add-score.component.html */ "./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.html"),
+            changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectionStrategy"].OnPush,
+            styles: [__webpack_require__(/*! ./add-score.component.sass */ "./src/app/component/dialog/marker-dialog/rating/elements/add-score/add-score.component.sass")]
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectorRef"]])
+    ], AddScoreComponent);
+    return AddScoreComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.html":
+/*!***********************************************************************************************************!*\
+  !*** ./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.html ***!
+  \***********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<span id=\"label\">{{label}}:</span>\n\n<span id=\"star-container\">\n    <fa-icon\n      *ngFor=\"let score of scoreArray(score.getScore(), false); let i = index\"\n      [id]=\"i\"\n      [icon]=\"(score === '/') ? 'star-half-alt' : 'star'\"\n      [ngClass]=\"(score !== 'o') ? 'active' : 'inactive'\"\n      class=\"fa-icon-star\"\n      [fixedWidth]=\"true\">\n    </fa-icon>\n    <!--<span>({{score.getScore()}})</span>-->\n</span>\n"
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.sass":
+/*!***********************************************************************************************************!*\
+  !*** ./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.sass ***!
+  \***********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ":host #label {\n  text-transform: capitalize; }\n\n:host #star-container {\n  float: right;\n  color: #d1d1d1 !important; }\n\n:host #star-container .active {\n    color: #e8aa1b !important; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbWFya2VyLWRpYWxvZy9yYXRpbmcvZWxlbWVudHMvY3VycmVudC1zY29yZS9jdXJyZW50LXNjb3JlLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFDO0VBR0csMEJBQTBCLEVBQUE7O0FBSDdCO0VBTUcsWUFBWTtFQUNaLHlCQUFvQyxFQUFBOztBQVB2QztJQVVLLHlCQUF5QixFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9tYXJrZXItZGlhbG9nL3JhdGluZy9lbGVtZW50cy9jdXJyZW50LXNjb3JlL2N1cnJlbnQtc2NvcmUuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3Qge1xuXG4gICNsYWJlbCB7XG4gICAgdGV4dC10cmFuc2Zvcm06IGNhcGl0YWxpemU7IH1cblxuICAjc3Rhci1jb250YWluZXIge1xuICAgIGZsb2F0OiByaWdodDtcbiAgICBjb2xvcjogcmdiKDIwOSwgMjA5LCAyMDkpICFpbXBvcnRhbnQ7XG5cbiAgICAuYWN0aXZlIHtcbiAgICAgIGNvbG9yOiAjZThhYTFiICFpbXBvcnRhbnQ7IH0gfSB9XG4iXX0= */"
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.ts":
+/*!*********************************************************************************************************!*\
+  !*** ./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.ts ***!
+  \*********************************************************************************************************/
+/*! exports provided: CurrentScoreComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CurrentScoreComponent", function() { return CurrentScoreComponent; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _type_rating__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../type/rating */ "./src/app/type/rating.ts");
+
+
+
+var CurrentScoreComponent = /** @class */ (function () {
+    function CurrentScoreComponent(_changeDetector) {
+        this._changeDetector = _changeDetector;
+    }
+    CurrentScoreComponent.prototype.ngOnInit = function () { };
+    CurrentScoreComponent.prototype.ngOnChanges = function (changes) {
+        if (changes.update) {
+            this._changeDetector.detectChanges();
+        }
+    };
+    // turns 3.7 into ['x', 'x', 'x', '/', 'o'], can round to the nearest number
+    CurrentScoreComponent.prototype.scoreArray = function (score, round) {
+        var _scoreArray = [];
+        score = (round) ? Math.round(score) : score;
+        for (var i = 0; i < 5; i++) {
+            if (score > i) {
+                if (score - i >= 1) {
+                    _scoreArray.push('x');
+                }
+                else {
+                    _scoreArray.push('/');
+                }
+            }
+            else {
+                _scoreArray.push('o');
+            }
+        }
+        return _scoreArray;
+    };
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", String)
+    ], CurrentScoreComponent.prototype, "label", void 0);
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_rating__WEBPACK_IMPORTED_MODULE_2__["TotalScore"])
+    ], CurrentScoreComponent.prototype, "score", void 0);
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Number)
+    ], CurrentScoreComponent.prototype, "update", void 0);
+    CurrentScoreComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
+            selector: 'rating-current-score',
+            template: __webpack_require__(/*! ./current-score.component.html */ "./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.html"),
+            changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectionStrategy"].OnPush,
+            styles: [__webpack_require__(/*! ./current-score.component.sass */ "./src/app/component/dialog/marker-dialog/rating/elements/current-score/current-score.component.sass")]
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectorRef"]])
+    ], CurrentScoreComponent);
+    return CurrentScoreComponent;
 }());
 
 
@@ -3569,18 +4504,18 @@ var MarkerDialogComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<h5>Rating:</h5>\n<div *ngFor=\"let name of poiType.rateBy\">{{name + ':'}} <span>*</span><span>*</span><span>*</span><span>*</span><span>*</span></div>\n"
+module.exports = "<div id=\"rate-container\">\n\n  <div id=\"rate-toggle\">\n    <h2 (click)=\"onToggleClick('current')\" [ngClass]=\"{'active': state === 'current'}\">Rating ({{totalRating}})</h2>\n    <span id=\"divider\"> | </span>\n    <h2 (click)=\"onToggleClick('add')\" [ngClass]=\"{'active': state === 'add'}\">Your Rating</h2>\n  </div>\n\n  <div id=\"rating-panel\" *ngFor=\"let type of rateablePoiTypes\">\n\n    <h4 *ngIf=\"(rateablePoiTypes.length > 1)\">{{type.label}}</h4>\n\n    <!-- toggle between current / add (form)-->\n\n    <div id=\"rating\" *ngFor=\"let name of type.rateBy\" #ratingPanel>\n\n      <rating-current-score *ngIf=\"state === 'current'\" [label]=\"name\" [score]=\"getAspect(type.type, name)\" [update]=\"timestamp\"></rating-current-score>\n      <rating-add-score *ngIf=\"state === 'add'\" [label]=\"name\" [type]=\"type.type\" [rating]=\"getRating(type.type)\"></rating-add-score>\n    </div>\n\n  </div>\n\n</div>\n"
 
 /***/ }),
 
-/***/ "./src/app/component/dialog/marker-dialog/rating/rating.component.scss":
+/***/ "./src/app/component/dialog/marker-dialog/rating/rating.component.sass":
 /*!*****************************************************************************!*\
-  !*** ./src/app/component/dialog/marker-dialog/rating/rating.component.scss ***!
+  !*** ./src/app/component/dialog/marker-dialog/rating/rating.component.sass ***!
   \*****************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbWFya2VyLWRpYWxvZy9yYXRpbmcvcmF0aW5nLmNvbXBvbmVudC5zY3NzIn0= */"
+module.exports = ":host #rate-container {\n  border-top: 1px solid #CCC;\n  background-color: #EEE;\n  padding: 12px; }\n  :host #rate-container #rate-toggle {\n    text-align: center;\n    padding-bottom: 12px; }\n  :host #rate-container #rate-toggle h2 {\n      display: inline;\n      font-size: 3.4vh;\n      font-family: Roboto, \"Helvetica Neue\", sans-serif;\n      font-weight: 500; }\n  :host #rate-container #rate-toggle h2:not(.active) {\n      color: grey; }\n  :host #rate-container #rate-toggle #divider {\n      color: #CCC; }\n  :host #rate-container #rating-panel {\n    position: relative; }\n  :host #rate-container #rating-panel h4 {\n      margin: 0 auto !important;\n      font-size: 3vh; }\n  :host #rate-container #rating-panel #rating {\n      padding: 6px 0; }\n  :host #rate-container #rating-panel > .warn::after {\n    content: \"\";\n    background-color: rgba(238, 238, 238, 0.9);\n    font-size: 12px;\n    position: absolute;\n    text-align: center;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n    box-sizing: border-box;\n    padding: auto 25%;\n    -webkit-backdrop-filter: blur(3px);\n    backdrop-filter: blur(3px);\n    vertical-align: -50%; }\n  :host #rate-container #rating-panel > .warn-gps::after {\n    content: \"Please enable GPS in order to rate this location.\"; }\n  :host #rate-container #rating-panel > .warn-distance::after {\n    content: \"You're currently > 4.5 miles from this location.\"; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbWFya2VyLWRpYWxvZy9yYXRpbmcvcmF0aW5nLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFDO0VBR0csMEJBQTBCO0VBQzFCLHNCQUFzQjtFQUN0QixhQUFhLEVBQUE7RUFMaEI7SUFRSyxrQkFBa0I7SUFDbEIsb0JBQW9CLEVBQUE7RUFUekI7TUFZTyxlQUFlO01BQ2YsZ0JBQWdCO01BQ2hCLGlEQUFpRDtNQUNqRCxnQkFBZ0IsRUFBQTtFQWZ2QjtNQWtCTyxXQUFXLEVBQUE7RUFsQmxCO01BcUJPLFdBQVcsRUFBQTtFQXJCbEI7SUF5Qkssa0JBQWtCLEVBQUE7RUF6QnZCO01BNEJPLHlCQUF5QjtNQUN6QixjQUFjLEVBQUE7RUE3QnJCO01BZ0NPLGNBQWMsRUFBQTtFQWhDckI7SUFtQ0ssV0FBVztJQUNYLDBDQUEwQztJQUMxQyxlQUFlO0lBQ2Ysa0JBQWtCO0lBQ2xCLGtCQUFrQjtJQUNsQixNQUFNO0lBQ04sT0FBTztJQUNQLFdBQVc7SUFDWCxZQUFZO0lBQ1osc0JBQXNCO0lBQ3RCLGlCQUFpQjtJQUNqQixrQ0FBa0M7SUFDbEMsMEJBQTBCO0lBQzFCLG9CQUFvQixFQUFBO0VBaER6QjtJQW1ESyw0REFBNEQsRUFBQTtFQW5EakU7SUFzREssMkRBQTJELEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnQvZGlhbG9nL21hcmtlci1kaWFsb2cvcmF0aW5nL3JhdGluZy5jb21wb25lbnQuc2FzcyIsInNvdXJjZXNDb250ZW50IjpbIiA6aG9zdCB7XG5cbiAgI3JhdGUtY29udGFpbmVyIHtcbiAgICBib3JkZXItdG9wOiAxcHggc29saWQgI0NDQztcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjRUVFO1xuICAgIHBhZGRpbmc6IDEycHg7XG5cbiAgICAjcmF0ZS10b2dnbGUge1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgcGFkZGluZy1ib3R0b206IDEycHg7XG5cbiAgICAgIGgyIHtcbiAgICAgICAgZGlzcGxheTogaW5saW5lO1xuICAgICAgICBmb250LXNpemU6IDMuNHZoO1xuICAgICAgICBmb250LWZhbWlseTogUm9ib3RvLCBcIkhlbHZldGljYSBOZXVlXCIsIHNhbnMtc2VyaWY7XG4gICAgICAgIGZvbnQtd2VpZ2h0OiA1MDA7IH1cblxuICAgICAgaDI6bm90KC5hY3RpdmUpIHtcbiAgICAgICAgY29sb3I6IGdyZXk7IH1cblxuICAgICAgI2RpdmlkZXIge1xuICAgICAgICBjb2xvcjogI0NDQzsgfSB9XG5cbiAgICAjcmF0aW5nLXBhbmVsIHtcblxuICAgICAgcG9zaXRpb246IHJlbGF0aXZlO1xuXG4gICAgICBoNCB7XG4gICAgICAgIG1hcmdpbjogMCBhdXRvICFpbXBvcnRhbnQ7XG4gICAgICAgIGZvbnQtc2l6ZTogM3ZoOyB9XG5cbiAgICAgICNyYXRpbmcge1xuICAgICAgICBwYWRkaW5nOiA2cHggMDsgfSB9XG5cbiAgICAjcmF0aW5nLXBhbmVsPi53YXJuOjphZnRlciB7XG4gICAgICBjb250ZW50OiBcIlwiO1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyMzgsIDIzOCwgMjM4LCAwLjkpO1xuICAgICAgZm9udC1zaXplOiAxMnB4O1xuICAgICAgcG9zaXRpb246IGFic29sdXRlO1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgdG9wOiAwO1xuICAgICAgbGVmdDogMDtcbiAgICAgIHdpZHRoOiAxMDAlO1xuICAgICAgaGVpZ2h0OiAxMDAlO1xuICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcbiAgICAgIHBhZGRpbmc6IGF1dG8gMjUlO1xuICAgICAgLXdlYmtpdC1iYWNrZHJvcC1maWx0ZXI6IGJsdXIoM3B4KTtcbiAgICAgIGJhY2tkcm9wLWZpbHRlcjogYmx1cigzcHgpO1xuICAgICAgdmVydGljYWwtYWxpZ246IC01MCU7IH1cblxuICAgICNyYXRpbmctcGFuZWw+Lndhcm4tZ3BzOjphZnRlciB7XG4gICAgICBjb250ZW50OiBcIlBsZWFzZSBlbmFibGUgR1BTIGluIG9yZGVyIHRvIHJhdGUgdGhpcyBsb2NhdGlvbi5cIjsgfVxuXG4gICAgI3JhdGluZy1wYW5lbD4ud2Fybi1kaXN0YW5jZTo6YWZ0ZXIge1xuICAgICAgY29udGVudDogXCJZb3UncmUgY3VycmVudGx5ID4gNC41IG1pbGVzIGZyb20gdGhpcyBsb2NhdGlvbi5cIjsgfSB9IH1cbiJdfQ== */"
 
 /***/ }),
 
@@ -3596,40 +4531,132 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RatingComponent", function() { return RatingComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_poi__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../type/poi */ "./src/app/type/poi.ts");
-/* harmony import */ var _service_rate_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../service/rate.service */ "./src/app/service/rate.service.ts");
-/* harmony import */ var _type_waypoint__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../type/waypoint */ "./src/app/type/waypoint.ts");
+/* harmony import */ var _service_rate_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../service/rate.service */ "./src/app/service/rate.service.ts");
+/* harmony import */ var _base_location_based_location_based_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../base/location-based/location-based.component */ "./src/app/base/location-based/location-based.component.ts");
 
 
 
 
-
-var RatingComponent = /** @class */ (function () {
-    function RatingComponent(_rateService) {
-        this._rateService = _rateService;
+var RatingComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](RatingComponent, _super);
+    function RatingComponent(_rateService, _changeDetector) {
+        var _this = _super.call(this) || this;
+        _this._rateService = _rateService;
+        _this._changeDetector = _changeDetector;
+        _this.totalRating = 0;
+        _this.state = 'current';
+        _this.rateablePoiTypes = [];
+        _this._ratings = {};
+        _this._ratingSubscriptions = [];
+        return _this;
     }
     RatingComponent.prototype.ngOnInit = function () {
-        var _rating = this._rateService.getRating(this.poiType.type, this.waypoint);
-        console.log(_rating);
+        _super.prototype.ngOnInit.call(this);
+        var _self = this;
+        this.poiTypes.forEach(function (type) {
+            if (type.rateable) {
+                _self.rateablePoiTypes.push(type);
+                var _rating = _self._rateService.getRatingById(type.type, _self.waypoint);
+                _self._ratings[type.type] = _rating;
+                _self._ratingSubscriptions.push(_rating.ratingChangedObserver.subscribe(function (update) {
+                    if (update !== -1) {
+                        _self.calculateTotalRating();
+                    }
+                }));
+            }
+        });
+        this.calculateTotalRating();
+    };
+    RatingComponent.prototype.ngOnDestroy = function () {
+        _super.prototype.ngOnDestroy.call(this);
+        this._saveRating();
+        // clear subscriptions
+        this._ratingSubscriptions.forEach(function (subscription) {
+            subscription.unsubscribe();
+            subscription = null;
+        });
+        this._ratingSubscriptions = null;
+        // destroy ratings (as everything is stored in Score
+        for (var key in this._ratings) {
+            this._ratings[key].destroy();
+        }
+        this._ratings = null;
+    };
+    RatingComponent.prototype.onToggleClick = function (state) {
+        // you're only allowed to rate if you're nearby (4.5 miles)
+        // if (state === 'add') {
+        //   if (this.status !== 'tracking' && !this.user) {
+        //     this.ratingPanel.nativeElement.classList.add('warn');
+        //     this.ratingPanel.nativeElement.classList.add('warn-gps');
+        //   } else {
+        //     const _distance = geolib.getDistance(waypointToLatLng(this.waypoint), waypointToLatLng(this.user.waypoint));
+        //     if (_distance > (environment.MILE * 4.5)) {
+        //       this.ratingPanel.nativeElement.classList.add('warn');
+        //       this.ratingPanel.nativeElement.classList.add('warn-distance');
+        //     }
+        //   }
+        // } else {
+        //   this.ratingPanel.nativeElement.classList.remove('warn');
+        //   this.ratingPanel.nativeElement.classList.remove('warn-gps');
+        //   this.ratingPanel.nativeElement.classList.remove('warn-distance');
+        // }
+        this.state = state;
+    };
+    RatingComponent.prototype.calculateTotalRating = function () {
+        var _ratingCount = 0;
+        var _cummulativeScore = 0;
+        for (var key in this._ratings) {
+            _ratingCount++;
+            var _rating = this._ratings[key];
+            _cummulativeScore += _rating.getRating();
+        }
+        this.totalRating = Number((_cummulativeScore / _ratingCount).toFixed(2));
+    };
+    RatingComponent.prototype.getAspect = function (type, aspect) {
+        return this.getRating(type).getAspect(aspect);
+    };
+    RatingComponent.prototype.getRating = function (type) {
+        return this._ratings[type];
+    };
+    // when a user switches from 'your rating' to 'ratings', save the users rating
+    RatingComponent.prototype._saveRating = function () {
+        var _scoreArray = [];
+        for (var key in this._ratings) {
+            var _rating = this._ratings[key];
+            var _aspects = _rating.getAspects();
+            for (var j = 0; j < _aspects.length; j++) {
+                var _totalScore = _aspects[j];
+                if (_totalScore.userScore && _totalScore.userScore.unsynced) {
+                    _scoreArray.push(_totalScore.userScore);
+                }
+            }
+        }
+        this._rateService.saveRatings(_scoreArray);
     };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
-        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_poi__WEBPACK_IMPORTED_MODULE_2__["PoiType"])
-    ], RatingComponent.prototype, "poiType", void 0);
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])('ratingPanel'),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _angular_core__WEBPACK_IMPORTED_MODULE_1__["ElementRef"])
+    ], RatingComponent.prototype, "ratingPanel", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_waypoint__WEBPACK_IMPORTED_MODULE_4__["Waypoint"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Array)
+    ], RatingComponent.prototype, "poiTypes", void 0);
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], RatingComponent.prototype, "waypoint", void 0);
     RatingComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
-            selector: 'rating-form',
+            selector: 'rating',
             template: __webpack_require__(/*! ./rating.component.html */ "./src/app/component/dialog/marker-dialog/rating/rating.component.html"),
-            styles: [__webpack_require__(/*! ./rating.component.scss */ "./src/app/component/dialog/marker-dialog/rating/rating.component.scss")]
+            changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectionStrategy"].OnPush,
+            styles: [__webpack_require__(/*! ./rating.component.sass */ "./src/app/component/dialog/marker-dialog/rating/rating.component.sass")]
         }),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_service_rate_service__WEBPACK_IMPORTED_MODULE_3__["RateService"]])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_service_rate_service__WEBPACK_IMPORTED_MODULE_2__["RateService"],
+            _angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectorRef"]])
     ], RatingComponent);
     return RatingComponent;
-}());
+}(_base_location_based_location_based_component__WEBPACK_IMPORTED_MODULE_3__["LocationBasedComponent"]));
 
 
 
@@ -3642,7 +4669,7 @@ var RatingComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<form #noteForm=\"ngForm\" class=\"example-form\" (ngSubmit)=\"submitNote(noteForm.value)\">\n  <mat-form-field class=\"example-full-width\">\n    <input matInput placeholder=\"title\" name=\"title\" id=\"title\" ngModel #titleField>\n  </mat-form-field>\n\n  <mat-form-field class=\"example-full-width\">\n    <textarea matInput placeholder=\"note\" name=\"note\" id=\"note\" ngModel>{{data.title}}</textarea>\n  </mat-form-field>\n\n  <button mat-button type=\"submit\">Save</button>\n  <button mat-button (click)=\"onButtonClick('cancel')\" type=\"button\">Cancel</button>\n</form>\n"
+module.exports = "<mat-card-content>\n\n  <h2>Add location</h2>\n\n  <form #noteForm=\"ngForm\" class=\"example-form\" (ngSubmit)=\"submitNote(noteForm.value)\">\n\n    <mat-form-field class=\"example-full-width\">\n      <input matInput placeholder=\"title\" name=\"title\" id=\"title\" ngModel #titleField>\n    </mat-form-field>\n\n    <mat-form-field class=\"example-full-width\">\n      <textarea matInput placeholder=\"note\" name=\"note\" id=\"note\" rows=\"5\" ngModel maxlength=\"140\"></textarea>\n    </mat-form-field>\n\n    <mat-form-field class=\"select-form-field\">\n      <mat-select placeholder=\"type\" [(ngModel)]=\"defaultType\" name=\"type\" ngModel>\n        <mat-option *ngFor=\"let poiType of getTypes()\" [value]=\"poiType.type\">\n          {{poiType.label}}\n        </mat-option>\n      </mat-select>\n    </mat-form-field>\n\n    <mat-checkbox name=\"share\" [ngModel]=\"true\">Share (with developer!)</mat-checkbox>\n\n    <div class=\"btn-group\">\n      <button mat-stroked-button (click)=\"onButtonClick('cancel')\" type=\"button\">Cancel</button>\n      <button mat-stroked-button color=\"primary\" type=\"submit\">Save</button>\n    </div>\n  </form>\n\n</mat-card-content>\n"
 
 /***/ }),
 
@@ -3653,7 +4680,7 @@ module.exports = "<form #noteForm=\"ngForm\" class=\"example-form\" (ngSubmit)=\
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbm90ZS1kaWFsb2cvbm90ZS1kaWFsb2cuY29tcG9uZW50LnNhc3MifQ== */"
+module.exports = ":host ::ng-deep mat-card-content {\n  display: block;\n  padding: 0 12px; }\n  :host ::ng-deep mat-card-content h2 {\n    text-align: center;\n    margin-bottom: 0 !important; }\n  :host ::ng-deep mat-card-content mat-form-field {\n    width: 100% !important; }\n  :host ::ng-deep mat-card-content mat-form-field .mat-form-field-infix {\n      border-top: 0 !important; }\n  :host ::ng-deep mat-card-content mat-form-field .mat-select, :host ::ng-deep mat-card-content mat-form-field input, :host ::ng-deep mat-card-content mat-form-field textarea {\n      box-sizing: border-box !important;\n      padding: 0 12px !important;\n      background-color: #EEE !important;\n      border-radius: 6px !important;\n      border: none !important; }\n  :host ::ng-deep mat-card-content mat-form-field textarea {\n      padding: 12px !important; }\n  :host ::ng-deep mat-card-content mat-form-field .mat-select, :host ::ng-deep mat-card-content mat-form-field input {\n      height: 48px !important; }\n  :host ::ng-deep mat-card-content mat-form-field .mat-select .mat-select-trigger, :host ::ng-deep mat-card-content mat-form-field input .mat-select-trigger {\n        height: 48px; }\n  :host ::ng-deep mat-card-content .btn-group {\n    text-align: center;\n    margin-bottom: 12px; }\n  :host ::ng-deep mat-card-content .btn-group button {\n      margin: 0 6px; }\n  :host ::ng-deep mat-card-content .mat-form-field-underline {\n    display: none; }\n  :host ::ng-deep mat-card-content .mat-form-field-underline .mat-list-item-content {\n      padding: 0 12px !important;\n      margin: 0 !important; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvbm90ZS1kaWFsb2cvbm90ZS1kaWFsb2cuY29tcG9uZW50LnNhc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUM7RUFHRyxjQUFjO0VBQ2QsZUFBZSxFQUFBO0VBSmxCO0lBT0ssa0JBQWtCO0lBQ2xCLDJCQUEyQixFQUFBO0VBUmhDO0lBV0ssc0JBQXNCLEVBQUE7RUFYM0I7TUFjTyx3QkFBd0IsRUFBQTtFQWQvQjtNQWlCTyxpQ0FBaUM7TUFDakMsMEJBQTBCO01BQzFCLGlDQUFpQztNQUNqQyw2QkFBNkI7TUFDN0IsdUJBQXVCLEVBQUE7RUFyQjlCO01Bd0JPLHdCQUF3QixFQUFBO0VBeEIvQjtNQTJCTyx1QkFBdUIsRUFBQTtFQTNCOUI7UUE4QlMsWUFBWSxFQUFBO0VBOUJyQjtJQWlDSyxrQkFBa0I7SUFDbEIsbUJBQW1CLEVBQUE7RUFsQ3hCO01BcUNPLGFBQWEsRUFBQTtFQXJDcEI7SUF3Q0ssYUFBYSxFQUFBO0VBeENsQjtNQTJDTywwQkFBMEI7TUFDMUIsb0JBQW9CLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnQvZGlhbG9nL25vdGUtZGlhbG9nL25vdGUtZGlhbG9nLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiIDpob3N0IDo6bmctZGVlcCB7XG5cbiAgbWF0LWNhcmQtY29udGVudCB7XG4gICAgZGlzcGxheTogYmxvY2s7XG4gICAgcGFkZGluZzogMCAxMnB4O1xuXG4gICAgaDIge1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgbWFyZ2luLWJvdHRvbTogMCAhaW1wb3J0YW50OyB9XG5cbiAgICBtYXQtZm9ybS1maWVsZCB7XG4gICAgICB3aWR0aDogMTAwJSAhaW1wb3J0YW50O1xuXG4gICAgICAubWF0LWZvcm0tZmllbGQtaW5maXgge1xuICAgICAgICBib3JkZXItdG9wOiAwICFpbXBvcnRhbnQ7IH1cblxuICAgICAgLm1hdC1zZWxlY3QsIGlucHV0LCB0ZXh0YXJlYSB7XG4gICAgICAgIGJveC1zaXppbmc6IGJvcmRlci1ib3ggIWltcG9ydGFudDtcbiAgICAgICAgcGFkZGluZzogMCAxMnB4ICFpbXBvcnRhbnQ7XG4gICAgICAgIGJhY2tncm91bmQtY29sb3I6ICNFRUUgIWltcG9ydGFudDtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogNnB4ICFpbXBvcnRhbnQ7XG4gICAgICAgIGJvcmRlcjogbm9uZSAhaW1wb3J0YW50OyB9XG5cbiAgICAgIHRleHRhcmVhIHtcbiAgICAgICAgcGFkZGluZzogMTJweCAhaW1wb3J0YW50OyB9XG5cbiAgICAgIC5tYXQtc2VsZWN0LCBpbnB1dCB7XG4gICAgICAgIGhlaWdodDogNDhweCAhaW1wb3J0YW50O1xuXG4gICAgICAgIC5tYXQtc2VsZWN0LXRyaWdnZXIge1xuICAgICAgICAgIGhlaWdodDogNDhweDsgfSB9IH1cblxuICAgIC5idG4tZ3JvdXAge1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgbWFyZ2luLWJvdHRvbTogMTJweDtcblxuICAgICAgYnV0dG9uIHtcbiAgICAgICAgbWFyZ2luOiAwIDZweDsgfSB9XG5cbiAgICAubWF0LWZvcm0tZmllbGQtdW5kZXJsaW5lIHtcbiAgICAgIGRpc3BsYXk6IG5vbmU7XG5cbiAgICAgIC5tYXQtbGlzdC1pdGVtLWNvbnRlbnQge1xuICAgICAgICBwYWRkaW5nOiAwIDEycHggIWltcG9ydGFudDtcbiAgICAgICAgbWFyZ2luOiAwICFpbXBvcnRhbnQ7IH0gfSB9IH1cblxuIl19 */"
 
 /***/ }),
 
@@ -3672,6 +4699,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_material__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/material */ "./node_modules/@angular/material/esm5/material.es5.js");
 /* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../service/note.service */ "./src/app/service/note.service.ts");
+/* harmony import */ var _settings__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../settings */ "./src/app/settings.ts");
+
 
 
 
@@ -3689,16 +4718,21 @@ var NoteDialogComponent = /** @class */ (function () {
         this.data = data;
     }
     NoteDialogComponent.prototype.ngOnInit = function () {
+        this.defaultType = this.data.type;
         this.titleField.nativeElement.focus();
     };
     NoteDialogComponent.prototype.submitNote = function (formData) {
-        // add missing properties to data object so we can convert it to a Poi
+        // add missing properties to data object so we can convert it to a Note
         this.data['id'] = new Date().getTime();
-        this.data['type'] = 'note';
+        // only add to type if it differs
+        if (formData['type'] !== this.data['type']) {
+            this.data['type'] += ', ' + formData['type'];
+        }
         this.data['label'] = formData['title'];
         this.data['description'] = formData['note'];
-        var _notePoi = this.data;
-        this._noteService.saveNote(_notePoi);
+        this.data['share'] = formData['share'];
+        var _noteObj = this.data;
+        this._noteService.saveNote(_noteObj);
         this._dialogRef.close('success');
     };
     NoteDialogComponent.prototype.onButtonClick = function (action) {
@@ -3706,6 +4740,15 @@ var NoteDialogComponent = /** @class */ (function () {
     };
     NoteDialogComponent.prototype._cancel = function () {
         this._dialogRef.close('cancel');
+    };
+    NoteDialogComponent.prototype.getTypes = function () {
+        var _types = [];
+        _settings__WEBPACK_IMPORTED_MODULE_4__["Settings"].POITYPES.forEach(function (type) {
+            if (type.userEnabled) {
+                _types.push(type);
+            }
+        });
+        return _types;
     };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["ViewChild"])('titleField'),
@@ -3895,7 +4938,7 @@ var AboutComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<mat-card #panel>\n\n  <h2>Settings</h2>\n\n  <mat-card-content>\n\n    <h3>User</h3>\n\n    <section>\n\n      <!--<mat-form-field>-->\n        <!--<input type=\"text\" matInput placeholder=\"username\" (input)=\"onUserNameChange($event.target.value)\">-->\n      <!--</mat-form-field>-->\n\n      <mat-form-field class=\"direction\">\n        <mat-select [value]=\"direction\" (selectionChange)=\"onDirectionSelect($event)\">\n          <mat-option *ngFor=\"let direction of directionList\" [value]=\"direction.id\">\n            {{direction.label}}\n          </mat-option>\n        </mat-select>\n      </mat-form-field>\n\n    </section>\n\n    <h3>Display Mode</h3>\n\n    <section>\n      <mat-radio-group [(ngModel)]=\"screenMode\">\n        <mat-radio-button *ngFor=\"let mode of screenModes\" [value]=\"mode.value\" (click)=\"onRadioClick(mode.value)\">\n          {{mode.label}}\n        </mat-radio-button>\n      </mat-radio-group>\n\n      <br/>\n    </section>\n\n    <h3>Elements</h3>\n\n    <mat-checkbox name=\"showSnow\" [(ngModel)]=\"showSnow\" (change)=\"onCheckboxChange($event)\">show snowpack</mat-checkbox>\n\n    <section>\n\n      <!--<mat-form-field>-->\n        <!--<input type=\"number\" value=\"250\" input=\"\" placeholder=\"Poi offtrail distance (ft.)\">-->\n      <!--</mat-form-field>-->\n\n      <!--<mat-form-field>-->\n        <!--<input type=\"number\" value=\"250\" input=\"\" placeholder=\"User offtrail distance (ft.)\">-->\n      <!--</mat-form-field>-->\n\n      <!--<hr/>-->\n\n      <!--<mat-form-field>-->\n        <!--<input type=\"number\" value=\"1000\" input=\"\" placeholder=\"Poi render radius (ft.)\">-->\n      <!--</mat-form-field>-->\n    </section>\n\n    <h3>Elevation Profile</h3>\n\n    <section>\n      <div *ngFor=\"let poiType of majorPoiTypes\">\n        <mat-checkbox [name]=\"createCamelCaseName(poiType, 'show')\" [(ngModel)]=\"this[createCamelCaseName(poiType, 'show')]\" (change)=\"onCheckboxChange($event)\">Show {{poiType}}</mat-checkbox>\n      </div>\n      <hr/>\n      <mat-checkbox name=\"showMiniMap\" [(ngModel)]=\"showMiniMap\" (change)=\"onCheckboxChange($event)\">Show mini-map</mat-checkbox>\n      <mat-checkbox name=\"parallaxEnabled\" [(ngModel)]=\"parallaxEnabled\" (change)=\"onCheckboxChange($event)\">Enable parallax</mat-checkbox>\n    </section>\n\n    <h3>Scroll Map</h3>\n\n    <section>\n      <mat-checkbox name=\"animateMap\" [(ngModel)]=\"animateMap\" (change)=\"onCheckboxChange($event)\">Animate Map (slow/buggy)</mat-checkbox>\n      <mat-checkbox name=\"showMileGrid\" [(ngModel)]=\"showMileGrid\" (change)=\"onCheckboxChange($event)\">Show Mile Grid (slow)</mat-checkbox>\n    </section>\n\n  </mat-card-content>\n</mat-card>\n"
+module.exports = "<mat-card #panel>\n\n  <h2>Settings</h2>\n\n  <mat-card-content>\n\n    <h3>Display Mode</h3>\n\n    <section>\n      <mat-radio-group [(ngModel)]=\"screenMode\">\n        <mat-radio-button *ngFor=\"let mode of screenModes\" [value]=\"mode.value\" (click)=\"onRadioClick(mode.value)\">\n          {{mode.label}}\n        </mat-radio-button>\n      </mat-radio-group>\n\n      <br/>\n    </section>\n\n    <h3>Elements</h3>\n\n    <mat-checkbox name=\"showSnow\" [(ngModel)]=\"showSnow\" (change)=\"onCheckboxChange($event)\">show snowpack</mat-checkbox>\n\n    <section>\n\n      <!--<mat-form-field>-->\n        <!--<input type=\"number\" value=\"250\" input=\"\" placeholder=\"Poi offtrail distance (ft.)\">-->\n      <!--</mat-form-field>-->\n\n      <!--<mat-form-field>-->\n        <!--<input type=\"number\" value=\"250\" input=\"\" placeholder=\"User offtrail distance (ft.)\">-->\n      <!--</mat-form-field>-->\n\n      <!--<hr/>-->\n\n      <!--<mat-form-field>-->\n        <!--<input type=\"number\" value=\"1000\" input=\"\" placeholder=\"Poi render radius (ft.)\">-->\n      <!--</mat-form-field>-->\n    </section>\n\n    <h3>Elevation Profile</h3>\n\n    <section>\n      <div *ngFor=\"let poiType of majorPoiTypes\">\n        <mat-checkbox [name]=\"createCamelCaseName(poiType, 'show')\" [(ngModel)]=\"this[createCamelCaseName(poiType, 'show')]\" (change)=\"onCheckboxChange($event)\">Show {{poiType}}</mat-checkbox>\n      </div>\n      <hr/>\n      <mat-checkbox name=\"showMiniMap\" [(ngModel)]=\"showMiniMap\" (change)=\"onCheckboxChange($event)\">Show mini-map</mat-checkbox>\n      <mat-checkbox name=\"parallaxEnabled\" [(ngModel)]=\"parallaxEnabled\" (change)=\"onCheckboxChange($event)\">Enable parallax</mat-checkbox>\n    </section>\n\n    <h3>Scroll Map</h3>\n\n    <section>\n      <mat-checkbox name=\"animateMap\" [(ngModel)]=\"animateMap\" (change)=\"onCheckboxChange($event)\">Animate Map (buggy)</mat-checkbox>\n      <mat-checkbox name=\"showMileGrid\" [(ngModel)]=\"showMileGrid\" (change)=\"onCheckboxChange($event)\">Show Mile Grid (buggy)</mat-checkbox>\n      <mat-checkbox name=\"detectRetina\" [(ngModel)]=\"detectRetina\" (change)=\"onCheckboxChange($event)\">Use Retina Tiles (battery intensive)</mat-checkbox>\n    </section>\n\n  </mat-card-content>\n</mat-card>\n"
 
 /***/ }),
 
@@ -3935,8 +4978,6 @@ var GeneralSettingsComponent = /** @class */ (function (_super) {
     function GeneralSettingsComponent(_localStorage) {
         var _this = _super.call(this) || this;
         _this._localStorage = _localStorage;
-        _this.userName = 'test';
-        _this.directionList = [{ id: 0, label: 'Northbound (NOBO)' }, { id: 1, label: 'Southbound (SOBO)' }];
         _this.screenModes = [
             { value: 'default', label: 'Default' },
             { value: 'highContrast', label: 'High Contrast' },
@@ -3950,9 +4991,9 @@ var GeneralSettingsComponent = /** @class */ (function (_super) {
         this.parallaxEnabled = this._localStorage.retrieve('parallaxEnabled');
         this.screenMode = this._localStorage.retrieve('screenMode');
         this.showMiniMap = this._localStorage.retrieve('showMiniMap');
-        this.direction = this._localStorage.retrieve('direction');
         this.showMileGrid = this._localStorage.retrieve('showMileGrid');
         this.animateMap = this._localStorage.retrieve('animateMap');
+        this.detectRetina = this._localStorage.retrieve('detectRetina');
         // dynamic poi type properties
         this.majorPoiTypes = Object(_util_poi__WEBPACK_IMPORTED_MODULE_4__["getMajorPoiTypes"])();
         this.majorPoiTypes.forEach(function (name) {
@@ -3967,26 +5008,6 @@ var GeneralSettingsComponent = /** @class */ (function (_super) {
     };
     GeneralSettingsComponent.prototype.onRadioClick = function (radioValue) {
         this._localStorage.store('screenMode', radioValue);
-    };
-    GeneralSettingsComponent.prototype.onDirectionSelect = function (event) {
-        this._localStorage.store('direction', event.value);
-        if (event.value !== this.direction) {
-            this.invalidate();
-        }
-    };
-    GeneralSettingsComponent.prototype.onUserNameChange = function (username) {
-        // enable god mode (admin panel)
-        if (username.toLowerCase() === 'iddqd') {
-            var _isAdmin = this._localStorage.retrieve('isAdmin');
-            if (!_isAdmin) {
-                this._localStorage.store('isAdmin', true);
-                alert('God mode enabled!');
-            }
-            else {
-                this._localStorage.clear('isAdmin');
-                alert('Just a regular mortal.');
-            }
-        }
     };
     GeneralSettingsComponent.prototype.createCamelCaseName = function (name, prepend, append) {
         prepend = (prepend) ? prepend : '';
@@ -4081,7 +5102,7 @@ var InstructionsComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<mat-card id=\"purchase-trails\">\n\n  <h2>Purchase Trail Data</h2>\n\n  <mat-card-content>\n    <section class=\"purchase\">\n      <div id=\"purchase-container\">\n        <div class=\"sign\" *ngFor=\"let trail of availableTrailList\">\n          <img class=\"cap\" src=\"../assets/images/sign-post/post-cap.png\"/>\n          <div class=\"post\">\n            <button mat-raised-button\n                    [value]=\"trail.id\"\n                    (click)=\"onTrailPurchased(trail.id)\"\n                    [disabled]=\"!trail.availableForPurchase\">\n              <img class=\"marker\" src=\"../assets/images/logos/{{trail.abbr}}.png\" width=\"48\" height=\"48\"/>\n              <!--<div class=\"unavailable\" *ngIf=\"!trail.availableForPurchase\">Unavailable</div>-->\n              <!--<div class=\"free\" *ngIf=\"trail.isFree\">Free</div>-->\n              <p>{{trail.name}}\n                <!--<small>({{trail.length}} mi)</small>-->\n              </p>\n              <div>•</div>\n            </button>\n          </div>\n        </div>\n      </div>\n    </section>\n  </mat-card-content>\n</mat-card>\n"
+module.exports = "<mat-card id=\"purchase-trails\">\n\n  <!--<h2>Purchase Trail Data</h2>-->\n\n  <mat-card-content>\n    <section class=\"purchase\">\n      <div *ngFor=\"let trail of availableTrailList\" class=\"purchase-container sign-{{trail.abbr}}\" >\n        <div class=\"sign\">\n          <img class=\"cap\" src=\"../assets/images/sign-post/post-cap.png\"/>\n          <div class=\"post\">\n            <button mat-raised-button\n                    [value]=\"trail.id\"\n                    (click)=\"onTrailPurchased(trail.id)\"\n                    [disabled]=\"!trail.availableForPurchase\">\n              <img class=\"marker\" src=\"../assets/images/logos/{{trail.abbr}}.png\" width=\"48\" height=\"48\"/>\n              <!--<div class=\"unavailable\" *ngIf=\"!trail.availableForPurchase\">Unavailable</div>-->\n              <!--<div class=\"free\" *ngIf=\"trail.isFree\">Free</div>-->\n              <p>{{trail.name}}\n                <!--<small>({{trail.length}} mi.)</small>-->\n              </p>\n              <div>•</div>\n            </button>\n          </div>\n        </div>\n      </div>\n    </section>\n  </mat-card-content>\n</mat-card>\n"
 
 /***/ }),
 
@@ -4092,7 +5113,7 @@ module.exports = "<mat-card id=\"purchase-trails\">\n\n  <h2>Purchase Trail Data
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "@charset \"UTF-8\";\n:host {\n  display: block;\n  width: 100%;\n  min-height: 100%;\n  height: auto;\n  padding-bottom: 12px; }\n:host #purchase-trails {\n    background: unset;\n    border: unset;\n    box-shadow: unset;\n    padding-bottom: 0;\n    background: darkseagreen;\n    border-radius: unset;\n    /* one item */\n    /* two items */ }\n:host #purchase-trails #purchase-container {\n      display: flex;\n      flex-wrap: wrap;\n      align-items: flex-end; }\n:host #purchase-trails #purchase-container .sign {\n        width: 30%;\n        max-width: 50%;\n        height: 100%; }\n:host #purchase-trails #purchase-container .sign .cap {\n          display: block;\n          width: 48px;\n          margin: 0 auto -3px auto; }\n:host #purchase-trails #purchase-container .sign .post {\n          background-image: url('post-backgound.jpg');\n          background-position: center top;\n          background-repeat: repeat-y;\n          padding: 24px 0 120px 0;\n          width: 100%; }\n:host #purchase-trails #purchase-container .sign .post button {\n            width: 100%;\n            box-sizing: border-box;\n            padding: 20px 12px 0px 12px;\n            text-align: center;\n            text-wrap: normal;\n            white-space: normal;\n            line-height: 24px;\n            font-size: 18px;\n            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.25);\n            border-radius: 6px; }\n:host #purchase-trails #purchase-container .sign .post button .unavailable {\n              color: red; }\n:host #purchase-trails #purchase-container .sign .post button .free {\n              color: green; }\n:host #purchase-trails #purchase-container .sign .post button p {\n              margin: 0;\n              padding: 0; }\n:host #purchase-trails #purchase-container .sign .post button p small {\n                text-wrap: none;\n                white-space: nowrap; }\n:host #purchase-trails #purchase-container .sign .post button .marker {\n              width: 48px;\n              height: 48px;\n              margin-bottom: 6px;\n              opacity: 0.8; }\n:host #purchase-trails #purchase-container .sign .post button::after {\n            content: \"•\";\n            background-image: url('sign-background.jpg');\n            opacity: 1;\n            width: 100%;\n            height: 100%;\n            left: 0;\n            bottom: 0;\n            position: absolute;\n            z-index: -1;\n            border-radius: 6px;\n            vertical-align: bottom;\n            border-top: 3px solid #8c7457; }\n:host #purchase-trails #purchase-container .sign .post button:disabled {\n            color: rgba(0, 0, 0, 0.87); }\n:host #purchase-trails #purchase-container .sign .post button:disabled::after {\n            opacity: 1; }\n:host #purchase-trails #purchase-container .sign:not(:first-child) {\n      margin-left: 5%; }\n:host #purchase-trails #purchase-container .sign:first-child:nth-last-child(1) {\n      width: 100%; }\n:host #purchase-trails #purchase-container .sign:first-child:nth-last-child(2),\n    :host #purchase-trails #purchase-container .sign:first-child:nth-last-child(2) ~ .sign {\n      width: 47.5%; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3B1cmNoYXNlLXNldHRpbmdzL3B1cmNoYXNlLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIiwiL1VzZXJzL2ZyYW5rZG91d2VzL3dvcmsvanVzdC1oaWtlL3NyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3B1cmNoYXNlLXNldHRpbmdzL3B1cmNoYXNlLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLGdCQUFnQjtBQ0FmO0VBQ0MsY0FBYztFQUNkLFdBQVc7RUFDWCxnQkFBZ0I7RUFDaEIsWUFBWTtFQUNaLG9CQUFvQixFQUFBO0FBTHJCO0lBUUcsaUJBQWlCO0lBQ2pCLGFBQWE7SUFDYixpQkFBaUI7SUFDakIsaUJBQWlCO0lBQ2pCLHdCQUF3QjtJQUN4QixvQkFBb0I7SUFpRnBCLGFBQUE7SUFJQSxjQUFBLEVBQWU7QUFsR2xCO01BZ0JLLGFBQWE7TUFDYixlQUFlO01BQ2YscUJBQXFCLEVBQUE7QUFsQjFCO1FBcUJPLFVBQVU7UUFDVixjQUFjO1FBQ2QsWUFBWSxFQUFBO0FBdkJuQjtVQTBCUyxjQUFjO1VBQ2QsV0FBVztVQUNYLHdCQUF3QixFQUFBO0FBNUJqQztVQStCUywyQ0FBcUY7VUFDckYsK0JBQStCO1VBQy9CLDJCQUEyQjtVQUMzQix1QkFBdUI7VUFDdkIsV0FBVyxFQUFBO0FBbkNwQjtZQXNDVyxXQUFXO1lBQ1gsc0JBQXNCO1lBQ3RCLDJCQUEyQjtZQUMzQixrQkFBa0I7WUFDbEIsaUJBQWlCO1lBQ2pCLG1CQUFtQjtZQUNuQixpQkFBaUI7WUFDakIsZUFBZTtZQUNmLGtEQUErQztZQUMvQyxrQkFBa0IsRUFBQTtBQS9DN0I7Y0FrRGEsVUFBVSxFQUFBO0FBbER2QjtjQXFEYSxZQUFZLEVBQUE7QUFyRHpCO2NBd0RhLFNBQVM7Y0FDVCxVQUFVLEVBQUE7QUF6RHZCO2dCQTREZSxlQUFlO2dCQUNmLG1CQUFtQixFQUFBO0FBN0RsQztjQWdFYSxXQUFXO2NBQ1gsWUFBWTtjQUNaLGtCQUFrQjtjQUNsQixZQUFZLEVBQUE7QUFuRXpCO1lBc0VXLFlBQVM7WUFDVCw0Q0FBc0Y7WUFDdEYsVUFBVTtZQUNWLFdBQVc7WUFDWCxZQUFZO1lBQ1osT0FBTztZQUNQLFNBQVM7WUFDVCxrQkFBa0I7WUFDbEIsV0FBVztZQUNYLGtCQUFrQjtZQUNsQixzQkFBc0I7WUFDdEIsNkJBQTZCLEVBQUE7QUFqRnhDO1lBb0ZXLDBCQUFzQixFQUFBO0FBcEZqQztZQXVGVyxVQUFVLEVBQUE7QUF2RnJCO01BNEZLLGVBQWUsRUFBQTtBQTVGcEI7TUFnR0ssV0FBVyxFQUFBO0FBaEdoQjs7TUFxR0ssWUFBWSxFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3B1cmNoYXNlLXNldHRpbmdzL3B1cmNoYXNlLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiQGNoYXJzZXQgXCJVVEYtOFwiO1xuOmhvc3Qge1xuICBkaXNwbGF5OiBibG9jaztcbiAgd2lkdGg6IDEwMCU7XG4gIG1pbi1oZWlnaHQ6IDEwMCU7XG4gIGhlaWdodDogYXV0bztcbiAgcGFkZGluZy1ib3R0b206IDEycHg7IH1cbiAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyB7XG4gICAgYmFja2dyb3VuZDogdW5zZXQ7XG4gICAgYm9yZGVyOiB1bnNldDtcbiAgICBib3gtc2hhZG93OiB1bnNldDtcbiAgICBwYWRkaW5nLWJvdHRvbTogMDtcbiAgICBiYWNrZ3JvdW5kOiBkYXJrc2VhZ3JlZW47XG4gICAgYm9yZGVyLXJhZGl1czogdW5zZXQ7XG4gICAgLyogb25lIGl0ZW0gKi9cbiAgICAvKiB0d28gaXRlbXMgKi8gfVxuICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgI3B1cmNoYXNlLWNvbnRhaW5lciB7XG4gICAgICBkaXNwbGF5OiBmbGV4O1xuICAgICAgZmxleC13cmFwOiB3cmFwO1xuICAgICAgYWxpZ24taXRlbXM6IGZsZXgtZW5kOyB9XG4gICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ24ge1xuICAgICAgICB3aWR0aDogMzAlO1xuICAgICAgICBtYXgtd2lkdGg6IDUwJTtcbiAgICAgICAgaGVpZ2h0OiAxMDAlOyB9XG4gICAgICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgI3B1cmNoYXNlLWNvbnRhaW5lciAuc2lnbiAuY2FwIHtcbiAgICAgICAgICBkaXNwbGF5OiBibG9jaztcbiAgICAgICAgICB3aWR0aDogNDhweDtcbiAgICAgICAgICBtYXJnaW46IDAgYXV0byAtM3B4IGF1dG87IH1cbiAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAjcHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IHtcbiAgICAgICAgICBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoXCIuLi8uLi8uLi8uLi8uLi8uLi9hc3NldHMvaW1hZ2VzL3NpZ24tcG9zdC9wb3N0LWJhY2tnb3VuZC5qcGdcIik7XG4gICAgICAgICAgYmFja2dyb3VuZC1wb3NpdGlvbjogY2VudGVyIHRvcDtcbiAgICAgICAgICBiYWNrZ3JvdW5kLXJlcGVhdDogcmVwZWF0LXk7XG4gICAgICAgICAgcGFkZGluZzogMjRweCAwIDEyMHB4IDA7XG4gICAgICAgICAgd2lkdGg6IDEwMCU7IH1cbiAgICAgICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ24gLnBvc3QgYnV0dG9uIHtcbiAgICAgICAgICAgIHdpZHRoOiAxMDAlO1xuICAgICAgICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcbiAgICAgICAgICAgIHBhZGRpbmc6IDIwcHggMTJweCAwcHggMTJweDtcbiAgICAgICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjtcbiAgICAgICAgICAgIHRleHQtd3JhcDogbm9ybWFsO1xuICAgICAgICAgICAgd2hpdGUtc3BhY2U6IG5vcm1hbDtcbiAgICAgICAgICAgIGxpbmUtaGVpZ2h0OiAyNHB4O1xuICAgICAgICAgICAgZm9udC1zaXplOiAxOHB4O1xuICAgICAgICAgICAgdGV4dC1zaGFkb3c6IDFweCAxcHggMXB4IHJnYmEoMjU1LCAyNTUsIDI1NSwgMC4yNSk7XG4gICAgICAgICAgICBib3JkZXItcmFkaXVzOiA2cHg7IH1cbiAgICAgICAgICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgI3B1cmNoYXNlLWNvbnRhaW5lciAuc2lnbiAucG9zdCBidXR0b24gLnVuYXZhaWxhYmxlIHtcbiAgICAgICAgICAgICAgY29sb3I6IHJlZDsgfVxuICAgICAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAjcHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IGJ1dHRvbiAuZnJlZSB7XG4gICAgICAgICAgICAgIGNvbG9yOiBncmVlbjsgfVxuICAgICAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAjcHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IGJ1dHRvbiBwIHtcbiAgICAgICAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICAgICAgICBwYWRkaW5nOiAwOyB9XG4gICAgICAgICAgICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgI3B1cmNoYXNlLWNvbnRhaW5lciAuc2lnbiAucG9zdCBidXR0b24gcCBzbWFsbCB7XG4gICAgICAgICAgICAgICAgdGV4dC13cmFwOiBub25lO1xuICAgICAgICAgICAgICAgIHdoaXRlLXNwYWNlOiBub3dyYXA7IH1cbiAgICAgICAgICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgI3B1cmNoYXNlLWNvbnRhaW5lciAuc2lnbiAucG9zdCBidXR0b24gLm1hcmtlciB7XG4gICAgICAgICAgICAgIHdpZHRoOiA0OHB4O1xuICAgICAgICAgICAgICBoZWlnaHQ6IDQ4cHg7XG4gICAgICAgICAgICAgIG1hcmdpbi1ib3R0b206IDZweDtcbiAgICAgICAgICAgICAgb3BhY2l0eTogMC44OyB9XG4gICAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAjcHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IGJ1dHRvbjo6YWZ0ZXIge1xuICAgICAgICAgICAgY29udGVudDogXCLigKJcIjtcbiAgICAgICAgICAgIGJhY2tncm91bmQtaW1hZ2U6IHVybChcIi4uLy4uLy4uLy4uLy4uLy4uL2Fzc2V0cy9pbWFnZXMvc2lnbi1wb3N0L3NpZ24tYmFja2dyb3VuZC5qcGdcIik7XG4gICAgICAgICAgICBvcGFjaXR5OiAxO1xuICAgICAgICAgICAgd2lkdGg6IDEwMCU7XG4gICAgICAgICAgICBoZWlnaHQ6IDEwMCU7XG4gICAgICAgICAgICBsZWZ0OiAwO1xuICAgICAgICAgICAgYm90dG9tOiAwO1xuICAgICAgICAgICAgcG9zaXRpb246IGFic29sdXRlO1xuICAgICAgICAgICAgei1pbmRleDogLTE7XG4gICAgICAgICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG4gICAgICAgICAgICB2ZXJ0aWNhbC1hbGlnbjogYm90dG9tO1xuICAgICAgICAgICAgYm9yZGVyLXRvcDogM3B4IHNvbGlkICM4Yzc0NTc7IH1cbiAgICAgICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ24gLnBvc3QgYnV0dG9uOmRpc2FibGVkIHtcbiAgICAgICAgICAgIGNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuODcpOyB9XG4gICAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAjcHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IGJ1dHRvbjpkaXNhYmxlZDo6YWZ0ZXIge1xuICAgICAgICAgICAgb3BhY2l0eTogMTsgfVxuICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgI3B1cmNoYXNlLWNvbnRhaW5lciAuc2lnbjpub3QoOmZpcnN0LWNoaWxkKSB7XG4gICAgICBtYXJnaW4tbGVmdDogNSU7IH1cbiAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMSkge1xuICAgICAgd2lkdGg6IDEwMCU7IH1cbiAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMiksXG4gICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAjcHVyY2hhc2UtY29udGFpbmVyIC5zaWduOmZpcnN0LWNoaWxkOm50aC1sYXN0LWNoaWxkKDIpIH4gLnNpZ24ge1xuICAgICAgd2lkdGg6IDQ3LjUlOyB9XG4iLCIgOmhvc3Qge1xuICBkaXNwbGF5OiBibG9jaztcbiAgd2lkdGg6IDEwMCU7XG4gIG1pbi1oZWlnaHQ6IDEwMCU7XG4gIGhlaWdodDogYXV0bztcbiAgcGFkZGluZy1ib3R0b206IDEycHg7XG5cbiAgI3B1cmNoYXNlLXRyYWlscyB7XG4gICAgYmFja2dyb3VuZDogdW5zZXQ7XG4gICAgYm9yZGVyOiB1bnNldDtcbiAgICBib3gtc2hhZG93OiB1bnNldDtcbiAgICBwYWRkaW5nLWJvdHRvbTogMDtcbiAgICBiYWNrZ3JvdW5kOiBkYXJrc2VhZ3JlZW47XG4gICAgYm9yZGVyLXJhZGl1czogdW5zZXQ7XG5cbiAgICAjcHVyY2hhc2UtY29udGFpbmVyIHtcbiAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICBmbGV4LXdyYXA6IHdyYXA7XG4gICAgICBhbGlnbi1pdGVtczogZmxleC1lbmQ7XG5cbiAgICAgIC5zaWduIHtcbiAgICAgICAgd2lkdGg6IDMwJTtcbiAgICAgICAgbWF4LXdpZHRoOiA1MCU7XG4gICAgICAgIGhlaWdodDogMTAwJTtcblxuICAgICAgICAuY2FwIHtcbiAgICAgICAgICBkaXNwbGF5OiBibG9jaztcbiAgICAgICAgICB3aWR0aDogNDhweDtcbiAgICAgICAgICBtYXJnaW46IDAgYXV0byAtM3B4IGF1dG87IH1cblxuICAgICAgICAucG9zdCB7XG4gICAgICAgICAgYmFja2dyb3VuZC1pbWFnZTogdXJsKFwiLi4vLi4vLi4vLi4vLi4vLi4vYXNzZXRzL2ltYWdlcy9zaWduLXBvc3QvcG9zdC1iYWNrZ291bmQuanBnXCIpO1xuICAgICAgICAgIGJhY2tncm91bmQtcG9zaXRpb246IGNlbnRlciB0b3A7XG4gICAgICAgICAgYmFja2dyb3VuZC1yZXBlYXQ6IHJlcGVhdC15O1xuICAgICAgICAgIHBhZGRpbmc6IDI0cHggMCAxMjBweCAwO1xuICAgICAgICAgIHdpZHRoOiAxMDAlO1xuXG4gICAgICAgICAgYnV0dG9uIHtcbiAgICAgICAgICAgIHdpZHRoOiAxMDAlO1xuICAgICAgICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcbiAgICAgICAgICAgIHBhZGRpbmc6IDIwcHggMTJweCAwcHggMTJweDtcbiAgICAgICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjtcbiAgICAgICAgICAgIHRleHQtd3JhcDogbm9ybWFsO1xuICAgICAgICAgICAgd2hpdGUtc3BhY2U6IG5vcm1hbDtcbiAgICAgICAgICAgIGxpbmUtaGVpZ2h0OiAyNHB4O1xuICAgICAgICAgICAgZm9udC1zaXplOiAxOHB4O1xuICAgICAgICAgICAgdGV4dC1zaGFkb3c6IDFweCAxcHggMXB4IHJnYmEoMjU1LDI1NSwyNTUsMC4yNSk7XG4gICAgICAgICAgICBib3JkZXItcmFkaXVzOiA2cHg7XG5cbiAgICAgICAgICAgIC51bmF2YWlsYWJsZSB7XG4gICAgICAgICAgICAgIGNvbG9yOiByZWQ7IH1cblxuICAgICAgICAgICAgLmZyZWUge1xuICAgICAgICAgICAgICBjb2xvcjogZ3JlZW47IH1cblxuICAgICAgICAgICAgcCB7XG4gICAgICAgICAgICAgIG1hcmdpbjogMDtcbiAgICAgICAgICAgICAgcGFkZGluZzogMDtcblxuICAgICAgICAgICAgICBzbWFsbCB7XG4gICAgICAgICAgICAgICAgdGV4dC13cmFwOiBub25lO1xuICAgICAgICAgICAgICAgIHdoaXRlLXNwYWNlOiBub3dyYXA7IH0gfVxuXG4gICAgICAgICAgICAubWFya2VyIHtcbiAgICAgICAgICAgICAgd2lkdGg6IDQ4cHg7XG4gICAgICAgICAgICAgIGhlaWdodDogNDhweDtcbiAgICAgICAgICAgICAgbWFyZ2luLWJvdHRvbTogNnB4O1xuICAgICAgICAgICAgICBvcGFjaXR5OiAwLjg7IH0gfVxuXG4gICAgICAgICAgYnV0dG9uOjphZnRlciB7XG4gICAgICAgICAgICBjb250ZW50OiBcIuKAolwiO1xuICAgICAgICAgICAgYmFja2dyb3VuZC1pbWFnZTogdXJsKFwiLi4vLi4vLi4vLi4vLi4vLi4vYXNzZXRzL2ltYWdlcy9zaWduLXBvc3Qvc2lnbi1iYWNrZ3JvdW5kLmpwZ1wiKTtcbiAgICAgICAgICAgIG9wYWNpdHk6IDE7XG4gICAgICAgICAgICB3aWR0aDogMTAwJTtcbiAgICAgICAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgICAgICAgIGxlZnQ6IDA7XG4gICAgICAgICAgICBib3R0b206IDA7XG4gICAgICAgICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICAgICAgICB6LWluZGV4OiAtMTtcbiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICAgICAgICAgIHZlcnRpY2FsLWFsaWduOiBib3R0b207XG4gICAgICAgICAgICBib3JkZXItdG9wOiAzcHggc29saWQgIzhjNzQ1NzsgfVxuXG4gICAgICAgICAgYnV0dG9uOmRpc2FibGVkIHtcbiAgICAgICAgICAgIGNvbG9yOiByZ2JhKDAsMCwwLC44Nyk7IH1cblxuICAgICAgICAgIGJ1dHRvbjpkaXNhYmxlZDo6YWZ0ZXIge1xuICAgICAgICAgICAgb3BhY2l0eTogMTsgfSB9IH0gfVxuXG5cblxuICAgICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ246bm90KDpmaXJzdC1jaGlsZCkge1xuICAgICAgbWFyZ2luLWxlZnQ6IDUlOyB9XG5cbiAgICAvKiBvbmUgaXRlbSAqL1xuICAgICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMSkge1xuICAgICAgd2lkdGg6IDEwMCU7IH1cblxuICAgIC8qIHR3byBpdGVtcyAqL1xuICAgICNwdXJjaGFzZS1jb250YWluZXIgLnNpZ246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMiksXG4gICAgI3B1cmNoYXNlLWNvbnRhaW5lciAuc2lnbjpmaXJzdC1jaGlsZDpudGgtbGFzdC1jaGlsZCgyKSB+IC5zaWduIHtcbiAgICAgIHdpZHRoOiA0Ny41JTsgfSB9IH1cbiJdfQ== */"
+module.exports = "@charset \"UTF-8\";\n:host {\n  display: block;\n  width: 100%;\n  min-height: 100%;\n  height: auto;\n  padding-bottom: 12px; }\n:host #purchase-trails {\n    background: unset;\n    border: unset;\n    box-shadow: unset;\n    padding-bottom: 0;\n    border-radius: unset; }\n:host #purchase-trails .sign-PCT {\n      background-image: url('pct.jpg'); }\n:host #purchase-trails .sign-CDT {\n      background-image: url('cdt.jpg'); }\n:host #purchase-trails .sign-SHR {\n      background-image: url('shr.jpg'); }\n:host #purchase-trails .purchase-container {\n      -webkit-perspective: 1000px;\n              perspective: 1000px;\n      background-size: cover;\n      height: 200px;\n      overflow-y: hidden;\n      border-radius: 12px;\n      margin-bottom: 6px;\n      border: 1px solid #CCC; }\n:host #purchase-trails .purchase-container .sign {\n        max-width: 75%;\n        height: 100%;\n        margin: 0 5% 0 auto;\n        padding-top: 12px;\n        -webkit-transform: rotate(1deg) skewY(3deg) skewX(-3deg) rotateX(-10deg);\n        transform: rotate(1deg) skewY(3deg) skewX(-3deg) rotateX(-10deg); }\n:host #purchase-trails .purchase-container .sign .cap {\n          display: block;\n          width: 48px;\n          margin: 0 auto -3px auto; }\n:host #purchase-trails .purchase-container .sign .post {\n          background-image: url('post-backgound.jpg');\n          background-position: center top;\n          background-repeat: repeat-y;\n          padding: 24px 0 48px 0;\n          width: 100%;\n          text-align: center; }\n:host #purchase-trails .purchase-container .sign .post button {\n            width: auto;\n            box-sizing: border-box;\n            padding: 20px 12px 0px 12px;\n            text-align: center;\n            text-wrap: normal;\n            white-space: normal;\n            line-height: 24px;\n            font-size: 18px;\n            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.25);\n            border-radius: 6px;\n            -webkit-transform: rotate(-1deg) skewY(1deg);\n            transform: rotate(-1deg) skewY(1deg); }\n:host #purchase-trails .purchase-container .sign .post button .unavailable {\n              color: red; }\n:host #purchase-trails .purchase-container .sign .post button .free {\n              color: green; }\n:host #purchase-trails .purchase-container .sign .post button p {\n              margin: 0;\n              padding: 0; }\n:host #purchase-trails .purchase-container .sign .post button p small {\n                text-wrap: none;\n                white-space: nowrap; }\n:host #purchase-trails .purchase-container .sign .post button .marker {\n              width: 48px;\n              height: 48px;\n              margin-bottom: 6px;\n              opacity: 0.8; }\n:host #purchase-trails .purchase-container .sign .post button::after {\n            content: \"•\";\n            background-image: url('sign-background.jpg');\n            opacity: 1;\n            width: 100%;\n            height: 100%;\n            left: 0;\n            bottom: 0;\n            position: absolute;\n            z-index: -1;\n            border-radius: 6px;\n            vertical-align: bottom;\n            border-top: 3px solid #8c7457; }\n:host #purchase-trails .purchase-container .sign .post button:disabled {\n            color: rgba(0, 0, 0, 0.87); }\n:host #purchase-trails .purchase-container .sign .post button:disabled::after {\n            opacity: 1; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbInNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3B1cmNoYXNlLXNldHRpbmdzL3B1cmNoYXNlLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIiwiL1VzZXJzL2ZyYW5rZG91d2VzL3dvcmsvanVzdC1oaWtlL3NyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3B1cmNoYXNlLXNldHRpbmdzL3B1cmNoYXNlLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLGdCQUFnQjtBQ0FmO0VBQ0MsY0FBYztFQUNkLFdBQVc7RUFDWCxnQkFBZ0I7RUFDaEIsWUFBWTtFQUNaLG9CQUFvQixFQUFBO0FBTHJCO0lBUUcsaUJBQWlCO0lBQ2pCLGFBQWE7SUFDYixpQkFBaUI7SUFDakIsaUJBQWlCO0lBQ2pCLG9CQUFvQixFQUFBO0FBWnZCO01BZUssZ0NBQWtGLEVBQUE7QUFmdkY7TUFrQkssZ0NBQWtGLEVBQUE7QUFsQnZGO01BcUJLLGdDQUFrRixFQUFBO0FBckJ2RjtNQXdCSywyQkFBbUI7Y0FBbkIsbUJBQW1CO01BQ25CLHNCQUFzQjtNQUN0QixhQUFhO01BQ2Isa0JBQWtCO01BQ2xCLG1CQUFtQjtNQUNuQixrQkFBa0I7TUFDbEIsc0JBQXNCLEVBQUE7QUE5QjNCO1FBb0NPLGNBQWM7UUFDZCxZQUFZO1FBQ1osbUJBQW1CO1FBQ25CLGlCQUFpQjtRQUdqQix3RUFBd0U7UUFDeEUsZ0VBQWdFLEVBQUE7QUEzQ3ZFO1VBOENTLGNBQWM7VUFDZCxXQUFXO1VBQ1gsd0JBQXdCLEVBQUE7QUFoRGpDO1VBbURTLDJDQUFxRjtVQUNyRiwrQkFBK0I7VUFDL0IsMkJBQTJCO1VBQzNCLHNCQUFzQjtVQUN0QixXQUFXO1VBQ1gsa0JBQWtCLEVBQUE7QUF4RDNCO1lBMkRXLFdBQVc7WUFDWCxzQkFBc0I7WUFDdEIsMkJBQTJCO1lBQzNCLGtCQUFrQjtZQUNsQixpQkFBaUI7WUFDakIsbUJBQW1CO1lBQ25CLGlCQUFpQjtZQUNqQixlQUFlO1lBQ2Ysa0RBQStDO1lBQy9DLGtCQUFrQjtZQUdsQiw0Q0FBNEM7WUFDNUMsb0NBQW9DLEVBQUE7QUF4RS9DO2NBMkVhLFVBQVUsRUFBQTtBQTNFdkI7Y0E4RWEsWUFBWSxFQUFBO0FBOUV6QjtjQWlGYSxTQUFTO2NBQ1QsVUFBVSxFQUFBO0FBbEZ2QjtnQkFxRmUsZUFBZTtnQkFDZixtQkFBbUIsRUFBQTtBQXRGbEM7Y0F5RmEsV0FBVztjQUNYLFlBQVk7Y0FDWixrQkFBa0I7Y0FDbEIsWUFBWSxFQUFBO0FBNUZ6QjtZQStGVyxZQUFTO1lBQ1QsNENBQXNGO1lBQ3RGLFVBQVU7WUFDVixXQUFXO1lBQ1gsWUFBWTtZQUNaLE9BQU87WUFDUCxTQUFTO1lBQ1Qsa0JBQWtCO1lBQ2xCLFdBQVc7WUFDWCxrQkFBa0I7WUFDbEIsc0JBQXNCO1lBQ3RCLDZCQUE2QixFQUFBO0FBMUd4QztZQTZHVywwQkFBc0IsRUFBQTtBQTdHakM7WUFnSFcsVUFBVSxFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3B1cmNoYXNlLXNldHRpbmdzL3B1cmNoYXNlLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiQGNoYXJzZXQgXCJVVEYtOFwiO1xuOmhvc3Qge1xuICBkaXNwbGF5OiBibG9jaztcbiAgd2lkdGg6IDEwMCU7XG4gIG1pbi1oZWlnaHQ6IDEwMCU7XG4gIGhlaWdodDogYXV0bztcbiAgcGFkZGluZy1ib3R0b206IDEycHg7IH1cbiAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyB7XG4gICAgYmFja2dyb3VuZDogdW5zZXQ7XG4gICAgYm9yZGVyOiB1bnNldDtcbiAgICBib3gtc2hhZG93OiB1bnNldDtcbiAgICBwYWRkaW5nLWJvdHRvbTogMDtcbiAgICBib3JkZXItcmFkaXVzOiB1bnNldDsgfVxuICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgLnNpZ24tUENUIHtcbiAgICAgIGJhY2tncm91bmQtaW1hZ2U6IHVybChcIi4uLy4uLy4uLy4uLy4uLy4uL2Fzc2V0cy9pbWFnZXMvcGFuZWwtYmFja2dyb3VuZHMvcGN0LmpwZ1wiKTsgfVxuICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgLnNpZ24tQ0RUIHtcbiAgICAgIGJhY2tncm91bmQtaW1hZ2U6IHVybChcIi4uLy4uLy4uLy4uLy4uLy4uL2Fzc2V0cy9pbWFnZXMvcGFuZWwtYmFja2dyb3VuZHMvY2R0LmpwZ1wiKTsgfVxuICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgLnNpZ24tU0hSIHtcbiAgICAgIGJhY2tncm91bmQtaW1hZ2U6IHVybChcIi4uLy4uLy4uLy4uLy4uLy4uL2Fzc2V0cy9pbWFnZXMvcGFuZWwtYmFja2dyb3VuZHMvc2hyLmpwZ1wiKTsgfVxuICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgLnB1cmNoYXNlLWNvbnRhaW5lciB7XG4gICAgICBwZXJzcGVjdGl2ZTogMTAwMHB4O1xuICAgICAgYmFja2dyb3VuZC1zaXplOiBjb3ZlcjtcbiAgICAgIGhlaWdodDogMjAwcHg7XG4gICAgICBvdmVyZmxvdy15OiBoaWRkZW47XG4gICAgICBib3JkZXItcmFkaXVzOiAxMnB4O1xuICAgICAgbWFyZ2luLWJvdHRvbTogNnB4O1xuICAgICAgYm9yZGVyOiAxcHggc29saWQgI0NDQzsgfVxuICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAucHVyY2hhc2UtY29udGFpbmVyIC5zaWduIHtcbiAgICAgICAgbWF4LXdpZHRoOiA3NSU7XG4gICAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgICAgbWFyZ2luOiAwIDUlIDAgYXV0bztcbiAgICAgICAgcGFkZGluZy10b3A6IDEycHg7XG4gICAgICAgIC1tcy10cmFuc2Zvcm06IHJvdGF0ZSgxZGVnKSBza2V3WSgzZGVnKSBza2V3WCgtM2RlZykgcm90YXRlWCgtMTBkZWcpO1xuICAgICAgICAtd2Via2l0LXRyYW5zZm9ybTogcm90YXRlKDFkZWcpIHNrZXdZKDNkZWcpIHNrZXdYKC0zZGVnKSByb3RhdGVYKC0xMGRlZyk7XG4gICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDFkZWcpIHNrZXdZKDNkZWcpIHNrZXdYKC0zZGVnKSByb3RhdGVYKC0xMGRlZyk7IH1cbiAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAucHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5jYXAge1xuICAgICAgICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgICAgICAgIHdpZHRoOiA0OHB4O1xuICAgICAgICAgIG1hcmdpbjogMCBhdXRvIC0zcHggYXV0bzsgfVxuICAgICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzIC5wdXJjaGFzZS1jb250YWluZXIgLnNpZ24gLnBvc3Qge1xuICAgICAgICAgIGJhY2tncm91bmQtaW1hZ2U6IHVybChcIi4uLy4uLy4uLy4uLy4uLy4uL2Fzc2V0cy9pbWFnZXMvc2lnbi1wb3N0L3Bvc3QtYmFja2dvdW5kLmpwZ1wiKTtcbiAgICAgICAgICBiYWNrZ3JvdW5kLXBvc2l0aW9uOiBjZW50ZXIgdG9wO1xuICAgICAgICAgIGJhY2tncm91bmQtcmVwZWF0OiByZXBlYXQteTtcbiAgICAgICAgICBwYWRkaW5nOiAyNHB4IDAgNDhweCAwO1xuICAgICAgICAgIHdpZHRoOiAxMDAlO1xuICAgICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsgfVxuICAgICAgICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgLnB1cmNoYXNlLWNvbnRhaW5lciAuc2lnbiAucG9zdCBidXR0b24ge1xuICAgICAgICAgICAgd2lkdGg6IGF1dG87XG4gICAgICAgICAgICBib3gtc2l6aW5nOiBib3JkZXItYm94O1xuICAgICAgICAgICAgcGFkZGluZzogMjBweCAxMnB4IDBweCAxMnB4O1xuICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgICAgICAgdGV4dC13cmFwOiBub3JtYWw7XG4gICAgICAgICAgICB3aGl0ZS1zcGFjZTogbm9ybWFsO1xuICAgICAgICAgICAgbGluZS1oZWlnaHQ6IDI0cHg7XG4gICAgICAgICAgICBmb250LXNpemU6IDE4cHg7XG4gICAgICAgICAgICB0ZXh0LXNoYWRvdzogMXB4IDFweCAxcHggcmdiYSgyNTUsIDI1NSwgMjU1LCAwLjI1KTtcbiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICAgICAgICAgIC1tcy10cmFuc2Zvcm06IHJvdGF0ZSgtMWRlZykgc2tld1koMWRlZyk7XG4gICAgICAgICAgICAtd2Via2l0LXRyYW5zZm9ybTogcm90YXRlKC0xZGVnKSBza2V3WSgxZGVnKTtcbiAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKC0xZGVnKSBza2V3WSgxZGVnKTsgfVxuICAgICAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAucHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IGJ1dHRvbiAudW5hdmFpbGFibGUge1xuICAgICAgICAgICAgICBjb2xvcjogcmVkOyB9XG4gICAgICAgICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzIC5wdXJjaGFzZS1jb250YWluZXIgLnNpZ24gLnBvc3QgYnV0dG9uIC5mcmVlIHtcbiAgICAgICAgICAgICAgY29sb3I6IGdyZWVuOyB9XG4gICAgICAgICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzIC5wdXJjaGFzZS1jb250YWluZXIgLnNpZ24gLnBvc3QgYnV0dG9uIHAge1xuICAgICAgICAgICAgICBtYXJnaW46IDA7XG4gICAgICAgICAgICAgIHBhZGRpbmc6IDA7IH1cbiAgICAgICAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAucHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IGJ1dHRvbiBwIHNtYWxsIHtcbiAgICAgICAgICAgICAgICB0ZXh0LXdyYXA6IG5vbmU7XG4gICAgICAgICAgICAgICAgd2hpdGUtc3BhY2U6IG5vd3JhcDsgfVxuICAgICAgICAgICAgOmhvc3QgI3B1cmNoYXNlLXRyYWlscyAucHVyY2hhc2UtY29udGFpbmVyIC5zaWduIC5wb3N0IGJ1dHRvbiAubWFya2VyIHtcbiAgICAgICAgICAgICAgd2lkdGg6IDQ4cHg7XG4gICAgICAgICAgICAgIGhlaWdodDogNDhweDtcbiAgICAgICAgICAgICAgbWFyZ2luLWJvdHRvbTogNnB4O1xuICAgICAgICAgICAgICBvcGFjaXR5OiAwLjg7IH1cbiAgICAgICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzIC5wdXJjaGFzZS1jb250YWluZXIgLnNpZ24gLnBvc3QgYnV0dG9uOjphZnRlciB7XG4gICAgICAgICAgICBjb250ZW50OiBcIuKAolwiO1xuICAgICAgICAgICAgYmFja2dyb3VuZC1pbWFnZTogdXJsKFwiLi4vLi4vLi4vLi4vLi4vLi4vYXNzZXRzL2ltYWdlcy9zaWduLXBvc3Qvc2lnbi1iYWNrZ3JvdW5kLmpwZ1wiKTtcbiAgICAgICAgICAgIG9wYWNpdHk6IDE7XG4gICAgICAgICAgICB3aWR0aDogMTAwJTtcbiAgICAgICAgICAgIGhlaWdodDogMTAwJTtcbiAgICAgICAgICAgIGxlZnQ6IDA7XG4gICAgICAgICAgICBib3R0b206IDA7XG4gICAgICAgICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICAgICAgICB6LWluZGV4OiAtMTtcbiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICAgICAgICAgIHZlcnRpY2FsLWFsaWduOiBib3R0b207XG4gICAgICAgICAgICBib3JkZXItdG9wOiAzcHggc29saWQgIzhjNzQ1NzsgfVxuICAgICAgICAgIDpob3N0ICNwdXJjaGFzZS10cmFpbHMgLnB1cmNoYXNlLWNvbnRhaW5lciAuc2lnbiAucG9zdCBidXR0b246ZGlzYWJsZWQge1xuICAgICAgICAgICAgY29sb3I6IHJnYmEoMCwgMCwgMCwgMC44Nyk7IH1cbiAgICAgICAgICA6aG9zdCAjcHVyY2hhc2UtdHJhaWxzIC5wdXJjaGFzZS1jb250YWluZXIgLnNpZ24gLnBvc3QgYnV0dG9uOmRpc2FibGVkOjphZnRlciB7XG4gICAgICAgICAgICBvcGFjaXR5OiAxOyB9XG4iLCIgOmhvc3Qge1xuICBkaXNwbGF5OiBibG9jaztcbiAgd2lkdGg6IDEwMCU7XG4gIG1pbi1oZWlnaHQ6IDEwMCU7XG4gIGhlaWdodDogYXV0bztcbiAgcGFkZGluZy1ib3R0b206IDEycHg7XG5cbiAgI3B1cmNoYXNlLXRyYWlscyB7XG4gICAgYmFja2dyb3VuZDogdW5zZXQ7XG4gICAgYm9yZGVyOiB1bnNldDtcbiAgICBib3gtc2hhZG93OiB1bnNldDtcbiAgICBwYWRkaW5nLWJvdHRvbTogMDtcbiAgICBib3JkZXItcmFkaXVzOiB1bnNldDtcblxuICAgIC5zaWduLVBDVCB7XG4gICAgICBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoXCIuLi8uLi8uLi8uLi8uLi8uLi9hc3NldHMvaW1hZ2VzL3BhbmVsLWJhY2tncm91bmRzL3BjdC5qcGdcIik7IH1cblxuICAgIC5zaWduLUNEVCB7XG4gICAgICBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoXCIuLi8uLi8uLi8uLi8uLi8uLi9hc3NldHMvaW1hZ2VzL3BhbmVsLWJhY2tncm91bmRzL2NkdC5qcGdcIik7IH1cblxuICAgIC5zaWduLVNIUiB7XG4gICAgICBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoXCIuLi8uLi8uLi8uLi8uLi8uLi9hc3NldHMvaW1hZ2VzL3BhbmVsLWJhY2tncm91bmRzL3Noci5qcGdcIik7IH1cblxuICAgIC5wdXJjaGFzZS1jb250YWluZXIge1xuICAgICAgcGVyc3BlY3RpdmU6IDEwMDBweDtcbiAgICAgIGJhY2tncm91bmQtc2l6ZTogY292ZXI7XG4gICAgICBoZWlnaHQ6IDIwMHB4O1xuICAgICAgb3ZlcmZsb3cteTogaGlkZGVuO1xuICAgICAgYm9yZGVyLXJhZGl1czogMTJweDtcbiAgICAgIG1hcmdpbi1ib3R0b206IDZweDtcbiAgICAgIGJvcmRlcjogMXB4IHNvbGlkICNDQ0M7XG4gICAgICAvL2Rpc3BsYXk6IGZsZXhcbiAgICAgIC8vZmxleC13cmFwOiB3cmFwXG4gICAgICAvL2FsaWduLWl0ZW1zOiBmbGV4LWVuZFxuXG4gICAgICAuc2lnbiB7XG4gICAgICAgIG1heC13aWR0aDogNzUlO1xuICAgICAgICBoZWlnaHQ6IDEwMCU7XG4gICAgICAgIG1hcmdpbjogMCA1JSAwIGF1dG87XG4gICAgICAgIHBhZGRpbmctdG9wOiAxMnB4O1xuXG4gICAgICAgIC1tcy10cmFuc2Zvcm06IHJvdGF0ZSgxZGVnKSBza2V3WSgzZGVnKSBza2V3WCgtM2RlZykgcm90YXRlWCgtMTBkZWcpIC8qIElFIDkgKi87XG4gICAgICAgIC13ZWJraXQtdHJhbnNmb3JtOiByb3RhdGUoMWRlZykgc2tld1koM2RlZykgc2tld1goLTNkZWcpIHJvdGF0ZVgoLTEwZGVnKSAvKiBTYWZhcmkgMy04ICovO1xuICAgICAgICB0cmFuc2Zvcm06IHJvdGF0ZSgxZGVnKSBza2V3WSgzZGVnKSBza2V3WCgtM2RlZykgcm90YXRlWCgtMTBkZWcpO1xuXG4gICAgICAgIC5jYXAge1xuICAgICAgICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgICAgICAgIHdpZHRoOiA0OHB4O1xuICAgICAgICAgIG1hcmdpbjogMCBhdXRvIC0zcHggYXV0bzsgfVxuXG4gICAgICAgIC5wb3N0IHtcbiAgICAgICAgICBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoXCIuLi8uLi8uLi8uLi8uLi8uLi9hc3NldHMvaW1hZ2VzL3NpZ24tcG9zdC9wb3N0LWJhY2tnb3VuZC5qcGdcIik7XG4gICAgICAgICAgYmFja2dyb3VuZC1wb3NpdGlvbjogY2VudGVyIHRvcDtcbiAgICAgICAgICBiYWNrZ3JvdW5kLXJlcGVhdDogcmVwZWF0LXk7XG4gICAgICAgICAgcGFkZGluZzogMjRweCAwIDQ4cHggMDtcbiAgICAgICAgICB3aWR0aDogMTAwJTtcbiAgICAgICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7XG5cbiAgICAgICAgICBidXR0b24ge1xuICAgICAgICAgICAgd2lkdGg6IGF1dG87XG4gICAgICAgICAgICBib3gtc2l6aW5nOiBib3JkZXItYm94O1xuICAgICAgICAgICAgcGFkZGluZzogMjBweCAxMnB4IDBweCAxMnB4O1xuICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgICAgICAgdGV4dC13cmFwOiBub3JtYWw7XG4gICAgICAgICAgICB3aGl0ZS1zcGFjZTogbm9ybWFsO1xuICAgICAgICAgICAgbGluZS1oZWlnaHQ6IDI0cHg7XG4gICAgICAgICAgICBmb250LXNpemU6IDE4cHg7XG4gICAgICAgICAgICB0ZXh0LXNoYWRvdzogMXB4IDFweCAxcHggcmdiYSgyNTUsMjU1LDI1NSwwLjI1KTtcbiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcblxuICAgICAgICAgICAgLW1zLXRyYW5zZm9ybTogcm90YXRlKC0xZGVnKSBza2V3WSgxZGVnKSAvKiBJRSA5ICovO1xuICAgICAgICAgICAgLXdlYmtpdC10cmFuc2Zvcm06IHJvdGF0ZSgtMWRlZykgc2tld1koMWRlZykgLyogU2FmYXJpIDMtOCAqLztcbiAgICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKC0xZGVnKSBza2V3WSgxZGVnKTtcblxuICAgICAgICAgICAgLnVuYXZhaWxhYmxlIHtcbiAgICAgICAgICAgICAgY29sb3I6IHJlZDsgfVxuXG4gICAgICAgICAgICAuZnJlZSB7XG4gICAgICAgICAgICAgIGNvbG9yOiBncmVlbjsgfVxuXG4gICAgICAgICAgICBwIHtcbiAgICAgICAgICAgICAgbWFyZ2luOiAwO1xuICAgICAgICAgICAgICBwYWRkaW5nOiAwO1xuXG4gICAgICAgICAgICAgIHNtYWxsIHtcbiAgICAgICAgICAgICAgICB0ZXh0LXdyYXA6IG5vbmU7XG4gICAgICAgICAgICAgICAgd2hpdGUtc3BhY2U6IG5vd3JhcDsgfSB9XG5cbiAgICAgICAgICAgIC5tYXJrZXIge1xuICAgICAgICAgICAgICB3aWR0aDogNDhweDtcbiAgICAgICAgICAgICAgaGVpZ2h0OiA0OHB4O1xuICAgICAgICAgICAgICBtYXJnaW4tYm90dG9tOiA2cHg7XG4gICAgICAgICAgICAgIG9wYWNpdHk6IDAuODsgfSB9XG5cbiAgICAgICAgICBidXR0b246OmFmdGVyIHtcbiAgICAgICAgICAgIGNvbnRlbnQ6IFwi4oCiXCI7XG4gICAgICAgICAgICBiYWNrZ3JvdW5kLWltYWdlOiB1cmwoXCIuLi8uLi8uLi8uLi8uLi8uLi9hc3NldHMvaW1hZ2VzL3NpZ24tcG9zdC9zaWduLWJhY2tncm91bmQuanBnXCIpO1xuICAgICAgICAgICAgb3BhY2l0eTogMTtcbiAgICAgICAgICAgIHdpZHRoOiAxMDAlO1xuICAgICAgICAgICAgaGVpZ2h0OiAxMDAlO1xuICAgICAgICAgICAgbGVmdDogMDtcbiAgICAgICAgICAgIGJvdHRvbTogMDtcbiAgICAgICAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgICAgICAgIHotaW5kZXg6IC0xO1xuICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogNnB4O1xuICAgICAgICAgICAgdmVydGljYWwtYWxpZ246IGJvdHRvbTtcbiAgICAgICAgICAgIGJvcmRlci10b3A6IDNweCBzb2xpZCAjOGM3NDU3OyB9XG5cbiAgICAgICAgICBidXR0b246ZGlzYWJsZWQge1xuICAgICAgICAgICAgY29sb3I6IHJnYmEoMCwwLDAsLjg3KTsgfVxuXG4gICAgICAgICAgYnV0dG9uOmRpc2FibGVkOjphZnRlciB7XG4gICAgICAgICAgICBvcGFjaXR5OiAxOyB9IH0gfSB9XG5cblxuXG4gICAgLy8ucHVyY2hhc2UtY29udGFpbmVyIC5zaWduOm5vdCg6Zmlyc3QtY2hpbGQpXG4gICAgLy8gIG1hcmdpbi1sZWZ0OiA1JVxuICAgIC8vXG4gICAgLy8vKiBvbmUgaXRlbSAqL1xuICAgIC8vLnB1cmNoYXNlLWNvbnRhaW5lciAuc2lnbjpmaXJzdC1jaGlsZDpudGgtbGFzdC1jaGlsZCgxKVxuICAgIC8vICB3aWR0aDogMTAwJVxuICAgIC8vXG4gICAgLy8vKiB0d28gaXRlbXMgKi9cbiAgICAvLy5wdXJjaGFzZS1jb250YWluZXIgLnNpZ246Zmlyc3QtY2hpbGQ6bnRoLWxhc3QtY2hpbGQoMiksXG4gICAgLy8ucHVyY2hhc2UtY29udGFpbmVyIC5zaWduOmZpcnN0LWNoaWxkOm50aC1sYXN0LWNoaWxkKDIpIH4gLnNpZ25cbiB9IH0gICAgLy8gIHdpZHRoOiA0Ny41JVxuIl19 */"
 
 /***/ }),
 
@@ -4110,7 +5131,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
 /* harmony import */ var _base_settings_panel_settings_panel_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../base/settings-panel/settings-panel.component */ "./src/app/base/settings-panel/settings-panel.component.ts");
-/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../_util/trail */ "./src/app/_util/trail.ts");
+/* harmony import */ var _util_trail_meta__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../_util/trail-meta */ "./src/app/_util/trail-meta.ts");
 
 
 
@@ -4131,7 +5152,7 @@ var PurchaseSettingsComponent = /** @class */ (function (_super) {
     PurchaseSettingsComponent.prototype._generateTrailLists = function () {
         var _self = this;
         this.availableTrailList = [];
-        var _trailData = Object(_util_trail__WEBPACK_IMPORTED_MODULE_4__["getTrailsMetaData"])();
+        var _trailData = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_4__["getTrailsMetaData"])();
         for (var key in _trailData) {
             if (_self._purchasedTrails && _self._purchasedTrails.indexOf(_trailData[key].id) === -1 && _trailData[key].abbr !== 'DEMO') {
                 if (_trailData[key].availableForPurchase === true) {
@@ -4191,46 +5212,42 @@ module.exports = ":host {\n  display: inline-block;\n  box-sizing: border-box;\n
 /*!***********************************************************************************************************!*\
   !*** ./src/app/component/dialog/settings-dialog/panels/trail-settings/downloader/downloader.component.ts ***!
   \***********************************************************************************************************/
-/*! exports provided: DownloadStatus, DownloaderComponent */
+/*! exports provided: DownloaderComponent */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DownloadStatus", function() { return DownloadStatus; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DownloaderComponent", function() { return DownloaderComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _service_download_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../service/download.service */ "./src/app/service/download.service.ts");
 /* harmony import */ var _service_filesystem_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../../service/filesystem.service */ "./src/app/service/filesystem.service.ts");
-/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../../_util/trail */ "./src/app/_util/trail.ts");
+/* harmony import */ var _util_trail_meta__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../../_util/trail-meta */ "./src/app/_util/trail-meta.ts");
 /* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var _service_connection_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../../service/connection.service */ "./src/app/service/connection.service.ts");
 
 
 
 
 
 
-var DownloadStatus = /** @class */ (function () {
-    function DownloadStatus() {
-    }
-    return DownloadStatus;
-}());
 
 var DownloaderComponent = /** @class */ (function () {
-    function DownloaderComponent(_changeDetector, _downloadService, _fileSystemService) {
+    function DownloaderComponent(_changeDetector, _downloadService, _fileSystemService, _connectionService) {
         this._changeDetector = _changeDetector;
         this._downloadService = _downloadService;
         this._fileSystemService = _fileSystemService;
+        this._connectionService = _connectionService;
         this.progressState = 'determinate';
     }
     DownloaderComponent.prototype.ngOnInit = function () {
-        this.trailMeta = Object(_util_trail__WEBPACK_IMPORTED_MODULE_4__["getTrailMetaDataById"])(this.trailId);
+        this.trailMeta = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_4__["getTrailMetaDataById"])(this.trailId);
         this._createDownloader();
         this._setup();
     };
     DownloaderComponent.prototype.ngOnChanges = function (changes) {
         if (changes.trailId) {
-            this.trailMeta = Object(_util_trail__WEBPACK_IMPORTED_MODULE_4__["getTrailMetaDataById"])(this.trailId);
+            this.trailMeta = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_4__["getTrailMetaDataById"])(this.trailId);
             this._createDownloader();
             this._setup();
         }
@@ -4245,7 +5262,7 @@ var DownloaderComponent = /** @class */ (function () {
     };
     DownloaderComponent.prototype._setup = function () {
         var _self = this;
-        this.isActive = this._downloader.isActiveSubject.getValue();
+        this.isActive = this._downloader.status.isActiveSubject.getValue();
         var _base = this.trailMeta.abbr + '/';
         if (this.isVersionSpecific) {
             _base += this.trailMeta[this.type + 'Version'] + '/';
@@ -4267,52 +5284,52 @@ var DownloaderComponent = /** @class */ (function () {
         if (this._downloadSubscription) {
             this._downloadSubscription.unsubscribe();
         }
-        console.log(this._url);
         this._downloadSubscription = this._downloader.meta.subscribe(function (status) {
-            _self.isActive = _self._downloader.isActiveSubject.getValue();
-            if (status.type === 'http' && status.label && status.label === 'complete') {
-                if (_self.extension !== 'zip' && _self.extension !== 'json') {
-                    _self._clear();
-                    _self.hasFile = false;
-                    _self.isActive = false;
-                    throw new Error('downloaded an unsupported file');
+            _self.isActive = _self._downloader.status.isActiveSubject.getValue();
+            if (status && status.label) {
+                if (status.type === 'http' && status.label === 'complete') {
+                    if (_self.extension !== 'zip' && _self.extension !== 'json') {
+                        _self._clear();
+                        _self.hasFile = false;
+                        _self.isActive = false;
+                        throw new Error('downloaded an unsupported file');
+                    }
                 }
-            }
-            else if (status['label'] && status['label'] === 'progress') {
-                // TODO: currently not showing saving/unzipping as part of the progress bar
-                if (status.type === 'http') {
-                    // only updates on full % difference, to save redraws
-                    var _newProgress = Math.floor(status.data.percentage);
-                    if (_newProgress !== _self.progress) {
-                        _self.progressState = 'determinate';
-                        _self.progress = status.data.percentage;
+                else if (status.label === 'progress') {
+                    // TODO: currently not showing saving/unzipping as part of the progress bar
+                    if (status.type === 'http') {
+                        // only updates on full % difference, to save redraws
+                        var _newProgress = Math.floor(status.data.percentage);
+                        if (_newProgress !== _self.progress) {
+                            _self.progressState = 'determinate';
+                            _self.progress = status.data.percentage;
+                            _self._changeDetector.detectChanges();
+                        }
+                    }
+                    else {
+                        _self.progressState = 'buffer';
                         _self._changeDetector.detectChanges();
                     }
                 }
-                else {
-                    _self.progressState = 'buffer';
-                    _self._changeDetector.detectChanges();
+                else if (status.label === 'error') {
+                    alert('Downloader error');
+                    _self.hasFile = false;
+                    _self.onClear(_self.type);
+                    _self.progress = 0;
                 }
-            }
-            else if (status['label'] && status['label'] === 'error') {
-                console.log(status, _self._url);
-                alert('Downloader error');
-                _self.hasFile = false;
-                _self.onClear(_self.type);
-                _self.progress = 0;
-            }
-            else if (status.type === 'downloader' && status.label === 'complete') {
-                _self.progress = 100;
-                _self.hasFile = true;
-                console.log('downloader complete?');
-                _self.onComplete(_self.type);
-            }
-            else if (status.type === 'downloader' && status.label === 'cleared') {
-                _self.progress = 0;
+                else if (status.type === 'downloader' && status.label === 'complete') {
+                    _self.progress = 100;
+                    _self.hasFile = true;
+                    console.log('downloader complete?');
+                    _self.onComplete(_self.type);
+                }
+                else if (status.type === 'downloader' && status.label === 'cleared') {
+                    _self.progress = 0;
+                }
             }
         }, function (error) {
             alert('Download error');
-            _self.isActive = _self._downloader.isActiveSubject.getValue();
+            _self.isActive = _self._downloader.status.isActiveSubject.getValue();
             _self.onClear(_self.type);
             _self.hasFile = false;
             _self.progress = 0;
@@ -4329,6 +5346,10 @@ var DownloaderComponent = /** @class */ (function () {
     };
     // BUTTON ACTIONS (dynanically called from button click)
     DownloaderComponent.prototype._download = function () {
+        if (this._connectionService.state !== 'online') {
+            alert('You\'re currently offline!');
+            return;
+        }
         var _url;
         if (typeof this._url === 'string') {
             _url = _environments_environment_prod__WEBPACK_IMPORTED_MODULE_5__["environment"].appDomain + _environments_environment_prod__WEBPACK_IMPORTED_MODULE_5__["environment"].fileBaseUrl + this._url;
@@ -4410,7 +5431,8 @@ var DownloaderComponent = /** @class */ (function () {
         }),
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectorRef"],
             _service_download_service__WEBPACK_IMPORTED_MODULE_2__["DownloadService"],
-            _service_filesystem_service__WEBPACK_IMPORTED_MODULE_3__["FilesystemService"]])
+            _service_filesystem_service__WEBPACK_IMPORTED_MODULE_3__["FilesystemService"],
+            _service_connection_service__WEBPACK_IMPORTED_MODULE_6__["ConnectionService"]])
     ], DownloaderComponent);
     return DownloaderComponent;
 }());
@@ -4437,7 +5459,7 @@ module.exports = "<mat-card id=\"trail-selector\">\n\n  <h2>Trail Downloads</h2>
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "::ng-deep .mat-form-field-wrapper {\n  padding-bottom: 0px !important; }\n\n#download {\n  border-radius: 0 0 6px 6px;\n  background-color: #F9F9F9;\n  padding: 36px 0 12px 0;\n  margin-top: -12px !important; }\n\n.warning {\n  text-align: center; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvc2V0dGluZ3MtZGlhbG9nL3BhbmVscy90cmFpbC1zZXR0aW5ncy90cmFpbC1zZXR0aW5ncy5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUdJLDhCQUE4QixFQUFBOztBQUVsQztFQUNFLDBCQUEwQjtFQUMxQix5QkFBeUI7RUFDekIsc0JBQXNCO0VBQ3RCLDRCQUE0QixFQUFBOztBQUU5QjtFQUNFLGtCQUFrQixFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3RyYWlsLXNldHRpbmdzL3RyYWlsLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiOjpuZy1kZWVwIHtcblxuICAubWF0LWZvcm0tZmllbGQtd3JhcHBlciB7XG4gICAgcGFkZGluZy1ib3R0b206IDBweCAhaW1wb3J0YW50OyB9IH1cblxuI2Rvd25sb2FkIHtcbiAgYm9yZGVyLXJhZGl1czogMCAwIDZweCA2cHg7XG4gIGJhY2tncm91bmQtY29sb3I6ICNGOUY5Rjk7XG4gIHBhZGRpbmc6IDM2cHggMCAxMnB4IDA7XG4gIG1hcmdpbi10b3A6IC0xMnB4ICFpbXBvcnRhbnQ7IH1cblxuLndhcm5pbmcge1xuICB0ZXh0LWFsaWduOiBjZW50ZXI7IH1cbiJdfQ== */"
+module.exports = "::ng-deep .mat-form-field-wrapper {\n  padding-bottom: 0px !important; }\n\n#download {\n  border-radius: 0 0 6px 6px;\n  background-color: #F9F9F9;\n  padding: 36px 0 12px 0;\n  margin-top: -12px !important; }\n\n.warning {\n  text-align: center; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvc2V0dGluZ3MtZGlhbG9nL3BhbmVscy90cmFpbC1zZXR0aW5ncy90cmFpbC1zZXR0aW5ncy5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUdJLDhCQUE4QixFQUFBOztBQU1sQztFQUNFLDBCQUEwQjtFQUMxQix5QkFBeUI7RUFDekIsc0JBQXNCO0VBQ3RCLDRCQUE0QixFQUFBOztBQUU5QjtFQUNFLGtCQUFrQixFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2RpYWxvZy9zZXR0aW5ncy1kaWFsb2cvcGFuZWxzL3RyYWlsLXNldHRpbmdzL3RyYWlsLXNldHRpbmdzLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiOjpuZy1kZWVwIHtcblxuICAubWF0LWZvcm0tZmllbGQtd3JhcHBlciB7XG4gICAgcGFkZGluZy1ib3R0b206IDBweCAhaW1wb3J0YW50OyB9XG5cbiAgLnNlbGVjdC1mb3JtLWZpZWxkIHtcbiAgICAubWF0LXNlbGVjdCB7XG4gfSB9IH0gICAgICAvL2JhY2tncm91bmQtY29sb3I6IHNhbG1vbiAhaW1wb3J0YW50XG5cbiNkb3dubG9hZCB7XG4gIGJvcmRlci1yYWRpdXM6IDAgMCA2cHggNnB4O1xuICBiYWNrZ3JvdW5kLWNvbG9yOiAjRjlGOUY5O1xuICBwYWRkaW5nOiAzNnB4IDAgMTJweCAwO1xuICBtYXJnaW4tdG9wOiAtMTJweCAhaW1wb3J0YW50OyB9XG5cbi53YXJuaW5nIHtcbiAgdGV4dC1hbGlnbjogY2VudGVyOyB9XG4iXX0= */"
 
 /***/ }),
 
@@ -4456,7 +5478,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
 /* harmony import */ var _base_settings_panel_settings_panel_component__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../base/settings-panel/settings-panel.component */ "./src/app/base/settings-panel/settings-panel.component.ts");
 /* harmony import */ var _service_download_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../service/download.service */ "./src/app/service/download.service.ts");
-/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../_util/trail */ "./src/app/_util/trail.ts");
+/* harmony import */ var _util_trail_meta__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../_util/trail-meta */ "./src/app/_util/trail-meta.ts");
 /* harmony import */ var _service_connection_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../service/connection.service */ "./src/app/service/connection.service.ts");
 /* harmony import */ var _util_cordova__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../../_util/cordova */ "./src/app/_util/cordova.ts");
 /* harmony import */ var _service_version_resolver_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../../service/version-resolver.service */ "./src/app/service/version-resolver.service.ts");
@@ -4491,7 +5513,7 @@ var TrailSettingsComponent = /** @class */ (function (_super) {
         _super.prototype.ngOnInit.call(this);
         var _self = this;
         this._purchasedTrails = this._localStorage.retrieve('purchasedTrails');
-        this.activeTrail = Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(this._localStorage.retrieve('activeTrailId') || 0);
+        this.activeTrail = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(this._localStorage.retrieve('activeTrailId') || 0);
         this._downloadService.isDownloadingObservable.subscribe(function (result) {
             _self._downloadersActive = result;
         });
@@ -4515,7 +5537,7 @@ var TrailSettingsComponent = /** @class */ (function (_super) {
     TrailSettingsComponent.prototype._generateTrailLists = function () {
         var _self = this;
         this.purchasedTrailList = [];
-        var _trailData = Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["getTrailsMetaData"])();
+        var _trailData = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_5__["getTrailsMetaData"])();
         for (var key in _trailData) {
             if (_self._purchasedTrails && _self._purchasedTrails.indexOf(_trailData[key].id) !== -1 || _trailData[key].abbr === 'DEMO') {
                 _self.purchasedTrailList.push(_trailData[key]);
@@ -4624,7 +5646,7 @@ var TrailSettingsComponent = /** @class */ (function (_super) {
                 this._downloadService.clearDownloaders(this.activeTrail.abbr, true);
             }
             this._storedTrailId = this._localStorage.store('activeTrailId', _newValue);
-            this.activeTrail = Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(_newValue);
+            this.activeTrail = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(_newValue);
             this._setupUpdateSubscriptions();
             _super.prototype.invalidate.call(this);
         }
@@ -4664,6 +5686,88 @@ var TrailSettingsComponent = /** @class */ (function (_super) {
 
 /***/ }),
 
+/***/ "./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.html":
+/*!****************************************************************************************************!*\
+  !*** ./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.html ***!
+  \****************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<mat-card id=\"user-settings\">\n\n  <h2>User Settings</h2>\n\n  <mat-card-content>\n\n    <section>\n\n      <mat-form-field id=\"user-name\">\n        <input type=\"text\" matInput placeholder=\"name\" value=\"{{userName}}\" (input)=\"onUserNameChange($event.target.value)\">\n      </mat-form-field>\n\n      <small>ID: {{UUID}}</small>\n\n      <mat-form-field class=\"direction\">\n        <mat-select placeholder=\"direction\" [value]=\"direction\" (selectionChange)=\"onDirectionSelect($event)\">\n          <mat-option *ngFor=\"let direction of directionList\" [value]=\"direction.id\">\n            {{direction.label}}\n          </mat-option>\n        </mat-select>\n      </mat-form-field>\n\n    </section>\n\n  </mat-card-content>\n\n</mat-card>\n"
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.sass":
+/*!****************************************************************************************************!*\
+  !*** ./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.sass ***!
+  \****************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ":host ::ng-deep #user-name .mat-form-field-wrapper {\n  padding-bottom: 0 !important; }\n\n:host small {\n  float: right;\n  margin-bottom: 17.5px;\n  color: grey; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvc2V0dGluZ3MtZGlhbG9nL3BhbmVscy91c2VyLXNldHRpbmdzL3VzZXItc2V0dGluZ3MuY29tcG9uZW50LnNhc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUM7RUFHRyw0QkFBNEIsRUFBQTs7QUFHL0I7RUFHRyxZQUFZO0VBQ1oscUJBQXFCO0VBQ3JCLFdBQVcsRUFBQSIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvc2V0dGluZ3MtZGlhbG9nL3BhbmVscy91c2VyLXNldHRpbmdzL3VzZXItc2V0dGluZ3MuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3QgOjpuZy1kZWVwIHtcblxuICAjdXNlci1uYW1lIC5tYXQtZm9ybS1maWVsZC13cmFwcGVyIHtcbiAgICBwYWRkaW5nLWJvdHRvbTogMCAhaW1wb3J0YW50OyB9IH1cblxuXG4gOmhvc3Qge1xuXG4gIHNtYWxsIHtcbiAgICBmbG9hdDogcmlnaHQ7XG4gICAgbWFyZ2luLWJvdHRvbTogMTcuNXB4O1xuICAgIGNvbG9yOiBncmV5OyB9IH1cbiJdfQ== */"
+
+/***/ }),
+
+/***/ "./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.ts":
+/*!**************************************************************************************************!*\
+  !*** ./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.ts ***!
+  \**************************************************************************************************/
+/*! exports provided: UserSettingsComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "UserSettingsComponent", function() { return UserSettingsComponent; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _base_settings_panel_settings_panel_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../base/settings-panel/settings-panel.component */ "./src/app/base/settings-panel/settings-panel.component.ts");
+/* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
+/* harmony import */ var _util_cordova__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../_util/cordova */ "./src/app/_util/cordova.ts");
+
+
+
+
+
+var UserSettingsComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](UserSettingsComponent, _super);
+    function UserSettingsComponent(_localStorage) {
+        var _this = _super.call(this) || this;
+        _this._localStorage = _localStorage;
+        _this.directionList = [{ id: 0, label: 'Northbound (NOBO)' }, { id: 1, label: 'Southbound (SOBO)' }];
+        return _this;
+    }
+    UserSettingsComponent.prototype.ngOnInit = function () {
+        this.direction = this._localStorage.retrieve('direction');
+        this.UUID = Object(_util_cordova__WEBPACK_IMPORTED_MODULE_4__["getUUID"])();
+        var _savedName = this._localStorage.retrieve('userName');
+        if (_savedName) {
+            this.userName = _savedName;
+        }
+    };
+    UserSettingsComponent.prototype.onDirectionSelect = function (event) {
+        this._localStorage.store('direction', event.value);
+        if (event.value !== this.direction) {
+            this.invalidate();
+        }
+    };
+    UserSettingsComponent.prototype.onUserNameChange = function (username) {
+        this._localStorage.store('userName', username);
+    };
+    UserSettingsComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
+            selector: 'user-settings',
+            template: __webpack_require__(/*! ./user-settings.component.html */ "./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.html"),
+            styles: [__webpack_require__(/*! ./user-settings.component.sass */ "./src/app/component/dialog/settings-dialog/panels/user-settings/user-settings.component.sass")]
+        }),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_3__["LocalStorageService"]])
+    ], UserSettingsComponent);
+    return UserSettingsComponent;
+}(_base_settings_panel_settings_panel_component__WEBPACK_IMPORTED_MODULE_2__["SettingsPanelComponent"]));
+
+
+
+/***/ }),
+
 /***/ "./src/app/component/dialog/settings-dialog/settings-dialog.component.html":
 /*!*********************************************************************************!*\
   !*** ./src/app/component/dialog/settings-dialog/settings-dialog.component.html ***!
@@ -4671,7 +5775,7 @@ var TrailSettingsComponent = /** @class */ (function (_super) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "  <div id=\"center-icon\" >\n    <display-button class=\"button\" label=\"\" icon=\"{{data['icon']}}\" routerLink=\"\"></display-button>\n  </div>\n\n  <!-- left -->\n  <div id=\"left-panel\">\n\n    <div id=\"setings-meta\">\n      <h1>Settings</h1>\n      <div mat-dialog-content>\n        <p>Select a topic below</p>\n      </div>\n    </div>\n\n    <mat-action-list id=\"settings-menu\">\n      <button *ngFor=\"let item of listItems\" mat-list-item (click)=\"onClick(item)\"> <h2>{{item.title}}</h2><span><fa-icon icon=\"angle-right\" size=\"lg\"></fa-icon></span></button>\n    </mat-action-list>\n  </div>\n\n  <!-- right -->\n  <div id=\"right-panel\" #contentPanel>\n\n    <!-- purchase / download panel -->\n    <instructions *ngIf=\"!activePanel\"></instructions>\n\n    <!-- purchase trails -->\n    <purchase-settings *ngIf=\"activePanel === 'purchase'\" (onSettingsChanged)=\"onSettingsChanged($event)\"></purchase-settings>\n\n    <!-- trail data -->\n    <trail-settings *ngIf=\"activePanel === 'trail'\" (onSettingsChanged)=\"onSettingsChanged($event)\"></trail-settings>\n\n    <!-- general settings panel -->\n    <general-settings *ngIf=\"activePanel === 'general'\" (onSettingsChanged)=\"onSettingsChanged($event)\"></general-settings>\n\n    <!-- about panel-->\n    <about *ngIf=\"activePanel === 'about'\"></about>\n\n  </div>\n"
+module.exports = "  <div id=\"center-icon\" >\n    <display-button class=\"button\" label=\"\" icon=\"{{data['icon']}}\" routerLink=\"\"></display-button>\n  </div>\n\n  <!-- left -->\n  <div id=\"left-panel\">\n\n    <div id=\"setings-meta\">\n      <h1>Settings</h1>\n      <div mat-dialog-content>\n        <p>Select a topic below</p>\n      </div>\n    </div>\n\n    <mat-action-list id=\"settings-menu\">\n      <button [disableRipple]=\"true\" *ngFor=\"let item of listItems\" mat-list-item (click)=\"onClick(item)\"> <h2>{{item.title}}</h2><span><fa-icon icon=\"angle-right\" size=\"lg\"></fa-icon></span></button>\n    </mat-action-list>\n  </div>\n\n  <!-- right -->\n  <div id=\"right-panel\" #contentPanel>\n\n    <!-- purchase / download panel -->\n    <instructions *ngIf=\"!activePanel\"></instructions>\n\n    <!-- purchase trails -->\n    <purchase-settings *ngIf=\"activePanel === 'purchase'\" (onSettingsChanged)=\"onSettingsChanged($event)\"></purchase-settings>\n\n    <!-- trail data -->\n    <trail-settings *ngIf=\"activePanel === 'trail'\" (onSettingsChanged)=\"onSettingsChanged($event)\"></trail-settings>\n\n    <!-- user settings -->\n    <user-settings *ngIf=\"activePanel === 'user'\" (onSettingsChanged)=\"onSettingsChanged($event)\"></user-settings>\n\n    <!-- general settings panel -->\n    <general-settings *ngIf=\"activePanel === 'general'\" (onSettingsChanged)=\"onSettingsChanged($event)\"></general-settings>\n\n    <!-- about panel-->\n    <about *ngIf=\"activePanel === 'about'\"></about>\n\n  </div>\n"
 
 /***/ }),
 
@@ -4682,7 +5786,7 @@ module.exports = "  <div id=\"center-icon\" >\n    <display-button class=\"butto
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ":host ::ng-deep hr {\n  border: unset;\n  border-top: 1px solid #CCC; }\n\n:host ::ng-deep mat-card h2 {\n  text-align: center;\n  margin-bottom: 0 !important; }\n\n:host ::ng-deep .input {\n  display: flex;\n  flex-direction: column; }\n\n:host ::ng-deep .input > * {\n  width: 100% !important; }\n\n:host ::ng-deep mat-form-field, :host ::ng-deep input {\n  width: 100% !important; }\n\n:host ::ng-deep .mat-select, :host ::ng-deep input {\n  box-sizing: border-box !important;\n  padding: 0 12px !important;\n  background-color: #EEE !important;\n  border-radius: 6px !important;\n  height: 48px !important;\n  border: none !important; }\n\n:host ::ng-deep .mat-select .mat-select-trigger, :host ::ng-deep input .mat-select-trigger {\n    height: 48px; }\n\n:host ::ng-deep .mat-select .mat-select-trigger .mat-select-value, :host ::ng-deep input .mat-select-trigger .mat-select-value {\n      vertical-align: middle; }\n\n:host ::ng-deep input {\n  background-color: transparent !important;\n  border: 2px solid #EEE !important; }\n\n:host ::ng-deep .mat-form-field-underline {\n  display: none; }\n\n:host ::ng-deep .mat-form-field-underline .mat-list-item-content {\n    padding: 0 12px !important;\n    margin: 0 !important; }\n\n:host ::ng-deep mat-radio-button, :host ::ng-deep mat-checkbox {\n  display: block;\n  padding: 3px 0 !important;\n  height: 28px !important; }\n\n:host ::ng-deep .mat-radio-container, :host ::ng-deep .mat-radio-outer-circle, :host ::ng-deep .mat-radio-inner-circle, :host ::ng-deep .mat-checkbox-inner-container {\n  width: 28px !important;\n  height: 28px !important; }\n\n:host ::ng-deep .mat-checkbox-frame, :host ::ng-deep .mat-checkbox-background {\n  width: 24px !important;\n  height: 24px !important;\n  border-radius: 4px !important; }\n\n:host #center-icon {\n  position: absolute;\n  left: 38.2%;\n  margin: -3.5vw 0 0 -3.5vw;\n  z-index: 1000; }\n\n:host #center-icon button {\n    user-focus: none; }\n\n:host #left-panel, :host #right-panel {\n  display: inline-block;\n  height: 100%; }\n\n:host #left-panel {\n  height: 98%;\n  width: 38.2%;\n  vertical-align: bottom;\n  overflow-y: hidden; }\n\n:host #left-panel h1, :host #left-panel h2 {\n    display: block;\n    text-align: left;\n    width: 90%;\n    white-space: nowrap;\n    text-overflow: ellipsis;\n    overflow: hidden; }\n\n:host #left-panel h1 {\n    font-size: 4.2vh;\n    padding: 0 12px; }\n\n:host #left-panel h2 {\n    font-size: 3.4vh;\n    font-weight: 300; }\n\n:host #left-panel #setings-meta {\n    background-color: white;\n    box-sizing: border-box;\n    height: 38.2%;\n    border-bottom: 1px solid #DDD;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    font-size: 3vh; }\n\n:host #left-panel #setings-meta .mat-dialog-title {\n      margin-bottom: 0;\n      padding-bottom: 0; }\n\n:host #left-panel #setings-meta .mat-dialog-content {\n      display: block; }\n\n:host #left-panel #setings-meta .mat-dialog-content p {\n        display: block;\n        margin: 6px 12px 12px 12px; }\n\n:host #left-panel #settings-menu {\n    height: 61.8%;\n    overflow-y: scroll;\n    padding: 0;\n    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f7f7f7+0,f9f9f9+7 */\n    background: #f7f7f7;\n    background: linear-gradient(to bottom, #f7f7f7 0%, #f9f9f9 7%);\n    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f9f9f9',GradientType=0 ); }\n\n:host #left-panel #settings-menu button {\n      border-bottom: 1px solid #EEE; }\n\n:host #left-panel #settings-menu span {\n      display: block;\n      position: absolute;\n      right: 0;\n      padding: 0 12px 0 12px;\n      vertical-align: center;\n      color: #CCC; }\n\n:host #right-panel {\n  box-sizing: border-box;\n  width: 61.8%;\n  background-color: #EEE;\n  vertical-align: top;\n  overflow-y: scroll; }\n\n:host #right-panel mat-card {\n    box-sizing: border-box;\n    background-color: #97a895;\n    min-height: 100%;\n    border: unset;\n    border-radius: unset; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvc2V0dGluZ3MtZGlhbG9nL3NldHRpbmdzLWRpYWxvZy5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUdHLGFBQWE7RUFDYiwwQkFBMEIsRUFBQTs7QUFKN0I7RUFTSyxrQkFBa0I7RUFDbEIsMkJBQTJCLEVBQUE7O0FBVmhDO0VBYUcsYUFBYTtFQUNiLHNCQUFzQixFQUFBOztBQWR6QjtFQWlCRyxzQkFBc0IsRUFBQTs7QUFqQnpCO0VBcUJHLHNCQUFzQixFQUFBOztBQXJCekI7RUF3QkcsaUNBQWlDO0VBQ2pDLDBCQUEwQjtFQUMxQixpQ0FBaUM7RUFDakMsNkJBQTZCO0VBQzdCLHVCQUF1QjtFQUN2Qix1QkFBdUIsRUFBQTs7QUE3QjFCO0lBZ0NLLFlBQVksRUFBQTs7QUFoQ2pCO01BbUNPLHNCQUFzQixFQUFBOztBQW5DN0I7RUFzQ0csd0NBQXdDO0VBQ3hDLGlDQUFpQyxFQUFBOztBQXZDcEM7RUEyQ0csYUFBYSxFQUFBOztBQTNDaEI7SUE4Q0ssMEJBQTBCO0lBQzFCLG9CQUFvQixFQUFBOztBQS9DekI7RUFtREcsY0FBYztFQUNkLHlCQUF5QjtFQUN6Qix1QkFBdUIsRUFBQTs7QUFyRDFCO0VBd0RHLHNCQUFzQjtFQUN0Qix1QkFBdUIsRUFBQTs7QUF6RDFCO0VBNERHLHNCQUFzQjtFQUN0Qix1QkFBdUI7RUFDdkIsNkJBQTZCLEVBQUE7O0FBRWhDO0VBR0csa0JBQWtCO0VBQ2xCLFdBQVc7RUFDWCx5QkFBeUI7RUFDekIsYUFBYSxFQUFBOztBQU5oQjtJQVNLLGdCQUFnQixFQUFBOztBQVRyQjtFQVlHLHFCQUFxQjtFQUNyQixZQUFZLEVBQUE7O0FBYmY7RUFnQkcsV0FBVztFQUNYLFlBQVk7RUFDWixzQkFBc0I7RUFDdEIsa0JBQWtCLEVBQUE7O0FBbkJyQjtJQXNCSyxjQUFjO0lBQ2QsZ0JBQWdCO0lBQ2hCLFVBQVU7SUFDVixtQkFBbUI7SUFDbkIsdUJBQXVCO0lBQ3ZCLGdCQUFnQixFQUFBOztBQTNCckI7SUE4QkssZ0JBQWdCO0lBQ2hCLGVBQWUsRUFBQTs7QUEvQnBCO0lBa0NLLGdCQUFnQjtJQUNoQixnQkFBZ0IsRUFBQTs7QUFuQ3JCO0lBc0NLLHVCQUF1QjtJQUN2QixzQkFBc0I7SUFDdEIsYUFBYTtJQUNiLDZCQUE2QjtJQUM3QixnQkFBZ0I7SUFDaEIsdUJBQXVCO0lBQ3ZCLGNBQWMsRUFBQTs7QUE1Q25CO01BK0NPLGdCQUFnQjtNQUNoQixpQkFBaUIsRUFBQTs7QUFoRHhCO01BbURPLGNBQWMsRUFBQTs7QUFuRHJCO1FBc0RTLGNBQWM7UUFDZCwwQkFBMEIsRUFBQTs7QUF2RG5DO0lBMERLLGFBQWE7SUFDYixrQkFBa0I7SUFDbEIsVUFBVTtJQUVWLDhHQUFBO0lBQ0EsbUJBQTRCO0lBRzVCLDhEQUFxRjtJQUNyRixtSEFBbUgsRUFBQTs7QUFuRXhIO01Bc0VPLDZCQUE2QixFQUFBOztBQXRFcEM7TUEwRU8sY0FBYztNQUNkLGtCQUFrQjtNQUNsQixRQUFRO01BQ1Isc0JBQXNCO01BQ3RCLHNCQUFzQjtNQUN0QixXQUFXLEVBQUE7O0FBL0VsQjtFQWtGRyxzQkFBc0I7RUFDdEIsWUFBWTtFQUNaLHNCQUFzQjtFQUN0QixtQkFBbUI7RUFDbkIsa0JBQWtCLEVBQUE7O0FBdEZyQjtJQXlGSyxzQkFBc0I7SUFDdEIseUJBQXlCO0lBQ3pCLGdCQUFnQjtJQUNoQixhQUFhO0lBQ2Isb0JBQW9CLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnQvZGlhbG9nL3NldHRpbmdzLWRpYWxvZy9zZXR0aW5ncy1kaWFsb2cuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3QgOjpuZy1kZWVwIHtcblxuICBociB7XG4gICAgYm9yZGVyOiB1bnNldDtcbiAgICBib3JkZXItdG9wOiAxcHggc29saWQgI0NDQzsgfVxuXG4gIG1hdC1jYXJkIHtcblxuICAgIGgyIHtcbiAgICAgIHRleHQtYWxpZ246IGNlbnRlcjtcbiAgICAgIG1hcmdpbi1ib3R0b206IDAgIWltcG9ydGFudDsgfSB9XG5cbiAgLmlucHV0IHtcbiAgICBkaXNwbGF5OiBmbGV4O1xuICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47IH1cblxuICAuaW5wdXQgPiAqIHtcbiAgICB3aWR0aDogMTAwJSAhaW1wb3J0YW50OyB9XG5cblxuICBtYXQtZm9ybS1maWVsZCwgaW5wdXQge1xuICAgIHdpZHRoOiAxMDAlICFpbXBvcnRhbnQ7IH1cblxuICAubWF0LXNlbGVjdCwgaW5wdXQge1xuICAgIGJveC1zaXppbmc6IGJvcmRlci1ib3ggIWltcG9ydGFudDtcbiAgICBwYWRkaW5nOiAwIDEycHggIWltcG9ydGFudDtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjRUVFICFpbXBvcnRhbnQ7XG4gICAgYm9yZGVyLXJhZGl1czogNnB4ICFpbXBvcnRhbnQ7XG4gICAgaGVpZ2h0OiA0OHB4ICFpbXBvcnRhbnQ7XG4gICAgYm9yZGVyOiBub25lICFpbXBvcnRhbnQ7XG5cbiAgICAubWF0LXNlbGVjdC10cmlnZ2VyIHtcbiAgICAgIGhlaWdodDogNDhweDtcblxuICAgICAgLm1hdC1zZWxlY3QtdmFsdWUge1xuICAgICAgICB2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlOyB9IH0gfSAvLyB1c2VzIHRhYmxlLWNlbGxcblxuICBpbnB1dCB7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdHJhbnNwYXJlbnQgIWltcG9ydGFudDtcbiAgICBib3JkZXI6IDJweCBzb2xpZCAjRUVFICFpbXBvcnRhbnQ7IH1cblxuXG4gIC5tYXQtZm9ybS1maWVsZC11bmRlcmxpbmUge1xuICAgIGRpc3BsYXk6IG5vbmU7XG5cbiAgICAubWF0LWxpc3QtaXRlbS1jb250ZW50IHtcbiAgICAgIHBhZGRpbmc6IDAgMTJweCAhaW1wb3J0YW50O1xuICAgICAgbWFyZ2luOiAwICFpbXBvcnRhbnQ7IH0gfVxuXG4gIC8vIHJhZGlvIGJ1dHRvbiAmIGNoZWNrYm94XG4gIG1hdC1yYWRpby1idXR0b24sIG1hdC1jaGVja2JveCB7XG4gICAgZGlzcGxheTogYmxvY2s7XG4gICAgcGFkZGluZzogM3B4IDAgIWltcG9ydGFudDtcbiAgICBoZWlnaHQ6IDI4cHggIWltcG9ydGFudDsgfVxuXG4gIC5tYXQtcmFkaW8tY29udGFpbmVyLCAubWF0LXJhZGlvLW91dGVyLWNpcmNsZSwgLm1hdC1yYWRpby1pbm5lci1jaXJjbGUsIC5tYXQtY2hlY2tib3gtaW5uZXItY29udGFpbmVyIHtcbiAgICB3aWR0aDogMjhweCAhaW1wb3J0YW50O1xuICAgIGhlaWdodDogMjhweCAhaW1wb3J0YW50OyB9XG5cbiAgLm1hdC1jaGVja2JveC1mcmFtZSwgLm1hdC1jaGVja2JveC1iYWNrZ3JvdW5kIHtcbiAgICB3aWR0aDogMjRweCAhaW1wb3J0YW50O1xuICAgIGhlaWdodDogMjRweCAhaW1wb3J0YW50O1xuICAgIGJvcmRlci1yYWRpdXM6IDRweCAhaW1wb3J0YW50OyB9IH1cblxuIDpob3N0IHtcblxuICAjY2VudGVyLWljb24ge1xuICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICBsZWZ0OiAzOC4yJTtcbiAgICBtYXJnaW46IC0zLjV2dyAwIDAgLTMuNXZ3O1xuICAgIHotaW5kZXg6IDEwMDA7XG5cbiAgICBidXR0b24ge1xuICAgICAgdXNlci1mb2N1czogbm9uZTsgfSB9XG5cbiAgI2xlZnQtcGFuZWwsICNyaWdodC1wYW5lbCB7XG4gICAgZGlzcGxheTogaW5saW5lLWJsb2NrO1xuICAgIGhlaWdodDogMTAwJTsgfVxuXG4gICNsZWZ0LXBhbmVsIHtcbiAgICBoZWlnaHQ6IDk4JTtcbiAgICB3aWR0aDogMzguMiU7XG4gICAgdmVydGljYWwtYWxpZ246IGJvdHRvbTtcbiAgICBvdmVyZmxvdy15OiBoaWRkZW47XG5cbiAgICBoMSwgaDIge1xuICAgICAgZGlzcGxheTogYmxvY2s7XG4gICAgICB0ZXh0LWFsaWduOiBsZWZ0O1xuICAgICAgd2lkdGg6IDkwJTtcbiAgICAgIHdoaXRlLXNwYWNlOiBub3dyYXA7XG4gICAgICB0ZXh0LW92ZXJmbG93OiBlbGxpcHNpcztcbiAgICAgIG92ZXJmbG93OiBoaWRkZW47IH1cblxuICAgIGgxIHtcbiAgICAgIGZvbnQtc2l6ZTogNC4ydmg7XG4gICAgICBwYWRkaW5nOiAwIDEycHg7IH1cblxuICAgIGgyIHtcbiAgICAgIGZvbnQtc2l6ZTogMy40dmg7XG4gICAgICBmb250LXdlaWdodDogMzAwOyB9XG5cbiAgICAjc2V0aW5ncy1tZXRhIHtcbiAgICAgIGJhY2tncm91bmQtY29sb3I6IHdoaXRlO1xuICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcbiAgICAgIGhlaWdodDogMzguMiU7XG4gICAgICBib3JkZXItYm90dG9tOiAxcHggc29saWQgI0RERDtcbiAgICAgIG92ZXJmbG93OiBoaWRkZW47XG4gICAgICB0ZXh0LW92ZXJmbG93OiBlbGxpcHNpcztcbiAgICAgIGZvbnQtc2l6ZTogM3ZoO1xuXG4gICAgICAubWF0LWRpYWxvZy10aXRsZSB7XG4gICAgICAgIG1hcmdpbi1ib3R0b206IDA7XG4gICAgICAgIHBhZGRpbmctYm90dG9tOiAwOyB9XG5cbiAgICAgIC5tYXQtZGlhbG9nLWNvbnRlbnQge1xuICAgICAgICBkaXNwbGF5OiBibG9jaztcblxuICAgICAgICBwIHtcbiAgICAgICAgICBkaXNwbGF5OiBibG9jaztcbiAgICAgICAgICBtYXJnaW46IDZweCAxMnB4IDEycHggMTJweDsgfSB9IH1cblxuICAgICNzZXR0aW5ncy1tZW51IHtcbiAgICAgIGhlaWdodDogNjEuOCU7XG4gICAgICBvdmVyZmxvdy15OiBzY3JvbGw7XG4gICAgICBwYWRkaW5nOiAwO1xuXG4gICAgICAvKiBQZXJtYWxpbmsgLSB1c2UgdG8gZWRpdCBhbmQgc2hhcmUgdGhpcyBncmFkaWVudDogaHR0cDovL2NvbG9yemlsbGEuY29tL2dyYWRpZW50LWVkaXRvci8jZjdmN2Y3KzAsZjlmOWY5KzcgKi9cbiAgICAgIGJhY2tncm91bmQ6IHJnYigyNDcsMjQ3LDI0NykgLyogT2xkIGJyb3dzZXJzICovO1xuICAgICAgYmFja2dyb3VuZDogLW1vei1saW5lYXItZ3JhZGllbnQodG9wLCByZ2JhKDI0NywyNDcsMjQ3LDEpIDAlLCByZ2JhKDI0OSwyNDksMjQ5LDEpIDclKSAvKiBGRjMuNi0xNSAqLztcbiAgICAgIGJhY2tncm91bmQ6IC13ZWJraXQtbGluZWFyLWdyYWRpZW50KHRvcCwgcmdiYSgyNDcsMjQ3LDI0NywxKSAwJSxyZ2JhKDI0OSwyNDksMjQ5LDEpIDclKSAvKiBDaHJvbWUxMC0yNSxTYWZhcmk1LjEtNiAqLztcbiAgICAgIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCh0byBib3R0b20sIHJnYmEoMjQ3LDI0NywyNDcsMSkgMCUscmdiYSgyNDksMjQ5LDI0OSwxKSA3JSkgLyogVzNDLCBJRTEwKywgRkYxNissIENocm9tZTI2KywgT3BlcmExMissIFNhZmFyaTcrICovO1xuICAgICAgZmlsdGVyOiBwcm9naWQ6RFhJbWFnZVRyYW5zZm9ybS5NaWNyb3NvZnQuZ3JhZGllbnQoIHN0YXJ0Q29sb3JzdHI9JyNmN2Y3ZjcnLCBlbmRDb2xvcnN0cj0nI2Y5ZjlmOScsR3JhZGllbnRUeXBlPTAgKSAvKiBJRTYtOSAqLztcblxuICAgICAgYnV0dG9uIHtcbiAgICAgICAgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkICNFRUU7XG4gfSAgICAgICAgLy9oZWlnaHQ6IDIyLjIyJVxuXG4gICAgICBzcGFuIHtcbiAgICAgICAgZGlzcGxheTogYmxvY2s7XG4gICAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgICAgcmlnaHQ6IDA7XG4gICAgICAgIHBhZGRpbmc6IDAgMTJweCAwIDEycHg7XG4gICAgICAgIHZlcnRpY2FsLWFsaWduOiBjZW50ZXI7XG4gICAgICAgIGNvbG9yOiAjQ0NDOyB9IH0gfVxuXG4gICNyaWdodC1wYW5lbCB7XG4gICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcbiAgICB3aWR0aDogNjEuOCU7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogI0VFRTtcbiAgICB2ZXJ0aWNhbC1hbGlnbjogdG9wO1xuICAgIG92ZXJmbG93LXk6IHNjcm9sbDtcblxuICAgIG1hdC1jYXJkIHtcbiAgICAgIGJveC1zaXppbmc6IGJvcmRlci1ib3g7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjOTdhODk1O1xuICAgICAgbWluLWhlaWdodDogMTAwJTtcbiAgICAgIGJvcmRlcjogdW5zZXQ7XG4gICAgICBib3JkZXItcmFkaXVzOiB1bnNldDsgfSB9IH1cbiJdfQ== */"
+module.exports = ":host ::ng-deep hr {\n  border: unset;\n  border-top: 1px solid #CCC; }\n\n:host ::ng-deep mat-card h2 {\n  text-align: center;\n  margin-bottom: 0 !important; }\n\n:host ::ng-deep .input {\n  display: flex;\n  flex-direction: column; }\n\n:host ::ng-deep .input > * {\n  width: 100% !important; }\n\n:host ::ng-deep mat-form-field, :host ::ng-deep input {\n  width: 100% !important; }\n\n:host ::ng-deep .mat-select, :host ::ng-deep input {\n  box-sizing: border-box !important;\n  padding: 0 12px !important;\n  background-color: #EEE !important;\n  border-radius: 6px !important;\n  height: 48px !important;\n  border: none !important; }\n\n:host ::ng-deep .mat-select .mat-select-trigger, :host ::ng-deep input .mat-select-trigger {\n    height: 48px; }\n\n:host ::ng-deep .mat-select .mat-select-trigger .mat-select-value, :host ::ng-deep input .mat-select-trigger .mat-select-value {\n      vertical-align: middle; }\n\n:host ::ng-deep input {\n  background-color: transparent !important;\n  border: 2px solid #EEE !important; }\n\n:host ::ng-deep .mat-form-field-underline {\n  display: none; }\n\n:host ::ng-deep .mat-form-field-underline .mat-list-item-content {\n    padding: 0 12px !important;\n    margin: 0 !important; }\n\n:host ::ng-deep mat-radio-button, :host ::ng-deep mat-checkbox {\n  display: block;\n  padding: 3px 0 !important;\n  height: 28px !important; }\n\n:host ::ng-deep .mat-radio-container, :host ::ng-deep .mat-radio-outer-circle, :host ::ng-deep .mat-radio-inner-circle, :host ::ng-deep .mat-checkbox-inner-container {\n  width: 28px !important;\n  height: 28px !important; }\n\n:host ::ng-deep .mat-checkbox-frame, :host ::ng-deep .mat-checkbox-background {\n  width: 24px !important;\n  height: 24px !important;\n  border-radius: 4px !important; }\n\n:host #center-icon {\n  position: absolute;\n  left: 38.2%;\n  margin: -3.5vw 0 0 -3.5vw;\n  z-index: 1000; }\n\n:host #center-icon button {\n    user-focus: none; }\n\n:host #left-panel, :host #right-panel {\n  display: inline-block;\n  height: 100%; }\n\n:host #left-panel {\n  height: 98%;\n  width: 38.2%;\n  vertical-align: bottom;\n  overflow-y: hidden; }\n\n:host #left-panel h1, :host #left-panel h2 {\n    display: block;\n    text-align: left;\n    width: 90%;\n    white-space: nowrap;\n    text-overflow: ellipsis;\n    overflow: hidden; }\n\n:host #left-panel h1 {\n    font-size: 4.2vh;\n    padding: 0 12px; }\n\n:host #left-panel h2 {\n    font-size: 3.4vh;\n    font-weight: 300; }\n\n:host #left-panel #setings-meta {\n    background-color: white;\n    box-sizing: border-box;\n    height: 25%;\n    border-bottom: 1px solid #DDD;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    font-size: 3vh; }\n\n:host #left-panel #setings-meta .mat-dialog-title {\n      margin-bottom: 0;\n      padding-bottom: 0; }\n\n:host #left-panel #setings-meta .mat-dialog-content {\n      display: block; }\n\n:host #left-panel #setings-meta .mat-dialog-content p {\n        display: block;\n        margin: 0 12px 12px 12px; }\n\n:host #left-panel #settings-menu {\n    height: 75%;\n    overflow-y: scroll;\n    padding: 0;\n    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f7f7f7+0,f9f9f9+7 */\n    background: #f7f7f7;\n    background: linear-gradient(to bottom, #f7f7f7 0%, #f9f9f9 7%);\n    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#f9f9f9',GradientType=0 ); }\n\n:host #left-panel #settings-menu button {\n      border-bottom: 1px solid #EEE;\n      height: 22.22%; }\n\n:host #left-panel #settings-menu span {\n      display: block;\n      position: absolute;\n      right: 0;\n      padding: 0 12px 0 12px;\n      vertical-align: center;\n      color: #CCC; }\n\n:host #right-panel {\n  box-sizing: border-box;\n  width: 61.8%;\n  background-color: #EEE;\n  vertical-align: top;\n  overflow-y: scroll; }\n\n:host #right-panel mat-card {\n    box-sizing: border-box;\n    background-color: #97a895;\n    min-height: 100%;\n    border: unset;\n    border-radius: unset; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvc2V0dGluZ3MtZGlhbG9nL3NldHRpbmdzLWRpYWxvZy5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUdHLGFBQWE7RUFDYiwwQkFBMEIsRUFBQTs7QUFKN0I7RUFTSyxrQkFBa0I7RUFDbEIsMkJBQTJCLEVBQUE7O0FBVmhDO0VBYUcsYUFBYTtFQUNiLHNCQUFzQixFQUFBOztBQWR6QjtFQWlCRyxzQkFBc0IsRUFBQTs7QUFqQnpCO0VBcUJHLHNCQUFzQixFQUFBOztBQXJCekI7RUF3QkcsaUNBQWlDO0VBQ2pDLDBCQUEwQjtFQUMxQixpQ0FBaUM7RUFDakMsNkJBQTZCO0VBQzdCLHVCQUF1QjtFQUN2Qix1QkFBdUIsRUFBQTs7QUE3QjFCO0lBZ0NLLFlBQVksRUFBQTs7QUFoQ2pCO01BbUNPLHNCQUFzQixFQUFBOztBQW5DN0I7RUFzQ0csd0NBQXdDO0VBQ3hDLGlDQUFpQyxFQUFBOztBQXZDcEM7RUEyQ0csYUFBYSxFQUFBOztBQTNDaEI7SUE4Q0ssMEJBQTBCO0lBQzFCLG9CQUFvQixFQUFBOztBQS9DekI7RUFtREcsY0FBYztFQUNkLHlCQUF5QjtFQUN6Qix1QkFBdUIsRUFBQTs7QUFyRDFCO0VBd0RHLHNCQUFzQjtFQUN0Qix1QkFBdUIsRUFBQTs7QUF6RDFCO0VBNERHLHNCQUFzQjtFQUN0Qix1QkFBdUI7RUFDdkIsNkJBQTZCLEVBQUE7O0FBRWhDO0VBR0csa0JBQWtCO0VBQ2xCLFdBQVc7RUFDWCx5QkFBeUI7RUFDekIsYUFBYSxFQUFBOztBQU5oQjtJQVNLLGdCQUFnQixFQUFBOztBQVRyQjtFQVlHLHFCQUFxQjtFQUNyQixZQUFZLEVBQUE7O0FBYmY7RUFnQkcsV0FBVztFQUNYLFlBQVk7RUFDWixzQkFBc0I7RUFDdEIsa0JBQWtCLEVBQUE7O0FBbkJyQjtJQXNCSyxjQUFjO0lBQ2QsZ0JBQWdCO0lBQ2hCLFVBQVU7SUFDVixtQkFBbUI7SUFDbkIsdUJBQXVCO0lBQ3ZCLGdCQUFnQixFQUFBOztBQTNCckI7SUE4QkssZ0JBQWdCO0lBQ2hCLGVBQWUsRUFBQTs7QUEvQnBCO0lBa0NLLGdCQUFnQjtJQUNoQixnQkFBZ0IsRUFBQTs7QUFuQ3JCO0lBc0NLLHVCQUF1QjtJQUN2QixzQkFBc0I7SUFDdEIsV0FBVztJQUNYLDZCQUE2QjtJQUM3QixnQkFBZ0I7SUFDaEIsdUJBQXVCO0lBQ3ZCLGNBQWMsRUFBQTs7QUE1Q25CO01BK0NPLGdCQUFnQjtNQUNoQixpQkFBaUIsRUFBQTs7QUFoRHhCO01BbURPLGNBQWMsRUFBQTs7QUFuRHJCO1FBc0RTLGNBQWM7UUFDZCx3QkFBd0IsRUFBQTs7QUF2RGpDO0lBMERLLFdBQVc7SUFDWCxrQkFBa0I7SUFDbEIsVUFBVTtJQUVWLDhHQUFBO0lBQ0EsbUJBQTRCO0lBRzVCLDhEQUFxRjtJQUNyRixtSEFBbUgsRUFBQTs7QUFuRXhIO01Bc0VPLDZCQUE2QjtNQUM3QixjQUFjLEVBQUE7O0FBdkVyQjtNQTBFTyxjQUFjO01BQ2Qsa0JBQWtCO01BQ2xCLFFBQVE7TUFDUixzQkFBc0I7TUFDdEIsc0JBQXNCO01BQ3RCLFdBQVcsRUFBQTs7QUEvRWxCO0VBa0ZHLHNCQUFzQjtFQUN0QixZQUFZO0VBQ1osc0JBQXNCO0VBQ3RCLG1CQUFtQjtFQUNuQixrQkFBa0IsRUFBQTs7QUF0RnJCO0lBeUZLLHNCQUFzQjtJQUN0Qix5QkFBeUI7SUFDekIsZ0JBQWdCO0lBQ2hCLGFBQWE7SUFDYixvQkFBb0IsRUFBQSIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudC9kaWFsb2cvc2V0dGluZ3MtZGlhbG9nL3NldHRpbmdzLWRpYWxvZy5jb21wb25lbnQuc2FzcyIsInNvdXJjZXNDb250ZW50IjpbIiA6aG9zdCA6Om5nLWRlZXAge1xuXG4gIGhyIHtcbiAgICBib3JkZXI6IHVuc2V0O1xuICAgIGJvcmRlci10b3A6IDFweCBzb2xpZCAjQ0NDOyB9XG5cbiAgbWF0LWNhcmQge1xuXG4gICAgaDIge1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgbWFyZ2luLWJvdHRvbTogMCAhaW1wb3J0YW50OyB9IH1cblxuICAuaW5wdXQge1xuICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgZmxleC1kaXJlY3Rpb246IGNvbHVtbjsgfVxuXG4gIC5pbnB1dCA+ICoge1xuICAgIHdpZHRoOiAxMDAlICFpbXBvcnRhbnQ7IH1cblxuXG4gIG1hdC1mb3JtLWZpZWxkLCBpbnB1dCB7XG4gICAgd2lkdGg6IDEwMCUgIWltcG9ydGFudDsgfVxuXG4gIC5tYXQtc2VsZWN0LCBpbnB1dCB7XG4gICAgYm94LXNpemluZzogYm9yZGVyLWJveCAhaW1wb3J0YW50O1xuICAgIHBhZGRpbmc6IDAgMTJweCAhaW1wb3J0YW50O1xuICAgIGJhY2tncm91bmQtY29sb3I6ICNFRUUgIWltcG9ydGFudDtcbiAgICBib3JkZXItcmFkaXVzOiA2cHggIWltcG9ydGFudDtcbiAgICBoZWlnaHQ6IDQ4cHggIWltcG9ydGFudDtcbiAgICBib3JkZXI6IG5vbmUgIWltcG9ydGFudDtcblxuICAgIC5tYXQtc2VsZWN0LXRyaWdnZXIge1xuICAgICAgaGVpZ2h0OiA0OHB4O1xuXG4gICAgICAubWF0LXNlbGVjdC12YWx1ZSB7XG4gICAgICAgIHZlcnRpY2FsLWFsaWduOiBtaWRkbGU7IH0gfSB9IC8vIHVzZXMgdGFibGUtY2VsbFxuXG4gIGlucHV0IHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiB0cmFuc3BhcmVudCAhaW1wb3J0YW50O1xuICAgIGJvcmRlcjogMnB4IHNvbGlkICNFRUUgIWltcG9ydGFudDsgfVxuXG5cbiAgLm1hdC1mb3JtLWZpZWxkLXVuZGVybGluZSB7XG4gICAgZGlzcGxheTogbm9uZTtcblxuICAgIC5tYXQtbGlzdC1pdGVtLWNvbnRlbnQge1xuICAgICAgcGFkZGluZzogMCAxMnB4ICFpbXBvcnRhbnQ7XG4gICAgICBtYXJnaW46IDAgIWltcG9ydGFudDsgfSB9XG5cbiAgLy8gcmFkaW8gYnV0dG9uICYgY2hlY2tib3hcbiAgbWF0LXJhZGlvLWJ1dHRvbiwgbWF0LWNoZWNrYm94IHtcbiAgICBkaXNwbGF5OiBibG9jaztcbiAgICBwYWRkaW5nOiAzcHggMCAhaW1wb3J0YW50O1xuICAgIGhlaWdodDogMjhweCAhaW1wb3J0YW50OyB9XG5cbiAgLm1hdC1yYWRpby1jb250YWluZXIsIC5tYXQtcmFkaW8tb3V0ZXItY2lyY2xlLCAubWF0LXJhZGlvLWlubmVyLWNpcmNsZSwgLm1hdC1jaGVja2JveC1pbm5lci1jb250YWluZXIge1xuICAgIHdpZHRoOiAyOHB4ICFpbXBvcnRhbnQ7XG4gICAgaGVpZ2h0OiAyOHB4ICFpbXBvcnRhbnQ7IH1cblxuICAubWF0LWNoZWNrYm94LWZyYW1lLCAubWF0LWNoZWNrYm94LWJhY2tncm91bmQge1xuICAgIHdpZHRoOiAyNHB4ICFpbXBvcnRhbnQ7XG4gICAgaGVpZ2h0OiAyNHB4ICFpbXBvcnRhbnQ7XG4gICAgYm9yZGVyLXJhZGl1czogNHB4ICFpbXBvcnRhbnQ7IH0gfVxuXG4gOmhvc3Qge1xuXG4gICNjZW50ZXItaWNvbiB7XG4gICAgcG9zaXRpb246IGFic29sdXRlO1xuICAgIGxlZnQ6IDM4LjIlO1xuICAgIG1hcmdpbjogLTMuNXZ3IDAgMCAtMy41dnc7XG4gICAgei1pbmRleDogMTAwMDtcblxuICAgIGJ1dHRvbiB7XG4gICAgICB1c2VyLWZvY3VzOiBub25lOyB9IH1cblxuICAjbGVmdC1wYW5lbCwgI3JpZ2h0LXBhbmVsIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gICAgaGVpZ2h0OiAxMDAlOyB9XG5cbiAgI2xlZnQtcGFuZWwge1xuICAgIGhlaWdodDogOTglO1xuICAgIHdpZHRoOiAzOC4yJTtcbiAgICB2ZXJ0aWNhbC1hbGlnbjogYm90dG9tO1xuICAgIG92ZXJmbG93LXk6IGhpZGRlbjtcblxuICAgIGgxLCBoMiB7XG4gICAgICBkaXNwbGF5OiBibG9jaztcbiAgICAgIHRleHQtYWxpZ246IGxlZnQ7XG4gICAgICB3aWR0aDogOTAlO1xuICAgICAgd2hpdGUtc3BhY2U6IG5vd3JhcDtcbiAgICAgIHRleHQtb3ZlcmZsb3c6IGVsbGlwc2lzO1xuICAgICAgb3ZlcmZsb3c6IGhpZGRlbjsgfVxuXG4gICAgaDEge1xuICAgICAgZm9udC1zaXplOiA0LjJ2aDtcbiAgICAgIHBhZGRpbmc6IDAgMTJweDsgfVxuXG4gICAgaDIge1xuICAgICAgZm9udC1zaXplOiAzLjR2aDtcbiAgICAgIGZvbnQtd2VpZ2h0OiAzMDA7IH1cblxuICAgICNzZXRpbmdzLW1ldGEge1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogd2hpdGU7XG4gICAgICBib3gtc2l6aW5nOiBib3JkZXItYm94O1xuICAgICAgaGVpZ2h0OiAyNSU7XG4gICAgICBib3JkZXItYm90dG9tOiAxcHggc29saWQgI0RERDtcbiAgICAgIG92ZXJmbG93OiBoaWRkZW47XG4gICAgICB0ZXh0LW92ZXJmbG93OiBlbGxpcHNpcztcbiAgICAgIGZvbnQtc2l6ZTogM3ZoO1xuXG4gICAgICAubWF0LWRpYWxvZy10aXRsZSB7XG4gICAgICAgIG1hcmdpbi1ib3R0b206IDA7XG4gICAgICAgIHBhZGRpbmctYm90dG9tOiAwOyB9XG5cbiAgICAgIC5tYXQtZGlhbG9nLWNvbnRlbnQge1xuICAgICAgICBkaXNwbGF5OiBibG9jaztcblxuICAgICAgICBwIHtcbiAgICAgICAgICBkaXNwbGF5OiBibG9jaztcbiAgICAgICAgICBtYXJnaW46IDAgMTJweCAxMnB4IDEycHg7IH0gfSB9XG5cbiAgICAjc2V0dGluZ3MtbWVudSB7XG4gICAgICBoZWlnaHQ6IDc1JTtcbiAgICAgIG92ZXJmbG93LXk6IHNjcm9sbDtcbiAgICAgIHBhZGRpbmc6IDA7XG5cbiAgICAgIC8qIFBlcm1hbGluayAtIHVzZSB0byBlZGl0IGFuZCBzaGFyZSB0aGlzIGdyYWRpZW50OiBodHRwOi8vY29sb3J6aWxsYS5jb20vZ3JhZGllbnQtZWRpdG9yLyNmN2Y3ZjcrMCxmOWY5ZjkrNyAqL1xuICAgICAgYmFja2dyb3VuZDogcmdiKDI0NywyNDcsMjQ3KSAvKiBPbGQgYnJvd3NlcnMgKi87XG4gICAgICBiYWNrZ3JvdW5kOiAtbW96LWxpbmVhci1ncmFkaWVudCh0b3AsIHJnYmEoMjQ3LDI0NywyNDcsMSkgMCUsIHJnYmEoMjQ5LDI0OSwyNDksMSkgNyUpIC8qIEZGMy42LTE1ICovO1xuICAgICAgYmFja2dyb3VuZDogLXdlYmtpdC1saW5lYXItZ3JhZGllbnQodG9wLCByZ2JhKDI0NywyNDcsMjQ3LDEpIDAlLHJnYmEoMjQ5LDI0OSwyNDksMSkgNyUpIC8qIENocm9tZTEwLTI1LFNhZmFyaTUuMS02ICovO1xuICAgICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KHRvIGJvdHRvbSwgcmdiYSgyNDcsMjQ3LDI0NywxKSAwJSxyZ2JhKDI0OSwyNDksMjQ5LDEpIDclKSAvKiBXM0MsIElFMTArLCBGRjE2KywgQ2hyb21lMjYrLCBPcGVyYTEyKywgU2FmYXJpNysgKi87XG4gICAgICBmaWx0ZXI6IHByb2dpZDpEWEltYWdlVHJhbnNmb3JtLk1pY3Jvc29mdC5ncmFkaWVudCggc3RhcnRDb2xvcnN0cj0nI2Y3ZjdmNycsIGVuZENvbG9yc3RyPScjZjlmOWY5JyxHcmFkaWVudFR5cGU9MCApIC8qIElFNi05ICovO1xuXG4gICAgICBidXR0b24ge1xuICAgICAgICBib3JkZXItYm90dG9tOiAxcHggc29saWQgI0VFRTtcbiAgICAgICAgaGVpZ2h0OiAyMi4yMiU7IH1cblxuICAgICAgc3BhbiB7XG4gICAgICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICAgIHJpZ2h0OiAwO1xuICAgICAgICBwYWRkaW5nOiAwIDEycHggMCAxMnB4O1xuICAgICAgICB2ZXJ0aWNhbC1hbGlnbjogY2VudGVyO1xuICAgICAgICBjb2xvcjogI0NDQzsgfSB9IH1cblxuICAjcmlnaHQtcGFuZWwge1xuICAgIGJveC1zaXppbmc6IGJvcmRlci1ib3g7XG4gICAgd2lkdGg6IDYxLjglO1xuICAgIGJhY2tncm91bmQtY29sb3I6ICNFRUU7XG4gICAgdmVydGljYWwtYWxpZ246IHRvcDtcbiAgICBvdmVyZmxvdy15OiBzY3JvbGw7XG5cbiAgICBtYXQtY2FyZCB7XG4gICAgICBib3gtc2l6aW5nOiBib3JkZXItYm94O1xuICAgICAgYmFja2dyb3VuZC1jb2xvcjogIzk3YTg5NTtcbiAgICAgIG1pbi1oZWlnaHQ6IDEwMCU7XG4gICAgICBib3JkZXI6IHVuc2V0O1xuICAgICAgYm9yZGVyLXJhZGl1czogdW5zZXQ7IH0gfSB9XG4iXX0= */"
 
 /***/ }),
 
@@ -4710,7 +5814,8 @@ var SettingsDialogComponent = /** @class */ (function () {
         this.listItems = [
             { title: 'Purchase', panel: 'purchase' },
             { title: 'Download', panel: 'trail' },
-            { title: 'Settings', panel: 'general' },
+            { title: 'User', panel: 'user' },
+            { title: 'Application', panel: 'general' },
             { title: 'About', panel: 'about' }
         ];
         this._settingsChanged = false;
@@ -4786,22 +5891,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var _service_loader_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../service/loader.service */ "./src/app/service/loader.service.ts");
+/* harmony import */ var _base_base_base_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../base/base/base.component */ "./src/app/base/base/base.component.ts");
 
 
 
 
-var ElevationProfileComponent = /** @class */ (function () {
+
+var ElevationProfileComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](ElevationProfileComponent, _super);
     function ElevationProfileComponent(_route, _loaderOverlay) {
-        this._route = _route;
-        this._loaderOverlay = _loaderOverlay;
+        var _this = _super.call(this) || this;
+        _this._route = _route;
+        _this._loaderOverlay = _loaderOverlay;
+        return _this;
     }
     ElevationProfileComponent.prototype.ngOnInit = function () {
         var _this = this;
-        this._route.data.subscribe(function (result) {
+        this.addSubscription('routeData', this._route.data.subscribe(function (result) {
             _this.trailData = result.data['trail'];
             _this.snowData = result.data['snow'];
             _this._loaderOverlay.hideOverlay();
-        });
+        }));
     };
     // EVENT HANDLERS
     ElevationProfileComponent.prototype.onScroll = function (response) {
@@ -4823,7 +5933,7 @@ var ElevationProfileComponent = /** @class */ (function () {
             _service_loader_service__WEBPACK_IMPORTED_MODULE_3__["LoaderService"]])
     ], ElevationProfileComponent);
     return ElevationProfileComponent;
-}());
+}(_base_base_base_component__WEBPACK_IMPORTED_MODULE_4__["BaseComponent"]));
 
 
 
@@ -4863,12 +5973,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ScrollbarComponent", function() { return ScrollbarComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_trail__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../type/trail */ "./src/app/type/trail.ts");
-/* harmony import */ var _util_math__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../_util/math */ "./src/app/_util/math.ts");
-/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-/* harmony import */ var hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! hammerjs/hammer.min */ "./node_modules/hammerjs/hammer.min.js");
-/* harmony import */ var hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_5__);
-
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! hammerjs/hammer.min */ "./node_modules/hammerjs/hammer.min.js");
+/* harmony import */ var hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../_util/trail */ "./src/app/_util/trail.ts");
 
 
 
@@ -4883,8 +5991,8 @@ var ScrollbarComponent = /** @class */ (function () {
     }
     // LIFECYCLE HOOKS
     ScrollbarComponent.prototype.ngOnInit = function () {
-        var sliderManager = new hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_5__["Manager"](this.main.nativeElement);
-        sliderManager.add(new hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_5__["Pan"]({ threshold: 0, pointers: 0, direction: hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_5__["DIRECTION_HORIZONTAL"] }));
+        var sliderManager = new hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_3__["Manager"](this.main.nativeElement);
+        sliderManager.add(new hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_3__["Pan"]({ threshold: 0, pointers: 0, direction: hammerjs_hammer_min__WEBPACK_IMPORTED_MODULE_3__["DIRECTION_HORIZONTAL"] }));
         sliderManager.on('pan', this._onSlide.bind(this));
     };
     ScrollbarComponent.prototype.ngAfterViewInit = function () {
@@ -4959,8 +6067,8 @@ var ScrollbarComponent = /** @class */ (function () {
     };
     // DRAW
     ScrollbarComponent.prototype._drawMap = function () {
-        var min = Number(this.trailData.elevationRange.low) / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_4__["environment"].FOOT;
-        var max = Number(this.trailData.elevationRange.high) / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_4__["environment"].FOOT;
+        var min = Number(this.trailData.elevationRange.low) / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__["environment"].FOOT;
+        var max = Number(this.trailData.elevationRange.high) / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__["environment"].FOOT;
         var elevation;
         var drawPoints = [];
         var counter = 0;
@@ -4968,17 +6076,17 @@ var ScrollbarComponent = /** @class */ (function () {
         var l = (this._svgWidth / this._flatWaypoints.length);
         // start points
         drawPoints.push([0, max]);
-        elevation = this._invertValue(Object(_util_math__WEBPACK_IMPORTED_MODULE_3__["normalizeElevation"])(this._svgHeight - (this._verticalPadding * 2), this._flatWaypoints[0]['elevation'], min, range, this._verticalPadding));
+        elevation = this._invertValue(Object(_util_trail__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight - (this._verticalPadding * 2), this._flatWaypoints[0]['elevation'], min, range, this._verticalPadding));
         drawPoints.push([0, elevation]);
         var prevPoint;
         var totalDistancePerc = 0;
-        for (var i = 0; i < this._flatWaypoints.length; i += this.trailData.scrollbarSegmentSize) {
+        for (var i = 0; i < this._flatWaypoints.length; i += Math.round(this.trailData.scrollbarSegmentSize / 10)) {
             var waypoint = this._flatWaypoints[i];
             // calculate distance, starting at 2nd point
             if (counter > 0) {
-                totalDistancePerc = (waypoint.distanceTotal / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_4__["environment"].MILE) / this.trailData.length;
+                totalDistancePerc = (waypoint.distanceTotal / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__["environment"].MILE) / this.trailData.length;
             }
-            elevation = this._invertValue(Object(_util_math__WEBPACK_IMPORTED_MODULE_3__["normalizeElevation"])(this._svgHeight - (this._verticalPadding * 2), waypoint.elevation, min, range, this._verticalPadding));
+            elevation = this._invertValue(Object(_util_trail__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight - (this._verticalPadding * 2), waypoint.elevation, min, range, this._verticalPadding));
             drawPoints.push([this._svgWidth * totalDistancePerc, elevation]);
             counter += l;
             prevPoint = waypoint;
@@ -5022,7 +6130,7 @@ var ScrollbarComponent = /** @class */ (function () {
     ], ScrollbarComponent.prototype, "viewport", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_trail__WEBPACK_IMPORTED_MODULE_2__["Trail"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], ScrollbarComponent.prototype, "trailData", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -5085,11 +6193,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GuidesComponent", function() { return GuidesComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_ohlc__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../type/ohlc */ "./src/app/type/ohlc.ts");
-/* harmony import */ var _util_color__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../_util/color */ "./src/app/_util/color.ts");
-/* harmony import */ var _util_math__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../_util/math */ "./src/app/_util/math.ts");
-/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-
+/* harmony import */ var _util_color__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../_util/color */ "./src/app/_util/color.ts");
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../_util/trail */ "./src/app/_util/trail.ts");
 
 
 
@@ -5110,13 +6216,13 @@ var GuidesComponent = /** @class */ (function () {
             var min = this.visibleOHLC.low; // high point
             var max = this.visibleOHLC.high; // low point
             var range = (max - min);
-            var _colors = Object(_util_color__WEBPACK_IMPORTED_MODULE_3__["interpolateColors"])('rgb(187, 97, 0)', 'rgb(62, 125, 158)', this.guides.length);
+            var _colors = Object(_util_color__WEBPACK_IMPORTED_MODULE_2__["interpolateColors"])('rgb(187, 97, 0)', 'rgb(62, 125, 158)', this.guides.length);
             var _self = this;
             var _guidesLength = this.guides.length;
             // loop, optimal
             for (var i = 0; i < _guidesLength; i++) {
                 var _guide = this.guides[i];
-                var elevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(_self._container.nativeElement.clientHeight, _guide['elevation'], min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_5__["environment"].LINEHEIGHT);
+                var elevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(_self._container.nativeElement.clientHeight, _guide['elevation'], min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].LINEHEIGHT);
                 // if item already exists, update
                 if (_self.processedGuides[i]) {
                     _self.processedGuides[i]['offset'] = elevation;
@@ -5135,7 +6241,7 @@ var GuidesComponent = /** @class */ (function () {
     };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_ohlc__WEBPACK_IMPORTED_MODULE_2__["OHLC"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], GuidesComponent.prototype, "visibleOHLC", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -5191,10 +6297,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LabelsComponent", function() { return LabelsComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_ohlc__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../type/ohlc */ "./src/app/type/ohlc.ts");
-/* harmony import */ var _util_math__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../_util/math */ "./src/app/_util/math.ts");
-/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../_util/trail */ "./src/app/_util/trail.ts");
 
 
 
@@ -5221,7 +6325,7 @@ var LabelsComponent = /** @class */ (function () {
             // loop, optimal
             for (var i = 0; i < _guidesLength; i++) {
                 var _guide = this.guides[i];
-                var elevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_3__["normalizeElevation"])(_self._container.nativeElement.clientHeight, _guide['elevation'], min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_4__["environment"].LINEHEIGHT);
+                var elevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_3__["normalizeElevation"])(_self._container.nativeElement.clientHeight, _guide['elevation'], min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_2__["environment"].LINEHEIGHT);
                 // if item already exists, update
                 if (_self.processedGuides[i]) {
                     _self.processedGuides[i]['label'] = _guide['label'];
@@ -5241,7 +6345,7 @@ var LabelsComponent = /** @class */ (function () {
     };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_ohlc__WEBPACK_IMPORTED_MODULE_2__["OHLC"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], LabelsComponent.prototype, "visibleOHLC", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -5297,20 +6401,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ListItemComponent", function() { return ListItemComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var seedrandom_seedrandom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! seedrandom/seedrandom */ "./node_modules/seedrandom/seedrandom.js");
-/* harmony import */ var seedrandom_seedrandom__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(seedrandom_seedrandom__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _util_smooth_line__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../_util/smooth-line */ "./src/app/_util/smooth-line.ts");
-/* harmony import */ var _util_math__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../_util/math */ "./src/app/_util/math.ts");
-/* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../_util/poi */ "./src/app/_util/poi.ts");
-/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-/* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
-/* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
-/* harmony import */ var _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../service/snow-generator.service */ "./src/app/service/snow-generator.service.ts");
-/* harmony import */ var _factory_marker_service__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../factory/marker.service */ "./src/app/factory/marker.service.ts");
-/* harmony import */ var _type_ohlc__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../../../type/ohlc */ "./src/app/type/ohlc.ts");
-/* harmony import */ var _type_mile__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../../../type/mile */ "./src/app/type/mile.ts");
-/* harmony import */ var _type_user__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../../../type/user */ "./src/app/type/user.ts");
-/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../../../service/note.service */ "./src/app/service/note.service.ts");
+/* harmony import */ var _base_base_base_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../base/base/base.component */ "./src/app/base/base/base.component.ts");
+/* harmony import */ var seedrandom_seedrandom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! seedrandom/seedrandom */ "./node_modules/seedrandom/seedrandom.js");
+/* harmony import */ var seedrandom_seedrandom__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(seedrandom_seedrandom__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _util_smooth_line__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../../_util/smooth-line */ "./src/app/_util/smooth-line.ts");
+/* harmony import */ var _util_math__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../_util/math */ "./src/app/_util/math.ts");
+/* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../../_util/poi */ "./src/app/_util/poi.ts");
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
+/* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
+/* harmony import */ var _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../../service/snow-generator.service */ "./src/app/service/snow-generator.service.ts");
+/* harmony import */ var _factory_marker_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../../../factory/marker.service */ "./src/app/factory/marker.service.ts");
+/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../../../service/note.service */ "./src/app/service/note.service.ts");
+/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../../../_util/trail */ "./src/app/_util/trail.ts");
 
 
 
@@ -5325,23 +6428,24 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-var ListItemComponent = /** @class */ (function () {
+var ListItemComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](ListItemComponent, _super);
     function ListItemComponent(_localStorage, _trailGenerator, _snowGenerator, _changeDetectorRef, _markerFactory, _noteService) {
-        this._localStorage = _localStorage;
-        this._trailGenerator = _trailGenerator;
-        this._snowGenerator = _snowGenerator;
-        this._changeDetectorRef = _changeDetectorRef;
-        this._markerFactory = _markerFactory;
-        this._noteService = _noteService;
-        this.markerEvent = new _angular_core__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"]();
-        this._dynamicSubscriptions = {};
-        this.settings = {};
+        var _this = _super.call(this) || this;
+        _this._localStorage = _localStorage;
+        _this._trailGenerator = _trailGenerator;
+        _this._snowGenerator = _snowGenerator;
+        _this._changeDetectorRef = _changeDetectorRef;
+        _this._markerFactory = _markerFactory;
+        _this._noteService = _noteService;
+        _this.markerEvent = new _angular_core__WEBPACK_IMPORTED_MODULE_1__["EventEmitter"]();
+        _this.settings = {};
+        return _this;
     }
     // LIFECYCLE HOOKS
     ListItemComponent.prototype.ngOnInit = function () {
         var _self = this;
-        this._majorPoiTypes = Object(_util_poi__WEBPACK_IMPORTED_MODULE_5__["getMajorPoiTypes"])();
+        this._majorPoiTypes = Object(_util_poi__WEBPACK_IMPORTED_MODULE_6__["getMajorPoiTypes"])();
         this._screenMode = this._localStorage.retrieve('screenMode');
         this._trailLength = this._trailGenerator.getTrailData().miles.length;
         // dynamic subscriptions based on PoiTypes that are set as being major (important)
@@ -5407,34 +6511,22 @@ var ListItemComponent = /** @class */ (function () {
             this._updateUserLocation();
         }
     };
-    ListItemComponent.prototype.ngOnDestroy = function () {
-        for (var key in this._dynamicSubscriptions) {
-            this._removeSubscription(key);
-        }
-    };
     // add a poi type subscription to the subscriptionsObject
     ListItemComponent.prototype._addSubscription = function (name) {
         var _this = this;
         var _camelName = this.createCamelCaseName(name, 'show');
-        var _subscription = this._localStorage.observe(_camelName).subscribe(function (result) {
+        this.addSubscription(_camelName, this._localStorage.observe(_camelName).subscribe(function (result) {
             _this.settings[_camelName] = result;
             if (_this._majorPoiTypes.indexOf(name) !== -1) {
                 _this._hasInvisiblePoi();
             }
             _this._drawMap();
-        });
-        this._dynamicSubscriptions[name] = _subscription;
+        }));
     };
     // get initial poi type saved values, as subscriptions only listen to updates
     ListItemComponent.prototype._getSettingFromStorage = function (name) {
         var _camelName = this.createCamelCaseName(name, 'show');
         this.settings[_camelName] = this._localStorage.retrieve(_camelName);
-    };
-    ListItemComponent.prototype._removeSubscription = function (name) {
-        var _subscription = this._dynamicSubscriptions[name];
-        if (_subscription) {
-            _subscription.unsubscribe();
-        }
     };
     // used to indicate that this mile has more pois than are being shown in elevation profile
     ListItemComponent.prototype._hasInvisiblePoi = function () {
@@ -5525,24 +6617,24 @@ var ListItemComponent = /** @class */ (function () {
         for (var i = 0; i < _totalWaypoints; i++) {
             var _waypoint = _waypointsArr[i];
             // calculate distance, starting at 2nd point
-            _waypointDistPerc = _waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE;
-            var _elevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight, _waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT);
+            _waypointDistPerc = _waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE;
+            var _elevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_13__["normalizeElevation"])(this._svgHeight, _waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT);
             // set startpoints
             if (i === 0) {
-                drawPoints.push([-_environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT, this._svgHeight]);
-                drawPoints.push([-_environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT, _elevation]);
+                drawPoints.push([-_environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT, this._svgHeight]);
+                drawPoints.push([-_environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT, _elevation]);
             }
             // add point
             drawPoints.push([Math.round(this._svgWidth * _waypointDistPerc), _elevation]);
             // set endpoints
             if (i === _waypointsArr.length - 1) {
-                drawPoints.push([this._svgWidth + _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT, _elevation]);
-                drawPoints.push([this._svgWidth + _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT, this._svgHeight]);
+                drawPoints.push([this._svgWidth + _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT, _elevation]);
+                drawPoints.push([this._svgWidth + _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT, this._svgHeight]);
             }
         }
         if (this.data.id === this._trailLength) {
             var _waypoint = _waypointsArr[_waypointsArr.length - 1];
-            var _lastWaypointDistPerc = _waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE;
+            var _lastWaypointDistPerc = _waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE;
             this._lineCanvas.size(this._svgWidth * _lastWaypointDistPerc, this._svgHeight);
             this._lineCanvas.viewbox(0, 0, this._svgWidth * _lastWaypointDistPerc, this._svgHeight);
         }
@@ -5554,8 +6646,8 @@ var ListItemComponent = /** @class */ (function () {
         else if (this._screenMode === 'nightHike') {
             _fill = 'rgba(89,89,89, 0.65)';
         }
-        var _polyline = this._lineCanvas.path(Object(_util_smooth_line__WEBPACK_IMPORTED_MODULE_3__["svgPath"])(drawPoints)).fill(_fill)
-            .stroke({ color: 'red', width: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT });
+        var _polyline = this._lineCanvas.path(Object(_util_smooth_line__WEBPACK_IMPORTED_MODULE_4__["svgPath"])(drawPoints)).fill(_fill)
+            .stroke({ color: 'red', width: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT });
     };
     ListItemComponent.prototype._drawSnow = function () {
         if (!this._snowData || !this._snowData[0] || this._snowData[0].length < 0) {
@@ -5576,18 +6668,18 @@ var ListItemComponent = /** @class */ (function () {
                 var _elevation = 0;
                 var elevationRange = function () {
                     // waypoint distance (%) on snowarray elevation range
-                    return _snowArray[0].elevation + ((_waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE) * ((_snowArray[1].elevation - _snowArray[0].elevation)));
+                    return _snowArray[0].elevation + ((_waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE) * ((_snowArray[1].elevation - _snowArray[0].elevation)));
                 };
                 // if waypoint is above snowline
                 if (_waypoint.elevation >= elevationRange()) {
                     // add point
-                    _elevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this_1._svgHeight, _waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT);
-                    drawPoints.push([Math.round(this_1._svgWidth * (_waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE)), _elevation]);
+                    _elevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_13__["normalizeElevation"])(this_1._svgHeight, _waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT);
+                    drawPoints.push([Math.round(this_1._svgWidth * (_waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE)), _elevation]);
                 }
                 else if (_waypoint.elevation < elevationRange()) {
                     // if trail drops below snowline
-                    var snowLine = this_1._lineCanvas.path(Object(_util_smooth_line__WEBPACK_IMPORTED_MODULE_3__["svgPath"])(drawPoints)).fill('rgba(255,255,255,0)')
-                        .stroke({ color: _stroke, width: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT * 2, linecap: 'round' });
+                    var snowLine = this_1._lineCanvas.path(Object(_util_smooth_line__WEBPACK_IMPORTED_MODULE_4__["svgPath"])(drawPoints)).fill('rgba(255,255,255,0)')
+                        .stroke({ color: _stroke, width: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT * 2, linecap: 'round' });
                     drawPoints = [];
                 }
             };
@@ -5597,8 +6689,8 @@ var ListItemComponent = /** @class */ (function () {
             }
             // if there is still snow to be drawn at the end of loop
             if (drawPoints.length >= 1) {
-                var snowLine = this._lineCanvas.path(Object(_util_smooth_line__WEBPACK_IMPORTED_MODULE_3__["svgPath"])(drawPoints)).fill('rgba(255,255,255,0)')
-                    .stroke({ color: _stroke, width: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT * 2, linecap: 'round' });
+                var snowLine = this._lineCanvas.path(Object(_util_smooth_line__WEBPACK_IMPORTED_MODULE_4__["svgPath"])(drawPoints)).fill('rgba(255,255,255,0)')
+                    .stroke({ color: _stroke, width: _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT * 2, linecap: 'round' });
             }
         }
     };
@@ -5634,10 +6726,10 @@ var ListItemComponent = /** @class */ (function () {
                     }
                 }
                 if (_visibleTypes.length > 0) {
-                    var _markerElevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight, _poi.waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT / 2);
+                    var _markerElevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_13__["normalizeElevation"])(this._svgHeight, _poi.waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT / 2);
                     var _marker = this._markerFactory.setupMarker(this._markerSvgCanvas, _poi, _visibleTypes);
                     _marker.click(this._onMarkerClick.bind({ data: _poi, self: this }));
-                    _marker.move(this._svgWidth * (_poi.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE), _markerElevation);
+                    _marker.move(this._svgWidth * (_poi.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE), _markerElevation);
                 }
             }
         }
@@ -5650,11 +6742,11 @@ var ListItemComponent = /** @class */ (function () {
         // only way to execute seedrandom without compile errors
         Math['seedrandom']('' + this.data.id); // reseed
         var _trees = this._markerSvgCanvas.group().addClass('tree-marker');
-        if (Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["isPrime"])(this.data.id) || Math.random() * 100 < 25) {
+        if (Object(_util_math__WEBPACK_IMPORTED_MODULE_5__["isPrime"])(this.data.id) || Math.random() * 100 < 25) {
             var _count = Math.round(Math.random() * 4);
             for (var i = 0; i < _count; i++) {
                 var primeMarker = this._markerFactory.createSvgFaElement(this._markerSvgCanvas, 'tree', 0.5 + Math.random() * 0.75);
-                var treeline = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight, this.data.elevationRange.low, min, range, 0);
+                var treeline = Object(_util_trail__WEBPACK_IMPORTED_MODULE_13__["normalizeElevation"])(this._svgHeight, this.data.elevationRange.low, min, range, 0);
                 treeline = treeline + (Math.random() * (treeline * 2));
                 primeMarker.move(Math.random() * this._svgWidth, treeline);
                 _trees.add(primeMarker);
@@ -5699,7 +6791,9 @@ var ListItemComponent = /** @class */ (function () {
         }
     };
     // EVENT HANDLERS
+    // TODO: add tooltip/overlay, same as leaflet map
     ListItemComponent.prototype._onUserClick = function (event) {
+        console.log('clicked on user');
         event.stopPropagation();
         event.stopImmediatePropagation();
     };
@@ -5724,30 +6818,30 @@ var ListItemComponent = /** @class */ (function () {
             var _withinVertBounds = (this.user.waypoint.elevation > this.visibleOHLC.low && this.user.waypoint.elevation < this.visibleOHLC.high);
             var _userElevation = 0;
             if (_withinVertBounds) {
-                _userElevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight, this.user.waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT / 2);
+                _userElevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_13__["normalizeElevation"])(this._svgHeight, this.user.waypoint.elevation, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT / 2);
             }
             else {
                 if (this.user.waypoint.elevation < this.visibleOHLC.low) {
-                    _userElevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight, this.visibleOHLC.low, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT / 2);
+                    _userElevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_13__["normalizeElevation"])(this._svgHeight, this.visibleOHLC.low, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT / 2);
                 }
                 else {
-                    _userElevation = Object(_util_math__WEBPACK_IMPORTED_MODULE_4__["normalizeElevation"])(this._svgHeight, this.visibleOHLC.high, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].LINEHEIGHT / 2);
+                    _userElevation = Object(_util_trail__WEBPACK_IMPORTED_MODULE_13__["normalizeElevation"])(this._svgHeight, this.visibleOHLC.high, min, range, _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].LINEHEIGHT / 2);
                 }
             }
             // set the user marker position
             if (!this._userMarker.attr('x')) {
-                this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE), _userElevation);
+                this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE), _userElevation);
             }
             else {
-                var _distance = this._trailGenerator.calcDistanceFlat({ latitude: this._userMarker.attr('x'), longitude: this._userMarker.attr('y') }, { latitude: this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE), longitude: _userElevation });
+                var _distance = this._trailGenerator.calcDistanceFlat({ latitude: this._userMarker.attr('x'), longitude: this._userMarker.attr('y') }, { latitude: this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE), longitude: _userElevation });
                 if (_distance > 1000000) {
-                    this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE), _userElevation);
+                    this._userMarker.move(this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE), _userElevation);
                 }
                 else {
-                    this._userMarker.animate({ duration: 300, ease: '' }).move(this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE), _userElevation);
+                    this._userMarker.animate({ duration: 300, ease: '' }).move(this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE), _userElevation);
                 }
             }
-            this._userMarker.attr('x', this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE));
+            this._userMarker.attr('x', this._svgWidth * (this.user.anchorPoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_7__["environment"].MILE));
             this._userMarker.attr('y', _userElevation);
         }
     };
@@ -5767,11 +6861,11 @@ var ListItemComponent = /** @class */ (function () {
     ], ListItemComponent.prototype, "markerEvent", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_mile__WEBPACK_IMPORTED_MODULE_12__["Mile"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], ListItemComponent.prototype, "data", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_ohlc__WEBPACK_IMPORTED_MODULE_11__["OHLC"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], ListItemComponent.prototype, "visibleOHLC", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -5791,7 +6885,7 @@ var ListItemComponent = /** @class */ (function () {
     ], ListItemComponent.prototype, "update", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_user__WEBPACK_IMPORTED_MODULE_13__["User"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], ListItemComponent.prototype, "user", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -5811,15 +6905,15 @@ var ListItemComponent = /** @class */ (function () {
         // uses basic for loops for performance
         // TODO: iOS scroll performance issues (jumps backwards during scroll event)
         ,
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_7__["LocalStorageService"],
-            _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_8__["TrailGeneratorService"],
-            _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_9__["SnowGeneratorService"],
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_8__["LocalStorageService"],
+            _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_9__["TrailGeneratorService"],
+            _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_10__["SnowGeneratorService"],
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectorRef"],
-            _factory_marker_service__WEBPACK_IMPORTED_MODULE_10__["MarkerService"],
-            _service_note_service__WEBPACK_IMPORTED_MODULE_14__["NoteService"]])
+            _factory_marker_service__WEBPACK_IMPORTED_MODULE_11__["MarkerService"],
+            _service_note_service__WEBPACK_IMPORTED_MODULE_12__["NoteService"]])
     ], ListItemComponent);
     return ListItemComponent;
-}());
+}(_base_base_base_component__WEBPACK_IMPORTED_MODULE_2__["BaseComponent"]));
 
 
 
@@ -5864,8 +6958,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_location_based_location_based_component__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../base/location-based/location-based.component */ "./src/app/base/location-based/location-based.component.ts");
 /* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
 /* harmony import */ var _service_screen_mode_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../../service/screen-mode.service */ "./src/app/service/screen-mode.service.ts");
-/* harmony import */ var _type_trail__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../../type/trail */ "./src/app/type/trail.ts");
-
 
 
 
@@ -5897,7 +6989,7 @@ var VirtualListComponent = /** @class */ (function (_super) {
         this._initialIndex = (this._route.snapshot) ? Number(this._route.snapshot.queryParams['id']) : 0;
         var _notes = this._localStorageService.retrieve(this.trailData.abbr + '_notes');
         this.cacheSize = Math.floor(this.trailData.miles.length / 10);
-        this._setupEventListeners();
+        this._setupSubscriptions();
     };
     VirtualListComponent.prototype.ngAfterViewInit = function () {
         var _self = this;
@@ -5915,20 +7007,6 @@ var VirtualListComponent = /** @class */ (function (_super) {
                     this.scrollViewport.scrollToIndex(this._currentIndex, 'auto');
                 }
             }
-        }
-    };
-    VirtualListComponent.prototype.ngOnDestroy = function () {
-        _super.prototype.ngOnDestroy.call(this);
-        if (this._parallaxEnabled) {
-            window.removeEventListener('scroll', this._onScrollEvent.bind(this), true);
-        }
-        if (this._parallaxSubscription) {
-            this._parallaxSubscription.unsubscribe();
-            this._parallaxSubscription = null;
-        }
-        if (this._screenModeSubscription) {
-            this._screenModeSubscription.unsubscribe();
-            this._screenModeSubscription = null;
         }
     };
     // OVERRIDES
@@ -5961,19 +7039,18 @@ var VirtualListComponent = /** @class */ (function (_super) {
         }
     };
     // EVENTS & HANDLERS
-    VirtualListComponent.prototype._setupEventListeners = function () {
+    VirtualListComponent.prototype._setupSubscriptions = function () {
         var _self = this;
         this.toggleParallax(this._localStorageService.retrieve('parallaxEnabled'));
-        this._parallaxSubscription = this._localStorageService.observe('parallaxEnabled').subscribe(function (result) {
+        this.addSubscription('parallax', this._localStorageService.observe('parallaxEnabled').subscribe(function (result) {
             _self.toggleParallax(result);
-        });
-        // redraw on highContrast or nightHike mode
-        this._screenModeSubscription = this._screenMode.screenModeChangeObserver.subscribe(function (result) {
+        }));
+        this.addSubscription('screenMode', this._screenMode.screenModeChangeObserver.subscribe(function (result) {
             if (_self.scrollViewport) {
                 _self.update = new Date().getTime();
                 _self._changeDetector.markForCheck();
             }
-        });
+        }));
     };
     // parralax effect seems to slow down iOS a lot, optional,
     VirtualListComponent.prototype._onScrollEvent = function (event) {
@@ -6067,10 +7144,10 @@ var VirtualListComponent = /** @class */ (function (_super) {
     VirtualListComponent.prototype.toggleParallax = function (enable) {
         // Listen for scroll events (angular "events" will not do!), needs to run on window for ios
         if (this._parallaxEnabled && !enable) {
-            window.removeEventListener('scroll', this._onScrollEvent.bind(this), true);
+            this.removeEventListener(window, 'scroll');
         }
         else if (!this._parallaxEnabled && enable) {
-            window.addEventListener('scroll', this._onScrollEvent.bind(this), true);
+            this.addEventListener(window, 'scroll', this._onScrollEvent.bind(this), true);
         }
         this._parallaxEnabled = enable;
     };
@@ -6093,7 +7170,7 @@ var VirtualListComponent = /** @class */ (function (_super) {
     ], VirtualListComponent.prototype, "scrollViewport", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_trail__WEBPACK_IMPORTED_MODULE_7__["Trail"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], VirtualListComponent.prototype, "trailData", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -6161,8 +7238,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FaIconComponent", function() { return FaIconComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_poi__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../type/poi */ "./src/app/type/poi.ts");
-
 
 
 var FaIconComponent = /** @class */ (function () {
@@ -6176,7 +7251,7 @@ var FaIconComponent = /** @class */ (function () {
     };
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_poi__WEBPACK_IMPORTED_MODULE_2__["PoiType"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], FaIconComponent.prototype, "data", void 0);
     FaIconComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
@@ -6254,6 +7329,93 @@ var FaSamplerComponent = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/app/component/leaflet-map/elements/dynamic-component-manager.ts":
+/*!*****************************************************************************!*\
+  !*** ./src/app/component/leaflet-map/elements/dynamic-component-manager.ts ***!
+  \*****************************************************************************/
+/*! exports provided: DynamicComponentManager */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DynamicComponentManager", function() { return DynamicComponentManager; });
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! leaflet */ "./node_modules/leaflet/dist/leaflet-src.js");
+/* harmony import */ var leaflet__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(leaflet__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _util_timer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../_util/timer */ "./src/app/_util/timer.ts");
+
+
+var DynamicComponentManager = /** @class */ (function () {
+    function DynamicComponentManager(map) {
+        this._map = map;
+    }
+    // load an angular component into a leaflet component map, _popupTimer
+    DynamicComponentManager.prototype.createPopupComponent = function (location, properties, onTimeOut) {
+        var _self = this;
+        var _popupContent = this._createDynamicComponent('popup', properties);
+        var _popup = leaflet__WEBPACK_IMPORTED_MODULE_0__["popup"]({ closeButton: false, autoClose: true, closeOnClick: true })
+            .setLatLng(location)
+            .setContent(_popupContent)
+            .addTo(this._map);
+        Object(_util_timer__WEBPACK_IMPORTED_MODULE_1__["clearTimeOut"])(this._popupTimer);
+        this._popupTimer = Object(_util_timer__WEBPACK_IMPORTED_MODULE_1__["setTimeOut"])(4000, function () {
+            _self._map.closePopup(_popup);
+            onTimeOut();
+        });
+        _popupContent.timer = this._popupTimer;
+        return this._popupTimer;
+    };
+    // load an angular component into a leaflet component
+    DynamicComponentManager.prototype.createTooltipComponent = function (location, properties, onTimeOut) {
+        var _self = this;
+        var _tooltipContent = this._createDynamicComponent('tooltip', properties);
+        var _tooltip = leaflet__WEBPACK_IMPORTED_MODULE_0__["tooltip"]({ autoClose: true, closeOnClick: true })
+            .setLatLng(location)
+            .setContent(_tooltipContent)
+            .addTo(this._map);
+        // provide the content component with the correct alignment value
+        if (_tooltip.getElement().classList.contains('leaflet-tooltip-left')) {
+            _tooltipContent.direction = 'left';
+        }
+        else {
+            _tooltipContent.direction = 'right';
+        }
+        // disable hide on click
+        var _tElement = _tooltip.getElement();
+        _tElement.addEventListener('click', function (event) {
+            event.stopPropagation();
+        });
+        Object(_util_timer__WEBPACK_IMPORTED_MODULE_1__["clearTimeOut"])(this._tooltipTimer);
+        this._tooltipTimer = Object(_util_timer__WEBPACK_IMPORTED_MODULE_1__["setTimeOut"])(2000, function () {
+            _self._map.closeTooltip(_tooltip);
+            onTimeOut();
+        });
+        _tooltipContent.timer = this._tooltipTimer;
+        return this._tooltipTimer;
+    };
+    DynamicComponentManager.prototype._createDynamicComponent = function (type, properties) {
+        var _component;
+        if (type === 'popup' || type === 'tooltip') {
+            var _popup = document.createElement('leaflet-element-popup');
+            _component = _popup;
+        }
+        _component.addEventListener('closed', function () { return document.body.removeChild(_component); });
+        // set properties
+        if (properties) {
+            for (var key in properties) {
+                _component[key] = properties[key];
+            }
+        }
+        // add to dom, so I can reference it later
+        document.body.appendChild(_component);
+        return _component;
+    };
+    return DynamicComponentManager;
+}());
+
+
+
+/***/ }),
+
 /***/ "./src/app/component/leaflet-map/elements/popup/popup.component.html":
 /*!***************************************************************************!*\
   !*** ./src/app/component/leaflet-map/elements/popup/popup.component.html ***!
@@ -6261,7 +7423,7 @@ var FaSamplerComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"{{position}}\">\n  <div id=\"menu\">\n    <button (click)=\"onLockClick()\">\n      <fa-icon [icon]=\"['fa', 'lock']\"></fa-icon>\n    </button>\n  </div>\n  <h3>{{label}}</h3>\n  <p>{{description}}</p>\n  <a *ngIf=\"showCoords\" [href]=\"createMapsLatLngLink()\" target=\"_blank\">Coordinates</a>\n</div>\n"
+module.exports = "<div class=\"wrapper {{position}}\">\n  <div class=\"container {{direction}}\">\n    <span class=\"icon-wrap\" (click)=\"tag()\">\n      <fa-icon class=\"menu\" [icon]=\"['fas', 'pen-alt']\"></fa-icon>\n    </span>\n    <div class=\"content\">\n      <h3>{{label}}</h3>\n      <p>{{description}}</p>\n      <a *ngIf=\"showCoords\" [href]=\"createMapsLatLngLink()\" target=\"_blank\">Coordinates</a>\n    </div>\n  </div>\n</div>\n"
 
 /***/ }),
 
@@ -6272,7 +7434,7 @@ module.exports = "<div class=\"{{position}}\">\n  <div id=\"menu\">\n    <button
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ":host #menu {\n  position: absolute;\n  top: -33px;\n  left: 0;\n  width: 100%; }\n  :host #menu button {\n    height: 33px !important;\n    width: 33px !important; }\n  :host h3, :host p {\n  margin: 0 3px;\n  color: #5f5349 !important; }\n  :host h3 {\n  font-weight: 600 !important; }\n  .inline #menu {\n  position: relative !important;\n  display: inline !important;\n  width: unset !important;\n  top: unset !important;\n  left: unset !important; }\n  .inline h3 {\n  display: inline !important; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9sZWFmbGV0LW1hcC9lbGVtZW50cy9wb3B1cC9wb3B1cC5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUdHLGtCQUFrQjtFQUNsQixVQUFVO0VBQ1YsT0FBTztFQUNQLFdBQVcsRUFBQTtFQU5kO0lBU0ssdUJBQXVCO0lBQ3ZCLHNCQUFzQixFQUFBO0VBVjNCO0VBYUcsYUFBYTtFQUNiLHlCQUFpQyxFQUFBO0VBZHBDO0VBaUJHLDJCQUEyQixFQUFBO0VBRS9CO0VBR0ksNkJBQTZCO0VBQzdCLDBCQUEwQjtFQUMxQix1QkFBdUI7RUFDdkIscUJBQXFCO0VBQ3JCLHNCQUFzQixFQUFBO0VBUDFCO0VBVUksMEJBQTBCLEVBQUEiLCJmaWxlIjoic3JjL2FwcC9jb21wb25lbnQvbGVhZmxldC1tYXAvZWxlbWVudHMvcG9wdXAvcG9wdXAuY29tcG9uZW50LnNhc3MiLCJzb3VyY2VzQ29udGVudCI6WyIgOmhvc3Qge1xuXG4gICNtZW51IHtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgdG9wOiAtMzNweDtcbiAgICBsZWZ0OiAwO1xuICAgIHdpZHRoOiAxMDAlO1xuXG4gICAgYnV0dG9uIHtcbiAgICAgIGhlaWdodDogMzNweCAhaW1wb3J0YW50O1xuICAgICAgd2lkdGg6IDMzcHggIWltcG9ydGFudDsgfSB9XG5cbiAgaDMsIHAge1xuICAgIG1hcmdpbjogMCAzcHg7XG4gICAgY29sb3I6IHJnYig5NSwgODMsIDczKSAhaW1wb3J0YW50OyB9XG5cbiAgaDMge1xuICAgIGZvbnQtd2VpZ2h0OiA2MDAgIWltcG9ydGFudDsgfSB9XG5cbi5pbmxpbmUge1xuXG4gICNtZW51IHtcbiAgICBwb3NpdGlvbjogcmVsYXRpdmUgIWltcG9ydGFudDtcbiAgICBkaXNwbGF5OiBpbmxpbmUgIWltcG9ydGFudDtcbiAgICB3aWR0aDogdW5zZXQgIWltcG9ydGFudDtcbiAgICB0b3A6IHVuc2V0ICFpbXBvcnRhbnQ7XG4gICAgbGVmdDogdW5zZXQgIWltcG9ydGFudDsgfVxuXG4gIGgzIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUgIWltcG9ydGFudDsgfSB9XG4iXX0= */"
+module.exports = ":host {\n  color: #5f5349 !important; }\n  :host .wrapper .container {\n    padding-top: 16.5px; }\n  :host .wrapper .container .icon-wrap {\n      position: absolute;\n      top: -16.5px;\n      left: 0;\n      width: 100%; }\n  :host .wrapper .container .icon-wrap fa-icon {\n        display: inline-block;\n        padding: 5px 0;\n        width: 31px;\n        text-align: center;\n        border: 2px solid #b4a392;\n        background-color: rgba(232, 214, 189, 0.85) !important;\n        border-radius: 50%;\n        font-size: 15px;\n        color: rgba(95, 83, 73, 0.85); }\n  :host .wrapper .container .content h3, :host .wrapper .container .content p {\n      margin: 0 3px; }\n  :host .wrapper .container .content h3 {\n      font-weight: 600 !important; }\n  :host .inline > div {\n    padding-top: 0 !important; }\n  :host .inline > div .icon-wrap {\n      width: 36px !important; }\n  :host .inline > div .icon-wrap fa-icon {\n        width: 24px !important;\n        font-size: 10px !important; }\n  :host .inline > div h3 {\n      padding-top: 3px; }\n  :host .left .icon-wrap {\n    top: -2px !important;\n    left: -36px !important; }\n  :host .right .icon-wrap {\n    top: -2px !important;\n    left: 100% !important; }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9sZWFmbGV0LW1hcC9lbGVtZW50cy9wb3B1cC9wb3B1cC5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUVDLHlCQUFpQyxFQUFBO0VBRmxDO0lBT0ssbUJBQW1CLEVBQUE7RUFQeEI7TUFVTyxrQkFBa0I7TUFDbEIsWUFBWTtNQUNaLE9BQU87TUFDUCxXQUFXLEVBQUE7RUFibEI7UUFnQlMscUJBQXFCO1FBQ3JCLGNBQWM7UUFDZCxXQUFXO1FBQ1gsa0JBQWtCO1FBQ2xCLHlCQUFvQztRQUNwQyxzREFBc0Q7UUFDdEQsa0JBQWtCO1FBQ2xCLGVBQWU7UUFDZiw2QkFBNkIsRUFBQTtFQXhCdEM7TUE0QlMsYUFBYSxFQUFBO0VBNUJ0QjtNQStCUywyQkFBMkIsRUFBQTtFQS9CcEM7SUFrQ0cseUJBQXlCLEVBQUE7RUFsQzVCO01BdUNLLHNCQUFzQixFQUFBO0VBdkMzQjtRQTRDTyxzQkFBc0I7UUFDdEIsMEJBQTBCLEVBQUE7RUE3Q2pDO01BK0NLLGdCQUFnQixFQUFBO0VBL0NyQjtJQW9ESyxvQkFBb0I7SUFDcEIsc0JBQXNCLEVBQUE7RUFyRDNCO0lBMERLLG9CQUFvQjtJQUNwQixxQkFBcUIsRUFBQSIsImZpbGUiOiJzcmMvYXBwL2NvbXBvbmVudC9sZWFmbGV0LW1hcC9lbGVtZW50cy9wb3B1cC9wb3B1cC5jb21wb25lbnQuc2FzcyIsInNvdXJjZXNDb250ZW50IjpbIiA6aG9zdCB7XG5cbiAgY29sb3I6IHJnYig5NSwgODMsIDczKSAhaW1wb3J0YW50O1xuXG4gIC53cmFwcGVyIHtcblxuICAgIC5jb250YWluZXIge1xuICAgICAgcGFkZGluZy10b3A6IDE2LjVweDtcblxuICAgICAgLmljb24td3JhcCB7XG4gICAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgICAgdG9wOiAtMTYuNXB4O1xuICAgICAgICBsZWZ0OiAwO1xuICAgICAgICB3aWR0aDogMTAwJTtcblxuICAgICAgICBmYS1pY29uIHtcbiAgICAgICAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gICAgICAgICAgcGFkZGluZzogNXB4IDA7XG4gICAgICAgICAgd2lkdGg6IDMxcHg7XG4gICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuICAgICAgICAgIGJvcmRlcjogMnB4IHNvbGlkIHJnYigxODAsIDE2MywgMTQ2KTtcbiAgICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDIzMiwgMjE0LCAxODksIDAuODUpICFpbXBvcnRhbnQ7XG4gICAgICAgICAgYm9yZGVyLXJhZGl1czogNTAlO1xuICAgICAgICAgIGZvbnQtc2l6ZTogMTVweDtcbiAgICAgICAgICBjb2xvcjogcmdiYSg5NSwgODMsIDczLCAwLjg1KTsgfSB9XG5cbiAgICAgIC5jb250ZW50IHtcbiAgICAgICAgaDMsIHAge1xuICAgICAgICAgIG1hcmdpbjogMCAzcHg7IH1cblxuICAgICAgICBoMyB7XG4gICAgICAgICAgZm9udC13ZWlnaHQ6IDYwMCAhaW1wb3J0YW50OyB9IH0gfSB9XG5cbiAgLmlubGluZSA+IGRpdiB7XG4gICAgcGFkZGluZy10b3A6IDAgIWltcG9ydGFudDtcblxuICAgIC5pY29uLXdyYXAge1xuICAgICAgLy9wb3NpdGlvbjogcmVsYXRpdmUgIWltcG9ydGFudFxuICAgICAgLy93aWR0aDogdW5zZXQgIWltcG9ydGFudFxuICAgICAgd2lkdGg6IDM2cHggIWltcG9ydGFudDtcbiAgICAgIC8vdG9wOiB1bnNldCAhaW1wb3J0YW50XG4gICAgICAvL2xlZnQ6IHVuc2V0ICFpbXBvcnRhbnRcblxuICAgICAgZmEtaWNvbiB7XG4gICAgICAgIHdpZHRoOiAyNHB4ICFpbXBvcnRhbnQ7XG4gICAgICAgIGZvbnQtc2l6ZTogMTBweCAhaW1wb3J0YW50OyB9IH1cbiAgICBoMyB7XG4gICAgICBwYWRkaW5nLXRvcDogM3B4OyB9IH1cblxuICAubGVmdCB7XG5cbiAgICAuaWNvbi13cmFwIHtcbiAgICAgIHRvcDogLTJweCAhaW1wb3J0YW50O1xuICAgICAgbGVmdDogLTM2cHggIWltcG9ydGFudDsgfSB9XG5cbiAgLnJpZ2h0IHtcblxuICAgIC5pY29uLXdyYXAge1xuICAgICAgdG9wOiAtMnB4ICFpbXBvcnRhbnQ7XG4gICAgICBsZWZ0OiAxMDAlICFpbXBvcnRhbnQ7IH0gfSB9XG5cbi8vXG4vLyAgI21lbnVcbi8vICAgIHBvc2l0aW9uOiBhYnNvbHV0ZVxuLy8gICAgdG9wOiAtMzNweFxuLy8gICAgbGVmdDogMFxuLy8gICAgd2lkdGg6IDEwMCVcbi8vXG4vLyAgICBidXR0b25cbi8vICAgICAgaGVpZ2h0OiAzM3B4ICFpbXBvcnRhbnRcbi8vICAgICAgd2lkdGg6IDMzcHggIWltcG9ydGFudFxuLy9cbi8vICBoMywgcFxuLy8gICAgbWFyZ2luOiAwIDNweFxuLy8gICAgY29sb3I6IHJnYig5NSwgODMsIDczKSAhaW1wb3J0YW50XG4vL1xuLy8gIGgzXG4vLyAgICBmb250LXdlaWdodDogNjAwICFpbXBvcnRhbnRcbi8vXG4vLy5pbmxpbmVcbi8vXG4vLyAgLnJpZ2h0XG4vLyAgICBmbG9hdDogcmlnaHRcbi8vXG4vLyAgICBoM1xuLy8gICAgICBmbG9hdDogcmlnaHRcbi8vXG4vLyAgI21lbnVcbi8vICAgIHBvc2l0aW9uOiByZWxhdGl2ZSAhaW1wb3J0YW50XG4vLyAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2sgIWltcG9ydGFudFxuLy8gICAgd2lkdGg6IHVuc2V0ICFpbXBvcnRhbnRcbi8vICAgIHRvcDogdW5zZXQgIWltcG9ydGFudFxuLy8gICAgbGVmdDogdW5zZXQgIWltcG9ydGFudFxuLy9cbi8vICBoM1xuLy8gICAgZGlzcGxheTogaW5saW5lLWJsb2NrICFpbXBvcnRhbnRcbiJdfQ== */"
 
 /***/ }),
 
@@ -6304,6 +7466,7 @@ __webpack_require__.r(__webpack_exports__);
 var PopupComponent = /** @class */ (function () {
     function PopupComponent(_dialogFactory) {
         this._dialogFactory = _dialogFactory;
+        this.direction = '';
         this.position = '';
     }
     PopupComponent.prototype.ngOnInit = function () {
@@ -6312,7 +7475,7 @@ var PopupComponent = /** @class */ (function () {
             this.position = 'inline';
         }
     };
-    PopupComponent.prototype.onLockClick = function () {
+    PopupComponent.prototype.tag = function () {
         if (!this.waypoint && !this.anchorPoint) {
             console.warn('error: popup must have a waypoint or anchorPoint');
             return;
@@ -6334,7 +7497,6 @@ var PopupComponent = /** @class */ (function () {
             _waypoint.distance = this.distance || 0;
             _waypoint.distanceTotal = this.distanceTotal || 0;
         }
-        console.log(_waypoint);
         var _anchorPoint = (this.anchorPoint) ? Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_4__["latLngToWaypoint"])(this.anchorPoint) : undefined;
         if (_anchorPoint) {
             _anchorPoint.distance = this.distanceTotal - (_environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE * Math.floor(this.distanceTotal / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_6__["environment"].MILE)) || 0;
@@ -6395,6 +7557,10 @@ var PopupComponent = /** @class */ (function () {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _util_timer__WEBPACK_IMPORTED_MODULE_5__["TimerObj"])
     ], PopupComponent.prototype, "timer", void 0);
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", String)
+    ], PopupComponent.prototype, "direction", void 0);
     PopupComponent = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Component"])({
             selector: 'leaflet-element-popup',
@@ -6428,7 +7594,7 @@ module.exports = "<div id=\"leaflet_{{this.name}}\" #leaflet></div>\n"
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = ":host {\n  display: block;\n  width: 100%;\n  height: 100%; }\n  :host .leaflet-container {\n    height: 100% !important;\n    background-color: rgba(0, 0, 0, 0); }\n  :host .leaflet-pane {\n    width: 100% !important;\n    height: 100% !important; }\n  :host .leaflet-pane .icon-white {\n      color: white; }\n  :host /deep/ #idle .circle, :host /deep/ #undefined .circle, :host /deep/ #idle .pin, :host /deep/ #undefined .pin {\n  fill: #7f7f7f;\n  stroke: #6c6c6c; }\n  :host /deep/ #fetching .circle, :host /deep/ #fetching .pin {\n  fill: #feff00;\n  stroke: #d7d800; }\n  :host /deep/ #tracking .circle, :host /deep/ #tracking .pin {\n  fill: #00ff00;\n  stroke: #00d800; }\n  :host /deep/ #error .circle, :host /deep/ #error .pin {\n  fill: #ff0100;\n  stroke: #d80100; }\n  :host /deep/ .user {\n  color: white;\n  width: 0 !important;\n  height: 0 !important;\n  margin: 0 !important;\n  transition: -webkit-transform .3s ease-out;\n  transition: transform .3s ease-out;\n  transition: transform .3s ease-out, -webkit-transform .3s ease-out;\n  text-rendering: optimizeLegibility; }\n  :host /deep/ #tracking .pulse {\n  position: absolute;\n  top: -13px;\n  left: -13px;\n  width: 26px;\n  height: 26px;\n  border-radius: 50%;\n  background-color: #4eba00;\n  -webkit-animation: pulse 3s ease-out;\n          animation: pulse 3s ease-out;\n  -webkit-animation-iteration-count: infinite;\n          animation-iteration-count: infinite;\n  z-index: -1; }\n  :host /deep/ .user-marker svg {\n  position: absolute;\n  top: 2px;\n  shape-rendering: optimizeSpeed;\n  text-rendering: optimizeLegibility; }\n  :host /deep/ .marker svg {\n  position: absolute;\n  top: 6px;\n  left: 6px;\n  shape-rendering: optimizeSpeed;\n  text-rendering: optimizeLegibility; }\n  :host /deep/ .mile-marker .label {\n  background-color: rgba(237, 237, 237, 0.75);\n  display: block;\n  position: absolute;\n  box-sizing: border-box;\n  padding: 0 3px;\n  width: auto;\n  min-width: 20px;\n  bottom: 0;\n  right: -50%;\n  border: 1px solid #888;\n  border-radius: 3px;\n  font-size: 12px;\n  text-align: center;\n  -webkit-backdrop-filter: blur(3px);\n          backdrop-filter: blur(3px); }\n  :host /deep/ .leaflet-control-scale {\n  padding: 0 0 10px 10px !important;\n  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left) !important; }\n  :host /deep/ .note {\n  color: rgba(95, 83, 73, 0.85) !important; }\n  :host /deep/ .pin-marker {\n  margin: 0 !important;\n  color: white; }\n  :host /deep/ .leaflet-popup-content-wrapper, :host /deep/ .leaflet-tooltip {\n  border-radius: 6px;\n  border: 2px solid #b4a392; }\n  :host /deep/ .leaflet-popup {\n  margin-bottom: 13px !important; }\n  :host /deep/ .leaflet-popup-content-wrapper, :host /deep/ .leaflet-tooltip, :host /deep/ .leaflet-popup-tip {\n  box-shadow: 0px -3px 20px -5px rgba(56, 50, 47, 0.25) !important;\n  text-align: center !important;\n  background-color: rgba(232, 214, 189, 0.85) !important;\n  -webkit-backdrop-filter: blur(3px);\n          backdrop-filter: blur(3px); }\n  :host /deep/ .leaflet-tooltip {\n  border-radius: 5px;\n  padding: 1px 4px;\n  color: #5f5349;\n  background-color: #e8d6bd !important;\n  pointer-events: unset !important;\n  cursor: default !important; }\n  :host /deep/ .leaflet-popup-tip {\n  width: 6px;\n  height: 6px;\n  margin-top: -4px;\n  background-color: #b4a392 !important; }\n  :host /deep/ .leaflet-popup-tip-container {\n  height: 7px;\n  bottom: -7px; }\n  :host /deep/ .leaflet-popup-content {\n  margin: 0;\n  padding: 0; }\n  :host /deep/ .leaflet-popup-content .btn-pill {\n    background-color: #b4a392;\n    border-radius: 26px;\n    padding: 4px 8px;\n    border: none;\n    color: white !important; }\n  :host /deep/ .leaflet-tooltip-left:before {\n  border-left-color: #b4a392 !important; }\n  :host /deep/ .leaflet-tooltip-right:before {\n  border-right-color: #b4a392 !important; }\n  :host /deep/ .leaflet-tooltip-top:before {\n  border-top-color: #b4a392 !important; }\n  :host /deep/ .leaflet-tooltip-bottom:before {\n  border-bottom-color: #b4a392 !important; }\n  @-webkit-keyframes pulse {\n  0% {\n    -webkit-transform: scale(0);\n            transform: scale(0);\n    opacity: 0.0; }\n  75% {\n    -webkit-transform: scale(1);\n            transform: scale(1);\n    opacity: 0.6; }\n  100% {\n    -webkit-transform: scale(1.65);\n            transform: scale(1.65);\n    opacity: 0.0; } }\n  @keyframes pulse {\n  0% {\n    -webkit-transform: scale(0);\n            transform: scale(0);\n    opacity: 0.0; }\n  75% {\n    -webkit-transform: scale(1);\n            transform: scale(1);\n    opacity: 0.6; }\n  100% {\n    -webkit-transform: scale(1.65);\n            transform: scale(1.65);\n    opacity: 0.0; } }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9sZWFmbGV0LW1hcC9sZWFmbGV0LW1hcC5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUNDLGNBQWM7RUFDZCxXQUFXO0VBQ1gsWUFBWSxFQUFBO0VBSGI7SUFNRyx1QkFBdUI7SUFDdkIsa0NBQW9DLEVBQUE7RUFQdkM7SUFVRyxzQkFBc0I7SUFDdEIsdUJBQXVCLEVBQUE7RUFYMUI7TUFjSyxZQUFZLEVBQUE7RUFFakI7RUFHRyxhQUFhO0VBQ2IsZUFBZSxFQUFBO0VBSmxCO0VBT0csYUFBYTtFQUNiLGVBQWUsRUFBQTtFQVJsQjtFQVdHLGFBQWE7RUFDYixlQUFlLEVBQUE7RUFabEI7RUFlRyxhQUFhO0VBQ2IsZUFBZSxFQUFBO0VBaEJsQjtFQW1CRyxZQUFZO0VBQ1osbUJBQW1CO0VBQ25CLG9CQUFvQjtFQUNwQixvQkFBb0I7RUFDcEIsMENBQWtDO0VBQWxDLGtDQUFrQztFQUFsQyxrRUFBa0M7RUFDbEMsa0NBQWtDLEVBQUE7RUF4QnJDO0VBMkJLLGtCQUFrQjtFQUNsQixVQUFVO0VBQ1YsV0FBVztFQUNYLFdBQVc7RUFDWCxZQUFZO0VBR1osa0JBQWtCO0VBQ2xCLHlCQUF5QjtFQUN6QixvQ0FBNEI7VUFBNUIsNEJBQTRCO0VBQzVCLDJDQUFtQztVQUFuQyxtQ0FBbUM7RUFDbkMsV0FBVyxFQUFBO0VBdENoQjtFQXlDRyxrQkFBa0I7RUFDbEIsUUFBUTtFQUNSLDhCQUE4QjtFQUM5QixrQ0FBa0MsRUFBQTtFQTVDckM7RUFnREcsa0JBQWtCO0VBQ2xCLFFBQVE7RUFDUixTQUFTO0VBQ1QsOEJBQThCO0VBQzlCLGtDQUFrQyxFQUFBO0VBcERyQztFQTBESywyQ0FBMkM7RUFFM0MsY0FBYztFQUNkLGtCQUFrQjtFQUNsQixzQkFBc0I7RUFFdEIsY0FBYztFQUVkLFdBQVc7RUFDWCxlQUFlO0VBRWYsU0FBUztFQUNULFdBQVc7RUFFWCxzQkFBc0I7RUFDdEIsa0JBQWtCO0VBRWxCLGVBQWU7RUFDZixrQkFBa0I7RUFFbEIsa0NBQTBCO1VBQTFCLDBCQUEwQixFQUFBO0VBOUUvQjtFQWlGRyxpQ0FBaUM7RUFDakMsNkhBQTZILEVBQUE7RUFsRmhJO0VBcUZHLHdDQUF3QyxFQUFBO0VBckYzQztFQXdGRyxvQkFBb0I7RUFDcEIsWUFBWSxFQUFBO0VBekZmO0VBNEZHLGtCQUFrQjtFQUNsQix5QkFBb0MsRUFBQTtFQTdGdkM7RUFnR0csOEJBQThCLEVBQUE7RUFoR2pDO0VBc0dHLGdFQUE2RDtFQUU3RCw2QkFBNkI7RUFDN0Isc0RBQXNEO0VBQ3RELGtDQUEwQjtVQUExQiwwQkFBMEIsRUFBQTtFQTFHN0I7RUE2R0csa0JBQWtCO0VBQ2xCLGdCQUFnQjtFQUNoQixjQUFzQjtFQUN0QixvQ0FBbUQ7RUFDbkQsZ0NBQWdDO0VBQ2hDLDBCQUEwQixFQUFBO0VBbEg3QjtFQXFIRyxVQUFVO0VBQ1YsV0FBVztFQUNYLGdCQUFnQjtFQUNoQixvQ0FBK0MsRUFBQTtFQXhIbEQ7RUEySEcsV0FBVztFQUNYLFlBQVksRUFBQTtFQTVIZjtFQStIRyxTQUFTO0VBQ1QsVUFBVSxFQUFBO0VBaEliO0lBbUlLLHlCQUFvQztJQUNwQyxtQkFBbUI7SUFDbkIsZ0JBQWdCO0lBQ2hCLFlBQVk7SUFDWix1QkFBdUIsRUFBQTtFQXZJNUI7RUEwSUcscUNBQWdELEVBQUE7RUExSW5EO0VBNklHLHNDQUFpRCxFQUFBO0VBN0lwRDtFQWdKRyxvQ0FBK0MsRUFBQTtFQWhKbEQ7RUFtSkcsdUNBQWtELEVBQUE7RUFFdEQ7RUFDRTtJQUNFLDJCQUFtQjtZQUFuQixtQkFBbUI7SUFDbkIsWUFBWSxFQUFBO0VBQ2Q7SUFDRSwyQkFBbUI7WUFBbkIsbUJBQW1CO0lBQ25CLFlBQVksRUFBQTtFQUNkO0lBQ0UsOEJBQXNCO1lBQXRCLHNCQUFzQjtJQUN0QixZQUFZLEVBQUEsRUFBQTtFQVRoQjtFQUNFO0lBQ0UsMkJBQW1CO1lBQW5CLG1CQUFtQjtJQUNuQixZQUFZLEVBQUE7RUFDZDtJQUNFLDJCQUFtQjtZQUFuQixtQkFBbUI7SUFDbkIsWUFBWSxFQUFBO0VBQ2Q7SUFDRSw4QkFBc0I7WUFBdEIsc0JBQXNCO0lBQ3RCLFlBQVksRUFBQSxFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2xlYWZsZXQtbWFwL2xlYWZsZXQtbWFwLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiIDpob3N0IHtcbiAgZGlzcGxheTogYmxvY2s7XG4gIHdpZHRoOiAxMDAlO1xuICBoZWlnaHQ6IDEwMCU7XG5cbiAgLmxlYWZsZXQtY29udGFpbmVyIHtcbiAgICBoZWlnaHQ6IDEwMCUgIWltcG9ydGFudDtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuMCk7IH1cblxuICAubGVhZmxldC1wYW5lIHtcbiAgICB3aWR0aDogMTAwJSAhaW1wb3J0YW50O1xuICAgIGhlaWdodDogMTAwJSAhaW1wb3J0YW50O1xuXG4gICAgLmljb24td2hpdGUge1xuICAgICAgY29sb3I6IHdoaXRlOyB9IH0gfVxuXG4gOmhvc3QgL2RlZXAvIHtcblxuICAjaWRsZSAuY2lyY2xlLCAjdW5kZWZpbmVkIC5jaXJjbGUsICNpZGxlIC5waW4sICN1bmRlZmluZWQgLnBpbiB7XG4gICAgZmlsbDogIzdmN2Y3ZjtcbiAgICBzdHJva2U6ICM2YzZjNmM7IH1cblxuICAjZmV0Y2hpbmcgLmNpcmNsZSwgI2ZldGNoaW5nIC5waW4ge1xuICAgIGZpbGw6ICNmZWZmMDA7XG4gICAgc3Ryb2tlOiAjZDdkODAwOyB9XG5cbiAgI3RyYWNraW5nIC5jaXJjbGUsICN0cmFja2luZyAucGluIHtcbiAgICBmaWxsOiAjMDBmZjAwO1xuICAgIHN0cm9rZTogIzAwZDgwMDsgfVxuXG4gICNlcnJvciAuY2lyY2xlLCAjZXJyb3IgLnBpbiB7XG4gICAgZmlsbDogI2ZmMDEwMDtcbiAgICBzdHJva2U6ICNkODAxMDA7IH1cblxuICAudXNlciB7XG4gICAgY29sb3I6IHdoaXRlO1xuICAgIHdpZHRoOiAwICFpbXBvcnRhbnQ7XG4gICAgaGVpZ2h0OiAwICFpbXBvcnRhbnQ7XG4gICAgbWFyZ2luOiAwICFpbXBvcnRhbnQ7XG4gICAgdHJhbnNpdGlvbjogdHJhbnNmb3JtIC4zcyBlYXNlLW91dDtcbiAgICB0ZXh0LXJlbmRlcmluZzogb3B0aW1pemVMZWdpYmlsaXR5OyB9XG5cbiAgI3RyYWNraW5nIC5wdWxzZSB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICB0b3A6IC0xM3B4O1xuICAgICAgbGVmdDogLTEzcHg7XG4gICAgICB3aWR0aDogMjZweDtcbiAgICAgIGhlaWdodDogMjZweDtcbiAgICAgIC13ZWJraXQtYm9yZGVyLXJhZGl1czogNTAlO1xuICAgICAgLW1vei1ib3JkZXItcmFkaXVzOiA1MCU7XG4gICAgICBib3JkZXItcmFkaXVzOiA1MCU7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjNGViYTAwO1xuICAgICAgYW5pbWF0aW9uOiBwdWxzZSAzcyBlYXNlLW91dDtcbiAgICAgIGFuaW1hdGlvbi1pdGVyYXRpb24tY291bnQ6IGluZmluaXRlO1xuICAgICAgei1pbmRleDogLTE7IH1cblxuICAudXNlci1tYXJrZXIgc3ZnIHtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgdG9wOiAycHg7XG4gICAgc2hhcGUtcmVuZGVyaW5nOiBvcHRpbWl6ZVNwZWVkO1xuICAgIHRleHQtcmVuZGVyaW5nOiBvcHRpbWl6ZUxlZ2liaWxpdHk7IH1cblxuXG4gIC5tYXJrZXIgc3ZnIHtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgdG9wOiA2cHg7XG4gICAgbGVmdDogNnB4O1xuICAgIHNoYXBlLXJlbmRlcmluZzogb3B0aW1pemVTcGVlZDtcbiAgICB0ZXh0LXJlbmRlcmluZzogb3B0aW1pemVMZWdpYmlsaXR5OyB9XG5cbiAgLm1pbGUtbWFya2VyIHtcblxuICAgIC5sYWJlbCB7XG5cbiAgICAgIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMjM3LCAyMzcsIDIzNywgMC43NSk7XG5cbiAgICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgICAgcG9zaXRpb246IGFic29sdXRlO1xuICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcblxuICAgICAgcGFkZGluZzogMCAzcHg7XG5cbiAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgbWluLXdpZHRoOiAyMHB4O1xuXG4gICAgICBib3R0b206IDA7XG4gICAgICByaWdodDogLTUwJTtcblxuICAgICAgYm9yZGVyOiAxcHggc29saWQgIzg4ODtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDNweDtcblxuICAgICAgZm9udC1zaXplOiAxMnB4O1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuXG4gICAgICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoM3B4KTsgfSB9ICAgIC8vIHNhZmFyaS9pT1Mgb25seSwgY2F1c2VzIGdsaXRjaGluZy4uLlxuXG4gIC5sZWFmbGV0LWNvbnRyb2wtc2NhbGUge1xuICAgIHBhZGRpbmc6IDAgMCAxMHB4IDEwcHggIWltcG9ydGFudDtcbiAgICBwYWRkaW5nOiBlbnYoc2FmZS1hcmVhLWluc2V0LXRvcCkgZW52KHNhZmUtYXJlYS1pbnNldC1yaWdodCkgZW52KHNhZmUtYXJlYS1pbnNldC1ib3R0b20pIGVudihzYWZlLWFyZWEtaW5zZXQtbGVmdCkgIWltcG9ydGFudDsgfVxuXG4gIC5ub3RlIHtcbiAgICBjb2xvcjogcmdiYSg5NSwgODMsIDczLCAwLjg1KSAhaW1wb3J0YW50OyB9XG5cbiAgLnBpbi1tYXJrZXIge1xuICAgIG1hcmdpbjogMCAhaW1wb3J0YW50O1xuICAgIGNvbG9yOiB3aGl0ZTsgfVxuXG4gIC5sZWFmbGV0LXBvcHVwLWNvbnRlbnQtd3JhcHBlciwgLmxlYWZsZXQtdG9vbHRpcCB7XG4gICAgYm9yZGVyLXJhZGl1czogNnB4O1xuICAgIGJvcmRlcjogMnB4IHNvbGlkIHJnYigxODAsIDE2MywgMTQ2KTsgfVxuXG4gIC5sZWFmbGV0LXBvcHVwIHtcbiAgICBtYXJnaW4tYm90dG9tOiAxM3B4ICFpbXBvcnRhbnQ7IH1cblxuICAubGVhZmxldC1wb3B1cC1jb250ZW50LXdyYXBwZXIsIC5sZWFmbGV0LXRvb2x0aXAsIC5sZWFmbGV0LXBvcHVwLXRpcCB7XG5cbiAgICAtd2Via2l0LWJveC1zaGFkb3c6IDBweCAtM3B4IDIwcHggLTVweCByZ2JhKDU2LDUwLDQ3LDAuMjUpICFpbXBvcnRhbnQ7XG4gICAgLW1vei1ib3gtc2hhZG93OiAwcHggLTNweCAyMHB4IC01cHggcmdiYSg1Niw1MCw0NywwLjI1KSAhaW1wb3J0YW50O1xuICAgIGJveC1zaGFkb3c6IDBweCAtM3B4IDIwcHggLTVweCByZ2JhKDU2LDUwLDQ3LDAuMjUpICFpbXBvcnRhbnQ7XG5cbiAgICB0ZXh0LWFsaWduOiBjZW50ZXIgIWltcG9ydGFudDtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDIzMiwgMjE0LCAxODksIDAuODUpICFpbXBvcnRhbnQ7XG4gICAgYmFja2Ryb3AtZmlsdGVyOiBibHVyKDNweCk7IH0gICAgLy8gc2FmYXJpL2lPUyBvbmx5LCBjYXVzZXMgZ2xpdGNoaW5nLi4uXG5cbiAgLmxlYWZsZXQtdG9vbHRpcCB7XG4gICAgYm9yZGVyLXJhZGl1czogNXB4O1xuICAgIHBhZGRpbmc6IDFweCA0cHg7XG4gICAgY29sb3I6IHJnYig5NSwgODMsIDczKTtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDIzMiwgMjE0LCAxODksIDEpICFpbXBvcnRhbnQ7XG4gICAgcG9pbnRlci1ldmVudHM6IHVuc2V0ICFpbXBvcnRhbnQ7XG4gICAgY3Vyc29yOiBkZWZhdWx0ICFpbXBvcnRhbnQ7IH1cblxuICAubGVhZmxldC1wb3B1cC10aXAge1xuICAgIHdpZHRoOiA2cHg7XG4gICAgaGVpZ2h0OiA2cHg7XG4gICAgbWFyZ2luLXRvcDogLTRweDtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMTgwLCAxNjMsIDE0NikgIWltcG9ydGFudDsgfVxuXG4gIC5sZWFmbGV0LXBvcHVwLXRpcC1jb250YWluZXIge1xuICAgIGhlaWdodDogN3B4O1xuICAgIGJvdHRvbTogLTdweDsgfVxuXG4gIC5sZWFmbGV0LXBvcHVwLWNvbnRlbnQge1xuICAgIG1hcmdpbjogMDtcbiAgICBwYWRkaW5nOiAwO1xuXG4gICAgLmJ0bi1waWxsIHtcbiAgICAgIGJhY2tncm91bmQtY29sb3I6IHJnYigxODAsIDE2MywgMTQ2KTtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDI2cHg7XG4gICAgICBwYWRkaW5nOiA0cHggOHB4O1xuICAgICAgYm9yZGVyOiBub25lO1xuICAgICAgY29sb3I6IHdoaXRlICFpbXBvcnRhbnQ7IH0gfVxuXG4gIC5sZWFmbGV0LXRvb2x0aXAtbGVmdDpiZWZvcmUge1xuICAgIGJvcmRlci1sZWZ0LWNvbG9yOiByZ2IoMTgwLCAxNjMsIDE0NikgIWltcG9ydGFudDsgfVxuXG4gIC5sZWFmbGV0LXRvb2x0aXAtcmlnaHQ6YmVmb3JlIHtcbiAgICBib3JkZXItcmlnaHQtY29sb3I6IHJnYigxODAsIDE2MywgMTQ2KSAhaW1wb3J0YW50OyB9XG5cbiAgLmxlYWZsZXQtdG9vbHRpcC10b3A6YmVmb3JlIHtcbiAgICBib3JkZXItdG9wLWNvbG9yOiByZ2IoMTgwLCAxNjMsIDE0NikgIWltcG9ydGFudDsgfVxuXG4gIC5sZWFmbGV0LXRvb2x0aXAtYm90dG9tOmJlZm9yZSB7XG4gICAgYm9yZGVyLWJvdHRvbS1jb2xvcjogcmdiKDE4MCwgMTYzLCAxNDYpICFpbXBvcnRhbnQ7IH0gfVxuXG5Aa2V5ZnJhbWVzIHB1bHNlIHtcbiAgMCUge1xuICAgIHRyYW5zZm9ybTogc2NhbGUoMCk7XG4gICAgb3BhY2l0eTogMC4wOyB9XG4gIDc1JSB7XG4gICAgdHJhbnNmb3JtOiBzY2FsZSgxKTtcbiAgICBvcGFjaXR5OiAwLjY7IH1cbiAgMTAwJSB7XG4gICAgdHJhbnNmb3JtOiBzY2FsZSgxLjY1KTtcbiAgICBvcGFjaXR5OiAwLjA7IH0gfVxuIl19 */"
+module.exports = ":host {\n  display: block;\n  width: 100%;\n  height: 100%; }\n  :host .leaflet-container {\n    height: 100% !important;\n    background-color: rgba(0, 0, 0, 0); }\n  :host .leaflet-pane {\n    width: 100% !important;\n    height: 100% !important; }\n  :host .leaflet-pane .icon-white {\n      color: white; }\n  :host /deep/ #idle .circle, :host /deep/ #undefined .circle, :host /deep/ #idle .pin, :host /deep/ #undefined .pin {\n  fill: #7f7f7f;\n  stroke: #6c6c6c; }\n  :host /deep/ #fetching .circle, :host /deep/ #fetching .pin {\n  fill: #feff00;\n  stroke: #d7d800; }\n  :host /deep/ #tracking .circle, :host /deep/ #tracking .pin {\n  fill: #00ff00;\n  stroke: #00d800; }\n  :host /deep/ #error .circle, :host /deep/ #error .pin {\n  fill: #ff0100;\n  stroke: #d80100; }\n  :host /deep/ .user {\n  color: white;\n  width: 0 !important;\n  height: 0 !important;\n  margin: 0 !important;\n  transition: -webkit-transform .3s ease-out;\n  transition: transform .3s ease-out;\n  transition: transform .3s ease-out, -webkit-transform .3s ease-out;\n  text-rendering: optimizeLegibility; }\n  :host /deep/ #tracking .pulse {\n  position: absolute;\n  top: -13px;\n  left: -13px;\n  width: 26px;\n  height: 26px;\n  border-radius: 50%;\n  background-color: #4eba00;\n  -webkit-animation: pulse 3s ease-out;\n          animation: pulse 3s ease-out;\n  -webkit-animation-iteration-count: infinite;\n          animation-iteration-count: infinite;\n  z-index: -1; }\n  :host /deep/ .user-marker svg {\n  position: absolute;\n  top: 2px;\n  shape-rendering: optimizeSpeed;\n  text-rendering: optimizeLegibility; }\n  :host /deep/ .marker svg {\n  position: absolute;\n  top: 6px;\n  left: 6px;\n  shape-rendering: optimizeSpeed;\n  text-rendering: optimizeLegibility; }\n  :host /deep/ .mile-marker .label {\n  background-color: rgba(237, 237, 237, 0.75);\n  display: block;\n  position: absolute;\n  box-sizing: border-box;\n  padding: 0 3px;\n  width: auto;\n  min-width: 20px;\n  bottom: 0;\n  right: -50%;\n  border: 1px solid #888;\n  border-radius: 3px;\n  font-size: 12px;\n  text-align: center;\n  -webkit-backdrop-filter: blur(3px);\n          backdrop-filter: blur(3px); }\n  :host /deep/ .leaflet-control-scale {\n  padding: 0 0 10px 10px !important;\n  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left) !important; }\n  :host /deep/ .pin-marker {\n  margin: 0 !important;\n  color: white; }\n  :host /deep/ .leaflet-popup-content-wrapper, :host /deep/ .leaflet-tooltip {\n  border-radius: 6px;\n  border: 2px solid #b4a392; }\n  :host /deep/ .leaflet-popup {\n  margin-bottom: 13px !important; }\n  :host /deep/ .leaflet-popup-content-wrapper, :host /deep/ .leaflet-tooltip, :host /deep/ .leaflet-popup-tip {\n  box-shadow: 0px -3px 20px -5px rgba(56, 50, 47, 0.25) !important;\n  text-align: center !important;\n  background-color: rgba(232, 214, 189, 0.85) !important;\n  -webkit-backdrop-filter: blur(3px);\n          backdrop-filter: blur(3px); }\n  :host /deep/ .leaflet-tooltip {\n  border-radius: 5px;\n  padding: 0 2px !important;\n  color: #5f5349;\n  background-color: #e8d6bd !important;\n  pointer-events: unset !important;\n  cursor: default !important; }\n  :host /deep/ .leaflet-popup-tip {\n  width: 6px;\n  height: 6px;\n  margin-top: -4px;\n  background-color: #5f5349 !important; }\n  :host /deep/ .leaflet-popup-tip-container {\n  height: 7px;\n  bottom: -7px; }\n  :host /deep/ .leaflet-popup-content {\n  margin: 0;\n  padding: 0; }\n  :host /deep/ .leaflet-popup-content .btn-pill {\n    background-color: #b4a392;\n    border-radius: 26px;\n    padding: 4px 8px;\n    border: none;\n    color: white !important; }\n  :host /deep/ .leaflet-tooltip-left:before {\n  border-left-color: #5f5349 !important; }\n  :host /deep/ .leaflet-tooltip-right:before {\n  border-right-color: #5f5349 !important; }\n  @-webkit-keyframes pulse {\n  0% {\n    -webkit-transform: scale(0);\n            transform: scale(0);\n    opacity: 0.0; }\n  75% {\n    -webkit-transform: scale(1);\n            transform: scale(1);\n    opacity: 0.6; }\n  100% {\n    -webkit-transform: scale(1.65);\n            transform: scale(1.65);\n    opacity: 0.0; } }\n  @keyframes pulse {\n  0% {\n    -webkit-transform: scale(0);\n            transform: scale(0);\n    opacity: 0.0; }\n  75% {\n    -webkit-transform: scale(1);\n            transform: scale(1);\n    opacity: 0.6; }\n  100% {\n    -webkit-transform: scale(1.65);\n            transform: scale(1.65);\n    opacity: 0.0; } }\n\n/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9Vc2Vycy9mcmFua2RvdXdlcy93b3JrL2p1c3QtaGlrZS9zcmMvYXBwL2NvbXBvbmVudC9sZWFmbGV0LW1hcC9sZWFmbGV0LW1hcC5jb21wb25lbnQuc2FzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQztFQUNDLGNBQWM7RUFDZCxXQUFXO0VBQ1gsWUFBWSxFQUFBO0VBSGI7SUFNRyx1QkFBdUI7SUFDdkIsa0NBQW9DLEVBQUE7RUFQdkM7SUFVRyxzQkFBc0I7SUFDdEIsdUJBQXVCLEVBQUE7RUFYMUI7TUFjSyxZQUFZLEVBQUE7RUFFakI7RUFHRyxhQUFhO0VBQ2IsZUFBZSxFQUFBO0VBSmxCO0VBT0csYUFBYTtFQUNiLGVBQWUsRUFBQTtFQVJsQjtFQVdHLGFBQWE7RUFDYixlQUFlLEVBQUE7RUFabEI7RUFlRyxhQUFhO0VBQ2IsZUFBZSxFQUFBO0VBaEJsQjtFQW1CRyxZQUFZO0VBQ1osbUJBQW1CO0VBQ25CLG9CQUFvQjtFQUNwQixvQkFBb0I7RUFDcEIsMENBQWtDO0VBQWxDLGtDQUFrQztFQUFsQyxrRUFBa0M7RUFDbEMsa0NBQWtDLEVBQUE7RUF4QnJDO0VBMkJLLGtCQUFrQjtFQUNsQixVQUFVO0VBQ1YsV0FBVztFQUNYLFdBQVc7RUFDWCxZQUFZO0VBR1osa0JBQWtCO0VBQ2xCLHlCQUF5QjtFQUN6QixvQ0FBNEI7VUFBNUIsNEJBQTRCO0VBQzVCLDJDQUFtQztVQUFuQyxtQ0FBbUM7RUFDbkMsV0FBVyxFQUFBO0VBdENoQjtFQXlDRyxrQkFBa0I7RUFDbEIsUUFBUTtFQUNSLDhCQUE4QjtFQUM5QixrQ0FBa0MsRUFBQTtFQTVDckM7RUFnREcsa0JBQWtCO0VBQ2xCLFFBQVE7RUFDUixTQUFTO0VBQ1QsOEJBQThCO0VBQzlCLGtDQUFrQyxFQUFBO0VBcERyQztFQTBESywyQ0FBMkM7RUFFM0MsY0FBYztFQUNkLGtCQUFrQjtFQUNsQixzQkFBc0I7RUFFdEIsY0FBYztFQUVkLFdBQVc7RUFDWCxlQUFlO0VBRWYsU0FBUztFQUNULFdBQVc7RUFFWCxzQkFBc0I7RUFDdEIsa0JBQWtCO0VBRWxCLGVBQWU7RUFDZixrQkFBa0I7RUFFbEIsa0NBQTBCO1VBQTFCLDBCQUEwQixFQUFBO0VBOUUvQjtFQWtGRyxpQ0FBaUM7RUFDakMsNkhBQTZILEVBQUE7RUFuRmhJO0VBc0ZHLG9CQUFvQjtFQUNwQixZQUFZLEVBQUE7RUF2RmY7RUEwRkcsa0JBQWtCO0VBQ2xCLHlCQUFvQyxFQUFBO0VBM0Z2QztFQThGRyw4QkFBOEIsRUFBQTtFQTlGakM7RUFvR0csZ0VBQTZEO0VBRTdELDZCQUE2QjtFQUM3QixzREFBc0Q7RUFDdEQsa0NBQTBCO1VBQTFCLDBCQUEwQixFQUFBO0VBeEc3QjtFQTJHRyxrQkFBa0I7RUFDbEIseUJBQXlCO0VBQ3pCLGNBQXNCO0VBQ3RCLG9DQUFtRDtFQUNuRCxnQ0FBZ0M7RUFDaEMsMEJBQTBCLEVBQUE7RUFoSDdCO0VBbUhHLFVBQVU7RUFDVixXQUFXO0VBQ1gsZ0JBQWdCO0VBQ2hCLG9DQUE0QyxFQUFBO0VBdEgvQztFQXlIRyxXQUFXO0VBQ1gsWUFBWSxFQUFBO0VBMUhmO0VBNkhHLFNBQVM7RUFDVCxVQUFVLEVBQUE7RUE5SGI7SUFpSUsseUJBQW9DO0lBQ3BDLG1CQUFtQjtJQUNuQixnQkFBZ0I7SUFDaEIsWUFBWTtJQUNaLHVCQUF1QixFQUFBO0VBckk1QjtFQXdJRyxxQ0FBNkMsRUFBQTtFQXhJaEQ7RUEwSUcsc0NBQThDLEVBQUE7RUFHbEQ7RUFDRTtJQUNFLDJCQUFtQjtZQUFuQixtQkFBbUI7SUFDbkIsWUFBWSxFQUFBO0VBQ2Q7SUFDRSwyQkFBbUI7WUFBbkIsbUJBQW1CO0lBQ25CLFlBQVksRUFBQTtFQUNkO0lBQ0UsOEJBQXNCO1lBQXRCLHNCQUFzQjtJQUN0QixZQUFZLEVBQUEsRUFBQTtFQVRoQjtFQUNFO0lBQ0UsMkJBQW1CO1lBQW5CLG1CQUFtQjtJQUNuQixZQUFZLEVBQUE7RUFDZDtJQUNFLDJCQUFtQjtZQUFuQixtQkFBbUI7SUFDbkIsWUFBWSxFQUFBO0VBQ2Q7SUFDRSw4QkFBc0I7WUFBdEIsc0JBQXNCO0lBQ3RCLFlBQVksRUFBQSxFQUFBIiwiZmlsZSI6InNyYy9hcHAvY29tcG9uZW50L2xlYWZsZXQtbWFwL2xlYWZsZXQtbWFwLmNvbXBvbmVudC5zYXNzIiwic291cmNlc0NvbnRlbnQiOlsiIDpob3N0IHtcbiAgZGlzcGxheTogYmxvY2s7XG4gIHdpZHRoOiAxMDAlO1xuICBoZWlnaHQ6IDEwMCU7XG5cbiAgLmxlYWZsZXQtY29udGFpbmVyIHtcbiAgICBoZWlnaHQ6IDEwMCUgIWltcG9ydGFudDtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2JhKDAsIDAsIDAsIDAuMCk7IH1cblxuICAubGVhZmxldC1wYW5lIHtcbiAgICB3aWR0aDogMTAwJSAhaW1wb3J0YW50O1xuICAgIGhlaWdodDogMTAwJSAhaW1wb3J0YW50O1xuXG4gICAgLmljb24td2hpdGUge1xuICAgICAgY29sb3I6IHdoaXRlOyB9IH0gfVxuXG4gOmhvc3QgL2RlZXAvIHtcblxuICAjaWRsZSAuY2lyY2xlLCAjdW5kZWZpbmVkIC5jaXJjbGUsICNpZGxlIC5waW4sICN1bmRlZmluZWQgLnBpbiB7XG4gICAgZmlsbDogIzdmN2Y3ZjtcbiAgICBzdHJva2U6ICM2YzZjNmM7IH1cblxuICAjZmV0Y2hpbmcgLmNpcmNsZSwgI2ZldGNoaW5nIC5waW4ge1xuICAgIGZpbGw6ICNmZWZmMDA7XG4gICAgc3Ryb2tlOiAjZDdkODAwOyB9XG5cbiAgI3RyYWNraW5nIC5jaXJjbGUsICN0cmFja2luZyAucGluIHtcbiAgICBmaWxsOiAjMDBmZjAwO1xuICAgIHN0cm9rZTogIzAwZDgwMDsgfVxuXG4gICNlcnJvciAuY2lyY2xlLCAjZXJyb3IgLnBpbiB7XG4gICAgZmlsbDogI2ZmMDEwMDtcbiAgICBzdHJva2U6ICNkODAxMDA7IH1cblxuICAudXNlciB7XG4gICAgY29sb3I6IHdoaXRlO1xuICAgIHdpZHRoOiAwICFpbXBvcnRhbnQ7XG4gICAgaGVpZ2h0OiAwICFpbXBvcnRhbnQ7XG4gICAgbWFyZ2luOiAwICFpbXBvcnRhbnQ7XG4gICAgdHJhbnNpdGlvbjogdHJhbnNmb3JtIC4zcyBlYXNlLW91dDtcbiAgICB0ZXh0LXJlbmRlcmluZzogb3B0aW1pemVMZWdpYmlsaXR5OyB9XG5cbiAgI3RyYWNraW5nIC5wdWxzZSB7XG4gICAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgICB0b3A6IC0xM3B4O1xuICAgICAgbGVmdDogLTEzcHg7XG4gICAgICB3aWR0aDogMjZweDtcbiAgICAgIGhlaWdodDogMjZweDtcbiAgICAgIC13ZWJraXQtYm9yZGVyLXJhZGl1czogNTAlO1xuICAgICAgLW1vei1ib3JkZXItcmFkaXVzOiA1MCU7XG4gICAgICBib3JkZXItcmFkaXVzOiA1MCU7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjNGViYTAwO1xuICAgICAgYW5pbWF0aW9uOiBwdWxzZSAzcyBlYXNlLW91dDtcbiAgICAgIGFuaW1hdGlvbi1pdGVyYXRpb24tY291bnQ6IGluZmluaXRlO1xuICAgICAgei1pbmRleDogLTE7IH1cblxuICAudXNlci1tYXJrZXIgc3ZnIHtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgdG9wOiAycHg7XG4gICAgc2hhcGUtcmVuZGVyaW5nOiBvcHRpbWl6ZVNwZWVkO1xuICAgIHRleHQtcmVuZGVyaW5nOiBvcHRpbWl6ZUxlZ2liaWxpdHk7IH1cblxuXG4gIC5tYXJrZXIgc3ZnIHtcbiAgICBwb3NpdGlvbjogYWJzb2x1dGU7XG4gICAgdG9wOiA2cHg7XG4gICAgbGVmdDogNnB4O1xuICAgIHNoYXBlLXJlbmRlcmluZzogb3B0aW1pemVTcGVlZDtcbiAgICB0ZXh0LXJlbmRlcmluZzogb3B0aW1pemVMZWdpYmlsaXR5OyB9XG5cbiAgLm1pbGUtbWFya2VyIHtcblxuICAgIC5sYWJlbCB7XG5cbiAgICAgIGJhY2tncm91bmQtY29sb3I6IHJnYmEoMjM3LCAyMzcsIDIzNywgMC43NSk7XG5cbiAgICAgIGRpc3BsYXk6IGJsb2NrO1xuICAgICAgcG9zaXRpb246IGFic29sdXRlO1xuICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDtcblxuICAgICAgcGFkZGluZzogMCAzcHg7XG5cbiAgICAgIHdpZHRoOiBhdXRvO1xuICAgICAgbWluLXdpZHRoOiAyMHB4O1xuXG4gICAgICBib3R0b206IDA7XG4gICAgICByaWdodDogLTUwJTtcblxuICAgICAgYm9yZGVyOiAxcHggc29saWQgIzg4ODtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDNweDtcblxuICAgICAgZm9udC1zaXplOiAxMnB4O1xuICAgICAgdGV4dC1hbGlnbjogY2VudGVyO1xuXG4gICAgICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoM3B4KTsgfSB9ICAgIC8vIHNhZmFyaS9pT1Mgb25seSwgY2F1c2VzIGdsaXRjaGluZy4uLlxuXG4gIC8vIGZpeCBmb3IgaU9TIG5vdGNoXG4gIC5sZWFmbGV0LWNvbnRyb2wtc2NhbGUge1xuICAgIHBhZGRpbmc6IDAgMCAxMHB4IDEwcHggIWltcG9ydGFudDtcbiAgICBwYWRkaW5nOiBlbnYoc2FmZS1hcmVhLWluc2V0LXRvcCkgZW52KHNhZmUtYXJlYS1pbnNldC1yaWdodCkgZW52KHNhZmUtYXJlYS1pbnNldC1ib3R0b20pIGVudihzYWZlLWFyZWEtaW5zZXQtbGVmdCkgIWltcG9ydGFudDsgfVxuXG4gIC5waW4tbWFya2VyIHtcbiAgICBtYXJnaW46IDAgIWltcG9ydGFudDtcbiAgICBjb2xvcjogd2hpdGU7IH1cblxuICAubGVhZmxldC1wb3B1cC1jb250ZW50LXdyYXBwZXIsIC5sZWFmbGV0LXRvb2x0aXAge1xuICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICBib3JkZXI6IDJweCBzb2xpZCByZ2IoMTgwLCAxNjMsIDE0Nik7IH1cblxuICAubGVhZmxldC1wb3B1cCB7XG4gICAgbWFyZ2luLWJvdHRvbTogMTNweCAhaW1wb3J0YW50OyB9XG5cbiAgLmxlYWZsZXQtcG9wdXAtY29udGVudC13cmFwcGVyLCAubGVhZmxldC10b29sdGlwLCAubGVhZmxldC1wb3B1cC10aXAge1xuXG4gICAgLXdlYmtpdC1ib3gtc2hhZG93OiAwcHggLTNweCAyMHB4IC01cHggcmdiYSg1Niw1MCw0NywwLjI1KSAhaW1wb3J0YW50O1xuICAgIC1tb3otYm94LXNoYWRvdzogMHB4IC0zcHggMjBweCAtNXB4IHJnYmEoNTYsNTAsNDcsMC4yNSkgIWltcG9ydGFudDtcbiAgICBib3gtc2hhZG93OiAwcHggLTNweCAyMHB4IC01cHggcmdiYSg1Niw1MCw0NywwLjI1KSAhaW1wb3J0YW50O1xuXG4gICAgdGV4dC1hbGlnbjogY2VudGVyICFpbXBvcnRhbnQ7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyMzIsIDIxNCwgMTg5LCAwLjg1KSAhaW1wb3J0YW50O1xuICAgIGJhY2tkcm9wLWZpbHRlcjogYmx1cigzcHgpOyB9ICAgIC8vIHNhZmFyaS9pT1Mgb25seSwgY2F1c2VzIGdsaXRjaGluZy4uLlxuXG4gIC5sZWFmbGV0LXRvb2x0aXAge1xuICAgIGJvcmRlci1yYWRpdXM6IDVweDtcbiAgICBwYWRkaW5nOiAwIDJweCAhaW1wb3J0YW50O1xuICAgIGNvbG9yOiByZ2IoOTUsIDgzLCA3Myk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogcmdiYSgyMzIsIDIxNCwgMTg5LCAxKSAhaW1wb3J0YW50O1xuICAgIHBvaW50ZXItZXZlbnRzOiB1bnNldCAhaW1wb3J0YW50O1xuICAgIGN1cnNvcjogZGVmYXVsdCAhaW1wb3J0YW50OyB9XG5cbiAgLmxlYWZsZXQtcG9wdXAtdGlwIHtcbiAgICB3aWR0aDogNnB4O1xuICAgIGhlaWdodDogNnB4O1xuICAgIG1hcmdpbi10b3A6IC00cHg7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogcmdiKDk1LCA4MywgNzMpICFpbXBvcnRhbnQ7IH1cblxuICAubGVhZmxldC1wb3B1cC10aXAtY29udGFpbmVyIHtcbiAgICBoZWlnaHQ6IDdweDtcbiAgICBib3R0b206IC03cHg7IH1cblxuICAubGVhZmxldC1wb3B1cC1jb250ZW50IHtcbiAgICBtYXJnaW46IDA7XG4gICAgcGFkZGluZzogMDtcblxuICAgIC5idG4tcGlsbCB7XG4gICAgICBiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMTgwLCAxNjMsIDE0Nik7XG4gICAgICBib3JkZXItcmFkaXVzOiAyNnB4O1xuICAgICAgcGFkZGluZzogNHB4IDhweDtcbiAgICAgIGJvcmRlcjogbm9uZTtcbiAgICAgIGNvbG9yOiB3aGl0ZSAhaW1wb3J0YW50OyB9IH1cblxuICAubGVhZmxldC10b29sdGlwLWxlZnQ6YmVmb3JlIHtcbiAgICBib3JkZXItbGVmdC1jb2xvcjogcmdiKDk1LCA4MywgNzMpICFpbXBvcnRhbnQ7IH1cbiAgLmxlYWZsZXQtdG9vbHRpcC1yaWdodDpiZWZvcmUge1xuICAgIGJvcmRlci1yaWdodC1jb2xvcjogcmdiKDk1LCA4MywgNzMpICFpbXBvcnRhbnQ7IH0gfVxuXG5cbkBrZXlmcmFtZXMgcHVsc2Uge1xuICAwJSB7XG4gICAgdHJhbnNmb3JtOiBzY2FsZSgwKTtcbiAgICBvcGFjaXR5OiAwLjA7IH1cbiAgNzUlIHtcbiAgICB0cmFuc2Zvcm06IHNjYWxlKDEpO1xuICAgIG9wYWNpdHk6IDAuNjsgfVxuICAxMDAlIHtcbiAgICB0cmFuc2Zvcm06IHNjYWxlKDEuNjUpO1xuICAgIG9wYWNpdHk6IDAuMDsgfSB9XG4iXX0= */"
 
 /***/ }),
 
@@ -6451,27 +7617,30 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var node_modules_leaflet_geometryutil_src_leaflet_geometryutil_js__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(node_modules_leaflet_geometryutil_src_leaflet_geometryutil_js__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var node_modules_leaflet_Geodesic_Leaflet_Geodesic_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! node_modules/leaflet.Geodesic/Leaflet.Geodesic.js */ "./node_modules/leaflet.Geodesic/Leaflet.Geodesic.js");
 /* harmony import */ var node_modules_leaflet_Geodesic_Leaflet_Geodesic_js__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(node_modules_leaflet_Geodesic_Leaflet_Geodesic_js__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _util_leaflet_grid_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../_util/leaflet/grid.js */ "./src/app/_util/leaflet/grid.js");
-/* harmony import */ var _util_leaflet_grid_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_util_leaflet_grid_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _util_leaflet_plugins_grid_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../_util/leaflet/plugins/grid.js */ "./src/app/_util/leaflet/plugins/grid.js");
+/* harmony import */ var _util_leaflet_plugins_grid_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_util_leaflet_plugins_grid_js__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _util_leaflet_marker_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../_util/leaflet/marker.js */ "./src/app/_util/leaflet/marker.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var _base_location_based_location_based_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../base/location-based/location-based.component */ "./src/app/base/location-based/location-based.component.ts");
-/* harmony import */ var _type_waypoint__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../type/waypoint */ "./src/app/type/waypoint.ts");
-/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-/* harmony import */ var _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../service/snow-generator.service */ "./src/app/service/snow-generator.service.ts");
-/* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
-/* harmony import */ var _service_orientation_service__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../service/orientation.service */ "./src/app/service/orientation.service.ts");
-/* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
-/* harmony import */ var _service_screen_mode_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../service/screen-mode.service */ "./src/app/service/screen-mode.service.ts");
-/* harmony import */ var _factory_marker_service__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../factory/marker.service */ "./src/app/factory/marker.service.ts");
-/* harmony import */ var _util_leaflet_icon__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../../_util/leaflet/icon */ "./src/app/_util/leaflet/icon.ts");
-/* harmony import */ var _util_leaflet_calculate__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../../_util/leaflet/calculate */ "./src/app/_util/leaflet/calculate.ts");
-/* harmony import */ var _util_leaflet_converter__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../../_util/leaflet/converter */ "./src/app/_util/leaflet/converter.ts");
-/* harmony import */ var _util_math__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../../_util/math */ "./src/app/_util/math.ts");
-/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ../../service/note.service */ "./src/app/service/note.service.ts");
-/* harmony import */ var _util_leaflet_layer__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ../../_util/leaflet/layer */ "./src/app/_util/leaflet/layer.ts");
-/* harmony import */ var _util_timer__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ../../_util/timer */ "./src/app/_util/timer.ts");
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../service/snow-generator.service */ "./src/app/service/snow-generator.service.ts");
+/* harmony import */ var _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../service/trail-generator.service */ "./src/app/service/trail-generator.service.ts");
+/* harmony import */ var _service_orientation_service__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../service/orientation.service */ "./src/app/service/orientation.service.ts");
+/* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
+/* harmony import */ var _service_screen_mode_service__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../service/screen-mode.service */ "./src/app/service/screen-mode.service.ts");
+/* harmony import */ var _factory_marker_service__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../factory/marker.service */ "./src/app/factory/marker.service.ts");
+/* harmony import */ var _util_leaflet_icon__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../_util/leaflet/icon */ "./src/app/_util/leaflet/icon.ts");
+/* harmony import */ var _util_leaflet_calculate__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../../_util/leaflet/calculate */ "./src/app/_util/leaflet/calculate.ts");
+/* harmony import */ var _util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../../_util/leaflet/converter */ "./src/app/_util/leaflet/converter.ts");
+/* harmony import */ var _util_math__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../../_util/math */ "./src/app/_util/math.ts");
+/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../../service/note.service */ "./src/app/service/note.service.ts");
+/* harmony import */ var _util_leaflet_layer__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ../../_util/leaflet/layer */ "./src/app/_util/leaflet/layer.ts");
+/* harmony import */ var _util_timer__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ../../_util/timer */ "./src/app/_util/timer.ts");
+/* harmony import */ var _elements_dynamic_component_manager__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./elements/dynamic-component-manager */ "./src/app/component/leaflet-map/elements/dynamic-component-manager.ts");
+/* harmony import */ var geolib__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! geolib */ "./node_modules/geolib/dist/geolib.js");
+/* harmony import */ var geolib__WEBPACK_IMPORTED_MODULE_25___default = /*#__PURE__*/__webpack_require__.n(geolib__WEBPACK_IMPORTED_MODULE_25__);
+
 
 
 
@@ -6524,13 +7693,13 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         this._showMileGrid = this._localStorageService.retrieve('showMileGrid');
         this._animateMap = this._localStorageService.retrieve('animateMap');
         this._trailLength = this._trailGenerator.getTrailData().miles.length;
-        this._notesSubscription = this._noteService.noteUpdateObserver.subscribe(function (update) {
+        this.addSubscription('notes', this._noteService.noteUpdateObserver.subscribe(function (update) {
             if (update === 'added') {
                 var _lastAddedNote = _self._noteService.getLastNote();
                 // extra check, should
                 if (_self._visibleMiles.includes(_lastAddedNote.belongsTo - 1)) {
-                    Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(_self._popupTimer);
-                    Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(_self._tooltipTimer);
+                    Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(_self._popupTimer);
+                    Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(_self._tooltipTimer);
                     _self._addNote(_lastAddedNote);
                 }
             }
@@ -6538,7 +7707,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
                 var _deletedNote = _self._noteService.getLastNote();
                 _self._removeMarkerByPoiId(_deletedNote.id);
             }
-        });
+        }));
     };
     LeafletMapComponent.prototype.ngOnChanges = function (changes) {
         if (this._initialized) {
@@ -6570,6 +7739,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
     };
     // SETUP
     LeafletMapComponent.prototype._setupMap = function () {
+        var _self = this;
         // no data, no map
         if (!this.trailGenerator.getTrailData()) {
             console.log('no map data');
@@ -6578,11 +7748,11 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         // create the tile layer (deals with online / offline / missing tiles)
         if (this.showMapTiles) {
             var _url = this._generateTileUrl();
-            this._tileLayers.push(Object(_util_leaflet_layer__WEBPACK_IMPORTED_MODULE_23__["createMapTileLayer"])(_url));
+            this._tileLayers.push(Object(_util_leaflet_layer__WEBPACK_IMPORTED_MODULE_22__["createMapTileLayer"])(_url, this._localStorageService.retrieve('detectRetina')));
         }
         // grid layer is only shown on the full map, not the mini map)
         if (this.allowZooming && this._showMileGrid) {
-            var _gridLayerArray = Object(_util_leaflet_layer__WEBPACK_IMPORTED_MODULE_23__["createGridLayer"])(this._trailGenerator.getTrailData().abbr);
+            var _gridLayerArray = Object(_util_leaflet_layer__WEBPACK_IMPORTED_MODULE_22__["createGridLayer"])(this._trailGenerator.getTrailData().abbr);
             this._tileLayers = this._tileLayers.concat(_gridLayerArray);
         }
         this._map = new leaflet__WEBPACK_IMPORTED_MODULE_1__["map"]('leaflet_' + this.name, {
@@ -6598,9 +7768,51 @@ var LeafletMapComponent = /** @class */ (function (_super) {
             maxBoundsViscosity: 0.95 // near solid
         });
         this._setupMapListeners();
+        this._dynamicComponentManager = new _elements_dynamic_component_manager__WEBPACK_IMPORTED_MODULE_24__["DynamicComponentManager"](this._map);
         this._setMapInteractionProperties();
         // set an initial location
         this._map.setView([0, 0], 15);
+        // TODO: this needs to be moved, as towns need to be linked to miles (like pois)
+        if (this._trailGenerator.getTrailData().towns) {
+            this._trailGenerator.getTrailData().towns.forEach(function (town) {
+                _self._drawTown(town);
+            });
+        }
+    };
+    // draw pois
+    LeafletMapComponent.prototype._drawTown = function (town) {
+        var _towns = [];
+        _towns.push(this._assembleTownMarker(town));
+        var _markerGroup = leaflet__WEBPACK_IMPORTED_MODULE_1__["featureGroup"](_towns);
+        _markerGroup.addTo(this._map);
+        // draw line from anchor point in direction of town
+        if (town.anchorPoint) {
+            var _distance = geolib__WEBPACK_IMPORTED_MODULE_25__["getDistance"](Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["waypointToLatLng"])(town.centerPoint), Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["waypointToLatLng"])(town.anchorPoint));
+            // only draw guide if trail is over a mile away
+            // max guide length is 0.2mi
+            if (_distance < _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE) {
+                return;
+            }
+            else {
+                _distance = ((_distance / 8) > _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE) ? _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE : _distance / 8;
+            }
+            var _heading = Math.atan2(town.centerPoint.longitude - town.anchorPoint.longitude, town.centerPoint.latitude - town.anchorPoint.latitude) * 180 / Math.PI;
+            var _point = this._createPoint(town.anchorPoint, _heading, _distance);
+            console.log(_point, town.anchorPoint);
+            var _guide = this._createGuide(Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["waypointToLatLng"])(town.anchorPoint), Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["waypointToLatLng"])(_point), false, true, 'rgb(0, 255, 0)');
+            _guide[0].addTo(this._map);
+            _guide[1].addTo(this._map);
+        }
+    };
+    LeafletMapComponent.prototype._assembleTownMarker = function (town) {
+        var _element = document.createElement('div');
+        var _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
+        this._markerFactory.createSvgCircleMarker(_svg, '#FF0000', 0.787878);
+        _svg.use(this._markerFactory.sampleFaIcon('town')).width(24).height(24).move(-12, -12);
+        var _icon = Object(_util_leaflet_icon__WEBPACK_IMPORTED_MODULE_17__["htmlIcon"])({ className: 'marker town', html: _element });
+        var _options = { icon: _icon, town: town };
+        var _poiMarker = leaflet__WEBPACK_IMPORTED_MODULE_1__["marker"](Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["waypointToLatLng"])(town.centerPoint), _options);
+        return _poiMarker;
     };
     LeafletMapComponent.prototype._setMapInteractionProperties = function () {
         // panning
@@ -6626,33 +7838,25 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         this._map.on('click', function (e) {
             // if there's still an overlay, or overlay data, get rid of it.
             if (_self._overlayElements) {
-                Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(_self._popupTimer);
-                Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(_self._tooltipTimer);
+                Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(_self._popupTimer);
+                Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(_self._tooltipTimer);
                 return;
             }
             _self._createPopupTooltip(e);
         });
-        // hide indicator (and guides)
-        // this._map.on('tooltipclose', this._onClose.bind(this));
-        // this._map.on('popupclose', this._onClose.bind(this));
     };
-    // private _onClose(): void {
-    //   this._clearOverlayElements();
-    // };
     // clear all the extra elements that belong to the overlays (popups/tooltips)
     LeafletMapComponent.prototype._clearOverlayElements = function () {
         var _self = this;
         if (this._overlayElements && this._overlayElements.length > 0) {
             this._overlayElements.forEach(function (element) {
-                _self._map.removeLayer(element); // remove
+                if (_self._map && element) {
+                    _self._map.removeLayer(element); // remove
+                }
             });
         }
         this._popupBelongsTo = -1;
         this._overlayElements = null;
-        // clearTimeOut(this._popupTimer);
-        // clearTimeOut(this._tooltipTimer);
-        // this._map.closePopup(this._popup);
-        // this._map.closeTooltip(this._);
     };
     // generate a tile url, if online tiles are available (downloaded) use those, else use an online source
     LeafletMapComponent.prototype._generateTileUrl = function () {
@@ -6662,13 +7866,13 @@ var LeafletMapComponent = /** @class */ (function (_super) {
             return this.fileSystem.rootPath + this.trailGenerator.getTrailData().abbr + '/' + _version + '/tiles/{x}/{y}.png';
         }
         else {
-            return _environments_environment_prod__WEBPACK_IMPORTED_MODULE_11__["environment"].onlineTileUrl;
+            return _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].onlineTileUrl;
         }
     };
     // display Tooltip (on trail) or Popup (off trail), both use dynamic components as content
     LeafletMapComponent.prototype._createPopupTooltip = function (e) {
         var _self = this;
-        var _eLatLngAsWaypoint = Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_20__["latLngToWaypoint"])(e.latlng);
+        var _eLatLngAsWaypoint = Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["latLngToWaypoint"])(e.latlng);
         var _anchor;
         var _nearestPoints;
         // use a plugin to get the nearest point in the nearest (rendered) trail segment.
@@ -6680,14 +7884,14 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         else {
             var _mile = this._trailGenerator.getTrailData().miles[Number(_closestLayer.layer.mileId) - 1];
             _nearestPoints = this._trailGenerator.findNearestWaypointInMile(_eLatLngAsWaypoint, _mile);
-            _anchor = Object(_util_leaflet_calculate__WEBPACK_IMPORTED_MODULE_19__["calculateTrailAnchorPoint"])(_mile, _nearestPoints);
+            _anchor = Object(_util_leaflet_calculate__WEBPACK_IMPORTED_MODULE_18__["calculateTrailAnchorPoint"])(_mile, _nearestPoints);
         }
-        var _anchorAsLatLng = Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_20__["waypointToLatLng"])(_anchor); // convert for leaflet
+        var _anchorAsLatLng = Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["waypointToLatLng"])(_anchor); // convert for leaflet
         // if the distance is substantial, show a guideline/popup, else show a tooltip
-        var _offTrail = (_nearestPoints[0]['distance'] > this.localStorage.retrieve('poiDistanceOffTrail'));
+        var _offTrail = (_nearestPoints[0].distance > this.localStorage.retrieve('poiDistanceOffTrail'));
         if (_offTrail) {
             this._popupBelongsTo = Number(_closestLayer.layer.mileId);
-            this._activatePopup(e.latlng, _anchorAsLatLng, _nearestPoints[0]['distance'], _anchor.distanceTotal);
+            this._activatePopup(e.latlng, _anchorAsLatLng, _nearestPoints[0].distance, _anchor.distanceTotal);
             // render guides
             this._overlayElements.forEach(function (element) {
                 element.addTo(_self._map);
@@ -6702,11 +7906,11 @@ var LeafletMapComponent = /** @class */ (function (_super) {
     };
     // activate a popup (component)
     LeafletMapComponent.prototype._activatePopup = function (waypoint, anchor, offTrailDistance, nearestMileage) {
-        var _offTrailDistanceConverted = Object(_util_math__WEBPACK_IMPORTED_MODULE_21__["distanceInMilesFeet"])(offTrailDistance);
-        var _nearestMileageConverted = Object(_util_math__WEBPACK_IMPORTED_MODULE_21__["distanceInMilesFeet"])(nearestMileage);
+        var _offTrailDistanceConverted = Object(_util_math__WEBPACK_IMPORTED_MODULE_20__["distanceInMilesFeet"])(offTrailDistance);
+        var _nearestMileageConverted = Object(_util_math__WEBPACK_IMPORTED_MODULE_20__["distanceInMilesFeet"])(nearestMileage);
         var _label = +_offTrailDistanceConverted.distance + ' ' + _offTrailDistanceConverted.unit + ' off trail';
         var _description = 'Nearest: ' + _nearestMileageConverted.unit + ' ' + _nearestMileageConverted.distance;
-        this._createPopupComponent(waypoint, {
+        this._popupTimer = this._dynamicComponentManager.createPopupComponent(waypoint, {
             label: _label,
             description: _description,
             waypoint: waypoint,
@@ -6714,21 +7918,21 @@ var LeafletMapComponent = /** @class */ (function (_super) {
             distance: offTrailDistance,
             distanceTotal: nearestMileage,
             belongsTo: this._popupBelongsTo
-        });
-        this._overlayElements = this._createGuide(anchor, waypoint, false, false, 'rgb(180, 163, 146)', 3);
+        }, this._clearOverlayElements.bind(this));
+        this._overlayElements = this._createGuide(anchor, waypoint, false, false, 'rgba(255, 0, 0, 0.75)', 3);
     };
     // activate a tooltip (component)
     LeafletMapComponent.prototype._activateTooltip = function (waypoint, nearestMileage) {
-        var _nearestMileageConverted = Object(_util_math__WEBPACK_IMPORTED_MODULE_21__["distanceInMilesFeet"])(nearestMileage);
+        var _nearestMileageConverted = Object(_util_math__WEBPACK_IMPORTED_MODULE_20__["distanceInMilesFeet"])(nearestMileage);
         _nearestMileageConverted.unit = String(_nearestMileageConverted.unit).charAt(0).toUpperCase() + String(_nearestMileageConverted.unit).slice(1);
-        this._createTooltipComponent(waypoint, {
+        this._dynamicComponentManager.createTooltipComponent(waypoint, {
             waypoint: waypoint,
             anchorPoint: waypoint,
             label: _nearestMileageConverted.unit + ' ' + _nearestMileageConverted.distance,
             distance: 0,
             distanceTotal: nearestMileage,
             belongsTo: this._popupBelongsTo
-        });
+        }, this._clearOverlayElements.bind(this));
     };
     // ELEMENT CREATION
     // manages the visible data (mile segments, markers, guides and snow)
@@ -6805,13 +8009,17 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         for (var i = 0; i < _mileIdsLength; i++) {
             var _mileId = mileIds[i];
             if (_self._popupBelongsTo === _mileId + 1) {
-                Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(this._popupTimer);
-                Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(this._tooltipTimer);
+                Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(this._popupTimer);
+                Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(this._tooltipTimer);
             }
             try {
                 if (_self._renderedData[_mileId] && _self._map) {
                     // remove miles/markers/snow data/notes
                     for (var key in _self._renderedData[_mileId]) {
+                        // clear from trailLayers
+                        if (key === 'trail') {
+                            _self._trailLayers.removeLayer(_self._renderedData[_mileId].trail);
+                        }
                         _self._map.removeLayer(_self._renderedData[_mileId][key]);
                         if (key === 'markers' || key === 'notes') {
                             _self._renderedData[_mileId][key].clearLayers();
@@ -6823,7 +8031,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
                     _self._renderedData[_mileId] = null;
                     delete _self._renderedData[_mileId];
                     _self._visibleMiles.splice(_self._visibleMiles.indexOf(_mileId), 1);
-                    // this leaves the array structure in plac (it'll be the length of the trail, as we're using the index for reference)
+                    // this leaves the array structure in place (it'll be the length of the trail, as we're using the index for reference)
                 }
             }
             catch (e) {
@@ -6858,7 +8066,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
             mile.waypoints.forEach(function (waypoint) {
                 function elevationRange() {
                     // waypoint distance (%) on snowarray elevation range
-                    return snowMile[0].elevation + ((waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_11__["environment"].MILE) * ((snowMile[1].elevation - snowMile[0].elevation)));
+                    return snowMile[0].elevation + ((waypoint.distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE) * ((snowMile[1].elevation - snowMile[0].elevation)));
                 }
                 // if waypoint is above showline
                 if (waypoint.elevation >= elevationRange()) {
@@ -6891,14 +8099,14 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         var _element = document.createElement('div');
         var _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
         this._markerFactory.setupMarker(_svg, poi, null);
-        var _poiTypeClassses = poi.type.split(',').join('');
-        var _icon = Object(_util_leaflet_icon__WEBPACK_IMPORTED_MODULE_18__["htmlIcon"])({ className: 'marker ' + _poiTypeClassses, html: _element });
+        var _poiTypeClasses = poi.type.split(',').join('');
+        var _icon = Object(_util_leaflet_icon__WEBPACK_IMPORTED_MODULE_17__["htmlIcon"])({ className: 'marker ' + _poiTypeClasses, html: _element });
         var _options = { icon: _icon, poi: poi };
         // add additional params to marker
         if (optionalMarkerParams) {
             _options = tslib__WEBPACK_IMPORTED_MODULE_0__["__assign"]({}, _options, optionalMarkerParams);
         }
-        var _poiMarker = leaflet__WEBPACK_IMPORTED_MODULE_1__["marker"](Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_20__["waypointToLatLng"])(poi.waypoint), _options);
+        var _poiMarker = leaflet__WEBPACK_IMPORTED_MODULE_1__["marker"](Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_19__["waypointToLatLng"])(poi.waypoint), _options);
         _poiMarker.on('click', this._onMarkerClick.bind({ data: poi, self: this }));
         return _poiMarker;
     };
@@ -6948,7 +8156,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
     LeafletMapComponent.prototype._addNote = function (note) {
         var _bounce = {
             bounceOnAdd: true,
-            bounceOnAddOptions: { duration: 600, height: 150 },
+            bounceOnAddOptions: { duration: 600, height: 55 },
         };
         var _noteMarker = this._assemblePoiMarker(note, _bounce);
         this._renderedData[note.belongsTo].notes.addLayer(_noteMarker);
@@ -6961,35 +8169,36 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         if (this.user && this._map && this.user.waypoint) {
             var _userLocation = new leaflet__WEBPACK_IMPORTED_MODULE_1__["LatLng"](this.user.waypoint.latitude, this.user.waypoint.longitude);
             this._userMarker.setLatLng(_userLocation);
-            this._userMarker.on('click', function (e) {
-                var _closestLayer = leaflet__WEBPACK_IMPORTED_MODULE_1__["GeometryUtil"].closestLayer(_self._map, _self._trailLayers.getLayers(), e.latlng);
-                if (_closestLayer) {
-                    // get the nearest point(s) for mile (own data routine)
-                    var _mile = _self._trailGenerator.getTrailData().miles[Number(_closestLayer.layer.mileId) - 1];
-                    var _nearestPoints = _self._trailGenerator.findNearestWaypointInMile(_self.user.waypoint, _mile);
-                    var _nearestMileage = (_self.user.anchorPoint.distanceTotal / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_11__["environment"].MILE).toFixed(2);
-                    var _onOffTrailString = void 0;
-                    var _2ndLine = '';
-                    // TODO: user also has a distance from trail value, needs to be displayed?
-                    var _offTrail = (_nearestPoints[0]['distance'] > _self.localStorage.retrieve('poiDistanceOffTrail'));
-                    if (_offTrail) {
-                        _onOffTrailString = (_nearestPoints[0]['distance'] / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_11__["environment"].MILE).toFixed(2) + ' mi. off trail';
-                        _2ndLine = 'Nearest: mi. ' + _nearestMileage;
+            if (!this.userCentered) {
+                this._userMarker.on('click', function (e) {
+                    var _closestLayer = leaflet__WEBPACK_IMPORTED_MODULE_1__["GeometryUtil"].closestLayer(_self._map, _self._trailLayers.getLayers(), e.latlng);
+                    if (_closestLayer) {
+                        // get the nearest point(s) for mile (own data routine)
+                        var _mile = _self._trailGenerator.getTrailData().miles[Number(_closestLayer.layer.mileId) - 1];
+                        var _nearestPoints = _self._trailGenerator.findNearestWaypointInMile(_self.user.waypoint, _mile);
+                        var _nearestMileage = (_self.user.anchorPoint.distanceTotal / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE).toFixed(2);
+                        var _onOffTrailString = void 0;
+                        var _2ndLine = '';
+                        var _offTrail = (_nearestPoints[0].distance > _self.localStorage.retrieve('poiDistanceOffTrail'));
+                        if (_offTrail) {
+                            _onOffTrailString = (_nearestPoints[0].distance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE).toFixed(2) + ' mi. off trail';
+                            _2ndLine = 'Nearest: mi. ' + _nearestMileage;
+                        }
+                        else {
+                            _onOffTrailString = 'On trail';
+                            _2ndLine = 'mi. ' + _nearestMileage;
+                        }
+                        _self._dynamicComponentManager.createPopupComponent(e.latlng, {
+                            waypoint: e.latlng,
+                            label: _onOffTrailString,
+                            description: _2ndLine,
+                            distance: _nearestPoints[0].distance,
+                            distanceTotal: _nearestMileage,
+                            showCoords: true
+                        }, _self._clearOverlayElements.bind(_self));
                     }
-                    else {
-                        _onOffTrailString = 'On trail';
-                        _2ndLine = 'mi. ' + _nearestMileage;
-                    }
-                    _self._createPopupComponent(e.latlng, {
-                        waypoint: e.latlng,
-                        label: _onOffTrailString,
-                        description: _2ndLine,
-                        distance: _nearestPoints[0]['distance'],
-                        distanceTotal: _nearestMileage,
-                        showCoords: true
-                    });
-                }
-            });
+                });
+            }
             this._userMarker.addTo(this._map);
         }
     };
@@ -7047,8 +8256,8 @@ var LeafletMapComponent = /** @class */ (function (_super) {
     // linked directly to svg marker (scope change)
     LeafletMapComponent.prototype._onMarkerClick = function (event) {
         // clear all overlays
-        Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(this['self']._popupTimer);
-        Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(this['self']._tooltipTimer);
+        Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(this['self']._popupTimer);
+        Object(_util_timer__WEBPACK_IMPORTED_MODULE_23__["clearTimeOut"])(this['self']._tooltipTimer);
         // center on the marker you just clicked
         this['self']._centerOnPoint(this['data'].waypoint, true);
         var _event = new CustomEvent('markerClick', {
@@ -7060,17 +8269,18 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         this['self']._map._container.dispatchEvent(_event);
     };
     LeafletMapComponent.prototype.onStatusChange = function (status) {
+        this.status = status;
         _super.prototype.onStatusChange.call(this, status);
         this.onUserLocationChange(this.user);
     };
     LeafletMapComponent.prototype.onUserLocationChange = function (user) {
-        // use the id for status
-        if (this._userMarker) {
-            this._userMarker._icon.id = this.status;
-        }
         _super.prototype.onUserLocationChange.call(this, user);
         if (this._map) {
             this._drawUser();
+        }
+        // use the id for status
+        if (this._userMarker) {
+            this._userMarker._icon.id = this.status;
         }
         if (this.userCentered) {
             this.centerOnUser();
@@ -7092,7 +8302,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
             longitude: mile.waypoints[0].longitude + ((mile.waypoints[1].longitude - mile.waypoints[0].longitude) * _xPercentage),
             elevation: mile.waypoints[0].elevation + ((mile.waypoints[1].elevation - mile.waypoints[0].elevation) * _xPercentage),
             distance: 0,
-            distanceTotal: (mile.id - 1) * _environments_environment_prod__WEBPACK_IMPORTED_MODULE_11__["environment"].MILE
+            distanceTotal: (mile.id - 1) * _environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE
         };
         /* calculate the position of the mile marker based on the angle of the trail
         * there are 2 measurements:
@@ -7166,7 +8376,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         else if (_angle < -180) {
             _angle = 180 - Math.abs(_angle - 180);
         }
-        var _distance = (_environments_environment_prod__WEBPACK_IMPORTED_MODULE_11__["environment"].MILE / 8) * _distancePerc;
+        var _distance = (_environments_environment_prod__WEBPACK_IMPORTED_MODULE_10__["environment"].MILE / 8) * _distancePerc;
         var _point = this._createPoint(_xPoint, _angle, _distance);
         var _labelIcon = leaflet__WEBPACK_IMPORTED_MODULE_1__["divIcon"]({ className: 'mile-marker', html: '<div class="label">' + (mile.id - 1) + '</div>' });
         _labelElements.push(leaflet__WEBPACK_IMPORTED_MODULE_1__["marker"]([_point.latitude, _point.longitude], { icon: _labelIcon, mileNumber: mile.id - 1 }));
@@ -7177,14 +8387,14 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         return _labelElements;
     };
     // create a point based on distance/angle of another point
-    LeafletMapComponent.prototype._createPoint = function (point, angle, kms) {
+    LeafletMapComponent.prototype._createPoint = function (point, angle, meters) {
         var toRad = function (deg) {
             return deg * Math.PI / 180;
         };
         var toDeg = function (rad) {
             return rad * 180 / Math.PI;
         };
-        var dist = (kms / 1000) / 6371;
+        var dist = (meters / 1000) / 6371;
         angle = toRad(angle);
         var lat1 = toRad(point.latitude), lon1 = toRad(point.longitude);
         var lat2 = Math.asin(Math.sin(lat1) * Math.cos(dist) +
@@ -7244,58 +8454,6 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         }
         return _elements;
     };
-    // load an angular component into a leaflet component
-    LeafletMapComponent.prototype._createPopupComponent = function (location, properties) {
-        var _self = this;
-        var _popupContent = this._createDynamicComponent('popup', properties);
-        var _popup = leaflet__WEBPACK_IMPORTED_MODULE_1__["popup"]({ closeButton: false, autoClose: true, closeOnClick: true })
-            .setLatLng(location)
-            .setContent(_popupContent)
-            .addTo(this._map);
-        Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(this._popupTimer);
-        this._popupTimer = Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["setTimeOut"])(4000, function () {
-            _self._map.closePopup(_popup);
-            _self._clearOverlayElements();
-        });
-        _popupContent.timer = this._popupTimer;
-    };
-    // load an angular component into a leaflet component
-    LeafletMapComponent.prototype._createTooltipComponent = function (location, properties) {
-        var _self = this;
-        var _tooltipContent = this._createDynamicComponent('tooltip', properties);
-        var _tooltip = leaflet__WEBPACK_IMPORTED_MODULE_1__["tooltip"]({ autoClose: true, closeOnClick: true })
-            .setLatLng(location)
-            .setContent(_tooltipContent)
-            .addTo(this._map);
-        // disable hide on click
-        var _tElement = _tooltip.getElement();
-        _tElement.addEventListener('click', function (event) {
-            event.stopPropagation();
-        });
-        Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["clearTimeOut"])(this._tooltipTimer);
-        this._tooltipTimer = Object(_util_timer__WEBPACK_IMPORTED_MODULE_24__["setTimeOut"])(2000, function () {
-            _self._map.closeTooltip(_tooltip);
-            _self._clearOverlayElements();
-        });
-        _tooltipContent.timer = this._tooltipTimer;
-    };
-    LeafletMapComponent.prototype._createDynamicComponent = function (type, properties) {
-        var _component;
-        if (type === 'popup' || type === 'tooltip') {
-            var _popup = document.createElement('leaflet-element-popup');
-            _component = _popup;
-        }
-        _component.addEventListener('closed', function () { return document.body.removeChild(_component); });
-        // set properties
-        if (properties) {
-            for (var key in properties) {
-                _component[key] = properties[key];
-            }
-        }
-        // add to dom, so I can reference it later
-        document.body.appendChild(_component);
-        return _component;
-    };
     LeafletMapComponent.prototype._removeMarkerByPoiId = function (poiId) {
         var _self = this;
         if (this._map) {
@@ -7324,7 +8482,7 @@ var LeafletMapComponent = /** @class */ (function (_super) {
     ], LeafletMapComponent.prototype, "userCentered", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_7__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_waypoint__WEBPACK_IMPORTED_MODULE_10__["Waypoint"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], LeafletMapComponent.prototype, "centerPoint", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_7__["Input"])(),
@@ -7358,20 +8516,21 @@ var LeafletMapComponent = /** @class */ (function (_super) {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_7__["Component"])({
             selector: 'leaflet-map',
             template: __webpack_require__(/*! ./leaflet-map.component.html */ "./src/app/component/leaflet-map/leaflet-map.component.html"),
+            changeDetection: _angular_core__WEBPACK_IMPORTED_MODULE_7__["ChangeDetectionStrategy"].OnPush,
             styles: [__webpack_require__(/*! ./leaflet-map.component.sass */ "./src/app/component/leaflet-map/leaflet-map.component.sass")]
         })
         // uses basic for loops for performance
-        /* TODO: needs cleanup! a lot of it! */
+        /* TODO: split up this monster into some smaller files */
         /* TODO: needs guidelines for towns */
         ,
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_router__WEBPACK_IMPORTED_MODULE_8__["ActivatedRoute"],
-            _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_12__["SnowGeneratorService"],
-            _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_13__["TrailGeneratorService"],
-            _service_orientation_service__WEBPACK_IMPORTED_MODULE_14__["OrientationService"],
-            ngx_webstorage__WEBPACK_IMPORTED_MODULE_15__["LocalStorageService"],
-            _service_screen_mode_service__WEBPACK_IMPORTED_MODULE_16__["ScreenModeService"],
-            _factory_marker_service__WEBPACK_IMPORTED_MODULE_17__["MarkerService"],
-            _service_note_service__WEBPACK_IMPORTED_MODULE_22__["NoteService"]])
+            _service_snow_generator_service__WEBPACK_IMPORTED_MODULE_11__["SnowGeneratorService"],
+            _service_trail_generator_service__WEBPACK_IMPORTED_MODULE_12__["TrailGeneratorService"],
+            _service_orientation_service__WEBPACK_IMPORTED_MODULE_13__["OrientationService"],
+            ngx_webstorage__WEBPACK_IMPORTED_MODULE_14__["LocalStorageService"],
+            _service_screen_mode_service__WEBPACK_IMPORTED_MODULE_15__["ScreenModeService"],
+            _factory_marker_service__WEBPACK_IMPORTED_MODULE_16__["MarkerService"],
+            _service_note_service__WEBPACK_IMPORTED_MODULE_21__["NoteService"]])
     ], LeafletMapComponent);
     return LeafletMapComponent;
 }(_base_location_based_location_based_component__WEBPACK_IMPORTED_MODULE_9__["LocationBasedComponent"]));
@@ -7512,49 +8671,45 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
 /* harmony import */ var _service_location_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../service/location.service */ "./src/app/service/location.service.ts");
+/* harmony import */ var _base_base_base_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../base/base/base.component */ "./src/app/base/base/base.component.ts");
 
 
 
 
 
-var MileDetailComponent = /** @class */ (function () {
+
+var MileDetailComponent = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](MileDetailComponent, _super);
     function MileDetailComponent(_localStorage, _locationService, _route, _router) {
-        this._localStorage = _localStorage;
-        this._locationService = _locationService;
-        this._route = _route;
-        this._router = _router;
+        var _this = _super.call(this) || this;
+        _this._localStorage = _localStorage;
+        _this._locationService = _locationService;
+        _this._route = _route;
+        _this._router = _router;
+        return _this;
     }
     // LIFECYCLE HOOKS
     MileDetailComponent.prototype.ngOnInit = function () {
+        this.isNobo = (this._localStorage.retrieve('direction') === 0);
+        this._addSubscriptions();
+    };
+    // SUBSCRIPTIONS
+    MileDetailComponent.prototype._addSubscriptions = function () {
         var _this = this;
         var _self = this;
         // get miles data based on route id
         this.routedMile = (this._route.snapshot) ? Number(this._route.snapshot.paramMap.get('id')) : 0;
-        this._route.data.subscribe(function (result) {
+        this.addSubscription('routeData', this._route.data.subscribe(function (result) {
             _this.trailData = result.data['trail'];
             _this._setMapData(_this.routedMile);
-        });
-        this._locationSubscription = this._locationService.locationStatus.subscribe(function (result) {
+        }));
+        this.addSubscription('location', this._locationService.locationStatus.subscribe(function (result) {
             _self.isTracking = (result === 'tracking');
-        });
-        this.isNobo = (this._localStorage.retrieve('direction') === 0);
-        //
-        // this._screenModeSubscription = this._screenModeService.screenModeChangeObserver.subscribe(function(screenMode) {
-        //
-        //   if (_self._screenMode !== screenMode) {
-        //     console.log('screenmode changed');
-        //     _self._screenMode = screenMode;
-        //     _self._changeDetector.markForCheck();
-        //   }
-        // })
-    };
-    MileDetailComponent.prototype.ngOnDestroy = function () {
-        if (this._locationSubscription) {
-            this._locationSubscription.unsubscribe();
-        }
+        }));
     };
     // EVENTS
     MileDetailComponent.prototype.onScrollTo = function (data) {
+        console.log('on scroll to', data.mileId);
         this._setMapData(data.mileId, data.renderedPoiRange, data.renderedMileRange);
         this.routedMile = data.mileId;
         /* updating queryParamams (this._router.navigate) seems to cause bugs over time on iOS,
@@ -7589,7 +8744,7 @@ var MileDetailComponent = /** @class */ (function () {
             _angular_router__WEBPACK_IMPORTED_MODULE_2__["Router"]])
     ], MileDetailComponent);
     return MileDetailComponent;
-}());
+}(_base_base_base_component__WEBPACK_IMPORTED_MODULE_5__["BaseComponent"]));
 
 
 
@@ -8040,7 +9195,7 @@ var DynamicItemComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<div class=\"icon-container\">\n  <display-icon [data]=\"this.poiTypes\" [name]=\"timeStamp\" showRating=\"true\"></display-icon>\n</div>\n<div class=\"mat-list-text\">\n  <h2 matLine> {{data.label}} </h2>\n  <p matLine *ngIf=\"data.anchorPoint\">\n    <span *ngIf=\"status !== 'tracking'\"> {{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} </span>\n    <span *ngIf=\"status === 'tracking' && data.distanceFromUser\"> {{data.distanceFromUser | distance:'meters':'miles':false:2:true:true}} </span>\n    <span *ngIf=\"data.distanceFromPoi\"> {{data.distanceFromPoi | distance:'meters':'miles':false:2:true:true}} </span>\n    <span> ({{data.waypoint.distance | distance:'meters':'miles':true}}) </span>\n  </p>\n</div>\n"
+module.exports = "<div class=\"icon-container\">\n  <display-icon [data]=\"this.poiTypes\" [name]=\"timeStamp\"></display-icon>\n</div>\n<div class=\"mat-list-text\">\n  <h2 matLine [innerHTML]=\"data.label\"></h2>\n  <p matLine *ngIf=\"data.anchorPoint\">\n    <span *ngIf=\"status !== 'tracking'\"> {{data.anchorPoint.distanceTotal | distance:'meters':'miles':false:2:true}} </span>\n    <span *ngIf=\"status === 'tracking' && data.distanceFromUser\"> {{data.distanceFromUser | distance:'meters':'miles':false:2:true:true}} </span>\n    <span *ngIf=\"data.distanceFromPoi\"> {{data.distanceFromPoi | distance:'meters':'miles':false:2:true:true}} </span>\n    <span> ({{data.waypoint.distance | distance:'meters':'miles':true}}) </span>\n  </p>\n</div>\n"
 
 /***/ }),
 
@@ -8067,9 +9222,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PoiListItemComponent", function() { return PoiListItemComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_poi__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../type/poi */ "./src/app/type/poi.ts");
-/* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../_util/poi */ "./src/app/_util/poi.ts");
-
+/* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../_util/poi */ "./src/app/_util/poi.ts");
 
 
 
@@ -8089,6 +9242,9 @@ var PoiListItemComponent = /** @class */ (function () {
     PoiListItemComponent.prototype.ngOnInit = function () {
         this.setupIcons();
     };
+    PoiListItemComponent.prototype.ngOnChanges = function (changes) {
+        console.log(changes);
+    };
     PoiListItemComponent.prototype.setupIcons = function () {
         var _self = this;
         this.poiTypes = [];
@@ -8099,20 +9255,20 @@ var PoiListItemComponent = /** @class */ (function () {
                 if (poi === 'offtrail') {
                     return;
                 }
-                var _poiData = Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])(poi);
+                var _poiData = Object(_util_poi__WEBPACK_IMPORTED_MODULE_2__["getPoiTypeByType"])(poi);
                 if (_poiData !== undefined) {
                     if (_poiStrArr_1.length > 2 && index === 1) {
-                        _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])('unknown'));
+                        _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_2__["getPoiTypeByType"])('unknown'));
                     }
                     _self.poiTypes.push(_poiData);
                 }
                 else {
-                    _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])('unknown'));
+                    _self.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_2__["getPoiTypeByType"])('unknown'));
                 }
             });
             // if no types
             if (this.poiTypes.length === 0) {
-                this.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_3__["getPoiTypeByType"])('unknown'));
+                this.poiTypes.push(Object(_util_poi__WEBPACK_IMPORTED_MODULE_2__["getPoiTypeByType"])('unknown'));
             }
         }
     };
@@ -8123,7 +9279,7 @@ var PoiListItemComponent = /** @class */ (function () {
     ], PoiListItemComponent.prototype, "typeClass", null);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_poi__WEBPACK_IMPORTED_MODULE_2__["Poi"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], PoiListItemComponent.prototype, "data", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])('status'),
@@ -8185,10 +9341,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base_location_based_location_based_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../base/location-based/location-based.component */ "./src/app/base/location-based/location-based.component.ts");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var _angular_cdk_scrolling__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @angular/cdk/scrolling */ "./node_modules/@angular/cdk/esm5/scrolling.es5.js");
-/* harmony import */ var _type_poi__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../type/poi */ "./src/app/type/poi.ts");
-/* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
-/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../service/note.service */ "./src/app/service/note.service.ts");
-
+/* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
+/* harmony import */ var _service_note_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../service/note.service */ "./src/app/service/note.service.ts");
 
 
 
@@ -8216,10 +9370,10 @@ var PoiListComponent = /** @class */ (function (_super) {
         var _self = this;
         _super.prototype.ngOnInit.call(this);
         this.itemSize = Math.round(this.container.elementRef.nativeElement.clientHeight / this._visibleItemCount);
-        this._dataSubscription = this.combinedData.subscribe(function (data) {
+        this.addSubscription('data', this.combinedData.subscribe(function (data) {
             _this._dataLength = data.length;
-        });
-        this._notesSubscription = this._noteService.noteUpdateObserver.subscribe(function (update) {
+        }));
+        this.addSubscription('note', this._noteService.noteUpdateObserver.subscribe(function (update) {
             if (update === 'added') {
                 var _lastAddedNote = _self._noteService.getLastNote();
                 var _newCombinedData = _self.combinedData.getValue();
@@ -8238,7 +9392,7 @@ var PoiListComponent = /** @class */ (function (_super) {
                     }
                 }
             }
-        });
+        }));
     };
     PoiListComponent.prototype.ngOnChanges = function (changes) {
         if (changes.milesData || changes.poisData) {
@@ -8251,14 +9405,6 @@ var PoiListComponent = /** @class */ (function (_super) {
     };
     PoiListComponent.prototype.ngOnDestroy = function () {
         _super.prototype.ngOnDestroy.call(this);
-        if (this._dataSubscription) {
-            this._dataSubscription.unsubscribe();
-            this._dataSubscription = null;
-        }
-        if (this._notesSubscription) {
-            this._notesSubscription.unsubscribe();
-            this._notesSubscription = null;
-        }
     };
     PoiListComponent.prototype.setup = function () {
         this._staticPoisArray = [];
@@ -8291,9 +9437,9 @@ var PoiListComponent = /** @class */ (function (_super) {
         if (this.showUser) {
             var _userRef = (this.user !== undefined) ? this.user : _super.prototype.createBlankUser.call(this);
             var _array = this._staticPoisArray.concat(_userRef);
-            var _notes = this._localStorage.retrieve(this.trailGenerator.getTrailData().abbr + '_notes');
+            var _notes = this._noteService.getFlatNotesArray();
             if (_notes) {
-                _array = _array.concat(JSON.parse(_notes));
+                _array = _array.concat(_notes);
             }
             this._sortListData(_array);
             this.onUserLocationChange(_userRef);
@@ -8315,15 +9461,12 @@ var PoiListComponent = /** @class */ (function (_super) {
         this._changeDetector.markForCheck(); // needed to update user poi list item
     };
     PoiListComponent.prototype.onUserLocationChange = function (user) {
-        var _notes = this._localStorage.retrieve(this.trailGenerator.getTrailData().abbr + '_notes');
+        var _notes = this._noteService.getFlatNotesArray();
+        var _poisArray;
         // // if tracking
         if (location && this.status !== 'idle') {
             if (this.showUser) {
-                var _array = this._staticPoisArray.concat(user);
-                if (_notes) {
-                    _array = _array.concat(JSON.parse(_notes));
-                }
-                this._sortListData(_array);
+                _poisArray = this._staticPoisArray.concat(user);
             }
             if (this.milesData) {
                 this._calculateDistance(user);
@@ -8331,12 +9474,12 @@ var PoiListComponent = /** @class */ (function (_super) {
         }
         else if (this.showUser) {
             user.waypoint = user.anchorPoint = undefined;
-            var _array = this._staticPoisArray.concat(user);
-            if (_notes) {
-                _array = _array.concat(JSON.parse(_notes));
-            }
-            this._sortListData(_array);
+            _poisArray = this._staticPoisArray.concat(user);
         }
+        if (_notes) {
+            _poisArray = _poisArray.concat(_notes);
+        }
+        this._sortListData(_poisArray);
     };
     PoiListComponent.prototype._calculateDistance = function (master) {
         if (master) {
@@ -8506,7 +9649,7 @@ var PoiListComponent = /** @class */ (function (_super) {
     ], PoiListComponent.prototype, "poisData", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_poi__WEBPACK_IMPORTED_MODULE_5__["Poi"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], PoiListComponent.prototype, "masterPoi", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -8529,8 +9672,8 @@ var PoiListComponent = /** @class */ (function (_super) {
         })
         // using basic for loops, nothing fancy for performance.
         ,
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_6__["LocalStorageService"],
-            _service_note_service__WEBPACK_IMPORTED_MODULE_7__["NoteService"],
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_5__["LocalStorageService"],
+            _service_note_service__WEBPACK_IMPORTED_MODULE_6__["NoteService"],
             _angular_core__WEBPACK_IMPORTED_MODULE_1__["ChangeDetectorRef"]])
     ], PoiListComponent);
     return PoiListComponent;
@@ -8574,8 +9717,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PoiUserItemComponent", function() { return PoiUserItemComponent; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_poi__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../type/poi */ "./src/app/type/poi.ts");
-
 
 
 var PoiUserItemComponent = /** @class */ (function () {
@@ -8636,7 +9777,7 @@ var PoiUserItemComponent = /** @class */ (function () {
     ], PoiUserItemComponent.prototype, "isActive", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", _type_poi__WEBPACK_IMPORTED_MODULE_2__["Poi"])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:type", Object)
     ], PoiUserItemComponent.prototype, "data", void 0);
     tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Input"])(),
@@ -8881,6 +10022,7 @@ var MarkerService = /** @class */ (function () {
             _marker.addClass(poiTypes[i]);
         }
         if (_poiTypesLength > 1) {
+            _marker.addClass('multiple');
             _iconSize = 14;
             _extraOffset = (_iconSize / 2);
         }
@@ -8991,454 +10133,232 @@ var MarkerService = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/app/parser/at-data.ts":
-/*!***********************************!*\
-  !*** ./src/app/parser/at-data.ts ***!
-  \***********************************/
-/*! exports provided: parseATData */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseATData", function() { return parseATData; });
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! x2js */ "./node_modules/x2js/x2js.js");
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(x2js__WEBPACK_IMPORTED_MODULE_0__);
-
-var _x2js = new x2js__WEBPACK_IMPORTED_MODULE_0__({
-    attributePrefix: '' // no attribute prefix
-});
-// trail specific parser for AT data
-function parseATData(trail, trailData, poiData, snow) {
-    // TRAIL (trail is KML)
-    var _waypoints = [];
-    // 1. parser to JSON
-    var _trailAsJson = _x2js.xml2js(trailData);
-    var _coordinates = _trailAsJson['kml'].Document.Folder.Placemark;
-    console.log(_coordinates);
-    //
-    // const _coordArray = _coordinates.split(' ');
-    //
-    // _coordArray.forEach(function( coord, index): void {
-    //
-    //   const _coordValues: Array<number> = coord.split(',');
-    //   _waypoints.push({latitude: _coordValues[1], longitude: _coordValues[0], elevation: _coordValues[2]});
-    // });
-    //
-    // // POIS TODO XXX
-    //
-    // // SNOW (the current snow pack)
-    // const _snow = snow['datasets'][0]
-    //
-    // return [trail, _waypoints, null, _snow];
-    return;
-}
-// figure out what type of POIS exist in raw data, assign them to poi types TODO
-function parsePois(pois) {
-    return [];
-}
-
-
-/***/ }),
-
-/***/ "./src/app/parser/cdt-data.ts":
-/*!************************************!*\
-  !*** ./src/app/parser/cdt-data.ts ***!
-  \************************************/
-/*! exports provided: parseCDTData */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseCDTData", function() { return parseCDTData; });
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! x2js */ "./node_modules/x2js/x2js.js");
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(x2js__WEBPACK_IMPORTED_MODULE_0__);
-
-var _x2js = new x2js__WEBPACK_IMPORTED_MODULE_0__({
-    attributePrefix: '' // no attribute prefix
-});
-// trail specific parser for CDT data
-function parseCDTData(trail, trailData, poiData, snow) {
-    // TRAIL (trail is a KML)
-    var _waypoints = [];
-    // 1. parser to JSON
-    var _trailAsJson = _x2js.xml2js(trailData);
-    // 2. convert coordinates (flat string to lat/lon/ele)
-    var _coordinates = _trailAsJson['kml'].Document.Folder.Placemark.MultiGeometry.LineString.coordinates;
-    var _coordArray = _coordinates.split(' ');
-    _coordArray.forEach(function (coord, index) {
-        var _coordValues = coord.split(',');
-        _waypoints.push({ latitude: _coordValues[1], longitude: _coordValues[0], elevation: _coordValues[2] });
-    });
-    // POIS TODO XXX
-    // SNOW (the current snow pack)
-    var _snow = snow['datasets'][0];
-    return [trail, _waypoints, null, _snow];
-}
-// figure out what type of POIS exist in raw data, assign them to poi types TODO
-function parsePois(pois) {
-    return [];
-}
-
-
-/***/ }),
-
-/***/ "./src/app/parser/demo-data.ts":
-/*!*************************************!*\
-  !*** ./src/app/parser/demo-data.ts ***!
-  \*************************************/
-/*! exports provided: parseDEMOData */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseDEMOData", function() { return parseDEMOData; });
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! x2js */ "./node_modules/x2js/x2js.js");
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(x2js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-
-
-var _x2js = new x2js__WEBPACK_IMPORTED_MODULE_0__({
-    attributePrefix: '' // no attribute prefix
-});
-// trail specific parser for PCT data
-function parseDEMOData(trail, trailData, poiData, snow) {
-    // TRAIL
-    var _waypoints = [];
-    // 1. parse string
-    // fix keys
-    trailData = trailData
-        .split('ele').join('elevation')
-        .split('lat=').join('latitude=')
-        .split('lon=').join('longitude=');
-    // 2. parser to JSON
-    var trailAsJson = _x2js.xml2js(trailData);
-    // 3. parse json
-    // get just the main trail data, ignore side-trails
-    trailAsJson['gpx']['trk'].filter(function (track) {
-        return track.extensions.TrackExtension.DisplayColor.__text.includes('Red');
-    }).map(function (track) {
-        _waypoints = _waypoints.concat(track.trkseg.trkpt);
-    });
-    // POIS (=points of interest. water sources, campsites etc.)
-    // 1. parse string
-    // fix keys
-    poiData = poiData
-        .split('ele').join('elevation')
-        .split('lat=').join('latitude=')
-        .split('lon=').join('longitude=')
-        .split('desc').join('description')
-        .split('sym').join('icon');
-    // 2. parser to JSON
-    var poiAsJson = _x2js.xml2js(poiData);
-    // 3. adjust poi data
-    var _pois = parsePois(poiAsJson['gpx']['wpt']);
-    // adjust individual pois
-    // Highway 78 elevation fix (mi 77), elevation seems to be in feet, while rest of the waypoints is in meters
-    _pois[80].waypoint.elevation = _pois[80].waypoint.elevation * _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__["environment"].FOOT;
-    // add 'end' type to the last POI (highway 79)
-    _pois[126].type += ', end';
-    // SNOW (the current snow pack, from postholer.com
-    var _snow = [];
-    snow['datasets'][0].forEach(function (point, index) {
-        if (point.x <= trail.length) {
-            _snow.push(point);
-        }
-    });
-    // return
-    return [trail, _waypoints, _pois, _snow];
-}
-// figure out what type of POIS exist in raw data, assign them to poi types TODO
-function parsePois(pois) {
-    var _poisLength = pois.length; // faster
-    var _parsedPois = [];
-    var _identifierTypes = {
-        BGCa: "",
-        BV: "",
-        BVB: "",
-        CS: 'camp',
-        CSB: "",
-        CSC: "",
-        GT: 'gate',
-        GTB: "",
-        GTC: "",
-        Hwy: 'highway',
-        MexB: 'end',
-        CanB: 'end',
-        PL: 'powerline',
-        PLB: "",
-        PO: 'postoffice',
-        RD: 'road',
-        RDB: 'road',
-        RDb: "",
-        RR: 'railroad',
-        TR: 'trail',
-        WACS: 'water, camp',
-        WR: 'water',
-        WRA: 'water',
-        WRB: 'water',
-        WRC: 'water',
-        WRCS: 'water, camp',
-    };
-    for (var i = 0; i < _poisLength; i++) {
-        var _poi = pois[i];
-        _poi['id'] = i;
-        // delete if poi is mile marker
-        if (_poi['icon'] === 'Triangle, Red') {
-            delete pois[i];
-        }
-        else {
-            // create waypoint
-            _poi['waypoint'] = { latitude: _poi['latitude'], longitude: _poi['longitude'], elevation: _poi['elevation'] };
-            delete _poi['latitude'];
-            delete _poi['longitude'];
-            delete _poi['elevation'];
-            // remove color from icon
-            delete _poi['icon'];
-            // _poi['icon'] = _poi['icon'].split(', ')[0].replace(/\s/g, '');
-            // set the type based on the remaining string
-            var _identifier = _poi['name'].replace(/\d+/g, '').substr(0, 4);
-            _poi['type'] = _identifierTypes[_identifier];
-            if (!_poi['type']) {
-                _poi['type'] = 'unknown';
-            }
-            // title & description
-            var _descriptionArr = _poi['description'].split('---').join('').split(',');
-            _poi['label'] = _descriptionArr.shift();
-            _poi['description'] = parseStringUrls(_descriptionArr.join(''));
-            _parsedPois.push(_poi);
-        }
-    }
-    return _parsedPois;
-}
-function parseStringUrls(s) {
-    var _regex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
-    s = s.replace(_regex, function (match, offset, string) {
-        return '<a href="http://' + match.toLowerCase() + '" target="_blank">' + match.toLowerCase() + '</a>';
-    });
-    return s;
-}
-
-
-/***/ }),
-
-/***/ "./src/app/parser/gpx-tools.ts":
-/*!*************************************!*\
-  !*** ./src/app/parser/gpx-tools.ts ***!
-  \*************************************/
-/*! exports provided: createGPX */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createGPX", function() { return createGPX; });
-/* harmony import */ var gps_to_gpx__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! gps-to-gpx */ "./node_modules/gps-to-gpx/lib/index.js");
-/* harmony import */ var gps_to_gpx__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(gps_to_gpx__WEBPACK_IMPORTED_MODULE_0__);
-
-/* dev only class for creating clean GPX data (for use with mobile atlas creator to generate tile sets) */
-function createGPX(trailMeta, flatTrailData) {
-    var _gpxOptions = {
-        activityName: trailMeta.abbr + 'simplified',
-        creator: 'Frank Douwes',
-        startTime: null,
-        timeKey: 'time',
-    };
-    flatTrailData.forEach(function (waypoint) {
-        delete waypoint.distanceTotal;
-        delete waypoint.nearestToPois;
-        delete waypoint.distance;
-        waypoint['time'] = null;
-    });
-    // split in 3
-    // const _fileLength = Math.ceil(flatTrailData.length / 3);
-    // const _arrays = _splitArray(flatTrailData, _fileLength);
-    var _files = [];
-    //
-    // _arrays.forEach(function(fileData) {
-    //   _files.push(createGpx(fileData, _gpxOptions));
-    // });
-    _files.push(gps_to_gpx__WEBPACK_IMPORTED_MODULE_0___default()(flatTrailData, _gpxOptions));
-    return _files;
-}
-function _splitArray(array, count) {
-    var _res = [];
-    while (array.length) {
-        _res.push(array.splice(0, count));
-    }
-    return _res;
-}
-
-
-/***/ }),
-
 /***/ "./src/app/parser/pct-data.ts":
 /*!************************************!*\
   !*** ./src/app/parser/pct-data.ts ***!
   \************************************/
-/*! exports provided: parsePCTData */
+/*! exports provided: PCTData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parsePCTData", function() { return parsePCTData; });
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! x2js */ "./node_modules/x2js/x2js.js");
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(x2js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PCTData", function() { return PCTData; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var _util_geolib_distance__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../_util/geolib/distance */ "./src/app/_util/geolib/distance.ts");
+/* harmony import */ var _util_leaflet_converter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../_util/leaflet/converter */ "./src/app/_util/leaflet/converter.ts");
+/* harmony import */ var _base_trail_parser_trail_parser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../base/trail-parser/trail-parser */ "./src/app/base/trail-parser/trail-parser.ts");
 
 
-var _identifierList = [];
-var _x2js = new x2js__WEBPACK_IMPORTED_MODULE_0__({
-    attributePrefix: '' // no attribute prefix
-});
-// trail specific parser for PCT data
-function parsePCTData(trail, trailData, poiData, snow) {
-    // TRAIL
-    var _waypoints = [];
-    // 1. parse string
-    // fix keys
-    trailData = trailData
-        .split('ele').join('elevation')
-        .split('lat=').join('latitude=')
-        .split('lon=').join('longitude=');
-    // 2. parser to JSON
-    var trailAsJson = _x2js.xml2js(trailData);
-    // 3. parse json
-    // get just the main trail data, ignore side-trails
-    trailAsJson['gpx']['trk'].filter(function (track) {
-        return track.extensions.TrackExtension.DisplayColor.__text.includes('Red');
-    }).map(function (track) {
-        _waypoints = _waypoints.concat(track.trkseg.trkpt);
-    });
-    // POIS (=points of interest. water sources, campsites etc.)
-    // 1. parse string
-    // fix keys
-    poiData = poiData
-        .split('ele').join('elevation')
-        .split('lat=').join('latitude=')
-        .split('lon=').join('longitude=')
-        .split('desc').join('description')
-        .split('cmt').join('comment')
-        .split('sym').join('icon');
-    // 2. parser to JSON
-    var poiAsJson = _x2js.xml2js(poiData);
-    // 3. adjust poi data
-    var _pois = parsePois(poiAsJson['gpx']['wpt']);
-    // adjust individual pois
-    // Highway elevation seems to be in feet, while rest of the waypoints is in meters
-    var _highwayExceptions = ['Highway 78', 'Highway 74', 'Highway 178', 'Highway 108', 'Highway 50', 'Highway 49', 'Highway 36',
-        'Highway 299', 'Highway 5', 'Highway 99', 'Highway 140', 'Hwy 242', 'under Highway 84', 'Stevens Pass', 'Highway 20'];
-    var _pLength = _pois.length;
-    var _eLength = _highwayExceptions.length;
-    for (var p = 0; p < _pLength; p++) {
-        var _exception = -1;
-        for (var e = 0; e < _eLength; e++) {
-            if (_pois[p].label.includes(_highwayExceptions[e])) {
-                _pois[p].waypoint.elevation = _pois[p].waypoint.elevation * _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__["environment"].FOOT;
-                _exception = e;
+
+
+
+/* Pacific Crest Trail www.pcta.org */
+var PCTData = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](PCTData, _super);
+    function PCTData() {
+        return _super.call(this) || this;
+    }
+    // parses the entire PCT as well as the DEMO trail (the first section of the PCT)
+    PCTData.prototype.parse = function (trail, trailData, poiData, snow, towns, direction) {
+        _super.prototype.parse.call(this, trail, trailData, poiData, snow, towns, direction);
+        // set waypoint string property conversion values
+        this.findReplaceArray = [
+            { find: 'ele', replace: 'elevation' },
+            { find: 'lat=', replace: 'latitude=' },
+            { find: 'lon=', replace: 'longitude=' },
+            { find: 'desc', replace: 'description' },
+            { find: 'cmt', replace: 'comment' },
+            { find: 'sym', replace: 'icon' }
+        ];
+        // WAYPOINTS
+        // convert the waypoints
+        var _trailData;
+        if (Array.isArray(this.trailData)) {
+            _trailData = this.parseTrail(this.trailData);
+        }
+        else {
+            _trailData = this.parseTrail([this.trailData]);
+        }
+        trail.length = this.totalDistance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__["environment"].MILE;
+        // POIS (=points of interest. water sources, campsites etc.)
+        poiData = this.convertToWaypointString(poiData);
+        var poiAsJson = this.x2js.xml2js(poiData);
+        var _pois = this.directionReverse(this.parsePois(poiAsJson['gpx']['wpt']));
+        return [trail, _trailData, _pois, snow['datasets'][0], towns];
+    };
+    PCTData.prototype.parseTrail = function (trailData) {
+        var _self = this;
+        // TRAIL
+        var _waypoints = [];
+        trailData.forEach(function (trailString, index) {
+            trailString = _self.convertToWaypointString(trailString);
+            console.log(trailString);
+            var trailAsJson = _self.x2js.xml2js(trailString);
+            console.log(trailAsJson);
+            // get just the main trail data, ignore side-trails (for now)
+            if (!Array.isArray(trailAsJson['gpx']['trk'])) {
+                // convert to array with 1 track
+                trailAsJson['gpx']['trk'] = [trailAsJson['gpx']['trk']];
+            }
+            trailAsJson['gpx']['trk'] = _self.directionReverse(trailAsJson['gpx']['trk']);
+            var _length = trailAsJson['gpx']['trk'].length;
+            for (var i = 0; i < _length; i++) {
+                var _section = trailAsJson['gpx']['trk'][i];
+                // 'Red' identifies the main track
+                if (_section.extensions.TrackExtension.DisplayColor.__text.includes('Red')) {
+                    _section.trkseg.trkpt = _self.directionReverse(_section.trkseg.trkpt);
+                    var _sectionWaypoints = Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_3__["pointArrayTypeConversion"])(_section.trkseg.trkpt, 'waypoint', 'waypoint');
+                    var _trailLength = void 0;
+                    // DEMO data has a single number, PCT has an array (sections)
+                    if (typeof _self.trail.length === 'number') {
+                        _trailLength = _self.trail.length;
+                    }
+                    else {
+                        _trailLength = _self.trail.length[index];
+                    }
+                    var _scale = Object(_util_geolib_distance__WEBPACK_IMPORTED_MODULE_2__["calculateSectionScale"])(_sectionWaypoints, _trailLength);
+                    _sectionWaypoints = _self.addDistanceToWaypoints(_sectionWaypoints, _scale);
+                    _waypoints = _waypoints.concat(_sectionWaypoints);
+                }
+            }
+        });
+        return _waypoints;
+    };
+    // TODO: cleanup (dealing with other peoples data files gets messy)
+    PCTData.prototype.parsePois = function (pois) {
+        var _poisLength = pois.length; // faster
+        var _parsedPois = [];
+        // a static list of poi types based on the raw data identifiers, which are manually linked to poiTypes (or unknown)
+        var _identifierTypes = { MexB: 'end', WR: 'water', RD: 'road', RDB: 'road', PO: 'postoffice', Trad: 'store, food', Hwy: 'highway', RR: 'railroad', CS: 'camp', GT: 'gate', GTB: 'gate', PL: 'powerline', PLB: 'powerline', WRCS: 'water, camp', WACS: 'water, camp', OakS: 'store, food', Kitc: 'water', TR: 'trail', RedT: 'information', RDb: 'road', Deck: 'view', TH: 'trailhead', WRA: 'water', WRB: 'water', WRC: 'water', BV: 'camp', BVB: 'camp', CSC: 'camp', CSB: 'camp', BGCa: 'sight', Ranc: 'view', GTC: 'gate', Eagl: 'sight', HwyB: 'highway', TRb: 'trail', WRb: 'water', Heme: 'store, food', Tqtz: 'water', Humb: 'trailhead', Sadd: 'trail', PSTr: 'trail', TrRo: 'trail', WA: 'water', MtSa: 'view', Roun: 'boundary', SJSh: 'shelter', TrWi: 'trail', Well: 'water', SJTr: 'trail', BY: 'boundary', Suic: 'peak', TrSu: 'trail', Stra: 'trailhead', Zigg: 'resort', RDC: 'road', CCra: 'sight', Fish: 'trail', Anim: 'sight', Spli: 'shelter', Brid: 'bridge', MFSp: 'unknown', Stat: 'boundary', Moja: 'powerline', Fore: 'boundary', McDo: 'food', RRB: 'railroad', RDD: 'road', Bald: 'trailhead', MtBa: 'peak', Memo: 'sight', Door: 'water', TRB: 'trail', TRC: 'trail', HwyC: 'highway', BigR: 'water', Burk: 'peak', Punc: 'water', HwyD: 'highway', HwyE: 'highway', Buck: 'road', HWYF: 'highway', HwyG: 'highway', HwyH: 'highway', HwyI: 'highway', Mess: 'camp', Acto: 'resort', Gold: 'sight', Agua: 'town', Sier: 'highway', Benc: 'sight', Casa: 'resort', Iber: 'postoffice, water', Wind: 'sight', Pass: 'peak', Gull: 'sight', KMSt: 'resort', WAB: 'water', Hors: 'camp', JMT: 'trail', BVI: 'camp', CSH: 'camp', CSL: 'camp', CSM: 'camp', MTWh: 'peak', Trai: 'peak', WAC: 'water', WAD: 'water', WAE: 'water', WAJ: 'water', WAN: 'water', WAO: 'water', WAQ: 'water', WAS: 'water', WAT: 'water', WAU: 'water', Onio: 'trailhead', RaeL: 'information', GTD: 'gate', McCl: 'information', HotS: 'sight', Muir: 'resort', CSD: 'camp', VVR: 'resort', Reds: 'resort', CSO: 'camp', WAF: 'water', WAK: 'water', WAV: 'water', MMSk: 'unknown', NoCa: 'warning', Tuol: 'postoffice, store, food', JMTC: 'camp', Happ: 'road', HWYB: 'highway', JMTW: 'water', Walk: 'trailhead', Cars: 'boundary', Meis: 'water', Echo: 'trailhead', Ski: 'sight', Weat: 'sight', Rest: 'sight', Pete: 'camp', Chur: 'sight', Road: 'road', Paul: 'water', EBra: 'water', WBra: 'water', RDN: 'road', Bear: 'water', Hask: 'store, resort', Lake: 'resort', Beld: 'resort', Will: 'water', Myrt: 'water', Cold: 'water', PCTM: 'sight', HWY: 'highway', Drak: 'resort', OldS: 'town', JJsC: 'food, store', Subw: 'water', HatC: 'view', Crys: 'water', Brit: 'water', Fitz: 'water', Fern: 'water', Dead: 'water', Litt: 'water', Wolf: 'water', Etna: 'road', Shel: 'water', Marb: 'water, camp', Seia: 'resort', Alex: 'water', Ward: 'road', Oreg: 'boundary', Rogu: 'boundary', Call: 'resort', OldH: 'highway', Camp: 'resort', Klum: 'camp, water', Howa: 'water, road', Brow: 'water, camp', RimD: 'highway', RimV: 'information', RimT: 'trailhead', Casc: 'water', Summ: 'trailhead', Maza: 'resort', ORWA: 'sign', CSDi: 'camp', SkiS: 'sight, camp', Isla: 'water', Koos: 'camp', Obsi: 'boundary, warning', Sant: 'trailhead', Jeff: 'boundary', SFor: 'water', Park: 'camp', Many: 'view', Olal: 'resort', Pinh: 'trailhead', OakG: 'water', Kohn: 'boundary', Timb: 'resort', Radi: 'sight', Ramo: 'water', Mudd: 'water, camp', Indi: 'water', Mile: 'sight', High: 'sight', Tunn: 'sight', SWMo: 'road', Tabl: 'information', Blue: 'water, camp', Yaka: 'warning', Krac: 'resort', TwoL: 'water', BigC: 'camp', Mart: 'camp', Uric: 'camp, water', Olla: 'sight', MFor: 'camp, water', Dutc: 'view', Lema: 'camp', Deep: 'water', Dece: 'water', HwyJ: 'highway', Rain: 'water', Monu: 'end', RESO: 'resort' };
+        var _count = 0;
+        for (var i = 0; i < _poisLength; i++) {
+            var _poi = pois[i];
+            // delete if poi is mile marker
+            if (_poi['icon'] === 'Triangle, Red') {
+                delete pois[i];
+            }
+            else {
+                _poi['id'] = _count;
+                _count++;
+                // create waypoint
+                _poi['waypoint'] = { latitude: _poi['latitude'], longitude: _poi['longitude'], elevation: _poi['elevation'] };
+                delete _poi['latitude'];
+                delete _poi['longitude'];
+                delete _poi['elevation'];
+                // remove color from icon
+                delete _poi['icon'];
+                // set the type based on the remaining string
+                var _identifier = _poi['name'].replace(/\d+/g, '');
+                // '-' means side trail, which we're ignoring for now.
+                if (!_poi['name'].includes('-')) {
+                    var _last2Letters = _identifier.substr(_identifier.length - 2, _identifier.length - 1).toLowerCase();
+                    var _last3Letters = _identifier.substr(_identifier.length - 3, _identifier.length - 1).toLowerCase();
+                    var _last4Letters = _identifier.substr(_identifier.length - 4, _identifier.length - 1).toLowerCase();
+                    if (_last2Letters === 'tr') {
+                        _identifier = 'TR';
+                    }
+                    else if (_last2Letters === 'th') {
+                        _identifier = 'TH';
+                    }
+                    else if (_last2Letters === 'cg' || _last3Letters === 'cmp') {
+                        _identifier = 'WRCS';
+                    }
+                    else if (_last2Letters === 'np' || _last2Letters === 'nf' || _last2Letters === 'sp' || _last4Letters === 'wild') {
+                        _identifier = 'BY';
+                    }
+                    else if (_last2Letters === 'rd' || _last4Letters === 'road') {
+                        _identifier = 'RD';
+                    }
+                    else if (_last4Letters === 'inn' || _last4Letters === 'odge' || _last4Letters === 'sort') {
+                        _identifier = 'RESO';
+                    }
+                    else if (_last4Letters === 'pass') {
+                        _identifier = 'Pass';
+                    }
+                    else if (_last4Letters === 'ring' || _last4Letters === 'reek' || _last4Letters === 'iver'
+                        || _last4Letters === 'trib' || _last4Letters === 'lake' || _last4Letters === 'pond' || _last4Letters === 'seep'
+                        || _last3Letters === 'crk' || _last3Letters === 'spg' || _last4Letters === 'fork') {
+                        _identifier = 'WA';
+                    }
+                    else if (_last4Letters === 'camp') {
+                        _identifier = 'CS';
+                    }
+                    else {
+                        _identifier = _poi['name'].replace(/\d+/g, '').substr(0, 4);
+                    }
+                    // generateIdentifierList(_identifier);
+                }
+                _poi['type'] = _identifierTypes[_identifier];
+                if (!_poi['type']) {
+                    _poi['type'] = 'unknown';
+                }
+                // title & description
+                console.log(JSON.stringify(_poi['description']));
+                var _textArray = this._splitCleanStrings(_poi['description'], [', ', '---', '<br/>']);
+                var _labelArray = _textArray.shift().split('. ');
+                _poi['label'] = _labelArray.shift();
+                _textArray.unshift(_labelArray.join('. '));
+                // filter out blank elements
+                var _descriptionArray = _textArray.filter(function (element) {
+                    return element !== '';
+                });
+                var _description = _descriptionArray.join(' ').split('. ').join('<br/><br/>');
+                _poi['description'] = this._convertDescription(_description);
+                _poi['identifier'] = 'HM: ' + _poi['name'];
+                delete _poi['name'];
+                _parsedPois.push(_poi);
+            }
+        }
+        // 4. adjust individual pois
+        // Highway elevation seems to be in feet, while rest of the waypoints is in meters
+        var _highwayExceptions = ['Highway 78', 'Highway 74', 'Highway 178', 'Highway 108', 'Highway 50', 'Highway 49', 'Highway 36',
+            'Highway 299', 'Highway 5', 'Highway 99', 'Highway 140', 'Hwy 242', 'under Highway 84', 'Stevens Pass', 'Highway 20'];
+        var _pLength = _parsedPois.length;
+        var _eLength = _highwayExceptions.length;
+        for (var p = 0; p < _pLength; p++) {
+            var _exception = -1;
+            for (var e = 0; e < _eLength; e++) {
+                if (_parsedPois[p].label.includes(_highwayExceptions[e])) {
+                    _parsedPois[p].waypoint.elevation = _parsedPois[p].waypoint.elevation * _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__["environment"].FOOT;
+                    _exception = e;
+                    break;
+                }
+            }
+            if (_exception !== -1) {
+                _highwayExceptions.splice(_exception, 1);
+            }
+            if (_highwayExceptions.length === 0) {
                 break;
             }
         }
-        if (_exception !== -1) {
-            _highwayExceptions.splice(_exception, 1);
-        }
-        if (_highwayExceptions.length === 0) {
-            break;
-        }
-    }
-    // SNOW (the current snow pack)
-    var _snow = snow['datasets'][0];
-    // return
-    return [trail, _waypoints, _pois, _snow];
-}
-// figure out what type of POIS exist in raw data, assign them to poi types TODO
-function parsePois(pois) {
-    var _poisLength = pois.length; // faster
-    var _parsedPois = [];
-    // a static list of poi types based on the raw data identifiers, which are manually linked to poiTypes (or unknown)
-    var _identifierTypes = { MexB: 'end', WR: 'water', RD: 'road', RDB: 'road', PO: 'postoffice', Trad: 'store, food', Hwy: 'highway', RR: 'railroad', CS: 'camp', GT: 'gate', GTB: 'gate', PL: 'powerline', PLB: 'powerline', WRCS: 'water, camp', WACS: 'water, camp', OakS: 'store, food', Kitc: 'water', TR: 'trail', RedT: 'information', RDb: 'road', Deck: 'view', TH: 'trailhead', WRA: 'water', WRB: 'water', WRC: 'water', BV: 'camp', BVB: 'camp', CSC: 'camp', CSB: 'camp', BGCa: 'sight', Ranc: 'view', GTC: 'gate', Eagl: 'sight', HwyB: 'highway', TRb: 'trail', WRb: 'water', Heme: 'store, food', Tqtz: 'water', Humb: 'trailhead', Sadd: 'trail', PSTr: 'trail', TrRo: 'trail', WA: 'water', MtSa: 'view', Roun: 'boundary', SJSh: 'shelter', TrWi: 'trail', Well: 'water', SJTr: 'trail', BY: 'boundary', Suic: 'peak', TrSu: 'trail', Stra: 'trailhead', Zigg: 'resort', RDC: 'road', CCra: 'sight', Fish: 'trail', Anim: 'sight', Spli: 'shelter', Brid: 'bridge', MFSp: 'unknown', Stat: 'boundary', Moja: 'powerline', Fore: 'boundary', McDo: 'food', RRB: 'railroad', RDD: 'road', Bald: 'trailhead', MtBa: 'peak', Memo: 'sight', Door: 'water', TRB: 'trail', TRC: 'trail', HwyC: 'highway', BigR: 'water', Burk: 'peak', Punc: 'water', HwyD: 'highway', HwyE: 'highway', Buck: 'road', HWYF: 'highway', HwyG: 'highway', HwyH: 'highway', HwyI: 'highway', Mess: 'camp', Acto: 'resort', Gold: 'sight', Agua: 'town', Sier: 'highway', Benc: 'sight', Casa: 'resort', Iber: 'postoffice, water', Wind: 'sight', Pass: 'peak', Gull: 'sight', KMSt: 'resort', WAB: 'water', Hors: 'camp', JMT: 'trail', BVI: 'camp', CSH: 'camp', CSL: 'camp', CSM: 'camp', MTWh: 'peak', Trai: 'peak', WAC: 'water', WAD: 'water', WAE: 'water', WAJ: 'water', WAN: 'water', WAO: 'water', WAQ: 'water', WAS: 'water', WAT: 'water', WAU: 'water', Onio: 'trailhead', RaeL: 'information', GTD: 'gate', McCl: 'information', HotS: 'sight', Muir: 'resort', CSD: 'camp', VVR: 'resort', Reds: 'resort', CSO: 'camp', WAF: 'water', WAK: 'water', WAV: 'water', MMSk: 'unknown', NoCa: 'warning', Tuol: 'postoffice, store, food', JMTC: 'camp', Happ: 'road', HWYB: 'highway', JMTW: 'water', Walk: 'trailhead', Cars: 'boundary', Meis: 'water', Echo: 'trailhead', Ski: 'sight', Weat: 'sight', Rest: 'sight', Pete: 'camp', Chur: 'sight', Road: 'road', Paul: 'water', EBra: 'water', WBra: 'water', RDN: 'road', Bear: 'water', Hask: 'store, resort', Lake: 'resort', Beld: 'resort', Will: 'water', Myrt: 'water', Cold: 'water', PCTM: 'sight', HWY: 'highway', Drak: 'resort', OldS: 'town', JJsC: 'food, store', Subw: 'water', HatC: 'view', Crys: 'water', Brit: 'water', Fitz: 'water', Fern: 'water', Dead: 'water', Litt: 'water', Wolf: 'water', Etna: 'road', Shel: 'water', Marb: 'water, camp', Seia: 'resort', Alex: 'water', Ward: 'road', Oreg: 'boundary', Rogu: 'boundary', Call: 'resort', OldH: 'highway', Camp: 'resort', Klum: 'camp, water', Howa: 'water, road', Brow: 'water, camp', RimD: 'highway', RimV: 'information', RimT: 'trailhead', Casc: 'water', Summ: 'trailhead', Maza: 'resort', ORWA: 'sign', CSDi: 'camp', SkiS: 'sight, camp', Isla: 'water', Koos: 'camp', Obsi: 'boundary, warning', Sant: 'trailhead', Jeff: 'boundary', SFor: 'water', Park: 'camp', Many: 'view', Olal: 'resort', Pinh: 'trailhead', OakG: 'water', Kohn: 'boundary', Timb: 'resort', Radi: 'sight', Ramo: 'water', Mudd: 'water, camp', Indi: 'water', Mile: 'sight', High: 'sight', Tunn: 'sight', SWMo: 'road', Tabl: 'information', Blue: 'water, camp', Yaka: 'warning', Krac: 'resort', TwoL: 'water', BigC: 'camp', Mart: 'camp', Uric: 'camp, water', Olla: 'sight', MFor: 'camp, water', Dutc: 'view', Lema: 'camp', Deep: 'water', Dece: 'water', HwyJ: 'highway', Rain: 'water', Monu: 'end', RESO: 'resort' };
-    var _count = 0;
-    for (var i = 0; i < _poisLength; i++) {
-        var _poi = pois[i];
-        // delete if poi is mile marker
-        if (_poi['icon'] === 'Triangle, Red') {
-            delete pois[i];
-        }
-        else {
-            _poi['id'] = _count;
-            _count++;
-            // create waypoint
-            _poi['waypoint'] = { latitude: _poi['latitude'], longitude: _poi['longitude'], elevation: _poi['elevation'] };
-            delete _poi['latitude'];
-            delete _poi['longitude'];
-            delete _poi['elevation'];
-            // remove color from icon
-            delete _poi['icon'];
-            // set the type based on the remaining string
-            var _identifier = _poi['name'].replace(/\d+/g, '');
-            // '-' means side trail, which we're ignoring for now.
-            if (!_poi['name'].includes('-')) {
-                var _last2Letters = _identifier.substr(_identifier.length - 2, _identifier.length - 1).toLowerCase();
-                var _last3Letters = _identifier.substr(_identifier.length - 3, _identifier.length - 1).toLowerCase();
-                var _last4Letters = _identifier.substr(_identifier.length - 4, _identifier.length - 1).toLowerCase();
-                if (_last2Letters === 'tr') {
-                    _identifier = 'TR';
-                }
-                else if (_last2Letters === 'th') {
-                    _identifier = 'TH';
-                }
-                else if (_last2Letters === 'cg' || _last3Letters === 'cmp') {
-                    _identifier = 'WRCS';
-                }
-                else if (_last2Letters === 'np' || _last2Letters === 'nf' || _last2Letters === 'sp' || _last4Letters === 'wild') {
-                    _identifier = 'BY';
-                }
-                else if (_last2Letters === 'rd' || _last4Letters === 'road') {
-                    _identifier = 'RD';
-                }
-                else if (_last4Letters === 'inn' || _last4Letters === 'odge' || _last4Letters === 'sort') {
-                    _identifier = 'RESO';
-                }
-                else if (_last4Letters === 'pass') {
-                    _identifier = 'Pass';
-                }
-                else if (_last4Letters === 'ring' || _last4Letters === 'reek' || _last4Letters === 'iver'
-                    || _last4Letters === 'trib' || _last4Letters === 'lake' || _last4Letters === 'pond' || _last4Letters === 'seep'
-                    || _last3Letters === 'crk' || _last3Letters === 'spg' || _last4Letters === 'fork') {
-                    _identifier = 'WA';
-                }
-                else if (_last4Letters === 'camp') {
-                    _identifier = 'CS';
-                }
-                else {
-                    _identifier = _poi['name'].replace(/\d+/g, '').substr(0, 4);
-                }
-                // generateIdentifierList(_identifier);
+        return _parsedPois;
+    };
+    PCTData.prototype._convertDescription = function (input) {
+        var _description = this.convertStringUrls(input); // a href tag
+        _description = this.convertStringTel(_description); // a tel tag
+        _description = this._capFirstLetter(_description); // capitalize
+        return _description;
+    };
+    // does not support ~ (tilde), this is slow...
+    PCTData.prototype._splitCleanStrings = function (input, remove) {
+        remove.push('~');
+        var _input = input;
+        var _length = remove.length;
+        for (var i = 0; i < _length; i++) {
+            _input = _input.split(remove[i]);
+            if (i !== _length - 1) {
+                _input = _input.join('~');
             }
-            _poi['type'] = _identifierTypes[_identifier];
-            if (!_poi['type']) {
-                _poi['type'] = 'unknown';
-            }
-            // title & description
-            var _descriptionArr = _poi['description'].split('---').join('').split(',');
-            _poi['label'] = _descriptionArr.shift();
-            _poi['description'] = parseStringUrls(_descriptionArr.join(''));
-            console.log(_poi);
-            _parsedPois.push(_poi);
         }
-    }
-    return _parsedPois;
-}
-function generateIdentifierList(input) {
-    if (_identifierList.indexOf(input) === -1) {
-        _identifierList.push(input);
-    }
-}
-function parseStringUrls(s) {
-    var _regex = /(([a-z]+:\/\/)?(([a-z0-9\-]+\.)+([a-z]{2}|aero|arpa|biz|com|coop|edu|gov|info|int|jobs|mil|museum|name|nato|net|org|pro|travel|local|internal))(:[0-9]{1,5})?(\/[a-z0-9_\-\.~]+)*(\/([a-z0-9_\-\.]*)(\?[a-z0-9+_\-\.%=&amp;]*)?)?(#[a-zA-Z0-9!$&'()*+.=-_~:@/?]*)?)(\s+|$)/gi;
-    s = s.replace(_regex, function (match, offset, string) {
-        return '<a href="http://' + match.toLowerCase() + '" target="_blank">' + match.toLowerCase() + '</a>';
-    });
-    return s;
-}
+        return _input;
+    };
+    PCTData.prototype._capFirstLetter = function (input) {
+        return input.charAt(0).toUpperCase() + input.slice(1);
+    };
+    return PCTData;
+}(_base_trail_parser_trail_parser__WEBPACK_IMPORTED_MODULE_4__["TrailParser"]));
+
 
 
 /***/ }),
@@ -9447,115 +10367,145 @@ function parseStringUrls(s) {
 /*!************************************!*\
   !*** ./src/app/parser/shr-data.ts ***!
   \************************************/
-/*! exports provided: parseSHRData */
+/*! exports provided: SHRData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parseSHRData", function() { return parseSHRData; });
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! x2js */ "./node_modules/x2js/x2js.js");
-/* harmony import */ var x2js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(x2js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SHRData", function() { return SHRData; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+/* harmony import */ var _util_geolib_distance__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../_util/geolib/distance */ "./src/app/_util/geolib/distance.ts");
+/* harmony import */ var _util_leaflet_converter__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../_util/leaflet/converter */ "./src/app/_util/leaflet/converter.ts");
+/* harmony import */ var _base_trail_parser_trail_parser__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../base/trail-parser/trail-parser */ "./src/app/base/trail-parser/trail-parser.ts");
 
-var _x2js = new x2js__WEBPACK_IMPORTED_MODULE_0__({
-    attributePrefix: '' // no attribute prefix
-});
-// trail specific parser for AT data
-function parseSHRData(trail, trailData, poiData, snow) {
-    // TRAIL
-    var _waypoints = [];
-    // 1. parse string
-    // fix keys
-    trailData = trailData
-        .split('ele').join('elevation')
-        .split('lat=').join('latitude=')
-        .split('lon=').join('longitude=');
-    // 2. parser to JSON
-    var trailAsJson = _x2js.xml2js(trailData);
-    // 3. parse json
-    // combine all track segments in a single array
-    trailAsJson['gpx']['trk'][1]['trkseg'].forEach(function (track) {
-        _waypoints = _waypoints.concat(track.trkpt);
-    });
-    // 1. parse string
-    // fix keys
-    poiData = poiData
-        .split('ele').join('elevation')
-        .split('lat=').join('latitude=')
-        .split('lon=').join('longitude=')
-        .split('dsc').join('description')
-        .split('cmt').join('comment');
-    // 2. parser to JSON
-    var poiAsJson = _x2js.xml2js(poiData);
-    var _combinedPoiData = poiAsJson['gpx']['wpt'];
-    // 3. adjust poi data
-    var _pois = parsePois(_combinedPoiData);
-    return [trail, _waypoints, _pois, snow];
-}
-// figure out what type of POIS exist in raw data, assign them to poi types TODO
-function parsePois(pois) {
-    pois.forEach(function (poi, index) {
-        console.log(poi);
-        poi['id'] = index;
-        // create waypoint
-        poi['waypoint'] = { latitude: poi['latitude'], longitude: poi['longitude'], elevation: poi['elevation'] };
-        delete poi['latitude'];
-        delete poi['longitude'];
-        delete poi['elevation'];
-        console.log(poi['waypoint']);
-        // fix name
-        if (poi['name'].match(/^\d/)) {
-            // string starts with a number
-            var _parts = poi['name'].split(' - ');
-            poi['name'] = _parts[0];
-            poi['label'] = _parts[1] || 'unknown';
+
+
+
+
+/* Sierra High Route, only app that supports it! */
+var SHRData = /** @class */ (function (_super) {
+    tslib__WEBPACK_IMPORTED_MODULE_0__["__extends"](SHRData, _super);
+    function SHRData() {
+        return _super.call(this) || this;
+    }
+    // parses the entire PCT as well as the DEMO trail (the first section of the PCT)
+    SHRData.prototype.parse = function (trail, trailData, poiData, snow, towns, direction) {
+        _super.prototype.parse.call(this, trail, trailData, poiData, snow, towns, direction);
+        // set waypoint string property conversion values
+        this.findReplaceArray = [
+            { find: 'ele', replace: 'elevation' },
+            { find: 'lat=', replace: 'latitude=' },
+            { find: 'lon=', replace: 'longitude=' },
+            { find: 'desc', replace: 'description' }
+        ];
+        // WAYPOINTS
+        // convert the waypoints
+        var _trailData = this.parseTrail(this.trailData);
+        trail.length = this.totalDistance / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_1__["environment"].MILE;
+        // POIS (=points of interest. water sources, campsites etc.)
+        poiData = this.convertToWaypointString(poiData);
+        var poiAsJson = this.x2js.xml2js(poiData);
+        var _pois = this.directionReverse(this.parsePois(poiAsJson['gpx']['wpt']));
+        return [trail, _trailData, _pois, snow, towns];
+    };
+    SHRData.prototype.parseTrail = function (trailData) {
+        var _self = this;
+        // TRAIL
+        var _waypoints = [];
+        trailData = _self.convertToWaypointString(trailData);
+        var trailAsJson = _self.x2js.xml2js(trailData);
+        var _tracks = _self.directionReverse(trailAsJson['gpx']['trk'][1]['trkseg']);
+        // combine all track segments in a single array
+        _tracks.forEach(function (track) {
+            var _sectionWaypoints = _self.directionReverse(Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_3__["pointArrayTypeConversion"])(track['trkpt'], 'waypoint', 'waypoint'));
+            _waypoints = _waypoints.concat(_sectionWaypoints);
+        });
+        var _trailLength = _self.trail.length;
+        var _scale = Object(_util_geolib_distance__WEBPACK_IMPORTED_MODULE_2__["calculateSectionScale"])(_waypoints, _trailLength);
+        _waypoints = _self.smoothFlatPoints(_waypoints);
+        _waypoints = _self.addDistanceToWaypoints(_waypoints, _scale);
+        return _waypoints;
+    };
+    // remove waypoints that don't have elevation
+    SHRData.prototype.smoothFlatPoints = function (waypoints) {
+        var _length = waypoints.length;
+        for (var i = 0; i < _length; i++) {
+            var _waypoint = waypoints[i];
+            if (!_waypoint.elevation) {
+                _waypoint.elevation = (waypoints[i - 1].elevation + waypoints[i + 1].elevation) / 2;
+            }
         }
-        else {
-            poi['name'] = poi['label'] = poi['name'].split(' - ')[0];
-        }
-        // if no name, use a part of the description
-        if (!poi['name']) {
-            if (String(poi['description']).includes(' - ')) {
-                poi['name'] = poi['label'] = poi['description'].split(' - ')[0] || 'unknown';
+        return waypoints;
+    };
+    SHRData.prototype.parsePois = function (pois) {
+        pois.forEach(function (poi, index) {
+            poi['id'] = index;
+            // create waypoint
+            poi['waypoint'] = { latitude: poi['latitude'], longitude: poi['longitude'], elevation: poi['elevation'] };
+            delete poi['latitude'];
+            delete poi['longitude'];
+            delete poi['elevation'];
+            // fix name
+            if (poi['name'].match(/^\d/)) {
+                // string starts with a number
+                var _parts = poi['name'].split(' - ');
+                poi['name'] = _parts[0];
+                poi['label'] = _parts[1] || 'unknown';
             }
             else {
-                poi['name'] = poi['label'] = 'alternate';
+                poi['name'] = poi['label'] = poi['name'].split(' - ')[0];
             }
-        }
-        // TODO: parse poi types
-        // set the type based on the remaining string
-        var _identifier = poi['name'] + poi['label'];
-        poi['type'] = 'unknown';
-        if (_identifier.includes('Begin') || _identifier.includes('Mono Village')) {
-            poi['type'] = 'end';
-        }
-        if (_identifier.includes('Peak') || _identifier.includes('Mount') || _identifier.includes('Col')) {
-            poi['type'] = 'peak';
-        }
-        if (_identifier.includes('Lake') || _identifier.includes('Outlet') || _identifier.includes('WA')
-            || _identifier.includes('Stream') || _identifier.includes('Tarn') || _identifier.includes('Creek')) {
-            poi['type'] = 'water';
-        }
-        if (_identifier.includes('WACS')) {
-            poi['type'] = 'water, camp';
-        }
-        if (_identifier.includes('Pass') || _identifier.includes('Saddle')) {
-            poi['type'] = 'view';
-        }
-        if (_identifier.includes('Memorial')) {
-            poi['type'] = 'sight';
-        }
-        if (_identifier.includes('OnionValley')) {
-            poi['type'] = 'trailhead';
-        }
-        if (_identifier.includes('CS') || _identifier.includes('Campsite')) {
-            poi['type'] = 'camp';
-        }
-        if (_identifier.includes('Point')) {
-            poi['type'] = 'view';
-        }
-    });
-    return pois;
-}
+            // if no name, use a part of the description
+            if (!poi['name']) {
+                if (String(poi['description']).includes(' - ')) {
+                    poi['name'] = poi['label'] = poi['description'].split(' - ')[0] || 'unknown';
+                }
+                else {
+                    poi['name'] = poi['label'] = 'alternate';
+                }
+            }
+            // TODO: parse poi types
+            // set the type based on the remaining string
+            var _identifier = poi['name'] + poi['label'];
+            poi['type'] = 'unknown';
+            if (_identifier.includes('Begin') || _identifier.includes('Mono Village')) {
+                poi['type'] = 'end';
+            }
+            else if (_identifier.includes('Peak') || _identifier.includes('Mount') || _identifier.includes('Col')) {
+                poi['type'] = 'peak';
+            }
+            else if (_identifier.includes('Lake') || _identifier.includes('Outlet') || _identifier.includes('WA')
+                || _identifier.includes('Stream') || _identifier.includes('Tarn') || _identifier.includes('Creek')) {
+                poi['type'] = 'water';
+            }
+            else if (_identifier.includes('WACS')) {
+                poi['type'] = 'water, camp';
+            }
+            else if (_identifier.includes('Pass') || _identifier.includes('Saddle')) {
+                poi['type'] = 'view';
+            }
+            else if (_identifier.includes('Memorial')) {
+                poi['type'] = 'sight';
+            }
+            else if (_identifier.includes('OnionValley')) {
+                poi['type'] = 'trailhead';
+            }
+            else if (_identifier.includes('CS') || _identifier.includes('Campsite')) {
+                poi['type'] = 'camp';
+            }
+            else if (_identifier.includes('Point')) {
+                poi['type'] = 'view';
+            }
+            // TODO: cleanup unused properties
+            delete poi['sym'];
+            delete poi['name'];
+        });
+        return pois;
+    };
+    return SHRData;
+}(_base_trail_parser_trail_parser__WEBPACK_IMPORTED_MODULE_4__["TrailParser"]));
+
 
 
 /***/ }),
@@ -9747,20 +10697,18 @@ __webpack_require__.r(__webpack_exports__);
 var ConnectionService = /** @class */ (function () {
     function ConnectionService() {
         this._connection = new rxjs__WEBPACK_IMPORTED_MODULE_2__["BehaviorSubject"](false);
+        this.state = 'unknown';
         this.connectionObserver = this._connection.asObservable();
     }
     ConnectionService.prototype.startTracking = function () {
-        if (Object(_util_cordova__WEBPACK_IMPORTED_MODULE_3__["hasConnection"])()) {
-            document.addEventListener('online', this._isOnline.bind(this), true);
-            document.addEventListener('offline', this._isOffline.bind(this), true);
-        }
+        window.addEventListener('online', this._toggleConnection.bind(this), true);
+        window.addEventListener('offline', this._toggleConnection.bind(this), true);
+        this._toggleConnection();
     };
     ConnectionService.prototype.stopTracking = function () {
-        if (Object(_util_cordova__WEBPACK_IMPORTED_MODULE_3__["hasConnection"])()) {
-            document.removeEventListener('online', this._isOnline.bind(this), true);
-            document.removeEventListener('offline', this._isOffline.bind(this), true);
-            this._connection.next(null);
-        }
+        window.removeEventListener('online', this._toggleConnection.bind(this), true);
+        window.removeEventListener('offline', this._toggleConnection.bind(this), true);
+        this._connection.next(null);
     };
     ConnectionService.prototype.getConnectionInfo = function () {
         if (!Object(_util_cordova__WEBPACK_IMPORTED_MODULE_3__["hasConnection"])()) {
@@ -9785,36 +10733,18 @@ var ConnectionService = /** @class */ (function () {
         if (!Object(_util_cordova__WEBPACK_IMPORTED_MODULE_3__["hasConnection"])()) {
             return 'unknown';
         }
+        // cordova navigator
         var _connection = Object(_util_cordova__WEBPACK_IMPORTED_MODULE_3__["getConnection"])();
         var _navigator = navigator;
         var _networkState = _navigator.connection.type;
         return (_networkState === _connection.NONE || _networkState === _connection.UNKNOWN) ? 'offline' : 'online';
     };
-    ConnectionService.prototype._isOnline = function (event) {
-        // console.log('on', navigator.onLine);
-        // console.log('online');
-        //
-        // // Handle the online event
-        // const _navigator: any = navigator;
-        // const _connection = getConnection();
-        // var _networkState = _navigator.connection.type;
-        //
-        // if (_networkState !== _connection.NONE) {
-        this._connection.next(true);
-        // }
-    };
-    ConnectionService.prototype._isOffline = function (event) {
-        // console.log('off', navigator.onLine);
-        // console.log('offline');
-        //
-        // // Handle the online event
-        // const _navigator: any = navigator;
-        // const _connection = getConnection();
-        // const _networkState = _navigator.connection.type;
-        //
-        // if (_networkState === _connection.NONE) {
-        this._connection.next(false);
-        // }
+    ConnectionService.prototype._toggleConnection = function (event) {
+        var _isOnline = navigator.onLine;
+        if (this._connection.getValue() !== _isOnline) {
+            this.state = (_isOnline) ? 'online' : 'offline';
+            this._connection.next(_isOnline);
+        }
     };
     ConnectionService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
@@ -9844,7 +10774,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
-/* harmony import */ var _util_downloader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../_util/downloader */ "./src/app/_util/downloader.ts");
+/* harmony import */ var _util_downloader_downloader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../_util/downloader/downloader */ "./src/app/_util/downloader/downloader.ts");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
 /* harmony import */ var _filesystem_service__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./filesystem.service */ "./src/app/service/filesystem.service.ts");
@@ -9872,7 +10802,7 @@ var DownloadService = /** @class */ (function () {
     DownloadService.prototype.createDownloader = function (name) {
         var _dl = this._downloaders[name];
         if (!_dl) {
-            _dl = new _util_downloader__WEBPACK_IMPORTED_MODULE_3__["Downloader"](name, this._fileSystemService, this._httpClient, this._localStorageService);
+            _dl = new _util_downloader_downloader__WEBPACK_IMPORTED_MODULE_3__["Downloader"](name, this._fileSystemService, this._httpClient, this._localStorageService);
             this._downloaders[name] = _dl;
             this._addStatusObserver(name, _dl);
         }
@@ -9920,7 +10850,7 @@ var DownloadService = /** @class */ (function () {
         var _downloadState = downloader.meta.subscribe(function (status) {
             _this._updateGlobalStatus();
         });
-        this._states[name] = downloader.isActiveSubject;
+        this._states[name] = downloader.status.isActiveSubject;
         this._observers[name] = _downloadState;
     };
     DownloadService.prototype._updateGlobalStatus = function () {
@@ -10244,14 +11174,18 @@ var FilesystemService = /** @class */ (function () {
             });
         }, false);
     };
-    // TODO: edited, test, check functionality!!! delete directory and everything in it
+    // delete directory and everything in it
     FilesystemService.prototype.deleteDirectory = function (directoryPath, callback) {
         this.setupDirectory(directoryPath, null, function (dirEntry) {
             if (dirEntry !== 'error') {
-                dirEntry.removeRecursively(function (dir) {
-                    callback(dir);
-                }, function (err) {
-                    console.log(err);
+                /* poorly described cordova only? function, it's not clear if chrome still has this
+                as the status of the filesysem of chrome is unclear. */
+                dirEntry.removeRecursively(function (directory) {
+                    callback(directory);
+                }, function (error) {
+                    // TODO: needs an error check, not sure what I'm getting here
+                    alert('error deleting directory' + error);
+                    callback(error);
                 });
             }
             else {
@@ -10554,6 +11488,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
 /* harmony import */ var _util_generic__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../_util/generic */ "./src/app/_util/generic.ts");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _connection_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./connection.service */ "./src/app/service/connection.service.ts");
+/* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
+
+
+
 
 
 
@@ -10562,17 +11502,15 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var NoteService = /** @class */ (function () {
-    function NoteService(_localStorage, _trailGenerator) {
+    function NoteService(_localStorage, _trailGenerator, _http, _connectionService) {
         this._localStorage = _localStorage;
         this._trailGenerator = _trailGenerator;
-        var _self = this;
-        var _trail = this._trailGenerator.getTrailData();
-        var _directionString = (_trail.direction === 1) ? 'sobo' : 'nobo';
+        this._http = _http;
+        this._connectionService = _connectionService;
+        this._previouslyOffline = false;
         this.noteSubject = new rxjs__WEBPACK_IMPORTED_MODULE_4__["BehaviorSubject"]('initialize');
         this.noteUpdateObserver = this.noteSubject.asObservable().pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_5__["share"])());
-        this._notesSubscription = this._localStorage.observe(_trail.abbr + '-' + _directionString + '_notes').subscribe(function (result) {
-            _self.noteSubject.next('storage changed');
-        });
+        this._setupSubscriptions();
         this._loadFromStorage();
     }
     NoteService.prototype.ngOnDestroy = function () {
@@ -10580,9 +11518,27 @@ var NoteService = /** @class */ (function () {
             this._notesSubscription.unsubscribe();
             this._notesSubscription = null;
         }
+        if (this._connectionSubscription) {
+            this._connectionSubscription.unsubscribe();
+            this._connectionSubscription = null;
+        }
         // just to be safe
         this.noteSubject = null;
         this.noteUpdateObserver = null;
+    };
+    NoteService.prototype._setupSubscriptions = function () {
+        var _self = this;
+        var _trail = this._trailGenerator.getTrailData();
+        var _directionString = (_trail.direction === 1) ? 'sobo' : 'nobo';
+        this._notesSubscription = this._localStorage.observe(_trail.abbr + '-' + _directionString + '_notes').subscribe(function (result) {
+            _self.noteSubject.next('storage changed');
+            _self._shareNotes();
+        });
+        this._connectionSubscription = this._connectionService.connectionObserver.subscribe(function (result) {
+            if (result === true) {
+                _self._shareNotes();
+            }
+        });
     };
     // notes are added 1 at a time, unless there are no notes (initial run)
     NoteService.prototype._parseNotes = function (notes) {
@@ -10679,14 +11635,85 @@ var NoteService = /** @class */ (function () {
         }
         this._notes.push(note);
         this._parseNotes([note]);
+        if (note.share) {
+            this._localStorage.store('shareNotes', true);
+        }
         this._updateStorage();
+    };
+    // easier to sort by distance (poi list)
+    NoteService.prototype.getFlatNotesArray = function () {
+        return this._notes;
+    };
+    /* share notes (upload notes to server), runs when internet becomes available
+    - TODO: currently used to share notes with developer, will eventually be shared to a personal online map */
+    NoteService.prototype._shareNotes = function () {
+        var _self = this;
+        // check connection
+        if (this._connectionService.state !== 'online') {
+            this._previouslyOffline = true;
+            return;
+        }
+        if (this._localStorage.retrieve('shareNotes') && this._notes) {
+            var _shareableNotes = this._gatherShareableNotes();
+            // upload
+            if (_shareableNotes.length > 0) {
+                var _trail = _self._trailGenerator.getTrailData();
+                var _directionString = (_trail.direction === 1) ? 'sobo' : 'nobo';
+                // params to send in post object
+                var _params = new FormData();
+                _params.append('trail', _trail.abbr);
+                _params.append('direction', _directionString);
+                _params.append('user', _self._localStorage.retrieve('userName'));
+                _params.append('data', JSON.stringify(_shareableNotes));
+                this._uploadObserver = this._http.post(_environments_environment_prod__WEBPACK_IMPORTED_MODULE_9__["environment"].mailto, _params, { responseType: 'text' });
+                this._uploadSubscription = this._uploadObserver.subscribe(function (result) {
+                    if (result === 'success') {
+                        // only show an alert if data didn't send before because user was online
+                        if (_self._previouslyOffline) {
+                            _self._previouslyOffline = false;
+                            alert('Successfully shared backed-up note(s) with developer, thanks!');
+                        }
+                        _self._clearShareableNotes();
+                    }
+                    else {
+                        alert('Error while sending note(s) to developer!');
+                    }
+                    _self._uploadSubscription.unsubscribe();
+                    _self._uploadSubscription = null;
+                }, function (error) {
+                    // error handling
+                    alert('Error while sending note(s) to developer!');
+                });
+            }
+        }
+    };
+    NoteService.prototype._clearShareableNotes = function () {
+        this._notes.forEach(function (note) {
+            if (note.share) {
+                note.share = false;
+            }
+        });
+        // write to storage
+        this._updateStorage();
+        this._localStorage.clear('shareNotes');
+    };
+    NoteService.prototype._gatherShareableNotes = function () {
+        var _shareableNotes = [];
+        // run through all data and collect notes that need sharing (duplicates)
+        this._notes.forEach(function (note) {
+            if (note.share) {
+                var _clone = Object(_util_generic__WEBPACK_IMPORTED_MODULE_6__["cloneData"])(note);
+                _shareableNotes.push(_clone);
+            }
+        });
+        return _shareableNotes;
     };
     NoteService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
             providedIn: 'root'
         })
         /* there are 2 types of notes:
-        - notes that belong to a mile
+        - notes that belong to a mile (TODO: not implemented yet)
         - notes that belong to a poi
         
         structure of notes library object:
@@ -10701,9 +11728,12 @@ var NoteService = /** @class */ (function () {
                     68: [Poi, Poi, Poi]
                     123: [Poi]
         */
+        // keeps track of new notes that should be uploaded (shared with developer)
         ,
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_2__["LocalStorageService"],
-            _trail_generator_service__WEBPACK_IMPORTED_MODULE_3__["TrailGeneratorService"]])
+            _trail_generator_service__WEBPACK_IMPORTED_MODULE_3__["TrailGeneratorService"],
+            _angular_common_http__WEBPACK_IMPORTED_MODULE_7__["HttpClient"],
+            _connection_service__WEBPACK_IMPORTED_MODULE_8__["ConnectionService"]])
     ], NoteService);
     return NoteService;
 }());
@@ -10780,168 +11810,260 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _type_rating__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../type/rating */ "./src/app/type/rating.ts");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
-/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../_util/trail */ "./src/app/_util/trail.ts");
+/* harmony import */ var _trail_generator_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./trail-generator.service */ "./src/app/service/trail-generator.service.ts");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/common/http */ "./node_modules/@angular/common/fesm5/http.js");
+/* harmony import */ var _util_generic__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../_util/generic */ "./src/app/_util/generic.ts");
+/* harmony import */ var _connection_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./connection.service */ "./src/app/service/connection.service.ts");
 
 
 
 
 
 
-// import {AngularFirestore} from '@angular/fire/firestore';
+
+
+
 var RateService = /** @class */ (function () {
-    function RateService(
-    // private _fireStore: AngularFirestore,
-    _localStorage) {
-        // const items = _fireStore.collection('ratings').valueChanges().subscribe(response => {
-        //   console.log(response);
-        // });
-        var _this = this;
+    function RateService(_localStorage, _trailGenerator, _connectionService, _http) {
         this._localStorage = _localStorage;
-        this._lastUpdated = new Date().getTime(); // TODO: needs to be stored/fetched
-        this._hasInternet = true;
-        this._activeTrailSubscription = this._localStorage.observe('activeTrailId').subscribe(function (trailId) {
-            _this._activeTrailAbbr = Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(trailId).abbr;
-            _this.syncRatingsForTrail(_this._activeTrailAbbr, _this._lastUpdated);
-        });
-        // initial values
-        var _id = this._localStorage.retrieve('activeTrailId');
-        this._activeTrailAbbr = Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(_id).abbr;
-        this.syncRatingsForTrail(this._activeTrailAbbr, this._lastUpdated);
+        this._trailGenerator = _trailGenerator;
+        this._connectionService = _connectionService;
+        this._http = _http;
+        this._lastUpdated = 0;
+        this._hasInternet = false;
+        this._localRatings = []; // all ratings for the current trail
     }
     // LIFECYCLE
     RateService.prototype.ngOnDestroy = function () {
-        this._activeTrailSubscription.unsubscribe();
-        this._activeTrailSubscription = null;
+        this._connectionSubscription.unsubscribe();
+        this._connectionSubscription = null;
+    };
+    // requires active trail meta data (runs after loading/parsing trail
+    // - 1. upload all data that needs uploading (offline mode etc.)
+    // - 2. download all new data since last update
+    // (TODO: this needs to be limited to the last 10 scores per belongsTo, firebase cloud functions...)
+    RateService.prototype.setup = function () {
+        var _self = this;
+        this._activeTrailAbbr = this._trailGenerator.getTrailData().abbr;
+        this._lastUpdated = this._localStorage.retrieve(this._activeTrailAbbr + '_scores-lastUpdated') || 0;
+        this._connectionSubscription = this._connectionService.connectionObserver.subscribe(function (result) {
+            // internet just became available
+            if (result !== _self._hasInternet && result === true) {
+                _self._hasInternet = result;
+                _self._syncData();
+            }
+            else {
+                _self._hasInternet = result;
+            }
+        });
+    };
+    RateService.prototype._syncData = function () {
+        var _self = this;
+        var runCount = 0;
+        var _scoreUpdateObservables = this.sendAllScores();
+        var _scoreUpdateLength = 1;
+        if (Array.isArray(_scoreUpdateObservables)) {
+            _scoreUpdateLength = _scoreUpdateObservables['length'];
+        }
+        // run in sequence
+        var _updateSubscription = Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["concat"])(_scoreUpdateObservables, this._getRatingsOnline()).subscribe(function (result) {
+            if (runCount === _scoreUpdateLength) {
+                // if new scores have been downloaded, parse them
+                if (result && !Object(_util_generic__WEBPACK_IMPORTED_MODULE_7__["isObjectEmpty"])(result)) {
+                    var resultArray = Object.keys(result).map(function (key) {
+                        if (!result[key].dbId && result[key].userId) {
+                            result[key].dbId = key; // set the firebase id so we can PUT instead of POST to update a users comment
+                        }
+                        return result[key];
+                    });
+                    _self._localScores = _self._localScores.concat(resultArray);
+                    _self._writeToLocalStorage();
+                }
+                // done getting updates / save timestamp & self destruct
+                _self._lastUpdated = new Date().getTime();
+                _self._localStorage.store(_self._activeTrailAbbr + '_scores-lastUpdated', _self._lastUpdated);
+                _updateSubscription.unsubscribe();
+                _updateSubscription = null;
+            }
+            else {
+                runCount++;
+            }
+        });
     };
     // gets/sets all ratings, since it's a (mostly) offline app, deals with both online/offline files and syncs everything
-    RateService.prototype.syncRatingsForTrail = function (trailAbbr, since) {
+    RateService.prototype.sendAllScores = function () {
         // get locally stored data
-        this._localRatings = this._localStorage.retrieve(this._activeTrailAbbr + '_ratings') || [];
-        // if there is no data, it's the first online run (or previously empty db), so we'll fetch all records
-        if (this._localRatings.length === -1) {
-            since = 0;
-        }
-        if (this._hasInternet) {
-            if (since !== 0) {
-                var _localUpdates = this._checkForUnsynced();
-                if (_localUpdates) {
-                    // TODO: http update _localUpdates;
+        this._localScores = this._localStorage.retrieve(this._activeTrailAbbr + '_scores') || [];
+        if (this._hasInternet && this._localScores.length !== -1) {
+            var _localUpdates_1 = this._checkForUnsynced();
+            if (_localUpdates_1) {
+                var _postArray = [];
+                var _url = 'https://just-hike.firebaseio.com/' + this._activeTrailAbbr + '/score.json';
+                var _length = _localUpdates_1.length;
+                var _loop_1 = function (i) {
+                    var _updateObservable = this_1._http.post(_url, _localUpdates_1[i]);
+                    _updateObservable.subscribe(function (result) {
+                        _localUpdates_1[i].unsynced = null;
+                    });
+                    _postArray.push(_updateObservable);
+                };
+                var this_1 = this;
+                for (var i = 0; i < _length; i++) {
+                    _loop_1(i);
                 }
+                return _postArray;
             }
-            var _result = this._getRatingsOnline(trailAbbr, since);
-            if (_result && _result !== 'error') {
-                this._saveRatingsLocally(_result);
-            }
-        }
-    };
-    // update a single rating, ratings are location and type based
-    RateService.prototype.updateRating = function (type, waypoint, data) {
-        var _rating = data;
-        _rating.id = type + '-' + waypoint.latitude.toFixed(4) + '_' + waypoint.longitude.toFixed(4);
-        if (this._hasInternet) {
-            // http
-            // should probably use a downloader for this...
-            // result = updated rating
-            var _result = '';
-            if (_result !== 'error') {
-                this._saveRatingsLocally(_result);
+            else {
+                return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null);
             }
         }
         else {
-            this._saveRatingsLocally(_rating, true);
+            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(null);
         }
-        return true;
     };
-    // gets a rating from local storage (and id = lat_lng)
+    // whenever a user rates something
+    RateService.prototype.saveRatings = function (scores) {
+        var _this = this;
+        if (this._hasInternet) {
+            var _scoreObservers_1 = [];
+            if (!Array.isArray(scores)) {
+                scores = [scores];
+            }
+            var _length = scores.length;
+            for (var i = 0; i < _length; i++) {
+                _scoreObservers_1.push(this._saveScoreOnline(scores[i]));
+            }
+            var count_1 = 0;
+            Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["concat"])(_scoreObservers_1).subscribe(function (result) {
+                count_1++;
+                if (count_1 === _scoreObservers_1.length) {
+                    _this._writeToLocalStorage();
+                }
+            });
+        }
+        else {
+            this._writeToLocalStorage();
+        }
+    };
+    // creates a Rating object, which houses aspects (Scores) that are locally/externally saved.
     // there's no need to make a separate online call here
     // as the app mostly runs in offline mode and syncRatingsForTrail() is called once the app goes online
     // this way the ratings stay reasonably up to date.
-    RateService.prototype.getRating = function (type, waypoint) {
-        console.log(waypoint);
-        var _id = type + '-' + Number(waypoint.latitude).toFixed(4) + '_' + Number(waypoint.longitude).toFixed(4);
-        console.log(this._localRatings);
+    RateService.prototype.getRatingById = function (type, location, create) {
+        if (create === void 0) { create = true; }
+        var _id = type + '_' + Number(location.latitude).toFixed(4) + '_' + Number(location.longitude).toFixed(4);
+        var _rating;
         var _length = this._localRatings.length;
         for (var i = 0; i < _length; i++) {
             if (this._localRatings[i].id === _id) {
-                return this._localRatings[i];
-            }
-        }
-        return;
-    };
-    // get all updated/new ratings online for trail
-    RateService.prototype._getRatingsOnline = function (trailAbbr, since) {
-        return;
-    };
-    // markForUpdate means the data still has to be pushed online (but can't be as there is currently no internet)
-    RateService.prototype._saveRatingsLocally = function (ratings, markForUpdate) {
-        if (markForUpdate === void 0) { markForUpdate = false; }
-        if (ratings instanceof _type_rating__WEBPACK_IMPORTED_MODULE_2__["Rating"]) {
-            ratings = [ratings];
-        }
-        var _length = ratings.length;
-        for (var i = 0; i < _length; i++) {
-            var _rating = ratings[i];
-            if (markForUpdate) {
-                _rating.unsynced = true;
-            }
-            this._setRatingLocally(_rating);
-            console.log(i);
-            // progress
-        }
-        // write everything to local storage
-        this._writeToLocalStorage();
-        // done
-        return new rxjs__WEBPACK_IMPORTED_MODULE_3__["Observable"]();
-    };
-    // check if there are local updates that need to be synced online
-    RateService.prototype._checkForUnsynced = function () {
-        if (!this._localRatings || this._localRatings.length === -1) {
-            return;
-        }
-        var _ratings = [];
-        var _length = this._localRatings.length;
-        for (var i = 0; i < _length; i++) {
-            if (this._localRatings[i].unsynced) {
-                _ratings.push(this._localRatings[i]);
-            }
-        }
-        return (_ratings.length > 0) ? _ratings : undefined;
-    };
-    // sets or updates local rating
-    RateService.prototype._setRatingLocally = function (rating) {
-        var _ratingIndex = -1;
-        // check if rating already exists
-        var _length = this._localRatings.length;
-        for (var i = 0; i < _length; i++) {
-            if (this._localRatings[i].id === rating.id) {
-                _ratingIndex = i;
+                _rating = this._localRatings[i];
+                _rating.setupObserver(); // important as they're being destroyed
                 break;
             }
         }
-        // change rating in local ratings
-        if (_ratingIndex !== -1) {
-            this._localRatings[_ratingIndex] = rating;
+        if (!_rating && create) {
+            this._getScoresForRating(type, location);
+            _rating = new _type_rating__WEBPACK_IMPORTED_MODULE_2__["Rating"](type, location, this._getScoresForRating(type, location));
+            this._localRatings.push(_rating);
+        }
+        return _rating;
+    };
+    RateService.prototype._getScoresForRating = function (type, location) {
+        var id = type + '_' + Number(location.latitude).toFixed(4) + '_' + Number(location.longitude).toFixed(4);
+        var _ratingScoresArray;
+        var _length = this._localScores.length;
+        for (var i = 0; i < _length; i++) {
+            var _score = this._localScores[i];
+            if (_score.belongsTo === id) {
+                if (!_ratingScoresArray) {
+                    _ratingScoresArray = [];
+                }
+                _ratingScoresArray.push(_score);
+            }
+        }
+        return _ratingScoresArray;
+    };
+    // get all updated/new ratings online for trail
+    // this will fetch 'Score' objects that have a 'belongTo' field with a waypointId
+    RateService.prototype._getRatingsOnline = function () {
+        var _since = this._lastUpdated || 0;
+        var _trailAbbr = this._activeTrailAbbr;
+        var _url = 'https://just-hike.firebaseio.com/' + _trailAbbr + '/score.json' +
+            '?orderBy="timestamp"' +
+            '&startAt=' + _since + '';
+        return this._http.get(_url);
+    };
+    /* cleans up scores:
+    - filter out duplicates based on timestamp/id
+    - maximum of 10 scores per Rating */
+    RateService.prototype._scoresAsRating = function () {
+        var _filteredScores = [];
+        var _length = this._localScores.length;
+        for (var i = 0; i < _length; i++) {
+        }
+    };
+    // check if there are local Scores that need to be synced online (marked unsynced)
+    RateService.prototype._checkForUnsynced = function () {
+        if (!this._localScores || this._localScores.length === -1) {
+            return;
+        }
+        var _scores = [];
+        var _length = this._localScores.length;
+        for (var i = 0; i < _length; i++) {
+            if (this._localScores[i].unsynced) {
+                _scores.push(this._localScores[i]);
+            }
+        }
+        return (_scores.length > 0) ? _scores : undefined;
+    };
+    RateService.prototype._saveScoreOnline = function (score) {
+        var _self = this;
+        var _duplicate = Object(_util_generic__WEBPACK_IMPORTED_MODULE_7__["cloneData"])(score);
+        _duplicate.unsynced = null;
+        var _trailAbbr = this._trailGenerator.getTrailData().abbr;
+        var _url = 'https://just-hike.firebaseio.com/' + _trailAbbr + '/score';
+        var _urlEnd = '.json';
+        var _scoreQuery;
+        if (_duplicate.dbId && _duplicate.score > 0) {
+            // we're updating
+            _scoreQuery = this._http.put(_url + '/' + _duplicate.dbId + _urlEnd, _duplicate);
+        }
+        else if (_duplicate.dbId) {
+            // deleting 0 score
+            _scoreQuery = this._http.delete(_url + '/' + _duplicate.dbId + _urlEnd);
         }
         else {
-            this._localRatings.push(rating);
+            // posting new
+            _scoreQuery = this._http.post(_url + _urlEnd, _duplicate);
         }
-    };
-    RateService.prototype._setRatingsOnline = function (ratings) {
-        // TODO: save online
+        var _sub = _scoreQuery.subscribe(function (result) {
+            score.unsynced = false;
+            if (!score.dbId) {
+                score.dbId = result['name'];
+            }
+            if (result === null) {
+                _self._localScores.splice(_self._localScores.indexOf(score), 1);
+                score = null;
+            }
+            _sub.unsubscribe();
+            _sub = null;
+        });
+        _duplicate = null;
+        return _scoreQuery;
     };
     RateService.prototype._writeToLocalStorage = function () {
-        this._localStorage.store(this._activeTrailAbbr + '_ratings', this._localRatings);
+        this._localStorage.store(this._activeTrailAbbr + '_scores', this._localScores);
     };
     RateService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
             providedIn: 'root'
         })
-        // Ratings for ratable poi types
-        // ratings are stored on local storage and online
-        // TODO: check the actual filesize of the data stored locally, if large, possibly save to filesystem instead / or use mongodb?
-        // TODO: very much WIP!
+        // Ratings are combined Scores, a water-source (rateable) can be rated on multiple aspects (providing Scores)
         ,
-        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_4__["LocalStorageService"]])
+        tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [ngx_webstorage__WEBPACK_IMPORTED_MODULE_4__["LocalStorageService"],
+            _trail_generator_service__WEBPACK_IMPORTED_MODULE_5__["TrailGeneratorService"],
+            _connection_service__WEBPACK_IMPORTED_MODULE_8__["ConnectionService"],
+            _angular_common_http__WEBPACK_IMPORTED_MODULE_6__["HttpClient"]])
     ], RateService);
     return RateService;
 }());
@@ -11130,6 +12252,7 @@ var SequentialResolverService = /** @class */ (function () {
             // setup cordova helpers
             if (cordova && !Object(_util_cordova__WEBPACK_IMPORTED_MODULE_8__["getCordova"])()) {
                 Object(_util_cordova__WEBPACK_IMPORTED_MODULE_8__["setCordova"])(cordova);
+                Object(_util_cordova__WEBPACK_IMPORTED_MODULE_8__["setDevice"])(device);
                 Object(_util_cordova__WEBPACK_IMPORTED_MODULE_8__["setScreen"])(screen);
                 Object(_util_cordova__WEBPACK_IMPORTED_MODULE_8__["setConnection"])(Connection);
                 Object(_util_cordova__WEBPACK_IMPORTED_MODULE_8__["setZip"])(zip);
@@ -11232,11 +12355,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TrailGeneratorService", function() { return TrailGeneratorService; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _type_ohlc__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../type/ohlc */ "./src/app/type/ohlc.ts");
+/* harmony import */ var geolib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! geolib */ "./node_modules/geolib/dist/geolib.js");
+/* harmony import */ var geolib__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(geolib__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
 /* harmony import */ var _loader_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./loader.service */ "./src/app/service/loader.service.ts");
 /* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../_util/poi */ "./src/app/_util/poi.ts");
 /* harmony import */ var _util_generic__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../_util/generic */ "./src/app/_util/generic.ts");
+/* harmony import */ var _util_geolib_distance__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../_util/geolib/distance */ "./src/app/_util/geolib/distance.ts");
+/* harmony import */ var _util_leaflet_converter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../_util/leaflet/converter */ "./src/app/_util/leaflet/converter.ts");
+/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../_util/trail */ "./src/app/_util/trail.ts");
+
+
+
 
 
 
@@ -11247,7 +12377,6 @@ __webpack_require__.r(__webpack_exports__);
 var TrailGeneratorService = /** @class */ (function () {
     function TrailGeneratorService(_loaderService) {
         this._loaderService = _loaderService;
-        this._tolerance = 0.0001;
     }
     TrailGeneratorService.prototype.setTrailData = function (data) {
         this._trailData = data;
@@ -11262,7 +12391,7 @@ var TrailGeneratorService = /** @class */ (function () {
         return this._trailData.pois[id];
     };
     TrailGeneratorService.prototype.calcDistanceFlat = function (p1, p2) {
-        return geolib.getDistance({ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude });
+        return geolib__WEBPACK_IMPORTED_MODULE_2__["getDistance"]({ latitude: p1.latitude, longitude: p1.longitude }, { latitude: p2.latitude, longitude: p2.longitude }, 0, 4);
     };
     TrailGeneratorService.prototype.getPoisByIds = function (ids) {
         var _self = this;
@@ -11274,7 +12403,7 @@ var TrailGeneratorService = /** @class */ (function () {
     };
     // called to generate new trail data files (json), only used by admin, not for users)
     // TODO: move this to a webworker, not a priority as it's rarely used (trail data won't update often)
-    TrailGeneratorService.prototype.generateMiles = function (trail, waypoints, pois, direction) {
+    TrailGeneratorService.prototype.generateMiles = function (trail, waypoints, pois, direction, towns) {
         this._trailData = Object(_util_generic__WEBPACK_IMPORTED_MODULE_6__["cloneData"])(trail);
         this._trailData.version = trail.trailVersion;
         // remove unneeded trail meta
@@ -11282,29 +12411,31 @@ var TrailGeneratorService = /** @class */ (function () {
         delete this._trailData['tilesVersion'];
         delete this._trailData['snowVersion'];
         delete this._trailData['dataPath'];
+        delete this._trailData['dataPath'];
+        delete this._trailData['waypointsPerMile'];
         this._trailData.direction = direction;
         // // sobo reversal
-        if (direction === 1) {
-            waypoints.reverse();
-            pois.reverse();
-        }
+        // if (direction === 1) {
+        //   waypoints.reverse();
+        //   pois.reverse();
+        // }
         this._trailData.pois = pois;
         // 1. optimise waypoints
-        var _optimisedWaypoints = this.simplify(waypoints, this._tolerance);
-        this.flatTrailData = _optimisedWaypoints;
+        // const _optimisedWaypoints: Array<Waypoint> = this.simplify(waypoints, this._tolerance);
+        this.flatTrailData = Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_8__["pointArrayTypeConversion"])(waypoints, 'waypoint', 'waypoint');
         this._loaderService.showMessage('optimised waypoints');
         // 2. calculate trail properties
         var flatPoints = [];
         // remove elevation, causes errors
-        for (var i = 0; i < _optimisedWaypoints.length; i++) {
-            flatPoints.push({ latitude: _optimisedWaypoints[i].latitude, longitude: _optimisedWaypoints[i].longitude });
+        for (var i = 0; i < this.flatTrailData.length; i++) {
+            flatPoints.push({ latitude: this.flatTrailData[i].latitude, longitude: this.flatTrailData[i].longitude });
         }
-        this._trailData.calcLength = geolib.getPathLength(flatPoints) / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE;
+        this._trailData.calcLength = geolib__WEBPACK_IMPORTED_MODULE_2__["getPathLength"](flatPoints) / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE;
         this._trailData.scale = (this._trailData.length / this._trailData.calcLength);
-        this._trailData.elevationRange = Object(_type_ohlc__WEBPACK_IMPORTED_MODULE_2__["calculateOHLC"])(_optimisedWaypoints, { start: 0, end: waypoints.length - 1 });
+        this._trailData.elevationRange = Object(_util_trail__WEBPACK_IMPORTED_MODULE_9__["calculateOHLC"])(this.flatTrailData, { start: 0, end: waypoints.length - 1 });
         this._loaderService.showMessage('calculated trail properties');
         // 3. split waypoints into miles
-        this._trailData.miles = this._createMiles(_optimisedWaypoints, this._trailData.scale);
+        this._trailData.miles = this._createMiles(this.flatTrailData);
         this._loaderService.showMessage('created miles');
         // 4a. generate waypoint tree for easy lookups
         var flatMileCoordinates = this._trailData.miles.map(function (elem) {
@@ -11322,7 +12453,8 @@ var TrailGeneratorService = /** @class */ (function () {
         else {
             this._loaderService.showMessage('no pois');
         }
-        console.log(this._trailData);
+        // 5. Towns
+        this._trailData.towns = this._calculateTownsAnchorPoints(towns);
         return this._trailData;
     };
     // create overlapping miles (first/last waypoint overlap, insert 2 new points at 0 & 100%
@@ -11335,7 +12467,7 @@ var TrailGeneratorService = /** @class */ (function () {
     //                                      */------/*                          (mile)
     //                                            */------/*                    (mile)
     //                                                       x             (/arr)
-    TrailGeneratorService.prototype._createMiles = function (waypoints, scale) {
+    TrailGeneratorService.prototype._createMiles = function (waypoints) {
         this._loaderService.showMessage('create miles');
         var _miles = [];
         var _prevPoint;
@@ -11353,6 +12485,7 @@ var TrailGeneratorService = /** @class */ (function () {
         var _wayPointsLength = waypoints.length; // faster.
         for (var i = 0; i < _wayPointsLength; i++) {
             var _waypoint = waypoints[i];
+            // elevation
             if (!_waypoint.elevation) {
                 _waypoint.elevation = 0;
             }
@@ -11360,8 +12493,7 @@ var TrailGeneratorService = /** @class */ (function () {
             var _elevationChange = 0;
             // calucalte distance between points
             if (_prevPoint) {
-                _distance = geolib.getDistance({ latitude: _prevPoint.latitude, longitude: _prevPoint.longitude }, { latitude: _waypoint.latitude, longitude: _waypoint.longitude });
-                _distance = _distance * scale;
+                _distance = _waypoint.distanceTotal - _prevPoint.distanceTotal;
                 _totalDistance += _distance;
                 _bridgedDistance += _distance;
                 // calculate elevation gain/loss
@@ -11374,12 +12506,11 @@ var TrailGeneratorService = /** @class */ (function () {
                 }
             }
             _waypoint.distance = _totalDistance - (_miles.length * _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE); // the mile distance
-            _waypoint.distanceTotal = _totalDistance; // the total distance = NOBO
             _mileWaypoints.push(_waypoint);
             // if a distance of 1 mile+ has been bridged, or end of waypoints reached
             if (_bridgedDistance > _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE || waypoints.length - 1 === i) {
                 var _combinedWaypoints = (_poisWaypoints.length > 0) ? _mileWaypoints.concat(_poisWaypoints) : _mileWaypoints;
-                var _combinedOhlc = Object(_type_ohlc__WEBPACK_IMPORTED_MODULE_2__["calculateOHLC"])(_combinedWaypoints, { start: 0, end: _combinedWaypoints.length });
+                var _combinedOhlc = Object(_util_trail__WEBPACK_IMPORTED_MODULE_9__["calculateOHLC"])(_combinedWaypoints, { start: 0, end: _combinedWaypoints.length });
                 // set data
                 _miles.push({
                     id: _miles.length + 1,
@@ -11387,8 +12518,7 @@ var TrailGeneratorService = /** @class */ (function () {
                     waypoints: Object(_util_generic__WEBPACK_IMPORTED_MODULE_6__["cloneData"])(_mileWaypoints),
                     elevationGain: Math.round(_totalGain),
                     elevationLoss: Math.round(_totalLoss),
-                    scale: scale,
-                    centerpoint: geolib.getCenter(_mileWaypoints),
+                    centerpoint: Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_8__["waypointToWaypoint"])(geolib__WEBPACK_IMPORTED_MODULE_2__["getCenter"](_mileWaypoints)),
                     isCurrent: false,
                     hasMajorPoi: false,
                     hasMinorPoi: false,
@@ -11414,62 +12544,93 @@ var TrailGeneratorService = /** @class */ (function () {
     };
     /* create data tree, a sorting mechanism to quickly figure out where the user is in relation to the trail,
     and what the closest waypoint it. TODO: research optimal algo, someone smart probably made something for this. */
-    TrailGeneratorService.prototype.createMileTree = function (startData, returnArray) {
-        if (!returnArray) {
-            this._tree = [startData];
-            this._loaderService.showMessage('create mile tree');
-        }
+    TrailGeneratorService.prototype.createMileTree = function (waypoints) {
+        this._mileCenterpointTree = this._createWaypointTree(waypoints);
+    };
+    /* create data tree, a sorting mechanism to quickly figure out where a waypoint is in relationship to a tree of waypoints.
+    TODO: research optimal algo, someone smart probably made something for this. */
+    TrailGeneratorService.prototype._createWaypointTree = function (startData, returnArray) {
         var resultArray = [];
-        for (var i = 0; i < startData.length; i += 2) {
+        var _length = startData.length;
+        for (var i = 0; i < _length; i += 2) {
             var _data = void 0;
             if (!startData[i + 1]) {
                 _data = startData[i];
             }
             else {
-                _data = geolib.getCenter([startData[i], startData[i + 1]]);
+                _data = geolib__WEBPACK_IMPORTED_MODULE_2__["getCenter"]([startData[i], startData[i + 1]]);
             }
             resultArray.push(_data);
         }
-        this._tree.unshift(resultArray);
+        if (returnArray) {
+            returnArray.unshift(resultArray);
+        }
+        else {
+            returnArray = [resultArray, startData];
+        }
         if (resultArray.length > 2) {
-            this.createMileTree(resultArray, this._tree);
+            return this._createWaypointTree(resultArray, returnArray);
+        }
+        else {
+            return returnArray;
+        }
+    };
+    // this should loop
+    // TODO: extend geolib.orderByDistance() to include a range within an array, that way I wont have to lookup indexOf(). optimisation!
+    TrailGeneratorService.prototype._findNearestWaypointInTree = function (location, waypointTree, branch, index) {
+        branch = (branch) ? branch : 0;
+        index = (index) ? index : 0;
+        var _multiplier = branch;
+        var _waypointBranch = waypointTree[branch];
+        var _startIndex = ((index * 2) - _multiplier > 0) ? (index * 2) - _multiplier : 0;
+        var _endIndex = ((index * 2) + _multiplier < waypointTree[branch].length - 1 && (index * 2) + _multiplier > 1) ? (index * 2) + _multiplier : waypointTree[branch].length - 1;
+        var _waypointSelection = _waypointBranch.slice(_startIndex, _endIndex + 1);
+        var _orderedWaypoints = geolib__WEBPACK_IMPORTED_MODULE_2__["orderByDistance"](location, _waypointSelection);
+        if (branch !== waypointTree.length - 1 && _orderedWaypoints.length > 1) {
+            // loop
+            branch++;
+            return this._findNearestWaypointInTree(location, waypointTree, branch, _startIndex + _waypointSelection.indexOf(_waypointSelection[_orderedWaypoints[0].key]));
+        }
+        else {
+            // get the 3 nearest
+            _orderedWaypoints = _orderedWaypoints.slice(0, 3);
+            // fix indexes
+            _orderedWaypoints.forEach(function (d) {
+                d.key = _startIndex + _waypointSelection.indexOf(_waypointSelection[d.key]);
+            });
+            return _orderedWaypoints;
         }
     };
     /* parses nearest 3 miles, sorts the reulting top 2 waypoints for each mile by distance
     returns 1 of 2 nearest points (in nearest mile) */
     TrailGeneratorService.prototype.findNearestPointInMileTree = function (location, count) {
         if (count === void 0) { count = 1; }
-        var _nearestMiles = [];
+        var _nearestMiles = this._findNearestWaypointInTree(location, this._mileCenterpointTree);
         var _nearestPoints = [];
         var _nearestMileNearestPoints = [];
-        for (var i = 0; i < this._tree.length; i++) {
-            var _orderedWaypoints = geolib.orderByDistance(location, this._tree[i]);
-            if (i === this._tree.length - 1) {
-                _nearestMiles = _orderedWaypoints.slice(0, 3);
-            }
-        }
         var _mLength = _nearestMiles.length;
         for (var i = 0; i < _mLength; i++) {
             var _mile = this._trailData.miles[_nearestMiles[i].key];
             var _nearestWaypoints = this.findNearestWaypointInMile(location, _mile);
             // limit to 2 for faster sorting (as we only really need 2
-            var _selection = _nearestWaypoints.splice(0, 2);
+            var _selection = _nearestWaypoints.slice(0, 2);
             for (var j = 0; j < _selection.length; j++) {
-                _selection[j]['belongsTo'] = _nearestMiles[i].key;
+                _selection[j].belongsTo = _nearestMiles[i].key;
             }
             _nearestPoints = _nearestPoints.concat(_selection);
         }
         _nearestPoints = Object(_util_generic__WEBPACK_IMPORTED_MODULE_6__["sortByKey"])(_nearestPoints, 'distance');
         _nearestPoints.filter(function (point) {
-            return point['belongsTo'] === _nearestPoints[0]['belongsTo'];
+            return point.belongsTo === _nearestPoints[0].belongsTo;
         }).map(function (point) {
             _nearestMileNearestPoints.push(point);
         });
         return _nearestMileNearestPoints.slice(0, count + 1);
     };
-    // get the nearest point
+    // Get the nearest point (this simply sorts a miles waypoints on distance and returns an array.
+    // Not very efficient for larger data sets.
     TrailGeneratorService.prototype.findNearestWaypointInMile = function (waypoint, nearestMile) {
-        return geolib.orderByDistance({ latitude: waypoint.latitude, longitude: waypoint.longitude }, nearestMile.waypoints);
+        return geolib__WEBPACK_IMPORTED_MODULE_2__["orderByDistance"]({ latitude: waypoint.latitude, longitude: waypoint.longitude }, nearestMile.waypoints);
     };
     // links points of interest to miles, this is a slow loop
     TrailGeneratorService.prototype._linkPoisToMiles = function (pois, miles) {
@@ -11478,12 +12639,15 @@ var TrailGeneratorService = /** @class */ (function () {
         var _poisLength = pois.length;
         for (var p = 0; p < _poisLength; p++) {
             var _poi = pois[p];
+            // fix string points
+            _poi.waypoint = Object(_util_leaflet_converter__WEBPACK_IMPORTED_MODULE_8__["waypointToWaypoint"])(_poi.waypoint);
             _poi.id = p; // to prevent mismatching ids in raw data
             _self._loaderService.showMessage('linking pois to miles:' + _poi.id);
+            console.log('linking pois to miles:' + _poi.id + ' of ' + (_poisLength - 1));
             _poi.waypoint.elevation = _poi.waypoint.elevation / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].FOOT;
             // get nearest point from 3 miles to fix potentially odd trail shape (loops and traverses)
             var _nearestMileWaypoints = _self.findNearestPointInMileTree({ latitude: _poi.waypoint.latitude, longitude: _poi.waypoint.longitude }, 2);
-            var _nearestMile = this._trailData.miles[_nearestMileWaypoints[0]['belongsTo']];
+            var _nearestMile = this._trailData.miles[_nearestMileWaypoints[0].belongsTo];
             var _anchorData = _self._anchorDistanceCalculation(_poi.waypoint, _nearestMile, _nearestMileWaypoints);
             _poi.anchorPoint = _anchorData.anchorPoint;
             _poi.belongsTo = _nearestMile.id;
@@ -11531,32 +12695,49 @@ var TrailGeneratorService = /** @class */ (function () {
             }
         }
     };
+    TrailGeneratorService.prototype._calculateTownsAnchorPoints = function (towns) {
+        if (!towns) {
+            return;
+        }
+        var _length = towns.length;
+        for (var t = 0; t < _length; t++) {
+            var _town = towns[t];
+            // only calculate the towns anchorpoint if it doesn't have any
+            if (!_town.anchorPoint) {
+                var _nearestMileWaypoints = this.findNearestPointInMileTree(_town.centerPoint, 2);
+                var _nearestMile = this._trailData.miles[_nearestMileWaypoints[0].belongsTo];
+                var _anchorData = this._anchorDistanceCalculation(_town.centerPoint, _nearestMile, _nearestMileWaypoints);
+                _town.anchorPoint = _anchorData.anchorPoint;
+            }
+        }
+        return towns;
+    };
     // distance calculation
     TrailGeneratorService.prototype._anchorDistanceCalculation = function (location, nearestMile, nearestWaypoints) {
-        var _nearestWaypoint = nearestMile.waypoints[nearestWaypoints[0]['key']];
-        var _2ndNearestWaypoint = nearestMile.waypoints[nearestWaypoints[1]['key']];
+        // console.log(location, nearestMile, nearestWaypoints);
+        var _nearestWaypoint = nearestMile.waypoints[nearestWaypoints[0].key];
+        var _2ndNearestWaypoint = nearestMile.waypoints[nearestWaypoints[1].key];
         // create an anchor waypoint (an on trail point nearest to the poi (simple triangulation)
-        var _diffDistPercentage = (nearestWaypoints[0]['distance'] / nearestWaypoints[1]['distance']);
-        var _lat = _nearestWaypoint.latitude + ((_2ndNearestWaypoint.latitude - _nearestWaypoint.latitude) * _diffDistPercentage);
-        var _lon = _nearestWaypoint.longitude + ((_2ndNearestWaypoint.longitude - _nearestWaypoint.longitude) * _diffDistPercentage);
-        var _ele = _nearestWaypoint.elevation + ((_2ndNearestWaypoint.elevation - _nearestWaypoint.elevation) * _diffDistPercentage);
-        var _dist = _nearestWaypoint.distance + ((_2ndNearestWaypoint.distance - _nearestWaypoint.distance) * _diffDistPercentage);
-        var _distT = _nearestWaypoint.distanceTotal + ((_2ndNearestWaypoint.distanceTotal - _nearestWaypoint.distanceTotal) * _diffDistPercentage);
+        var _diffDistPercentage = (nearestWaypoints[0].distance / nearestWaypoints[1].distance);
+        var _lat = _nearestWaypoint.latitude + (((_2ndNearestWaypoint.latitude - _nearestWaypoint.latitude) * _diffDistPercentage) || 0);
+        var _lon = _nearestWaypoint.longitude + (((_2ndNearestWaypoint.longitude - _nearestWaypoint.longitude) * _diffDistPercentage) || 0);
+        var _ele = _nearestWaypoint.elevation + (((_2ndNearestWaypoint.elevation - _nearestWaypoint.elevation) * _diffDistPercentage) || 0);
+        var _dist = _nearestWaypoint.distance + (((_2ndNearestWaypoint.distance - _nearestWaypoint.distance) * _diffDistPercentage) || 0);
+        var _distT = _nearestWaypoint.distanceTotal + (((_2ndNearestWaypoint.distanceTotal - _nearestWaypoint.distanceTotal) * _diffDistPercentage) || 0);
+        // console.log({latitude: _lat, longitude: _lon}, {latitude: location.latitude, longitude: location.longitude});
         // return data
         return {
             anchorPoint: { latitude: _lat, longitude: _lon, elevation: _ele, distance: _dist, distanceTotal: _distT },
             nearestWaypoint: _nearestWaypoint,
-            distance: geolib.getDistance({ latitude: _lat, longitude: _lon }, { latitude: location.latitude, longitude: location.longitude })
+            distance: Object(_util_geolib_distance__WEBPACK_IMPORTED_MODULE_7__["calculateDistance"])({ latitude: _lat, longitude: _lon }, { latitude: location.latitude, longitude: location.longitude })
         };
     };
     // simplify an array of data points using 2 methods (radial distance and the douglas peucker alg.)
     TrailGeneratorService.prototype.simplify = function (points, tolerance, highestQuality) {
         if (highestQuality === void 0) { highestQuality = true; }
-        var originalPointCount = points.length;
         var sqTolerance = tolerance !== undefined ? tolerance * tolerance : 1;
         points = highestQuality ? this._simplifyRadialDistance(points, sqTolerance) : points;
         points = this._simplifyDouglasPeucker(points, sqTolerance);
-        // console.log('simplified from: ' + originalPointCount + ' to ' + points.length + ' data points');
         return points;
     };
     // basic distance-based simplification
@@ -11614,7 +12795,7 @@ var TrailGeneratorService = /** @class */ (function () {
     */
     // square distance between 2 points
     TrailGeneratorService.prototype._getSquareDistance = function (p1, p2) {
-        var dx = p1.latitude - p2.latitude, dy = p1.longitude - p2.longitude, dz = p1.elevation - p2.elevation;
+        var dx = p1.latitude - p2.latitude, dy = p1.longitude - p2.longitude, dz = (p1.elevation - p2.elevation) || 0;
         return dx * dx + dy * dy + dz * dz;
     };
     // square distance from a point to a segment
@@ -11638,13 +12819,12 @@ var TrailGeneratorService = /** @class */ (function () {
         dz = p.elevation - z;
         return dx * dx + dy * dy + dz * dz;
     };
-    TrailGeneratorService.prototype.toMile = function (number) {
-        return number / _environments_environment_prod__WEBPACK_IMPORTED_MODULE_3__["environment"].MILE;
-    };
     TrailGeneratorService = tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"]([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
             providedIn: 'root'
-        }),
+        })
+        // TODO: generating multiple trails causes enourmous slowdown in poiToMiles, I'm assuming I'm not clearing something...
+        ,
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_loader_service__WEBPACK_IMPORTED_MODULE_4__["LoaderService"]])
     ], TrailGeneratorService);
     return TrailGeneratorService;
@@ -11676,6 +12856,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _snow_generator_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./snow-generator.service */ "./src/app/service/snow-generator.service.ts");
 /* harmony import */ var _util_snow__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../_util/snow */ "./src/app/_util/snow.ts");
 /* harmony import */ var _download_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./download.service */ "./src/app/service/download.service.ts");
+/* harmony import */ var _rate_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./rate.service */ "./src/app/service/rate.service.ts");
+
 
 
 
@@ -11690,7 +12872,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var TrailResolverService = /** @class */ (function () {
     // makes sure trail data is available before navigating anywhere
-    function TrailResolverService(_localStorage, _trailService, _router, _loaderService, _downloadService, _trailGenerator, _snowGenerator) {
+    function TrailResolverService(_localStorage, _trailService, _router, _loaderService, _downloadService, _trailGenerator, _snowGenerator, _rateService) {
         this._localStorage = _localStorage;
         this._trailService = _trailService;
         this._router = _router;
@@ -11698,6 +12880,7 @@ var TrailResolverService = /** @class */ (function () {
         this._downloadService = _downloadService;
         this._trailGenerator = _trailGenerator;
         this._snowGenerator = _snowGenerator;
+        this._rateService = _rateService;
     }
     /* there are 3 locations for trail data
      * - assets: contains default trail data that shipped with the app
@@ -11705,20 +12888,21 @@ var TrailResolverService = /** @class */ (function () {
      * - online data */
     TrailResolverService.prototype.resolve = function (route, state) {
         var _this = this;
-        this._activeTrailId = this._localStorage.retrieve('activeTrailId') | 0;
-        var _direction = this._localStorage.retrieve('direction') | 0;
+        this._activeTrailId = this._localStorage.retrieve('activeTrailId') || 0;
+        var _direction = this._localStorage.retrieve('direction') || 0;
         if (this._cachedTrail && this._cachedTrail.id === this._activeTrailId && this._cachedTrail.direction === _direction) {
             return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])({ trail: this._cachedTrail, snow: this._cachedSnow });
         }
         else {
-            return this._trailService.getPreParsedTrailData(this._activeTrailId, _direction).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["take"])(1), Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(function (data) {
+            return this._trailService.getPreParsedTrailData(this._activeTrailId, _direction).pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["take"])(1), // closes subscription
+            Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["switchMap"])(function (data) {
                 if (data) {
                     // cache trail
                     _this._cachedTrail = data[0];
                     _this._trailGenerator.setTrailData(_this._cachedTrail);
                     // if there's snow data, there might not be
                     if (data[1]) {
-                        // parse snow data individually (as it's a seperate update/download)
+                        // parse snow data individually (as it's a separate update/download)
                         _this._cachedSnow = data[1];
                         _this._snowGenerator.setSnowData(_this._cachedSnow);
                         // reverse if needed
@@ -11732,6 +12916,9 @@ var TrailResolverService = /** @class */ (function () {
                     });
                     _this._trailGenerator.createMileTree(flatMileCoordinates);
                     _this._loaderService.showMessage('created mile tree');
+                    // set up the rating system (requires active trail data)
+                    _this._rateService.setup();
+                    _this._loaderService.showMessage('initialized rating system');
                     _this._loaderService.hideOverlay();
                     return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])({ trail: _this._cachedTrail, snow: _this._cachedSnow });
                 }
@@ -11753,7 +12940,8 @@ var TrailResolverService = /** @class */ (function () {
             _loader_service__WEBPACK_IMPORTED_MODULE_6__["LoaderService"],
             _download_service__WEBPACK_IMPORTED_MODULE_11__["DownloadService"],
             _trail_generator_service__WEBPACK_IMPORTED_MODULE_8__["TrailGeneratorService"],
-            _snow_generator_service__WEBPACK_IMPORTED_MODULE_9__["SnowGeneratorService"]])
+            _snow_generator_service__WEBPACK_IMPORTED_MODULE_9__["SnowGeneratorService"],
+            _rate_service__WEBPACK_IMPORTED_MODULE_12__["RateService"]])
     ], TrailResolverService);
     return TrailResolverService;
 }());
@@ -11782,13 +12970,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _snow_generator_service__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./snow-generator.service */ "./src/app/service/snow-generator.service.ts");
 /* harmony import */ var _util_snow__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../_util/snow */ "./src/app/_util/snow.ts");
 /* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../_util/trail */ "./src/app/_util/trail.ts");
+/* harmony import */ var _util_trail_meta__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../_util/trail-meta */ "./src/app/_util/trail-meta.ts");
 /* harmony import */ var _filesystem_service__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./filesystem.service */ "./src/app/service/filesystem.service.ts");
 /* harmony import */ var _parser_pct_data__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../parser/pct-data */ "./src/app/parser/pct-data.ts");
-/* harmony import */ var _parser_demo_data__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../parser/demo-data */ "./src/app/parser/demo-data.ts");
-/* harmony import */ var _parser_cdt_data__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../parser/cdt-data */ "./src/app/parser/cdt-data.ts");
-/* harmony import */ var _parser_at_data__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../parser/at-data */ "./src/app/parser/at-data.ts");
-/* harmony import */ var _parser_shr_data__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../parser/shr-data */ "./src/app/parser/shr-data.ts");
+/* harmony import */ var _parser_shr_data__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../parser/shr-data */ "./src/app/parser/shr-data.ts");
 
 
 
@@ -11803,12 +12988,13 @@ __webpack_require__.r(__webpack_exports__);
 
 
 // dynamically called
-
-
-
+// import { parseCDTData } from '../parser/cdt-data';
+// import { parseATData } from '../parser/at-data';
 
 
 var TrailService = /** @class */ (function () {
+    // private _parseCDTData:    Function = parseCDTData;
+    // private _parseATData:     Function = parseATData;
     function TrailService(_http, _localStorage, _loaderService, _trailGenerator, _snowGenerator, _fileSystemService) {
         this._http = _http;
         this._localStorage = _localStorage;
@@ -11818,14 +13004,13 @@ var TrailService = /** @class */ (function () {
         this._fileSystemService = _fileSystemService;
         // prevent removal of dynamically used imports (tree shaking), see: https://github.com/Microsoft/TypeScript/issues/9191
         // since each dataset has a different source, they all have their own parsing routine, before step 2 (generateMiles() / parseSnow())
-        this._parseDEMOData = _parser_demo_data__WEBPACK_IMPORTED_MODULE_13__["parseDEMOData"];
-        this._parsePCTData = _parser_pct_data__WEBPACK_IMPORTED_MODULE_12__["parsePCTData"];
-        this._parseCDTData = _parser_cdt_data__WEBPACK_IMPORTED_MODULE_14__["parseCDTData"];
-        this._parseATData = _parser_at_data__WEBPACK_IMPORTED_MODULE_15__["parseATData"];
-        this._parseSHRData = _parser_shr_data__WEBPACK_IMPORTED_MODULE_16__["parseSHRData"];
+        this._DEMOParser = new _parser_pct_data__WEBPACK_IMPORTED_MODULE_12__["PCTData"](); // demo is the first section of the PCT
+        this._PCTParser = new _parser_pct_data__WEBPACK_IMPORTED_MODULE_12__["PCTData"]();
+        this._SHRParser = new _parser_shr_data__WEBPACK_IMPORTED_MODULE_13__["SHRData"]();
     }
     // Get raw trail data, for parsing (dev mode)
     // this generates the preparsed data files to be used by regular users (stored online for download + default version in assets)
+    // supports trails that consist of multiple files (sections)
     TrailService.prototype.getRawTrailData = function (trailId) {
         var _trailMeta;
         var _observables = [];
@@ -11841,23 +13026,41 @@ var TrailService = /** @class */ (function () {
         // CDT data from CDTC (might be able to get better dataset)
         // SHR http://onthetrail.org/trekking/shr/ (unofficial)
         // TODO: snow data ripped from postholer (not very nice, I know)
-        // .dat is an xml structured file (so .gpx or .kml)
+        // .dat is an xml structured file (so a .gpx or .kml)
         var _assetsDir = 'assets/data/';
-        var _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', { responseType: 'text' });
+        if (_trailMeta.multipart) {
+            for (var i = 0; i < _trailMeta.parts; i++) {
+                var _trailDownloader = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail_' + i + '.dat', { responseType: 'text' });
+                _observables.push(_trailDownloader);
+            }
+        }
+        else {
+            var _trail = this._http.get(_assetsDir + _trailMeta.dataPath + 'trail.dat', { responseType: 'text' });
+            _observables.push(_trail);
+        }
         var _poi = this._http.get(_assetsDir + _trailMeta.dataPath + 'poi.dat', { responseType: 'text' });
-        _observables.push(_trail, _poi);
+        _observables.push(_poi);
         // snow is an optional data file
         var _snow;
         if (_trailMeta.snowVersion) {
             _snow = this._http.get(_assetsDir + _trailMeta.dataPath + 'snow.json', { responseType: 'json' });
             _observables.push(_snow);
         }
+        // towns is an optional data file
+        var _towns;
+        if (_trailMeta.hasTowns) {
+            _towns = this._http.get(_assetsDir + _trailMeta.dataPath + 'towns.json', { responseType: 'json' });
+            _observables.push(_towns);
+        }
         return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["forkJoin"])(_observables);
     };
-    // Get the pre parsed trail data (regular user), returns a promise
+    /* Get the pre parsed trail data (regular user), returns a promise
+    2 options
+    - get the locally stored (user downloaded) combined trail file (that includes trail & poi), 2 separate JSONs, trail has nobo/sobo versions
+    - get the default combined file (from assets, baked into the app), 2 separate JSONs, trail has nobo/sobo versions */
     TrailService.prototype.getPreParsedTrailData = function (trailId, direction) {
         var _self = this;
-        var _trailMeta = Object(_util_trail__WEBPACK_IMPORTED_MODULE_10__["getTrailMetaDataById"])(trailId);
+        var _trailMeta = Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_10__["getTrailMetaDataById"])(trailId);
         var _directionString = (direction === 0) ? 'nobo' : 'sobo';
         this._loaderService.showMessage('fetching trail data');
         var _getData = function (name, hasDirection) {
@@ -11896,11 +13099,11 @@ var TrailService = /** @class */ (function () {
         return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["forkJoin"])(_observables);
     };
     // Parse the raw data (routines for each trail), returns a promise
-    TrailService.prototype.parseTrailData = function (trail, waypoints, pois, snow, direction) {
+    TrailService.prototype.parseTrailData = function (trail, waypoints, pois, snow, towns, direction) {
         this._loaderService.showMessage('parsing trail data');
         // dynamic function call
-        var _parsed = this['_parse' + trail.abbr + 'Data'](trail, waypoints, pois, snow, direction);
-        var _trail = this._trailGenerator.generateMiles(_parsed[0], _parsed[1], _parsed[2], direction);
+        var _parsed = this['_' + trail.abbr + 'Parser'].parse(trail, waypoints, pois, snow, towns, direction);
+        var _trail = this._trailGenerator.generateMiles(_parsed[0], _parsed[1], _parsed[2], direction, _parsed[4]);
         var _snow;
         if (_parsed[3]) {
             _snow = Object(_util_snow__WEBPACK_IMPORTED_MODULE_8__["parseSnow"])(_parsed[3], _trail.id, _trail.abbr, trail.snowVersion);
@@ -11915,9 +13118,12 @@ var TrailService = /** @class */ (function () {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
             providedIn: 'root'
         })
-        /* 2 options
-        - get the locally stored (user downloaded) combined trail file (that includes trail & poi), 2 separate JSONs, trail has nobo/sobo versions
-        - get the default combined file (from assets, baked into the app), 2 separate JSONs, trail has nobo/sobo versions*/
+        /* trail generating, trail parsing, trail loading:
+        trail:
+        - consists of trail waypoints (can be multiple files)
+        - contists poi data (points of interest), can be multiple files (TODO: multi poi files, when needed)
+        - consists of snow data (single file)
+         */
         ,
         tslib__WEBPACK_IMPORTED_MODULE_0__["__metadata"]("design:paramtypes", [_angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpClient"],
             ngx_webstorage__WEBPACK_IMPORTED_MODULE_4__["LocalStorageService"],
@@ -11948,7 +13154,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/router */ "./node_modules/@angular/router/fesm5/router.js");
 /* harmony import */ var ngx_webstorage__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ngx-webstorage */ "./node_modules/ngx-webstorage/fesm5/ngx-webstorage.js");
 /* harmony import */ var _environments_environment_prod__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../environments/environment.prod */ "./src/environments/environment.prod.ts");
-/* harmony import */ var _util_trail__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../_util/trail */ "./src/app/_util/trail.ts");
+/* harmony import */ var _util_trail_meta__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../_util/trail-meta */ "./src/app/_util/trail-meta.ts");
 /* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
 /* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
 /* harmony import */ var _trail_generator_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./trail-generator.service */ "./src/app/service/trail-generator.service.ts");
@@ -12030,17 +13236,17 @@ var VersionResolverService = /** @class */ (function () {
                 if (_external) {
                     _this._localStorage.store('lastVersionCheck', new Date().getTime());
                     _this._localStorage.store('availableUpdates', _external);
-                    Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["setTrailMetaData"])(_external);
+                    Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_5__["setTrailMetaData"])(_external);
                 }
                 else {
                     /* we're using internal data, so the last version data is what we saved to local storage
                     the last time internet was available, if nothing was ever downloaded use internal data */
                     var _updateData = _this._localStorage.retrieve('availableUpdates');
                     if (_updateData) {
-                        Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["setTrailMetaData"])(_updateData);
+                        Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_5__["setTrailMetaData"])(_updateData);
                     }
                     else {
-                        Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["setTrailMetaData"])(_internal);
+                        Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_5__["setTrailMetaData"])(_internal);
                     }
                 }
                 return Object(rxjs__WEBPACK_IMPORTED_MODULE_6__["of"])('success');
@@ -12095,7 +13301,7 @@ var VersionResolverService = /** @class */ (function () {
             var _activeTrailId = _self._localStorage.retrieve('activeTrailId') | 0;
             var _trails = _self._localStorage.retrieve('availableUpdates');
             if (currentTrailOnly) {
-                _trails = { activeTrail: Object(_util_trail__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(_activeTrailId) };
+                _trails = { activeTrail: Object(_util_trail_meta__WEBPACK_IMPORTED_MODULE_5__["getTrailMetaDataById"])(_activeTrailId) };
             }
             var _loop_2 = function (key) {
                 var _trailMeta = _trails[key];
@@ -12181,7 +13387,8 @@ var Settings = /** @class */ (function () {
             iconType: 'fa',
             icon: 'tint',
             rateable: true,
-            rateBy: ['quality', 'flow', 'accessibility']
+            rateBy: ['quality', 'flow', 'accessibility'],
+            userEnabled: true
         }, {
             type: 'camp',
             label: 'campsite',
@@ -12189,45 +13396,52 @@ var Settings = /** @class */ (function () {
             color: '#d9a758',
             iconType: 'fa',
             icon: 'campground',
+            userEnabled: true
         }, {
             type: 'shelter',
             label: 'shelter',
             isMajor: false,
             color: '#d9a758',
             iconType: 'fa',
-            icon: 'shelter',
-            rateBy: ['pests', 'amenities']
+            icon: 'house-damage',
+            rateBy: ['pests', 'amenities'],
+            userEnabled: true
         }, {
             type: 'road',
             label: 'road',
             color: '#878787',
             iconType: 'fa',
-            icon: 'road'
+            icon: 'road',
+            userEnabled: true
         }, {
             type: 'highway',
             label: 'highway',
             isMajor: true,
             color: '#9b9b9b',
             iconType: 'fa',
-            icon: 'car'
+            icon: 'car',
+            userEnabled: true
         }, {
             type: 'railroad',
             label: 'railroad',
             color: '#afafaf',
             iconType: 'fa',
-            icon: 'train'
+            icon: 'train',
+            userEnabled: true
         }, {
             type: 'gate',
             label: 'gate',
             color: '#58d9aa',
             iconType: 'fa',
-            icon: 'door-open'
+            icon: 'door-open',
+            userEnabled: true
         }, {
             type: 'powerline',
             label: 'powerline',
             color: '#8b6765',
             iconType: 'fa',
-            icon: 'bolt'
+            icon: 'bolt',
+            userEnabled: true
         }, {
             type: 'store',
             label: 'store',
@@ -12235,13 +13449,15 @@ var Settings = /** @class */ (function () {
             iconType: 'fa',
             icon: 'store',
             rateable: true,
-            rateBy: ['assortment', 'price']
+            rateBy: ['assortment', 'price'],
+            userEnabled: true
         }, {
             type: 'postoffice',
             label: 'post office',
             color: '#d958aa',
             iconType: 'fa',
-            icon: 'box-open'
+            icon: 'box-open',
+            userEnabled: true
         }, {
             type: 'food',
             label: 'food',
@@ -12249,55 +13465,64 @@ var Settings = /** @class */ (function () {
             iconType: 'fa',
             icon: 'utensils',
             rateable: true,
-            rateBy: ['quantity', 'quality', 'price']
+            rateBy: ['quantity', 'quality', 'price'],
+            userEnabled: true
         }, {
             type: 'information',
             label: 'information',
             color: '#4498d9',
             iconType: 'fa',
-            icon: 'info'
+            icon: 'info',
+            userEnabled: true
         }, {
             type: 'trailhead',
             label: 'trail head',
             color: '#8d5e35',
             iconType: 'fa',
-            icon: 'parking'
+            icon: 'parking',
+            userEnabled: true
         }, {
             type: 'sign',
             label: 'sign',
             color: '#d08d4b',
             iconType: 'fa',
-            icon: 'map-signs'
+            icon: 'map-signs',
+            userEnabled: true
         }, {
             type: 'bridge',
             label: 'bridge',
             color: '#d95da5',
             iconType: 'fa',
-            icon: 'shoe-prints'
+            icon: 'shoe-prints',
+            userEnabled: true
         }, {
             type: 'trail',
-            label: 'sign',
+            label: 'trail',
             color: '#a5d958',
             iconType: 'fa',
-            icon: 'map-signs'
+            icon: 'map-signs',
+            userEnabled: true
         }, {
             type: 'view',
             label: 'view',
             color: '#d97948',
             iconType: 'fa',
-            icon: 'mountain'
+            icon: 'mountain',
+            userEnabled: true
         }, {
             type: 'peak',
             label: 'summit',
             color: '#d97948',
             iconType: 'fa',
-            icon: 'mountain'
+            icon: 'mountain',
+            userEnabled: true
         }, {
             type: 'boundary',
             label: 'boundary',
             color: '#d9c558',
             iconType: 'fa',
-            icon: 'map-pin'
+            icon: 'map-pin',
+            userEnabled: true
         }, {
             type: 'end',
             label: 'sign',
@@ -12319,7 +13544,15 @@ var Settings = /** @class */ (function () {
             iconType: 'fa',
             icon: 'hotel',
             rateable: true,
-            rateBy: ['amenities', 'price']
+            rateBy: ['amenities', 'price'],
+            userEnabled: true
+        }, {
+            type: 'town',
+            label: 'town / city',
+            isMajor: true,
+            color: '#ff0000',
+            iconType: 'fa',
+            icon: 'city'
         },
         // warning
         {
@@ -12327,7 +13560,8 @@ var Settings = /** @class */ (function () {
             label: 'note',
             color: '#E8D6BD',
             iconType: 'fas',
-            icon: 'pen-alt'
+            icon: 'pen-alt',
+            userEnabled: true
         },
         // warning
         {
@@ -12361,121 +13595,201 @@ var Settings = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/app/type/mile.ts":
-/*!******************************!*\
-  !*** ./src/app/type/mile.ts ***!
-  \******************************/
-/*! exports provided: Mile */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Mile", function() { return Mile; });
-var Mile = /** @class */ (function () {
-    function Mile() {
-    }
-    return Mile;
-}());
-
-
-
-/***/ }),
-
-/***/ "./src/app/type/ohlc.ts":
-/*!******************************!*\
-  !*** ./src/app/type/ohlc.ts ***!
-  \******************************/
-/*! exports provided: OHLC, calculateOHLC */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OHLC", function() { return OHLC; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "calculateOHLC", function() { return calculateOHLC; });
-var OHLC = /** @class */ (function () {
-    function OHLC() {
-    }
-    return OHLC;
-}());
-
-// calculate elevation range
-function calculateOHLC(data, range, identifier, nested) {
-    if (identifier === void 0) { identifier = 'elevation'; }
-    if (nested === void 0) { nested = true; }
-    // select sub data set to use for calculations
-    var _subArr = data.slice(range['start'], range['end']);
-    return _ohlc(_subArr);
-}
-// calculate ohlc of single data point?
-function _ohlc(waypoints) {
-    // calculate OHLC
-    var _open = Number(waypoints[0].elevation);
-    var _high = Number(_open);
-    var _low = Number(_open);
-    var _close = Number(waypoints[waypoints.length - 1].elevation);
-    for (var _i = 0, waypoints_1 = waypoints; _i < waypoints_1.length; _i++) {
-        var waypoint = waypoints_1[_i];
-        var _elevation = Number(waypoint["elevation"]);
-        if (_elevation > _high) {
-            _high = _elevation;
-        }
-        else if (_elevation < _low) {
-            _low = _elevation;
-        }
-    }
-    return { open: _open, high: _high, low: _low, close: _close };
-}
-
-
-/***/ }),
-
-/***/ "./src/app/type/poi.ts":
-/*!*****************************!*\
-  !*** ./src/app/type/poi.ts ***!
-  \*****************************/
-/*! exports provided: Poi, PoiType */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Poi", function() { return Poi; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PoiType", function() { return PoiType; });
-var Poi = /** @class */ (function () {
-    function Poi() {
-    }
-    return Poi;
-}());
-
-var PoiType = /** @class */ (function () {
-    function PoiType() {
-    }
-    return PoiType;
-}());
-
-
-
-/***/ }),
-
 /***/ "./src/app/type/rating.ts":
 /*!********************************!*\
   !*** ./src/app/type/rating.ts ***!
   \********************************/
-/*! exports provided: Score, Rating */
+/*! exports provided: TotalScore, Rating */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Score", function() { return Score; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TotalScore", function() { return TotalScore; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Rating", function() { return Rating; });
-var Score = /** @class */ (function () {
-    function Score() {
+/* harmony import */ var _util_poi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_util/poi */ "./src/app/_util/poi.ts");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/_esm5/index.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/_esm5/operators/index.js");
+/* harmony import */ var _util_cordova__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../_util/cordova */ "./src/app/_util/cordova.ts");
+
+
+
+
+// maintains a total score based on the last 10 inputs
+var TotalScore = /** @class */ (function () {
+    function TotalScore(belongsTo, aspect, scores) {
+        this._scores = []; // max. the last 10 ratings
+        this._count = 0; // max. 10
+        this._belongsTo = belongsTo;
+        this._aspect = aspect;
+        this._setScore(scores);
+        console.log(this);
     }
-    return Score;
+    TotalScore.prototype._setScore = function (scores) {
+        if (scores) {
+            var _length = scores.length;
+            var _UUID = Object(_util_cordova__WEBPACK_IMPORTED_MODULE_3__["getUUID"])();
+            for (var i = 0; i < _length; i++) {
+                var _score = scores[i];
+                this._scores.push(_score.score);
+                // set user score ref
+                if (_score.userId === _UUID) {
+                    this.userScore = _score;
+                }
+                this._count++;
+            }
+        }
+    };
+    TotalScore.prototype.addToScore = function (score, force) {
+        if (force === void 0) { force = false; }
+        // without forcing a user can only have a single score
+        if (this.userScore && !force) {
+            this.userScore.score = score;
+            this.userScore.unsynced = true;
+            this.userScore.timestamp = new Date().getTime();
+            this.removeUserScore(false);
+        }
+        else {
+            this.userScore = {
+                aspect: this._aspect,
+                belongsTo: this._belongsTo,
+                score: score,
+                timestamp: new Date().getTime(),
+                unsynced: true,
+                userId: Object(_util_cordova__WEBPACK_IMPORTED_MODULE_3__["getUUID"])()
+            };
+            if (this._count < 10) {
+                this._count++;
+            }
+        }
+        this._scores.push(this.userScore.score);
+        if (this._scores.length > 10) {
+            this._scores.shift();
+        }
+    };
+    TotalScore.prototype.getScore = function () {
+        var _total = 0;
+        var _count = 0;
+        for (var i = 0; i < this._scores.length; i++) {
+            var _multiplier = (1 + (i * 0.5)); // make more recent scores count more
+            _total += (this._scores[i] * _multiplier);
+            _count += _multiplier;
+        }
+        return Number((_total / _count).toFixed(2));
+    };
+    TotalScore.prototype.getUserScore = function () {
+        if (this.userScore) {
+            return this.userScore.score;
+        }
+        else {
+            return 0;
+        }
+    };
+    TotalScore.prototype.removeUserScore = function (clearUserScoreObj) {
+        if (clearUserScoreObj === void 0) { clearUserScoreObj = true; }
+        if (this.userScore) {
+            var _userScroreIndex = this._scores.indexOf(this.userScore.score);
+            this._scores.splice(_userScroreIndex, 1);
+            if (clearUserScoreObj) {
+                this.userScore = null;
+            }
+            this._count--;
+        }
+    };
+    return TotalScore;
 }());
 
 var Rating = /** @class */ (function () {
-    function Rating() {
+    function Rating(type, location, scores) {
+        this._aspects = {}; // you can rate different aspects (water: flow / quality / ease of use)
+        var _self = this;
+        this._type = type;
+        this.id = type + '_' + Number(location.latitude).toFixed(4) + '_' + Number(location.longitude).toFixed(4);
+        var _poiType = Object(_util_poi__WEBPACK_IMPORTED_MODULE_0__["getPoiTypeByType"])(this._type);
+        if (!_poiType.rateable) {
+            console.warn('trying to create a rating object for an unrateable type: ' + this._type);
+            return;
+        }
+        _self._setTotalScores(scores, _poiType.rateBy);
+        this.setupObserver();
+        this.calculateRating();
     }
+    Rating.prototype.destroy = function () {
+        if (this.ratingChangedObserver) {
+            this.ratingChangedObserver = null;
+            this._ratingChangedSubject = null;
+        }
+    };
+    Rating.prototype.setupObserver = function () {
+        if (!this.ratingChangedObserver) {
+            this._ratingChangedSubject = new rxjs__WEBPACK_IMPORTED_MODULE_1__["BehaviorSubject"](-1);
+            this.ratingChangedObserver = this._ratingChangedSubject.asObservable().pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_2__["share"])());
+        }
+    };
+    // sort scores by aspect
+    Rating.prototype._setTotalScores = function (scores, aspects) {
+        var _this = this;
+        var aspectCount = 0;
+        if (scores) {
+            var _aspectsTypeCollection = {};
+            var _length = scores.length;
+            for (var i = 0; i < _length; i++) {
+                var _score = scores[i];
+                if (!_aspectsTypeCollection[_score.aspect]) {
+                    _aspectsTypeCollection[_score.aspect] = [];
+                }
+                _aspectsTypeCollection[_score.aspect].push(_score);
+            }
+            // create total scores based on the aspects provided by scores
+            for (var key in _aspectsTypeCollection) {
+                this._aspects[key] = new TotalScore(this.id, key, _aspectsTypeCollection[key]);
+                aspectCount++;
+            }
+        }
+        // create blank total scores
+        if (aspects.length !== aspectCount) {
+            aspects.forEach(function (aspect) {
+                if (!_this._aspects.hasOwnProperty(aspect)) {
+                    _this._aspects[aspect] = new TotalScore(_this.id, aspect);
+                }
+            });
+        }
+    };
+    // updates the user rating within the total score object
+    // sets the new total value
+    Rating.prototype.setAspectRating = function (aspect, rating, force) {
+        if (force === void 0) { force = false; }
+        var _curAspect = this._aspects[aspect];
+        _curAspect.addToScore(rating, force);
+        this.calculateRating();
+    };
+    Rating.prototype.calculateRating = function () {
+        var _aspectCount = 0;
+        var _cummulativeScore = 0;
+        for (var key in this._aspects) {
+            var _rating = this._aspects[key];
+            var _aspectScore = _rating.getScore() || 0;
+            if (_aspectScore) {
+                _aspectCount++;
+                _cummulativeScore += _aspectScore;
+            }
+        }
+        this._rating = Number((_cummulativeScore / _aspectCount).toFixed(2)) || 0;
+        // trigger
+        this._ratingChangedSubject.next(new Date().getTime());
+    };
+    Rating.prototype.getRating = function () {
+        return this._rating;
+    };
+    Rating.prototype.getAspect = function (name) {
+        return this._aspects[name];
+    };
+    Rating.prototype.getAspects = function () {
+        var _returnArray = [];
+        for (var key in this._aspects) {
+            _returnArray.push(this._aspects[key]);
+        }
+        return _returnArray;
+    };
     return Rating;
 }());
 
@@ -12501,81 +13815,11 @@ var Snow = /** @class */ (function () {
 }());
 
 var Snowpoint = /** @class */ (function () {
-    function Snowpoint() {
+    function Snowpoint(elevation, distance) {
+        this.elevation = elevation;
+        this.distance = distance;
     }
     return Snowpoint;
-}());
-
-
-
-/***/ }),
-
-/***/ "./src/app/type/trail.ts":
-/*!*******************************!*\
-  !*** ./src/app/type/trail.ts ***!
-  \*******************************/
-/*! exports provided: Trail, TrailMeta */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Trail", function() { return Trail; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TrailMeta", function() { return TrailMeta; });
-// the current trail data
-var Trail = /** @class */ (function () {
-    function Trail() {
-    }
-    return Trail;
-}());
-
-/* the data that is always available regardless of the currently selected trail. (provided by version.json)
-TrailMeta represents the most recent available data for a given trail, meaning the version data is what is available online,
-not what it downloaded. TrailMeta is used for Trail generation as well as version checking */
-var TrailMeta = /** @class */ (function () {
-    function TrailMeta() {
-    }
-    return TrailMeta;
-}());
-
-
-
-/***/ }),
-
-/***/ "./src/app/type/user.ts":
-/*!******************************!*\
-  !*** ./src/app/type/user.ts ***!
-  \******************************/
-/*! exports provided: User */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "User", function() { return User; });
-// !user does not hold a status property (idle, fetching, tracking, error)
-var User = /** @class */ (function () {
-    function User() {
-    }
-    return User;
-}());
-
-
-
-/***/ }),
-
-/***/ "./src/app/type/waypoint.ts":
-/*!**********************************!*\
-  !*** ./src/app/type/waypoint.ts ***!
-  \**********************************/
-/*! exports provided: Waypoint */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Waypoint", function() { return Waypoint; });
-var Waypoint = /** @class */ (function () {
-    function Waypoint() {
-    }
-    return Waypoint;
 }());
 
 
@@ -12596,12 +13840,16 @@ var environment = {
     production: true,
     simulateTouch: false,
     version: '1.0',
+    // FILES
+    // PRODUCTION SERVER:
     // appDomain: 'https://storage.googleapis.com/',
     // fileBaseUrl: 'just-hike/',
+    // TEST SERVER:
     appDomain: 'https://hike.frankdouwes.com/',
     fileBaseUrl: 'files/',
-    onlineTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+    mailto: 'https://hike.frankdouwes.com/scripts/mailto.php',
     updateCheckInterval: 86400000,
+    onlineTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
     MILE: 1609.344,
     FOOT: 0.3048,
     LINEHEIGHT: 4,
@@ -12609,8 +13857,6 @@ var environment = {
     DEFAULT_USER_SETTINGS: {
         activeTrailId: 0,
         purchasedTrails: [],
-        useMiles: true,
-        useFeet: true,
         direction: 0,
         showSnow: true,
         showMiniMap: true,
@@ -12633,7 +13879,7 @@ var environment = {
         // elevationProfile
         parallaxEnabled: false,
         screenMode: 'default',
-        showExtraDesign: true,
+        detectRetina: false // disable retina by default (battery saving)
     },
     // Data set by DEVs before generating new trail data.
     TRAILS_GENERATION: [
@@ -12643,18 +13889,25 @@ var environment = {
             trailVersion: '1.1',
             tilesVersion: '1.0',
             snowVersion: '1.0',
+            hasTowns: true,
             length: 109.5,
             dataPath: 'DEMO/',
-            scrollbarSegmentSize: 100 // one scrollbar segment for every X miles
+            scrollbarSegmentSize: 100,
+            multipart: false
         }, {
             abbr: 'PCT',
             id: 1,
             trailVersion: '1.1',
             tilesVersion: '1.0',
             snowVersion: '1.0',
-            length: 2661.4,
+            hasTowns: true,
+            length: [109.5, 100, 132.5, 112.5, 111.9, 85.6, 115, 175.5, 74.4, 75.4,
+                64.8, 38.3, 91.4, 132.2, 82.2, 98.5, 56.2, 63, 54.5, 74.4, 60.1, 75.9,
+                107.9, 55, 148.2, 98.3, 70.9, 127, 70.3],
             dataPath: 'PCT/',
-            scrollbarSegmentSize: 200 // one scrollbar segment for every X miles
+            scrollbarSegmentSize: 200,
+            multipart: true,
+            parts: 29
         }, {
             abbr: 'CDT',
             id: 2,
@@ -12663,7 +13916,8 @@ var environment = {
             snowVersion: '1.0',
             length: 3011,
             dataPath: 'CDT/',
-            scrollbarSegmentSize: 200 // one scrollbar segment for every X miles
+            scrollbarSegmentSize: 200,
+            multipart: false,
         }, {
             abbr: 'AT',
             id: 3,
@@ -12672,15 +13926,17 @@ var environment = {
             snowVersion: '1.0',
             length: 2199,
             dataPath: 'AT/',
-            scrollbarSegmentSize: 200 // one scrollbar segment for every X miles
+            scrollbarSegmentSize: 200,
+            multipart: false,
         }, {
+            abbr: 'SHR',
             id: 4,
             trailVersion: '1.0',
             tilesVersion: '1.0',
-            abbr: 'SHR',
             length: 215,
             dataPath: 'SHR/',
-            scrollbarSegmentSize: 100 // one scrollbar segment for every X miles
+            scrollbarSegmentSize: 100,
+            multipart: false,
         }
     ]
 };

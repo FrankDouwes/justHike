@@ -126,6 +126,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
           _poiIndexes = _poiIndexes.concat(_mile.pois);
         }
       }
+
     } else if (this.poisData) {
       _poiIndexes = this.poisData;
     }

@@ -164,11 +164,17 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   // off trail dialog (mile simulator)
   private _openOfftrailDialog(event): void {
 
+    if (this._offtrailDialog) {
+      this._markerDialog.close();
+    }
+
     this._offtrailDialog = this._dialog.open(OfftrailDialogComponent, {
-      panelClass: 'offtrail-dialog', autoFocus: false, width: '50%', height: '75%%', data: event.detail
+      panelClass: 'offtrail-dialog', autoFocus: false, width: '50%', height: 'auto', data: event.detail
     });
 
     this._onDialogClose(this._offtrailDialog, 'offtrailClosed', result => {
+
+      this._offtrailDialog = null;
 
       if (result) {
         this._localStorage.store('simulatedMile', Number(result.simulatedMile));
@@ -176,7 +182,6 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
 
       const _simulate = !!(result);
       this._injector.get(LocationService).toggleTracking(_simulate);
-
     });
   }
 
@@ -184,16 +189,16 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
 
     this.addSubscription(name, dialog.afterClosed().subscribe(result => {
 
-      console.log('close');
-
       this._toggleNavigationVisibility(true);
+
+      this.removeSubscription(name);
+      dialog = null;
 
       if (callback) {
         callback(result);
       }
 
-      this.removeSubscription(name);
-      dialog = null;
+
     }));
   }
 

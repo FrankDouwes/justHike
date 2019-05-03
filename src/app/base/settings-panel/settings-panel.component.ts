@@ -12,15 +12,15 @@ export class SettingsPanelComponent implements OnInit, OnDestroy {
 
   @Output() onSettingsChanged: EventEmitter<boolean> = new EventEmitter();
 
-  public settingsChanged: boolean = false;
+  public settingsChanged = false;
 
   constructor() { }
 
   ngOnInit() {}
 
   ngOnDestroy(): void {
-    this.onSettingsChanged = null;
     this.validate();
+    this.onSettingsChanged = null;
   }
 
   protected invalidate(): void {

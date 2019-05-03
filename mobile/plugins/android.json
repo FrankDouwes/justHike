@@ -22,10 +22,6 @@
     "cordova-plugin-geolocation": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
-    "cordova-plugin-ionic-webview": {
-      "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+",
-      "PACKAGE_NAME": "hike.frankdouwes.com"
-    },
     "cordova-plugin-network-information": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
@@ -33,6 +29,10 @@
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
     "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-ionic-webview": {
+      "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+",
       "PACKAGE_NAME": "hike.frankdouwes.com"
     }
   },

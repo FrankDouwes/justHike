@@ -277,14 +277,6 @@ module.exports = [
         "runs": true
     },
     {
-        "file": "plugins/cordova-plugin-ionic-webview/src/www/util.js",
-        "id": "cordova-plugin-ionic-webview.IonicWebView",
-        "pluginId": "cordova-plugin-ionic-webview",
-        "clobbers": [
-            "Ionic.WebView"
-        ]
-    },
-    {
         "file": "plugins/cordova-plugin-dialogs/www/notification.js",
         "id": "cordova-plugin-dialogs.notification",
         "pluginId": "cordova-plugin-dialogs",
@@ -313,6 +305,14 @@ module.exports = [
         "id": "cordova-plugin-device.DeviceProxy",
         "pluginId": "cordova-plugin-device",
         "runs": true
+    },
+    {
+        "file": "plugins/cordova-plugin-ionic-webview/src/www/util.js",
+        "id": "cordova-plugin-ionic-webview.IonicWebView",
+        "pluginId": "cordova-plugin-ionic-webview",
+        "clobbers": [
+            "Ionic.WebView"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -328,9 +328,9 @@ module.exports.metadata =
     "cordova-plugin-whitelist": "1.3.3",
     "es6-promise-plugin": "4.2.2",
     "cordova-plugin-splashscreen": "5.0.3-dev",
-    "cordova-plugin-ionic-webview": "4.0.1",
     "cordova-plugin-dialogs": "2.0.1",
-    "cordova-plugin-device": "2.0.2"
+    "cordova-plugin-device": "2.0.2",
+    "cordova-plugin-ionic-webview": "4.0.1"
 }
 // BOTTOM OF METADATA
 });

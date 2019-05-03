@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {Score} from '../../../../../../type/rating';
+import {Score, TotalScore} from '../../../../../../type/rating';
 
 @Component({
   selector: 'rating-current-score',
@@ -10,7 +10,7 @@ import {Score} from '../../../../../../type/rating';
 export class CurrentScoreComponent implements OnInit, OnChanges {
 
   @Input() label: string;
-  @Input() score: Score;
+  @Input() score: TotalScore;
   @Input() update: number;
 
   constructor(private _changeDetector: ChangeDetectorRef) {}
@@ -42,8 +42,6 @@ export class CurrentScoreComponent implements OnInit, OnChanges {
         _scoreArray.push('o');
       }
     }
-
-    console.log(_scoreArray);
 
     return _scoreArray;
   }

@@ -7,7 +7,6 @@ import {TrailGeneratorService} from './trail-generator.service';
 import {HttpClient} from '@angular/common/http';
 import {getUUID} from '../_util/cordova';
 import {cloneData, isObjectEmpty} from '../_util/generic';
-import {BaseComponent} from '../base/base/base.component';
 import {ConnectionService} from './connection.service';
 
 @Injectable({
@@ -16,7 +15,7 @@ import {ConnectionService} from './connection.service';
 
 
 // Ratings are combined Scores, a water-source (rateable) can be rated on multiple aspects (providing Scores)
-export class RateService extends BaseComponent implements OnDestroy {
+export class RateService implements OnDestroy {
 
   private _lastUpdated = 0;
   private _hasInternet = false;
@@ -24,23 +23,22 @@ export class RateService extends BaseComponent implements OnDestroy {
   private _localScores: Array<Score>;         // all scores (aspects of rating)
   private _localRatings: Array<Rating> = [];  // all ratings for the current trail
 
-  private _activeTrailSubscription: Subscription;
   private _activeTrailAbbr: string;
+
+  private _connectionSubscription: Subscription;
 
   constructor(
     private _localStorage: LocalStorageService,
     private _trailGenerator: TrailGeneratorService,
     private _connectionService: ConnectionService,
     private _http: HttpClient) {
-    super();
   }
 
   // LIFECYCLE
 
   ngOnDestroy(): void {
-    super.ngOnDestroy();
-    this._activeTrailSubscription.unsubscribe();
-    this._activeTrailSubscription = null;
+    this._connectionSubscription.unsubscribe();
+    this._connectionSubscription = null;
   }
 
   // requires active trail meta data (runs after loading/parsing trail
@@ -54,7 +52,7 @@ export class RateService extends BaseComponent implements OnDestroy {
     this._activeTrailAbbr = this._trailGenerator.getTrailData().abbr;
     this._lastUpdated = this._localStorage.retrieve(this._activeTrailAbbr + '_scores-lastUpdated') || 0;
 
-    this.addSubscription('connection', this._connectionService.connectionObserver.subscribe(function(result) {
+    this._connectionSubscription = this._connectionService.connectionObserver.subscribe(function(result) {
 
       // internet just became available
       if (result !== _self._hasInternet && result === true) {
@@ -64,7 +62,7 @@ export class RateService extends BaseComponent implements OnDestroy {
         _self._hasInternet = result;
       }
 
-    }))
+    });
   }
 
   private _syncData(): void {

@@ -85,27 +85,23 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
 
   public onToggleClick(state: 'current' | 'add'): void {
 
-    // TODO: check if gps is tracking
-    // TODO: check within X miles
-
-
     // you're only allowed to rate if you're nearby (4.5 miles)
-    if (state === 'add') {
-      if (this.status !== 'tracking' && !this.user) {
-        this.ratingPanel.nativeElement.classList.add('warn');
-        this.ratingPanel.nativeElement.classList.add('warn-gps');
-      } else {
-        const _distance = geolib.getDistance(waypointToLatLng(this.waypoint), waypointToLatLng(this.user.waypoint));
-        if (_distance > (environment.MILE * 4.5)) {
-          this.ratingPanel.nativeElement.classList.add('warn');
-          this.ratingPanel.nativeElement.classList.add('warn-distance');
-        }
-      }
-    } else {
-      this.ratingPanel.nativeElement.classList.remove('warn');
-      this.ratingPanel.nativeElement.classList.remove('warn-gps');
-      this.ratingPanel.nativeElement.classList.remove('warn-distance');
-    }
+    // if (state === 'add') {
+    //   if (this.status !== 'tracking' && !this.user) {
+    //     this.ratingPanel.nativeElement.classList.add('warn');
+    //     this.ratingPanel.nativeElement.classList.add('warn-gps');
+    //   } else {
+    //     const _distance = geolib.getDistance(waypointToLatLng(this.waypoint), waypointToLatLng(this.user.waypoint));
+    //     if (_distance > (environment.MILE * 4.5)) {
+    //       this.ratingPanel.nativeElement.classList.add('warn');
+    //       this.ratingPanel.nativeElement.classList.add('warn-distance');
+    //     }
+    //   }
+    // } else {
+    //   this.ratingPanel.nativeElement.classList.remove('warn');
+    //   this.ratingPanel.nativeElement.classList.remove('warn-gps');
+    //   this.ratingPanel.nativeElement.classList.remove('warn-distance');
+    // }
     this.state = state;
   }
 

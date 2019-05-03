@@ -14,11 +14,11 @@
 		</data>
 		<key>Assets.car</key>
 		<data>
-		Ymp9kgpU2wdIZjItaXV6Zpbq+aM=
+		gVhN4Ea6TaMalXmKgYridbfmJQM=
 		</data>
 		<key>CDVLaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
 		<data>
-		MBdLL4y9lXbu1N2GAwljuOdFvXY=
+		YKJiqUUv6kb2VeNHCUmRoY1gMnc=
 		</data>
 		<key>CDVLaunchScreen.storyboardc/Info.plist</key>
 		<data>
@@ -26,7 +26,7 @@
 		</data>
 		<key>CDVLaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib</key>
 		<data>
-		qlExPmVcFi6GLxDjhxR3pbL6KwI=
+		4ZSYzIo1wA+tvikqCuzZ5rp4A6w=
 		</data>
 		<key>CDVNotification.bundle/beep.wav</key>
 		<data>
@@ -34,11 +34,11 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		RO9fgjYkE5YOZmQNncvMDF4Vi3U=
+		8exqWWLfUiPg8Po0GWykEKMuVC0=
 		</data>
 		<key>MainViewController.nib</key>
 		<data>
-		W+wYCuTwpm9eg5WINbKAlwlsA7Q=
+		KNA7WvkHT6OPMUHGFqmnQDZWt0A=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -46,11 +46,11 @@
 		</data>
 		<key>config.xml</key>
 		<data>
-		/S6/kDhJc5ar8nXr+EH6mb7awY4=
+		gSiyVgO+N3rA+dZhbrAklGTbpwY=
 		</data>
 		<key>embedded.mobileprovision</key>
 		<data>
-		hFoMAUSWEojbiFpuYtT2cIWy5kk=
+		lBUIFUjkeKhGogpOjAv3XKbJ5Yc=
 		</data>
 		<key>www/assets/css/highContrast.css</key>
 		<data>
@@ -92,6 +92,10 @@
 		<data>
 		UqEhzaAMgKdC80ZSgyMOgp9rzo4=
 		</data>
+		<key>www/assets/data/DEMO/towns.json</key>
+		<data>
+		OiQFLgXHRiMEsCG/ouxVhEuu05E=
+		</data>
 		<key>www/assets/data/DEMO/trail.dat</key>
 		<data>
 		rwGQzOtpQhR3lJHuMNIY2Z9Jvig=
@@ -104,9 +108,125 @@
 		<data>
 		lMO8dK+pUIAfLkrxgNj9c75CRng=
 		</data>
-		<key>www/assets/data/PCT/trail.dat</key>
+		<key>www/assets/data/PCT/towns.json</key>
 		<data>
-		pzEreFhqbFVsjWuv6Jc5besDqK0=
+		4FrYXO81bu48bMuRmNn+uUlSCo0=
+		</data>
+		<key>www/assets/data/PCT/trail_0.dat</key>
+		<data>
+		rwGQzOtpQhR3lJHuMNIY2Z9Jvig=
+		</data>
+		<key>www/assets/data/PCT/trail_1.dat</key>
+		<data>
+		N3hpXGgMAJwejioQvWizha8RhSg=
+		</data>
+		<key>www/assets/data/PCT/trail_10.dat</key>
+		<data>
+		CH9O287c5G+IiR9eDpga1sp1Ygc=
+		</data>
+		<key>www/assets/data/PCT/trail_11.dat</key>
+		<data>
+		q/CRBBtesVnpDH0k/qubH+jgwtI=
+		</data>
+		<key>www/assets/data/PCT/trail_12.dat</key>
+		<data>
+		som8v2ZyykIF9ljueAOPbqJJmT4=
+		</data>
+		<key>www/assets/data/PCT/trail_13.dat</key>
+		<data>
+		ApzZdnbZDfjbwXofgnapUIE2Oaw=
+		</data>
+		<key>www/assets/data/PCT/trail_14.dat</key>
+		<data>
+		dsCbzwqZzrd7tOpt+32tJ8cCEf4=
+		</data>
+		<key>www/assets/data/PCT/trail_15.dat</key>
+		<data>
+		cF/cZW9oPvfL6wBSZBy4yOLFh/E=
+		</data>
+		<key>www/assets/data/PCT/trail_16.dat</key>
+		<data>
+		5tvF6V9yc+A5hmRvi5nFPJeDI6I=
+		</data>
+		<key>www/assets/data/PCT/trail_17.dat</key>
+		<data>
+		EShX1lCkv3BCqG9c2EKCAqSTDVo=
+		</data>
+		<key>www/assets/data/PCT/trail_18.dat</key>
+		<data>
+		Gn+grq53G01pcbo6cNeBN9Z5yVw=
+		</data>
+		<key>www/assets/data/PCT/trail_19.dat</key>
+		<data>
+		FU7a7/VxEFnfMN2rw6lF5ojGDts=
+		</data>
+		<key>www/assets/data/PCT/trail_2.dat</key>
+		<data>
+		Hk6vJAVrpINjX/C8DM9T59Jz5Z8=
+		</data>
+		<key>www/assets/data/PCT/trail_20.dat</key>
+		<data>
+		AClwU5zNh/Bgkyt75Ph47MOrHFg=
+		</data>
+		<key>www/assets/data/PCT/trail_21.dat</key>
+		<data>
+		v5QuFz+ZZxq7DTbEcFnpn7wp2IM=
+		</data>
+		<key>www/assets/data/PCT/trail_22.dat</key>
+		<data>
+		R6pFQBhuUwGtc3lVkzkNVJTCyh4=
+		</data>
+		<key>www/assets/data/PCT/trail_23.dat</key>
+		<data>
+		pEOSgwu7GwA1Rf5zpQ5U2+KQQbA=
+		</data>
+		<key>www/assets/data/PCT/trail_24.dat</key>
+		<data>
+		JFbzdX34Ayq7r9isLp0DcxNS8Pg=
+		</data>
+		<key>www/assets/data/PCT/trail_25.dat</key>
+		<data>
+		wEqKCTQVz6UxvmvFgYsVC0Gpak4=
+		</data>
+		<key>www/assets/data/PCT/trail_26.dat</key>
+		<data>
+		1vgs/3Xyqd6gQc7p+fnPqkgi3DM=
+		</data>
+		<key>www/assets/data/PCT/trail_27.dat</key>
+		<data>
+		saRmZHYgFLq2D3E+iNfbi+eASws=
+		</data>
+		<key>www/assets/data/PCT/trail_28.dat</key>
+		<data>
+		d09yWfoAWjZY23ohCqGzyHj0h7U=
+		</data>
+		<key>www/assets/data/PCT/trail_3.dat</key>
+		<data>
+		E3D2DbnC7Zt3JdGPb9T0kF2iy+0=
+		</data>
+		<key>www/assets/data/PCT/trail_4.dat</key>
+		<data>
+		G/ky9xu+W2P3j1AGQXY3nM29FTg=
+		</data>
+		<key>www/assets/data/PCT/trail_5.dat</key>
+		<data>
+		cjB7QM2uN6wuBL91TekG1EE5olo=
+		</data>
+		<key>www/assets/data/PCT/trail_6.dat</key>
+		<data>
+		RnNbfloYDnuEZQPp72xSFon3QY4=
+		</data>
+		<key>www/assets/data/PCT/trail_7.dat</key>
+		<data>
+		N1tQISqV27NNdGmao9J2+1j9Fck=
+		</data>
+		<key>www/assets/data/PCT/trail_8.dat</key>
+		<data>
+		Ae6a8140g0gbl9JVYwV2i3sQvnU=
+		</data>
+		<key>www/assets/data/PCT/trail_9.dat</key>
+		<data>
+		9dqGmpDezq/uZHSoN1qF76VaLgc=
 		</data>
 		<key>www/assets/data/SHR/poi.dat</key>
 		<data>
@@ -116,37 +236,45 @@
 		<data>
 		aNOo/ylDI+TvsnHz0qaN9nD7rOQ=
 		</data>
+		<key>www/assets/files/DEMO/Xtrail-nobo.json</key>
+		<data>
+		N7aed4f7+L2a4J3rxCiL+pdGP3U=
+		</data>
+		<key>www/assets/files/DEMO/Xtrail-sobo.json</key>
+		<data>
+		vwH64/68yFA0ix48UtL2T5mKZsc=
+		</data>
 		<key>www/assets/files/DEMO/snow.json</key>
 		<data>
-		2f4F3Ypo3S7V+0MO1/5AZhYj020=
+		oZC2XJHVpVb/MIyTH8tyKkFE3SE=
 		</data>
 		<key>www/assets/files/DEMO/trail-nobo.json</key>
 		<data>
-		EdAshaZHdN/3d8aJno83zVz8XSE=
+		xxOI7lcAZKvBPejG8P/UtonMT/4=
 		</data>
 		<key>www/assets/files/DEMO/trail-sobo.json</key>
 		<data>
-		lsbqT7Ca8JFyaLxj+Ftt0LvLY+k=
+		gYPClrBwJCaUfKOguucsBZjY5BQ=
 		</data>
 		<key>www/assets/files/PCT/snow.json</key>
 		<data>
-		UOKg/5692DcbFUKpo0mWadZ4I3M=
+		wYs5iYES/0KXgfcv2DMGO/Tj7XU=
 		</data>
 		<key>www/assets/files/PCT/trail-nobo.json</key>
 		<data>
-		87pj9AfbC1OnHCYW6k17e0Oh388=
+		zJ0so7Zd6K7Cyjo0ikmnbID0aoY=
 		</data>
 		<key>www/assets/files/PCT/trail-sobo.json</key>
 		<data>
-		I6c4iav7MIWbdK59DmPDVYIOE4o=
+		6QAtxDHFOz12Kh4lf5siVdrTpVk=
 		</data>
 		<key>www/assets/files/SHR/trail-nobo.json</key>
 		<data>
-		k3ijTRw46y1NMN6CMrBlIvsmQy8=
+		3/zlfKB70N1WrzC1euAeXRyH0Ic=
 		</data>
 		<key>www/assets/files/SHR/trail-sobo.json</key>
 		<data>
-		hH4Zd/efKUNs1RuwuG+Dy3LwEW0=
+		oATEkyYDv8zGt5/AJ1ZcCKCELDY=
 		</data>
 		<key>www/assets/files/version.json</key>
 		<data>
@@ -171,10 +299,6 @@
 		<key>www/assets/icons/marker-shadow.png</key>
 		<data>
 		e2qN9jkwOB6WYE5wUWjQUn1rgrw=
-		</data>
-		<key>www/assets/images/backdrop.jpg</key>
-		<data>
-		8X+nYMNwKFcwNklC2pdLXl280MI=
 		</data>
 		<key>www/assets/images/logos/AT.png</key>
 		<data>
@@ -216,6 +340,18 @@
 		<data>
 		UY3R3hpHVBnISYOHbnwX3PBoSjg=
 		</data>
+		<key>www/assets/images/panel-backgrounds/cdt.jpg</key>
+		<data>
+		QgsvkF4JqWgOAd8sOUYJc8jRSzE=
+		</data>
+		<key>www/assets/images/panel-backgrounds/pct.jpg</key>
+		<data>
+		Be/59Dymk/HRMsk4n0ItidP2ERo=
+		</data>
+		<key>www/assets/images/panel-backgrounds/shr.jpg</key>
+		<data>
+		I9AoYhJAKCZeXn5N30Y2t39i0sg=
+		</data>
 		<key>www/assets/images/sign-post/post-backgound.jpg</key>
 		<data>
 		+NN9ZSTuXthlIt/4iezYJseYnUE=
@@ -240,6 +376,10 @@
 		<data>
 		ikNxoEeX5X7WueMSvasDZfvC9Uc=
 		</data>
+		<key>www/cdt.jpg</key>
+		<data>
+		QgsvkF4JqWgOAd8sOUYJc8jRSzE=
+		</data>
 		<key>www/cordova-js-src/exec.js</key>
 		<data>
 		3QDPaUQrAr8Wq2XcQhqcl8DLabQ=
@@ -262,7 +402,7 @@
 		</data>
 		<key>www/cordova_plugins.js</key>
 		<data>
-		P2XNAPiYjpS34DQ+cydxRnbQvx4=
+		tRrPDMGWoHbZv8eDmEg4KEzQeuo=
 		</data>
 		<key>www/favicon.ico</key>
 		<data>
@@ -270,7 +410,7 @@
 		</data>
 		<key>www/index.html</key>
 		<data>
-		EmVa9/vlypSqM1Os4jJ9OauouqQ=
+		C6TmOfzSNivjZJEMiTpJugVQrVg=
 		</data>
 		<key>www/layers-2x.png</key>
 		<data>
@@ -282,11 +422,11 @@
 		</data>
 		<key>www/main.js</key>
 		<data>
-		0gKYOqVWZgZfsv3jt4QaqQa4tCA=
+		aOGBsvDYhBkmYQnDNPzla4aTVkE=
 		</data>
 		<key>www/main.js.map</key>
 		<data>
-		tKKT9Swh7brJwqsW0LoYfEpgBn4=
+		UEYIaL9EOwXlqvR6jQ5Z4QxtRgM=
 		</data>
 		<key>www/manifest.json</key>
 		<data>
@@ -316,6 +456,10 @@
 		<data>
 		saCcFNWXYiBl8Z1FBxqtbNTH8Oc=
 		</data>
+		<key>www/pct.jpg</key>
+		<data>
+		Be/59Dymk/HRMsk4n0ItidP2ERo=
+		</data>
 		<key>www/plugins/cordova-plugin-device-orientation/www/CompassError.js</key>
 		<data>
 		DqTfeVGIdTUO5DhZOpOEYH1SMfc=
@@ -327,6 +471,10 @@
 		<key>www/plugins/cordova-plugin-device-orientation/www/compass.js</key>
 		<data>
 		lVZBIXmH1yYkW1ihgdt21GAb0jw=
+		</data>
+		<key>www/plugins/cordova-plugin-device/www/device.js</key>
+		<data>
+		1GfO/IDwwyLde/veo05ABQB5yTk=
 		</data>
 		<key>www/plugins/cordova-plugin-dialogs/www/notification.js</key>
 		<data>
@@ -494,11 +642,15 @@
 		</data>
 		<key>www/scripts.js</key>
 		<data>
-		GUEKMeQ4qtTNVFpjyN9UPXp1dLA=
+		QweGma/VfAdYpDsPb7kOBmYYx+8=
 		</data>
 		<key>www/scripts.js.map</key>
 		<data>
-		t+0z2OMvag14wwPV6whdnhK5QWQ=
+		r0xFofnhTXIDpwHvpT/Ka0+rw1A=
+		</data>
+		<key>www/shr.jpg</key>
+		<data>
+		I9AoYhJAKCZeXn5N30Y2t39i0sg=
 		</data>
 		<key>www/sign-background.jpg</key>
 		<data>
@@ -506,19 +658,19 @@
 		</data>
 		<key>www/styles.js</key>
 		<data>
-		38ggsI4pHdz3R+/BXVV7hPu2eBk=
+		ZmN8Q8ZgGxY5Mgb3fK4ovYnTbCw=
 		</data>
 		<key>www/styles.js.map</key>
 		<data>
-		ZtDPCt8MeOfA53uPLs3mpx21yMA=
+		TeOVXC7hC8FhDllbQ0cYK6p5asQ=
 		</data>
 		<key>www/vendor.js</key>
 		<data>
-		Hy6mW1Njo6ApfARQdNxsQHuukag=
+		BvumQ3vG91HAYtST95fhuCumxpI=
 		</data>
 		<key>www/vendor.js.map</key>
 		<data>
-		QlzUNodbCiHPrhPAwVA/h6BgUQU=
+		/OhNiTtrz6irjsY7XbF6AuTaGes=
 		</data>
 		<key>www/wk-plugin.js</key>
 		<data>
@@ -545,14 +697,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			0njMrqluFbb+HUQrwVFJqbQqZwggYevm0vA/yX/WiDg=
+			+tbnfHp57f3ni7VqLwudv7qBWNjOu7CYITQvlUx9n3w=
 			</data>
 		</dict>
 		<key>CDVLaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			0O/R7GMBpUJ3KeuQgAzuv8Zf4UQG/Cg7obBuRrod9ow=
+			ZMxYul31SzxyyrVgQSXx6nPMJ6JiZTvzPa30bGfZ5y0=
 			</data>
 		</dict>
 		<key>CDVLaunchScreen.storyboardc/Info.plist</key>
@@ -566,7 +718,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Kkt2keHP9QSaFzNlWvK/wzNy0Zv16BVZbzfizjSY59A=
+			Z4QtHtiOUZWrSykKjLT0y+NNwSibfSwmzP5v4H96FDc=
 			</data>
 		</dict>
 		<key>CDVNotification.bundle/beep.wav</key>
@@ -580,21 +732,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			MeVF2PSxGsTeVOYIPMdGF8UT3DOjiOAesrYz2Vkul4k=
+			maIazBbg693kPN+B2DnjeveD1/tGIqeAjDxcnbrbjy0=
 			</data>
 		</dict>
 		<key>config.xml</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			oFAh/et6cS93kdorVZOI/428USD2Fe5MWDQZ1OE0cO4=
+			HNORzX6HuxafyDWMIvjUKWdMikrGiaIqmzh3bECF7nA=
 			</data>
 		</dict>
 		<key>embedded.mobileprovision</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			fBg4k0DgFisdPA+6z7fBzC1wLANb6F5stQbank5yblE=
+			BSRFSm62GZAOencGfUrP9k529Smwlkgsb/ORcYdHR6I=
 			</data>
 		</dict>
 		<key>www/assets/css/highContrast.css</key>
@@ -667,6 +819,13 @@
 			iDsWyGD5itthXIkf+RIThy0Fo6VW72udibKXI6IcQss=
 			</data>
 		</dict>
+		<key>www/assets/data/DEMO/towns.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			h5ikQxeTm5OEx7ozNYNX94EB5mmAxCpfR1KGhXr3Z2s=
+			</data>
+		</dict>
 		<key>www/assets/data/DEMO/trail.dat</key>
 		<dict>
 			<key>hash2</key>
@@ -688,11 +847,214 @@
 			dsLw3s0SxuF2DW3Yokfm5yNFYJV9o7mwJN4p7NzmLPY=
 			</data>
 		</dict>
-		<key>www/assets/data/PCT/trail.dat</key>
+		<key>www/assets/data/PCT/towns.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			+q2PaiRkcyxkTvm9S1UryzYmBPz+WpyNEJt6Hb4+ajw=
+			ph2vDIYhfb5VYjc4l+raS+Su9DjpBMjZvxjUkvav43o=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_0.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			gz5dzn2LcJY/pxNqlC8kEk3+//kNSZQsIFT3xnEkvHQ=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_1.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			v84x5eLBHxEPtXmRrGpoe75QltOK7nwJYYaCy7Ztlo8=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_10.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			QVxQxyyMO+On/MO3GrPGEoXhL3XRSS+DsjXUbvp3crw=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_11.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Rm0WRsNtjq07xOu4NamONgECcYJWqW8irjBDUd4LRKU=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_12.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MXbX1XSMlSKhJ1yv9TCedyJFXki3beIFG6wqF2AXhF4=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_13.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			+OC43FSlTFLSpZNtqt7Ms3VtONeXUSuktgOAUQsN/vk=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_14.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ZM0IJTS0m4MT0BYhfjI2dIXAbhI9zfn8Y5z7K793sZQ=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_15.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Du8mqPS6F8yaDYhwh3wCNgwMXYG4ypHFH/u4W59qyfc=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_16.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			pU2q3dozkorJBtNgtgpsj1wmxkP2LMGb8zcjeTOVopY=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_17.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Win0c17EWuA6TPoAZBhFhYgMcyCLXJIZLrtqn6MZhcQ=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_18.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			jFCDcB75cYFchxsj1CkZa2BtgngnKHeKVK91NzvsnSc=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_19.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			X9z4kZ5KudrXYRJXTYg5OhMbIrn5EbRfo7/P4Qbe5HA=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_2.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Vftw3JWE/oTFKSm8YxLCrHTlD1pWzuWeOrXfcjwePaY=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_20.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			F0ulOm78vZoXYECjGIZ0eRsv4C9q0bZIDPFSOZ+YOI8=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_21.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MWLXAQ45WteQhAqIJ3oOlsbv5RZhzCfB9BnLcf5xx6Y=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_22.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			rtDuZVV7mYzJFBYxcSBRs9ot/s/hnn8wtdBPgwbVuxI=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_23.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			uXCqfqJpL4OynF5SP/RKTf80MgAFTEvg1oNezLug5/Q=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_24.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ucKu/z3qctQXxl3BWgz8XtQ5UWq+NfqhpXm/MaQNGEU=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_25.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			qriSnaxb5/OPMra/923vAEqtfM9Is9b3OAhNkGT3K/M=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_26.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			kXXzvMQyJYgKpc/8cRAC197OSHuxuBWFCkHZksgtmXY=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_27.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			f+kkbixcufxOXCi8ZH6BAhUYQ9p9NRQE0iXWynI8J/I=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_28.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			yThSiwbeUYBww2PsK3zPM3zYebQ9EM41A/QFwNVmwto=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_3.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			U7zGSfWpcqJcxtebwuCrWr0jgTcLYg/bOD14wLwDtYA=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_4.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			LWZis87Pfxat3EtsIezRjel3gU9VNnOQHJiLx4iKd7k=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_5.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			NNl8lGcAEMxbQR5KiRQXcGm6CEOMx+HcKyORIjCcr4c=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_6.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nKgOYpm0CgyJ8OmANGKtQlBvvJ+XvasQisa8F3Fe8Hw=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_7.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Ae4C5HlwQ00aaY60kVNoN9w4s0zF3CFAiyTUazdh4Gg=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_8.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			67uqusU/M+8mTGRaTPJLhtdRccfSjOzuz4pUzAxK3FE=
+			</data>
+		</dict>
+		<key>www/assets/data/PCT/trail_9.dat</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			foIg6peShjjxuiDemeNv3SJOHy0J8AJ2MFniGjPa7RE=
 			</data>
 		</dict>
 		<key>www/assets/data/SHR/poi.dat</key>
@@ -709,60 +1071,74 @@
 			yMb5EYWZaOvfU6fuB73YZJNertHp2VuQN88tzJh5ed0=
 			</data>
 		</dict>
+		<key>www/assets/files/DEMO/Xtrail-nobo.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			351KJRDNM7oXhHVL/o8ZmE0GtcOViWabhBOAIRSPIkg=
+			</data>
+		</dict>
+		<key>www/assets/files/DEMO/Xtrail-sobo.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			YL/Zfrlm9m32Qi/7D9SB9HJqx2jNOLiAEVpSuAYU9Fo=
+			</data>
+		</dict>
 		<key>www/assets/files/DEMO/snow.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			8TJm/N5XkMmGjIe3HbxBMl8kF68s3hPK6eOUqRcKN3Q=
+			23KeriGHJY0fEqBZVw2DP1gWw6bQU0PW7WRvz4D44Fc=
 			</data>
 		</dict>
 		<key>www/assets/files/DEMO/trail-nobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			jpCm/wc0DSl3eWqV9DnFrtKUU7yrXu0tk/xsqq44IWc=
+			JLBonu1jvROpGHMOYzmPCzxLKUg1MBP/HsGafMDwjA0=
 			</data>
 		</dict>
 		<key>www/assets/files/DEMO/trail-sobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			LsOXmDH3r+D1eWHHl6eGUk86gWK+jC1DOAbW6WxCkB8=
+			tcLts6gI0TdiJ/b/0AvK+3cnrn/RsPskrSMzhh7O2rI=
 			</data>
 		</dict>
 		<key>www/assets/files/PCT/snow.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			sbkBzjNc+pA1PsSkHLBCSXJLcnpMV3/EZcDAoZ6VUHA=
+			e88t7GZ+b49p8Xc26H0oJm7gOZzV4AMTXgleQ48aqhU=
 			</data>
 		</dict>
 		<key>www/assets/files/PCT/trail-nobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			FebrLngrRJwfyS99HuNfvCf3llGkACm4RzFeoYHGaeo=
+			8Smur8qVK15zidrlXsa62jpqMqbwxVXhEITHYyR4Iu0=
 			</data>
 		</dict>
 		<key>www/assets/files/PCT/trail-sobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			SVtkMjEG1IGz6tD7Oj5sS2mbTNpCApOL4Y8636Uncy0=
+			0kcPoTLtlSGs8Std77XajVid4/XaDp6kHL6JfDJYb6o=
 			</data>
 		</dict>
 		<key>www/assets/files/SHR/trail-nobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			jNozIwb7dwRajzYdoPJBmPAALNMKpIWFDde8Wk2tsg4=
+			Lnrwxc25vyo5SZkbymKs/M7CRV/C+HdkkgrU7JKbJlA=
 			</data>
 		</dict>
 		<key>www/assets/files/SHR/trail-sobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			hoqJ9jQE4fMmjIqoTjxOQog9NFvP1wlwXDELwV0tU1I=
+			WKL0XsWWA5reRSqWzPRBCmB2n+D7531RJ0XFWGBUMVI=
 			</data>
 		</dict>
 		<key>www/assets/files/version.json</key>
@@ -805,13 +1181,6 @@
 			<key>hash2</key>
 			<data>
 			Jk9cZAM58ELdcpBiz8BMF/jqDymIK1OOOEjtjxDttNo=
-			</data>
-		</dict>
-		<key>www/assets/images/backdrop.jpg</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			Nuxq9aw7A86bsO5ZFDGPoryM3C/2LqsufQCsIVsoMWE=
 			</data>
 		</dict>
 		<key>www/assets/images/logos/AT.png</key>
@@ -884,6 +1253,27 @@
 			RwUpeA78G+Mk730p0zuwVTLInbdIUcAG1+Nngcy0Moo=
 			</data>
 		</dict>
+		<key>www/assets/images/panel-backgrounds/cdt.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			wODpINCdbmUvpNTleJn9Uf4eT0nHqIKZ08m8qxPNsSM=
+			</data>
+		</dict>
+		<key>www/assets/images/panel-backgrounds/pct.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			wSaUJAIh4cqaPHau066lhue91D3UqX1tK+9C0IhiODA=
+			</data>
+		</dict>
+		<key>www/assets/images/panel-backgrounds/shr.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			GbjI/Eq4r7BXuqZMp9g91DBx/HAkFsP8phLAOAdI9gs=
+			</data>
+		</dict>
 		<key>www/assets/images/sign-post/post-backgound.jpg</key>
 		<dict>
 			<key>hash2</key>
@@ -926,6 +1316,13 @@
 			FnJ/hBByanm6o4ZKJjiZQIG+n2xpYV35Sh8hVUY8Sig=
 			</data>
 		</dict>
+		<key>www/cdt.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			wODpINCdbmUvpNTleJn9Uf4eT0nHqIKZ08m8qxPNsSM=
+			</data>
+		</dict>
 		<key>www/cordova-js-src/exec.js</key>
 		<dict>
 			<key>hash2</key>
@@ -965,7 +1362,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ZX4ADEofC9Zwe37Oa4oE6aJncamvpyeOLOwbsjQL7pQ=
+			ufRqT/SD0y/bauB8u58+oDFFRbxGhiMCABWRB44czIQ=
 			</data>
 		</dict>
 		<key>www/favicon.ico</key>
@@ -979,7 +1376,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			dfG2qh2Vpo81wPu0Nk9pGEUpG6CazFaLRVQvwswDihg=
+			xoaHQ+4c5MeqDIIw8FlCtx/RSPR1sT84HY7gbNfBTdc=
 			</data>
 		</dict>
 		<key>www/layers-2x.png</key>
@@ -1000,14 +1397,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			zCdVAeGdKjfpuQCSFRGlQtiJO2Uf8EKvxtZcfhnvmbI=
+			sW18E/h7SogTIpU8LdPFSMAG+r2nNwZ+htSBOFoNaI4=
 			</data>
 		</dict>
 		<key>www/main.js.map</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			gA+xOSPKG/xGe0IgiewkUAODhhnzs5jPVs+MbpV5LK8=
+			e1oBBcyCK9LrIM9QSM0RUoPTVbL3hZI3Ec+tybp98Po=
 			</data>
 		</dict>
 		<key>www/manifest.json</key>
@@ -1059,6 +1456,13 @@
 			zFxlwdVjwDlfcPVnP/BT4TSXCug7P9uG1Vqk4GigOpo=
 			</data>
 		</dict>
+		<key>www/pct.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			wSaUJAIh4cqaPHau066lhue91D3UqX1tK+9C0IhiODA=
+			</data>
+		</dict>
 		<key>www/plugins/cordova-plugin-device-orientation/www/CompassError.js</key>
 		<dict>
 			<key>hash2</key>
@@ -1078,6 +1482,13 @@
 			<key>hash2</key>
 			<data>
 			4M6IfCw3LngpfZyOUOWsKoWDGMbO3hDYu31lNyXNhk8=
+			</data>
+		</dict>
+		<key>www/plugins/cordova-plugin-device/www/device.js</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			lxEtW0KU6QKkPs5VCr3ZhsLIA3wAu5RMxZ4W4izq3gE=
 			</data>
 		</dict>
 		<key>www/plugins/cordova-plugin-dialogs/www/notification.js</key>
@@ -1371,14 +1782,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			e46uGrCo5AX3iZDnYwU5ePGtHva6V9qoZ7i08ywNedY=
+			LxBQLDmvF3QjwbXY0evuLj34ScxTHeuqmRoe2S+wA/0=
 			</data>
 		</dict>
 		<key>www/scripts.js.map</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			6rKNpY2jhhF7ZCG59a2Jnxe32pgDGPm3IVx8DYHMOTE=
+			Jy1KJUmq5vFCLURv36nZlylYv+j9KHYJOyKGqV/nd1c=
+			</data>
+		</dict>
+		<key>www/shr.jpg</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			GbjI/Eq4r7BXuqZMp9g91DBx/HAkFsP8phLAOAdI9gs=
 			</data>
 		</dict>
 		<key>www/sign-background.jpg</key>
@@ -1392,28 +1810,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			PBA4IOStUenwErC6I4MPrQ7bZxQsFULTVLHR9ktdzoM=
+			jf2iRiz90xsoX23tbHpNIlOBReupSC5MBPD7JfkMvvk=
 			</data>
 		</dict>
 		<key>www/styles.js.map</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			40J+Zv2DtO7Kroz4bYcrYimX4ifx3URBHXyNP9LnfJM=
+			nP70k5cojRXj9jeuGD/kpJ50zdvBU4im6b3gL751Jfg=
 			</data>
 		</dict>
 		<key>www/vendor.js</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			I/uO4zUAjEnVqFEbzUm1wXYFQyhywgbOxg9a3jUvVjE=
+			jo+fjKeSWFjPsoHxkfTN30OOT8Zl3BhLa+xKo/8J2Vc=
 			</data>
 		</dict>
 		<key>www/vendor.js.map</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			g56SLpRIFvTJ9MYeVAZQ4zmLzdYhnSMd72xIG03Kf+Y=
+			sGe18vRcFLkmxZtaTDUKSbwN/XiaHnL2471CA2pBVdk=
 			</data>
 		</dict>
 		<key>www/wk-plugin.js</key>

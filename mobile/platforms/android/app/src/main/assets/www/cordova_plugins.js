@@ -252,14 +252,6 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "runs": true
     },
     {
-      "id": "cordova-plugin-ionic-webview.IonicWebView",
-      "file": "plugins/cordova-plugin-ionic-webview/src/www/util.js",
-      "pluginId": "cordova-plugin-ionic-webview",
-      "clobbers": [
-        "Ionic.WebView"
-      ]
-    },
-    {
       "id": "cordova-plugin-network-information.network",
       "file": "plugins/cordova-plugin-network-information/www/network.js",
       "pluginId": "cordova-plugin-network-information",
@@ -297,6 +289,14 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "clobbers": [
         "navigator.splashscreen"
       ]
+    },
+    {
+      "id": "cordova-plugin-ionic-webview.IonicWebView",
+      "file": "plugins/cordova-plugin-ionic-webview/src/www/util.js",
+      "pluginId": "cordova-plugin-ionic-webview",
+      "clobbers": [
+        "Ionic.WebView"
+      ]
     }
   ];
   module.exports.metadata = {
@@ -307,11 +307,11 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-zip": "3.1.0",
     "cordova-plugin-downloader": "0.0.4",
     "cordova-plugin-geolocation": "4.0.2-dev",
-    "cordova-plugin-ionic-webview": "4.0.1",
     "cordova-plugin-network-information": "2.0.1",
     "es6-promise-plugin": "4.2.2",
     "cordova-plugin-screen-orientation": "3.0.1",
     "cordova-plugin-splashscreen": "5.0.3-dev",
-    "cordova-plugin-whitelist": "1.3.3"
+    "cordova-plugin-whitelist": "1.3.3",
+    "cordova-plugin-ionic-webview": "4.0.1"
   };
 });
