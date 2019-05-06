@@ -1,3 +1,3 @@
-<div *ngFor="let guide of processedGuides" [ngStyle]="{'margin-top': guide.offset + 'px'}" class="guide">
-  <span class="guide-label {{guide.range}}">{{guide.label}} ft.</span>
+<div *ngFor="let guide of processedGuides" [style.transform]="'translateY(' + guide['offset'] + 'px)'" class="guide">
+  <span class="guide-label {{guide['range']}}">{{guide['label']}} ft.</span>
 </div>

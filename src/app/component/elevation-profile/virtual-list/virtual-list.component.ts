@@ -1,5 +1,7 @@
-import { Component, OnInit, AfterViewInit, OnChanges, Input, ViewChild,
-  SimpleChanges, EventEmitter, Output, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef} from '@angular/core';
+import {
+  Component, OnInit, AfterViewInit, OnChanges, Input, ViewChild,
+  SimpleChanges, EventEmitter, Output, ElementRef, ChangeDetectionStrategy, ChangeDetectorRef, OnDestroy
+} from '@angular/core';
 
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -20,7 +22,7 @@ import {Trail} from '../../../type/trail';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges {
+export class VirtualListComponent extends LocationBasedComponent implements OnInit, AfterViewInit, OnChanges, OnDestroy {
 
   @ViewChild('background') background: ElementRef;
   @ViewChild('backgroundFlat') backgroundFlat: ElementRef;
@@ -74,8 +76,6 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     this._initialIndex = (this._route.snapshot) ? Number(this._route.snapshot.queryParams['id']) : 0;
 
-    const _notes = this._localStorageService.retrieve(this.trailData.abbr + '_notes');
-
     this.cacheSize = Math.floor(this.trailData.miles.length / 10);
 
     this._setupSubscriptions();
@@ -85,10 +85,12 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
 
     const _self = this;
 
-    window.requestAnimationFrame(function() {
+    const _delay = window.requestAnimationFrame(function() {
       if(_self._initialIndex) {
         _self.scrollViewport.scrollToIndex(_self._initialIndex, 'auto');
       }
+
+      window.cancelAnimationFrame(_delay);       // probably not needed
     });
   }
 
@@ -102,6 +104,13 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
         }
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    super.ngOnDestroy();
+
+    this.scrollViewport.detach();
+    this.scrollViewport = null;
   }
 
 
@@ -202,8 +211,8 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   }
 
   public onScroll(viewport: CdkVirtualScrollViewport, index: number): void {
-      this._currentIndex = index;
-      this._redraw();
+    this._currentIndex = index;
+    this._redraw();
   }
 
 
@@ -239,7 +248,7 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   // calculate the number of guides and their values (used for labels and guides)
   private _calculateGuides(): void {
 
-    this.guides = [];
+    const _newGuides = [];
 
     const _range = this.visibleOHLC.high - this.visibleOHLC.low;
 
@@ -249,20 +258,22 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
     const _maxSize = Math.ceil(this.visibleOHLC.high / _stepSize) * _stepSize;
 
     for (let i = _startSize ; i < _maxSize; i += _stepSize) {
-      this.guides.push({elevation: i, label: Math.round(i)});
+      _newGuides.push({elevation: i, label: Math.round(i)});
     }
 
     // max visible elevation
-    if (this.guides[this.guides.length - 1]['elevation'] >= this.visibleOHLC.high - (_stepSize / 4)) {
-      this.guides.pop();
+    if (_newGuides[_newGuides.length - 1]['elevation'] >= this.visibleOHLC.high - (_stepSize / 4)) {
+      _newGuides.pop();
     }
-    this.guides.push({elevation: this.visibleOHLC.high, label: Math.round(this.visibleOHLC.high), range: 'max'});
+    _newGuides.push({elevation: this.visibleOHLC.high, label: Math.round(this.visibleOHLC.high), range: 'max'});
 
     // min visible elevation
-    if (this.guides[0]['elevation'] <= this.visibleOHLC.low + (_stepSize / 4)) {
-      this.guides.shift();
+    if (_newGuides[0]['elevation'] <= this.visibleOHLC.low + (_stepSize / 4)) {
+      _newGuides.shift();
     }
-    this.guides.unshift({elevation: this.visibleOHLC.low, label: Math.round(this.visibleOHLC.low), range: 'min'});
+    _newGuides.unshift({elevation: this.visibleOHLC.low, label: Math.round(this.visibleOHLC.low), range: 'min'});
+
+    this.guides = _newGuides;     // triggers a single redraw as guides is only changed once.
   }
 
   // redraw guides and trigger a scroll event (that redraws the list)

@@ -25,6 +25,7 @@ export class NoteDialogComponent implements OnInit {
   @ViewChild('titleField') titleField: ElementRef;
 
   public defaultType: string;
+  public noteTypes: Array<string> = ['note'];
   private _notes: Array<Note>;
 
   constructor(
@@ -46,13 +47,21 @@ export class NoteDialogComponent implements OnInit {
     this.data['id'] = new Date().getTime();
 
     // only add to type if it differs
-    if (formData['type'] !== this.data['type']) {
-      this.data['type'] += ', ' + formData['type'];
+    const _types: Array<string> = [this.data['type']];
+    for (const key in formData) {
+      if (key.includes('type')) {
+        if (_types.indexOf(formData[key]) === -1) {
+          _types.push(formData[key]);
+        }
+      }
     }
 
+    this.data['type'] = _types.toString().split(',').join(', ');
     this.data['label'] = formData['title'];
     this.data['description'] = formData['note'];
     this.data['share'] = formData['share'];
+
+    console.log(this.data);
 
     const _noteObj: Note = this.data as Note;
 
@@ -78,6 +87,14 @@ export class NoteDialogComponent implements OnInit {
     });
 
     return _types;
+  }
+
+  public addType(): void {
+    this.noteTypes.push('note');
+  }
+
+  public removeType(index: number): void {
+    this.noteTypes.splice(index, 1);
   }
 
 }

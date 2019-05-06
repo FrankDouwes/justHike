@@ -5,7 +5,6 @@ import {concat, Observable, of, Subscription} from 'rxjs';
 import {LocalStorageService} from 'ngx-webstorage';
 import {TrailGeneratorService} from './trail-generator.service';
 import {HttpClient} from '@angular/common/http';
-import {getUUID} from '../_util/cordova';
 import {cloneData, isObjectEmpty} from '../_util/generic';
 import {ConnectionService} from './connection.service';
 
@@ -131,7 +130,10 @@ export class RateService implements OnDestroy {
         const _length = _localUpdates.length;
 
         for (let i = 0; i < _length; i++) {
-          const _updateObservable: Observable<object> = this._http.post(_url, _localUpdates[i]);
+
+          const _scoreClone: Score = cloneData(_localUpdates[i]) as Score;
+
+          const _updateObservable: Observable<object> = this._http.post(_url, _scoreClone);
           _updateObservable.subscribe(function(result) {
             _localUpdates[i].unsynced = null;
           });
@@ -165,7 +167,12 @@ export class RateService implements OnDestroy {
       const _length = scores.length;
 
       for (let i = 0; i < _length; i++) {
-        _scoreObservers.push(this._saveScoreOnline(scores[i]));
+
+        const _scoreQuery = this._saveScoreOnline(scores[i]);
+
+        if (_scoreQuery) {
+          _scoreObservers.push(_scoreQuery);
+        }
       }
 
       let count = 0;
@@ -245,19 +252,6 @@ export class RateService implements OnDestroy {
     return this._http.get(_url);
   }
 
-  /* cleans up scores:
-  - filter out duplicates based on timestamp/id
-  - maximum of 10 scores per Rating */
-  private _scoresAsRating(): void {
-
-    const _filteredScores: Array<Score> = [];
-
-    const _length = this._localScores.length;
-    for (let i = 0; i < _length; i++) {
-
-    }
-  }
-
   // check if there are local Scores that need to be synced online (marked unsynced)
   private _checkForUnsynced(): Array<Score> {
 
@@ -266,14 +260,35 @@ export class RateService implements OnDestroy {
     }
 
     const _scores = [];
+
+    this._deleteZeroScores();
+
     const _length = this._localScores.length;
+
     for (let i = 0; i < _length; i++) {
       if (this._localScores[i].unsynced) {
-        _scores.push(this._localScores[i]);
+        if (this._localScores[i].score === 0) {
+          console.log('zero score found, BUG!');
+        } else {
+          _scores.push(this._localScores[i]);
+        }
       }
     }
 
     return (_scores.length > 0) ? _scores : undefined;
+  }
+
+  private _deleteZeroScores(): void {
+
+    const _length = this._localScores.length;
+    let _deletedScores = 0;
+
+    for (let i = 0; i < _length; i++) {
+      if (this._localScores[i - _deletedScores].score === 0) {
+        this._localScores.splice(i - _deletedScores, 1);
+        _deletedScores ++;
+      }
+    }
   }
 
 
@@ -297,16 +312,21 @@ export class RateService implements OnDestroy {
 
       // deleting 0 score
       _scoreQuery = this._http.delete(_url + '/' + _duplicate.dbId + _urlEnd);
-    } else {
+    } else if (_duplicate.score > 0) {
 
       // posting new
       _scoreQuery = this._http.post(_url + _urlEnd, _duplicate);
+    } else {
+
+      // score with a 0 value that doesn't exist online, delete
+      score = null;
+      return;
     }
 
     let _sub = _scoreQuery.subscribe(
       function(result) {
 
-        score.unsynced = false;
+        score.unsynced = null;
 
         if (!score.dbId) {
           score.dbId = result['name'];

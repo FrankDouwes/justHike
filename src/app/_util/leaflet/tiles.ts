@@ -46,6 +46,8 @@ const _fallbackTileLayer = L.TileLayer.extend({
 
   updateTileUrl: function (coords, url) {
 
+    // console.log(this.options);
+
     const data = {
       r: Browser.retina ? '@2x' : '',
       s: this._getSubdomain(coords),

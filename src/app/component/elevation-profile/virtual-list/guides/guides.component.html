@@ -1,1 +1,1 @@
-<div *ngFor="let guide of processedGuides" [ngStyle]="{'margin-top': guide.offset + 'px', 'border-color': guide.color}" class="guide"></div>
+<div *ngFor="let guide of processedGuides" [style.transform]="'translateY(' + guide['offset'] + 'px)'" [ngStyle]="{'border-color': guide['color']}" class="guide"></div>

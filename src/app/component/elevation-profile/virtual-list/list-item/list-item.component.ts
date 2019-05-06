@@ -38,7 +38,6 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
   @Input() data:                Mile;
   @Input() visibleOHLC:         OHLC;
-  @Input() guides:              Array<object>;
   @Input() isLast:              boolean;
   @Input() resize:              number;
   @Input() update:              number;           // triggers a redraw

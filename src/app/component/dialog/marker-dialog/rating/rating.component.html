@@ -1,23 +1,15 @@
-<div id="rate-container">
+<div id="rate-toggle">
+  <h2 (click)="onToggleClick('current')" [ngClass]="{'active': state === 'current'}">Rating ({{totalRating}})</h2>
+  <span id="divider"> | </span>
+  <h2 (click)="onToggleClick('add')" [ngClass]="{'active': state === 'add'}">Your Rating</h2>
+</div>
 
-  <div id="rate-toggle">
-    <h2 (click)="onToggleClick('current')" [ngClass]="{'active': state === 'current'}">Rating ({{totalRating}})</h2>
-    <span id="divider"> | </span>
-    <h2 (click)="onToggleClick('add')" [ngClass]="{'active': state === 'add'}">Your Rating</h2>
-  </div>
-
+<div id="rate-container" #ratingPanel>
   <div id="rating-panel" *ngFor="let type of rateablePoiTypes">
-
     <h4 *ngIf="(rateablePoiTypes.length > 1)">{{type.label}}</h4>
-
-    <!-- toggle between current / add (form)-->
-
-    <div id="rating" *ngFor="let name of type.rateBy" #ratingPanel>
-
+    <div id="rating" *ngFor="let name of type.rateBy">
       <rating-current-score *ngIf="state === 'current'" [label]="name" [score]="getAspect(type.type, name)" [update]="timestamp"></rating-current-score>
       <rating-add-score *ngIf="state === 'add'" [label]="name" [type]="type.type" [rating]="getRating(type.type)"></rating-add-score>
     </div>
-
   </div>
-
 </div>

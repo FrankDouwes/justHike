@@ -20,7 +20,12 @@
     box-sizing: border-box
     border-top: 1px solid
     width: 100%
-    transition: margin-top 0.1s linear
+
+    -webkit-transform: translate3d(0,0,0)
+    transform: translate3d(0,0,0)
+    backface-visibility: hidden     // faster
+
+    transition: transform 0.1s linear
 
     .max
       top: -19px

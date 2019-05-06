@@ -12,13 +12,23 @@
       <textarea matInput placeholder="note" name="note" id="note" rows="5" ngModel maxlength="140"></textarea>
     </mat-form-field>
 
-    <mat-form-field class="select-form-field">
-      <mat-select placeholder="type" [(ngModel)]="defaultType" name="type" ngModel>
-        <mat-option *ngFor="let poiType of getTypes()" [value]="poiType.type">
-          {{poiType.label}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+    <div id="type-container">
+      <div class="type" *ngFor="let type of noteTypes; let i = index">
+        <mat-form-field class="select-form-field">
+          <mat-label>type</mat-label>
+          <mat-select class="select-dropdown" placeholder="type" [(ngModel)]="type" [name]="'type_' + i" ngModel>
+            <mat-option *ngFor="let poiType of getTypes()" [value]="poiType.type">
+              {{poiType.label}}
+            </mat-option>
+            <mat-option class="delete" *ngIf="noteTypes.length > 1" (click)="removeType(i)">
+              delete
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <button mat-stroked-button class="add-type-btn" *ngIf="noteTypes.length < 3" (click)="addType()" type="button">+</button>
+    </div>
+
 
     <mat-checkbox name="share" [ngModel]="true">Share (with developer!)</mat-checkbox>
 

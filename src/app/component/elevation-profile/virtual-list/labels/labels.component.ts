@@ -36,11 +36,11 @@ export class LabelsComponent implements OnInit, OnChanges {
         this.processedGuides.splice(this.processedGuides.length - this.guides.length, this.processedGuides.length - this.guides.length);
       }
 
-      let min: number = this.visibleOHLC.low;   // high point
-      let max: number = this.visibleOHLC.high;  // low point
-      let range = (max - min);
+      const min: number = this.visibleOHLC.low;   // high point
+      const max: number = this.visibleOHLC.high;  // low point
+      const range = (max - min);
 
-      var _self = this;
+      const _self = this;
 
       const _guidesLength = this.guides.length;
 
@@ -70,7 +70,6 @@ export class LabelsComponent implements OnInit, OnChanges {
               range: _guide['range']
             });
         }
-
       }
     }
   }

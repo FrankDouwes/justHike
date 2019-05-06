@@ -61,8 +61,6 @@ export class DownloadParser {
         // progress
         _self._status.setStatus(new DownloaderStatus('filesystem', 'progress', {percentage: (result['percentage'] * 0.33) + 66}), true);
       }
-
-      _observer.unsubscribe();
     });
   }
 

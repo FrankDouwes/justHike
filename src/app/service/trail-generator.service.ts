@@ -473,10 +473,20 @@ export class TrailGeneratorService {
 
       // only calculate the towns anchorpoint if it doesn't have any
       if (!_town.anchorPoint) {
+
         const _nearestMileWaypoints = this.findNearestPointInMileTree(_town.centerPoint, 2);
-        const _nearestMile = this._trailData.miles[_nearestMileWaypoints[0].belongsTo];
+
+        // link towns to nearest mile
+        const _nearestMile: Mile = this._trailData.miles[_nearestMileWaypoints[0].belongsTo];
+        if (!_nearestMile.towns) {
+          _nearestMile.towns = [];
+        }
+        _nearestMile.towns.push(_town.id);
+
+        // create anchor point
         const _anchorData = this._anchorDistanceCalculation(_town.centerPoint, _nearestMile, _nearestMileWaypoints);
         _town.anchorPoint = _anchorData.anchorPoint;
+
       }
     }
 

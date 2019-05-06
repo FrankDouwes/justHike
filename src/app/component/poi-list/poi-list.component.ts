@@ -106,6 +106,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   ngOnDestroy() {
     super.ngOnDestroy();
+
+    this.container.detach();
+    this.container = null;
   }
 
   private setup(): void {
@@ -266,7 +269,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     const _self = this;
     if (this.container) {
 
-      requestAnimationFrame(function() {
+      const _delay = window.requestAnimationFrame(function() {
 
         const _padding = _self.itemSize * 2;    // this makes sure the user list item is fully on screen, therefor the poi/mile index is correct
         let _verticalOffset = _padding;
@@ -276,6 +279,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
         }
 
         _self.container.scrollToOffset((_self.itemSize * _self._userIndex) - _verticalOffset, 'auto');
+
+        window.cancelAnimationFrame(_delay);      // probably not needed
       });
     }
   }
@@ -306,7 +311,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     let _middlePoi: number = _activeMile.pois[Math.floor(_activeMile.pois.length - 1)];
 
-    window.requestAnimationFrame(function () {
+    const _delay = window.requestAnimationFrame(function () {
 
       const _maxIndex = _self.combinedData.getValue().length;
 
@@ -324,10 +329,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       _self.container.scrollToIndex(_middlePoi, 'auto');
       _self.container.scrollToOffset(_total, 'auto');
+
+      window.cancelAnimationFrame(_delay);       // probably not needed
     });
   }
 
   public onScroll(event): void {
+
+    console.log('poi list scrolled');
 
     if (this.combinedData.getValue().length < 1) {
       return; // no data

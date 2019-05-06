@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {LoaderService} from '../../service/loader.service';
 import {TrailMeta} from '../../type/trail';
 import {getTrailMetaDataById, getTrailsMetaData} from '../../_util/trail-meta';
@@ -10,7 +10,6 @@ import {saveFileAs} from '../../_util/save';
 import {FilesystemService} from '../../service/filesystem.service';
 import {createGPX} from '../../_util/admin/gpx-tools';
 import {TrailGeneratorService} from '../../service/trail-generator.service';
-import {OrientationService} from '../../service/orientation.service';
 import {SequentialResolverService} from '../../service/sequential-resolver.service';
 import {cloneData} from '../../_util/generic';
 import {Waypoint} from '../../type/waypoint';
@@ -21,7 +20,7 @@ import {BaseComponent} from '../../base/base/base.component';
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.sass']
 })
-export class AdminComponent extends BaseComponent implements OnInit {
+export class AdminComponent extends BaseComponent implements OnInit, OnDestroy {
 
   // public compass: number;
 
@@ -29,6 +28,9 @@ export class AdminComponent extends BaseComponent implements OnInit {
   public selectedTrail = 0;
   public selectedDirection = 0;
   public trailDataStateClassName: string = '';
+
+  public simulationMode: boolean;
+  public distanceCheck: boolean;
 
   private _generatedData: any;
 
@@ -56,12 +58,27 @@ export class AdminComponent extends BaseComponent implements OnInit {
     this.trailMeta = Object.keys(_trailMetaObj).map(function(key) {
       return _trailMetaObj[key];
     });
+
+    this.addSubscription('disableSimulation', this._localStorageService.observe('disableSimulation').subscribe((value: boolean) => {
+      this.simulationMode = value;
+    }));
+    this.simulationMode = this._localStorageService.retrieve('disableSimulation') || false;
+
+    this.addSubscription( 'disableDistanceCheck', this._localStorageService.observe('disableDistanceCheck').subscribe((value: boolean) => {
+      this.distanceCheck = value;
+    }));
+    this.distanceCheck = this._localStorageService.retrieve('disableDistanceCheck') || false;
+
     //
     // this._orientationService.orientationObserver.subscribe(function(direction) {
     //   _self.compass = direction;
     // });
     //
     // this._orientationService.startTracking();
+  }
+
+  ngOnDestroy(): void {
+    super.ngOnDestroy();
   }
 
   public genGpxData(): void {
@@ -185,8 +202,6 @@ export class AdminComponent extends BaseComponent implements OnInit {
       _tileSettings[meta.abbr + 'Version'] = _self._localStorageService.retrieve(meta.abbr + 'Version');
     });
 
-    console.log(_tileSettings);
-
     // clear all
     this._localStorageService.clear();
 
@@ -206,19 +221,17 @@ export class AdminComponent extends BaseComponent implements OnInit {
     this.defaultUserData();
   }
 
-  public disableSimulation(): void {
-
+  public toggleSimulation(): void {
     const _current = this._localStorageService.retrieve('disableSimulation');
     this._localStorageService.store('disableSimulation', !(_current))
   }
 
-  // TODO: does not work on all devices...
-  public sendAllNotes(): void {
-    const _notes = this._localStorageService.retrieve(this._trailGeneratorService.getTrailData().abbr + '_notes');
-    window.open('mailto:frankdouwes@gmail.com?subject=Hello there&body=' + _notes);
+  public toggleDistanceCheck(): void {
+    const _current = this._localStorageService.retrieve('disableDistanceCheck');
+    this._localStorageService.store('disableDistanceCheck', !(_current))
   }
-
-  public sendAllPins(): void {
-    alert('not implemented');
-  }
+  //
+  // public sendAllPins(): void {
+  //   alert('not implemented');
+  // }
 }

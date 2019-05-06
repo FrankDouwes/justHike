@@ -24,13 +24,14 @@ export class AddScoreComponent implements OnInit {
     this.setScoreArray();
   }
 
+  // scores of 0 are discarded.
   public setScore(event): void {
 
     let _newScore: number = (event.target.id !== 'wrapper') ? Number(event.target.id) + 1 : 0;
     const _currentScore: number = this.score.getUserScore();
 
-    // toggle
-    if (_newScore === _currentScore) {
+    // toggle on/off star
+    if (_newScore === _currentScore && _newScore !== 0) {
       _newScore --;
     }
 

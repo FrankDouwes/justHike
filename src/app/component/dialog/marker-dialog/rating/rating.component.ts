@@ -7,6 +7,7 @@ import {Subscription} from 'rxjs';
 import {LocationBasedComponent} from '../../../../base/location-based/location-based.component';
 import {waypointToLatLng} from '../../../../_util/leaflet/converter';
 import {environment} from '../../../../../environments/environment.prod';
+import {LocalStorageService} from 'ngx-webstorage';
 
 @Component({
   selector: 'rating',
@@ -27,10 +28,11 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
 
   private _ratings: object = {};
   private _ratingSubscriptions: Array<Subscription> = [];
+  private _disableDistanceCheck: boolean;
 
   constructor(
     private _rateService: RateService,
-    private _changeDetector: ChangeDetectorRef
+    private _localStorage: LocalStorageService
   ) {
     super();
   }
@@ -40,6 +42,8 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
     super.ngOnInit();
 
     const _self = this;
+
+    this._disableDistanceCheck = this._localStorage.retrieve('disableDistanceCheck');
 
     this.poiTypes.forEach(function(type: PoiType) {
 
@@ -87,7 +91,7 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
   public onToggleClick(state: 'current' | 'add'): void {
 
     // you're only allowed to rate if you're nearby (4.5 miles)
-    if (state === 'add') {
+    if (state === 'add' && !this._disableDistanceCheck) {
       if (this.status !== 'tracking' && !this.user) {
         this.ratingPanel.nativeElement.classList.add('warn');
         this.ratingPanel.nativeElement.classList.add('warn-gps');
@@ -98,33 +102,38 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
           this.ratingPanel.nativeElement.classList.add('warn-distance');
         }
       }
-    } else {
+    } else if (!this._disableDistanceCheck) {
+
+      this._saveRating();
       this.ratingPanel.nativeElement.classList.remove('warn');
       this.ratingPanel.nativeElement.classList.remove('warn-gps');
       this.ratingPanel.nativeElement.classList.remove('warn-distance');
     }
+
     this.state = state;
   }
 
   public calculateTotalRating(): void {
 
-    let _ratingCount: number = 0;
-    let _cummulativeScore: number = 0;
+    // TODO: BUG: rating not always adding up to total...
+
+    let _ratingCount = 0;
+    let _cumulativeScore = 0;
 
     for (const key in this._ratings) {
-      _ratingCount ++;
       const _rating: Rating = this._ratings[key];
-      _cummulativeScore += _rating.getRating();
+      const _rScore = _rating.getRating();
+
+      if (_rScore !== 0) {
+        _ratingCount ++;
+        _cumulativeScore += _rating.getRating();
+      }
     }
 
-    this.totalRating = Number((_cummulativeScore / _ratingCount).toFixed(2));
+    this.totalRating = Number((_cumulativeScore / _ratingCount).toFixed(2)) || 0;
   }
 
   public getAspect(type: string, aspect: string): TotalScore {
-
-    console.log(this._ratings);
-    console.log(this.getRating(type));
-
     return this.getRating(type).getAspect(aspect);
   }
 
@@ -132,7 +141,7 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
     return this._ratings[type];
   }
 
-  // when a user switches from 'your rating' to 'ratings', save the users rating
+  // when a user switches from 'your rating' to 'ratings' (or when closing the dialog), save the users rating
   private _saveRating(): void {
 
     const _scoreArray: Array<Score> = [];
@@ -144,7 +153,7 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
       const _aspects: Array<TotalScore> = _rating.getAspects();
       for (let j = 0; j < _aspects.length; j++) {
         const _totalScore: TotalScore = _aspects[j];
-        if (_totalScore.userScore && _totalScore.userScore.unsynced) {
+        if (_totalScore.userScore && _totalScore.userScore.unsynced && _totalScore.userScore.score) {
           _scoreArray.push(_totalScore.userScore);
         }
       }

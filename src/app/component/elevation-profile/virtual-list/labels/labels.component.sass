@@ -19,7 +19,12 @@
     padding: 0
     box-sizing: border-box
     width: 20vw
-    transition: margin-top 0.1s linear
+
+    -webkit-transform: translate3d(0,0,0)
+    transform: translate3d(0,0,0)
+    backface-visibility: hidden     // faster
+
+    transition: transform 0.1s linear
 
     .guide-label
       position: absolute
@@ -32,11 +37,11 @@
       border-radius: 0 0 4px 0
       border: 0.5px solid rgba(136, 178, 199, 0.25)
       font-size: 12px
-      backdrop-filter: blur(3px)    // safari/iOS only, causes glitching...
+      backdrop-filter: blur(3px)    // safari/iOS only, (sometimes) causes glitching?..
 
     .max
       top: -23px
       border-radius: 0 4px 0 0
 
     .min
-      top: 0px
+      top: 0

@@ -2,10 +2,10 @@
 
 <span id="star-container">
     <fa-icon
-      *ngFor="let score of scoreArray(score.getScore(), false); let i = index"
+      *ngFor="let scoreStr of scoreArray(score.getScore(), false); let i = index"
       [id]="i"
-      [icon]="(score === '/') ? 'star-half-alt' : 'star'"
-      [ngClass]="(score !== 'o') ? 'active' : 'inactive'"
+      [icon]="(scoreStr === '/') ? 'star-half-alt' : 'star'"
+      [ngClass]="(scoreStr !== 'o') ? 'active' : 'inactive'"
       class="fa-icon-star"
       [fixedWidth]="true">
     </fa-icon>

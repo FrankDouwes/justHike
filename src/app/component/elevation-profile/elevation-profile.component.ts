@@ -1,11 +1,9 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Trail } from '../../type/trail';
 import {Snow} from '../../type/snow';
 import {LoaderService} from '../../service/loader.service';
 import {BaseComponent} from '../../base/base/base.component';
-import {ConnectionService} from '../../service/connection.service';
-import {RateService} from '../../service/rate.service';
 
 @Component({
   selector: 'app-elevation-profile',

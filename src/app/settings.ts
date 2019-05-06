@@ -186,7 +186,7 @@ export class Settings {
       type: 'town',
       label: 'town / city',
       isMajor: true,
-      color: '#ff0000',
+      color: '#9b9b9b',
       iconType: 'fa',
       icon: 'city'
     },

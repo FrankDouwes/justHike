@@ -1,6 +1,6 @@
 import {Component, ElementRef, Injector, OnDestroy, OnInit, ViewChild, ViewContainerRef} from '@angular/core';
 import {LoaderService} from './service/loader.service';
-import {MatDialog} from '@angular/material';
+import {MatDialog, MatDialogRef} from '@angular/material';
 import {SettingsDialogComponent} from './component/dialog/settings-dialog/settings-dialog.component';
 import {MarkerDialogComponent} from './component/dialog/marker-dialog/marker-dialog.component';
 import {LocationService} from './service/location.service';
@@ -10,7 +10,6 @@ import {FilesystemService} from './service/filesystem.service';
 import {ActivatedRoute} from '@angular/router';
 import {ConnectionService} from './service/connection.service';
 import {BaseComponent} from './base/base/base.component';
-import {RateService} from './service/rate.service';
 
 @Component({
   selector: 'app-root',
@@ -25,8 +24,8 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   public showLoader      = true;    // show loader/spinner by default
   public navIsVisible    = true;    // nav visibility
 
-  private _offtrailDialog: any;
-  private _markerDialog: any;
+  private _offtrailDialog: MatDialogRef<any>;
+  private _markerDialog: MatDialogRef<any>;
   
   constructor(
     private _route: ActivatedRoute,
@@ -133,6 +132,7 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   // marker dialog
   private _openMarkerDialog(event): void {
 
+    // only show once
     if (this._markerDialog) {
       this._markerDialog.close();
     }
@@ -165,7 +165,7 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   private _openOfftrailDialog(event): void {
 
     if (this._offtrailDialog) {
-      this._markerDialog.close();
+      return;
     }
 
     this._offtrailDialog = this._dialog.open(OfftrailDialogComponent, {

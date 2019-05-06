@@ -2,8 +2,11 @@ import * as L from 'leaflet';
 import 'leaflet-polylinedecorator/dist/leaflet.polylineDecorator';
 import 'node_modules/leaflet-geometryutil/src/leaflet.geometryutil.js';
 import 'node_modules/leaflet.Geodesic/Leaflet.Geodesic.js';
-import '../../_util/leaflet/plugins/grid.js';
 import '../../_util/leaflet/marker.js';
+import '../../_util/leaflet/plugins/grid/mgrs';
+import '../../_util/leaflet/plugins/grid/grid';
+import '../../_util/leaflet/plugins/grid/scale';
+
 import {
   Component,
   OnInit,
@@ -40,6 +43,7 @@ import {Distance} from '../../_util/geolib/distance';
 import {DynamicComponentManager} from './elements/dynamic-component-manager';
 import {Town} from '../../type/town';
 import * as geolib from "geolib";
+import {getPoiTypeByType} from '../../_util/poi';
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -84,6 +88,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   private _showMileGrid: boolean;
   private _animateMap: boolean;
   private _trailLength: number;
+  private _tileLayersVisible: boolean = true;
 
   private _centerpoint: object;
   private _userMarker;
@@ -207,19 +212,19 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // grid layer is only shown on the full map, not the mini map)
     if (this.allowZooming && this._showMileGrid) {
-      const _gridLayerArray = createGridLayer(this._trailGenerator.getTrailData().abbr);
+      const _gridLayerArray = L.grids.distance.imperial();
       this._tileLayers = this._tileLayers.concat(_gridLayerArray);
     }
 
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 13.75,
+      minZoom: 13,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: this._tileLayers,
       zoomSnap: 0,
-      preferCanvas: true,
+      // preferCanvas: true,
       closePopupOnClick: false,     // manual toggle
       maxBoundsViscosity: 0.95      // near solid
     });
@@ -256,26 +261,27 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // draw line from anchor point in direction of town
     if (town.anchorPoint) {
 
-
       let _distance: number = geolib.getDistance(waypointToLatLng(town.centerPoint), waypointToLatLng(town.anchorPoint))
 
-      // only draw guide if trail is over a mile away
-      // max guide length is 0.2mi
-      if (_distance < environment.MILE) {
+      // only draw guide if trail is over a half mile away
+      // max guide length is 0.125mi
+      if (_distance < environment.MILE / 2) {
         return;
       } else {
-        _distance = ((_distance / 8) > environment.MILE) ? environment.MILE : _distance / 8;
+        _distance = ((_distance / 8) > environment.MILE / 2) ? environment.MILE : _distance / 8;
       }
 
       const _heading = Math.atan2(town.centerPoint.longitude - town.anchorPoint.longitude, town.centerPoint.latitude - town.anchorPoint.latitude) * 180 / Math.PI;
 
-      const _point: Waypoint = this._createPoint(town.anchorPoint, _heading, _distance);
+      // const _point: Waypoint = this._createPoint(town.anchorPoint, _heading, _distance);
 
-      console.log(_point, town.anchorPoint);
+      const _point = town.centerPoint;
 
-      const _guide = this._createGuide(waypointToLatLng(town.anchorPoint), waypointToLatLng(_point), false, true, 'rgb(0, 255, 0)');
-      _guide[0].addTo(this._map);
-      _guide[1].addTo(this._map);
+      const _guide = this._createGuide(waypointToLatLng(town.anchorPoint), waypointToLatLng(_point), false, true, 'rgba(155, 155, 155, 0.5)', 4, true);
+
+      _guide.forEach((guide) => {
+        guide.addTo(this._map);
+      });
     }
   }
 
@@ -283,10 +289,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     const _element = document.createElement('div');
     const _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
-    this._markerFactory.createSvgCircleMarker(_svg, '#FF0000', 0.787878);
+    this._markerFactory.createSvgCircleMarker(_svg, getPoiTypeByType('town').color, 1.47, 0.5, false);
     _svg.use(this._markerFactory.sampleFaIcon('town')).width(24).height(24).move(-12, -12);
 
-    const _icon = htmlIcon({className: 'marker town', html: _element});
+    const _icon = htmlIcon({className: 'fa-marker marker town', html: _element});
     const _options = {icon: _icon , town: town};
     const _poiMarker = L.marker(waypointToLatLng(town.centerPoint), _options);
     return _poiMarker;
@@ -320,7 +326,19 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     } else {
 
       // if zoom is enabled, add scale indicator
-      L.control.scale().addTo(this._map);
+      const _scaleOptions = {
+        gridType: 'distance',
+        showMetric: false,
+        metric: false
+      };
+
+      if (this._showMileGrid) {
+        const _scale = L.control.gridscale(_scaleOptions);
+        _scale.addTo(this._map);
+      } else {
+        L.control.scale(_scaleOptions).addTo(this._map);
+      }
+
     }
   }
 
@@ -333,17 +351,38 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     // show popup or inditor (and guides)
     this._map.on('click', function(e: any) {
 
-      // if there's still an overlay, or overlay data, get rid of it.
-      if (_self._overlayElements) {
+      if (!_self.userCentered) {
+        // if there's still an overlay, or overlay data, get rid of it.
+        if (_self._overlayElements) {
 
-        clearTimeOut(_self._popupTimer);
-        clearTimeOut(_self._tooltipTimer);
+          clearTimeOut(_self._popupTimer);
+          clearTimeOut(_self._tooltipTimer);
 
-        return;
+          return;
+        }
+
+        _self._createPopupTooltip(e);
       }
+    });
 
-      _self._createPopupTooltip(e);
+    this._map.on('zoom', function(){
 
+      const _zoomLevel = _self._map.getZoom();
+
+      if (_zoomLevel < 13.5 && _self._tileLayersVisible) {
+        _self._tileLayers.forEach((layer) => {
+          layer.removeFrom(_self._map);
+        });
+
+        _self._tileLayersVisible = false;
+
+      } else if (_zoomLevel > 13.5 && !_self._tileLayersVisible) {
+        _self._tileLayers.forEach((layer) => {
+          layer.addTo(_self._map);
+        });
+
+        _self._tileLayersVisible = true;
+      }
     });
   }
 
@@ -442,7 +481,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         belongsTo: this._popupBelongsTo
       }, this._clearOverlayElements.bind(this));
 
-    this._overlayElements = this._createGuide(anchor, waypoint, false, false, 'rgba(255, 0, 0, 0.75)', 3);
+    this._overlayElements = this._createGuide(anchor, waypoint, false, false, 'rgba(255, 0, 0, 0.5)', 3, true);
   }
 
   // activate a tooltip (component)
@@ -780,7 +819,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     };
 
     const _noteMarker = this._assemblePoiMarker(note, _bounce);
-    this._renderedData[note.belongsTo].notes.addLayer(_noteMarker);
+    this._renderedData[note.belongsTo - 1].notes.addLayer(_noteMarker);
   }
 
   private _drawUser(): void {
@@ -882,12 +921,13 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       this._map.stop();
 
       // else center on the center mile of the rendered range.
-      if (this._renderedCenterMileId === -1) {
-        this._map.fitBounds(_group.getBounds(), {animate: this._animateMap, duration: 0.5, maxZoom: 16});
-      } else {
-        const _centerPoint = this._trailGenerator.getTrailData().miles[this._renderedCenterMileId].centerpoint;
-        this._map.setView([_centerPoint['latitude'], _centerPoint['longitude']], 13.75, {animate: this._animateMap, duration: 0.5, maxZoom: 16});
-      }
+      // if (this._renderedCenterMileId === -1) {
+        this._map.fitBounds(_group.getBounds(), {animate: this._animateMap, duration: 0.5, maxZoom: 16, minZoom: 13.75});
+      // } else {
+      //   const _centerPoint = this._trailGenerator.getTrailData().miles[this._renderedCenterMileId].centerpoint;
+      //   this._map.panTo([_centerPoint.latitude, _centerPoint.longitude], {animate: this._animateMap, duration: 0.5, maxZoom: 16, minZoom: 13});
+      //   // this._map.setView([_centerPoint['latitude'], _centerPoint['longitude']], 13.75, {animate: this._animateMap, duration: 0.5, maxZoom: 16, minZoom: 13});
+      // }
     }
   }
 
@@ -900,7 +940,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         _animate = forceAnimate;
       }
 
-      this._map.panTo([point.latitude, point.longitude], {animate: _animate, duration: 0.5, maxZoom: 16});
+      this._map.panTo([point.latitude, point.longitude], {animate: _animate, duration: 0.5, maxZoom: 16, minZoom: 13.75});
     }
   }
 
@@ -1081,7 +1121,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     const _newPoint = new L.latLng(_point.latitude, _point.longitude, 0);
 
     if (_distance > 0) {
-      _labelElements = _labelElements.concat(this._createGuide(_zPoint, _newPoint));
+      _labelElements = _labelElements.concat(this._createGuide(_zPoint, _newPoint, true));
     }
 
     return _labelElements;
@@ -1125,20 +1165,25 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   }
 
   // create a guide line, with optional arrowheads on either side.
-  private _createGuide(point1: any, point2: any, arrowHeadStart?: boolean, arrowHeadEnd?: boolean, color?: string, width?: number): Array<any> {
+  private _createGuide(point1: any, point2: any, arrowHeadStart?: boolean, arrowHeadEnd?: boolean, color?: string, width?: number, dashed: boolean = false): Array<any> {
 
     const _elements: Array<any> = [];
 
     const _weight = width || 2;
 
-    const _guide = new L.geodesic([], {
-      color: color || 'rgb(119, 119, 119)',
-      dashArray: _weight * 2.5 + ' ' + _weight * 3.5,
+    const _options = {
+      color: color || 'rgba(119, 119, 119, 0.5)',
       weight: _weight,
       opacity: 1,
       smoothFactor: 3,
       steps: 10
-    });
+    };
+
+    if (dashed) {
+      _options['dashArray'] = _weight * 2.5 + ' ' + _weight * 3.5;
+    }
+
+    const _guide = new L.geodesic([], _options);
 
     _guide.setLatLngs([[point1, point2]]);
 
@@ -1158,7 +1203,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
             polygon: false,
             pathOptions: {
               color: color,
-              weight: 2}
+              weight: _weight}
           })
         }]
       });

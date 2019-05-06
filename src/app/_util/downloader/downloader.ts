@@ -76,6 +76,9 @@ export class Downloader {
       if (this._hasParts) {
         this._localStorageService.clear(this._name + '_filesDownloaded');
       }
+
+      console.log('finished downloading, sequencer set to complete');
+
       this.status.setStatus(new DownloaderStatus('downloader', 'complete', null), false);
     }
   }

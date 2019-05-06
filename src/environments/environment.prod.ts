@@ -16,7 +16,6 @@ export const environment = {
 
   mailto: 'https://hike.frankdouwes.com/scripts/mailto.php',       // TODO: BETA only
 
-
   updateCheckInterval: 86400000,      // the time between (online) data update checks
   onlineTileUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
 
@@ -38,7 +37,7 @@ export const environment = {
     poiDistanceOffTrail: 250,       // distance (in feet?) that a water source has to be off trail to be rendered as such
     poiMaxDistance: 1000,           // the maximum distance before a poi is ignored (and not rendered), eliminates side trail poi
     userDistanceOffTrail: 10,       // the distance (in feet?) that a user has to be off trail for marker to change
-    autoUpdate: true,               // auto download updates (only used for snow data) (TODO UNUSED v1)
+    autoUpdate: true,               // auto download updates (only used for snow data) (TODO UNUSED: add auto updater for snow?)
 
     // major markers visibility (elevation profile)
     showWater: true,

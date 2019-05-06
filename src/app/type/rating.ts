@@ -34,8 +34,6 @@ export class TotalScore {
     this._aspect = aspect;
 
     this._setScore(scores);
-
-    console.log(this);
   }
 
   private _setScore(scores: Array<Score>) {
@@ -62,6 +60,10 @@ export class TotalScore {
 
   public addToScore(score: number, force: boolean = false) {
 
+    if (score === 0 && !this.userScore) {
+      return;
+    }
+
     // without forcing a user can only have a single score
     if (this.userScore && !force) {
 
@@ -71,6 +73,7 @@ export class TotalScore {
       this.removeUserScore(false);
 
     } else {
+
       this.userScore = {
         aspect: this._aspect,
         belongsTo: this._belongsTo,
@@ -91,6 +94,8 @@ export class TotalScore {
     if (this._scores.length > 10) {
       this._scores.shift();
     }
+
+    console.log('length of scores', this._scores.length);
   }
 
   public getScore(): number {
@@ -222,6 +227,8 @@ export class Rating {
   // sets the new total value
   public setAspectRating(aspect: string, rating: number, force: boolean = false): void {
 
+    console.log(aspect, rating, force);
+
     const _curAspect: TotalScore = this._aspects[aspect];
     _curAspect.addToScore(rating, force);
 
@@ -235,10 +242,12 @@ export class Rating {
 
     for (const key in this._aspects) {
 
-      const _rating: TotalScore = this._aspects[key];
-      const _aspectScore = _rating.getScore() || 0;
+      const _totalScore: TotalScore = this._aspects[key];
+      const _aspectScore = _totalScore.getScore() || 0;
 
-      if (_aspectScore) {
+      console.log(key, _aspectScore);
+
+      if (_aspectScore !== 0) {
         _aspectCount ++;
         _cummulativeScore += _aspectScore;
       }

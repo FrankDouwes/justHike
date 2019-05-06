@@ -113,7 +113,7 @@ export class MarkerService {
 
   public createSvgFaElement(canvas: any, id: string, scale: number = 1, offsetX: number = -16.5, offsetY: number = -48) {
 
-    let _element = canvas.group();
+    const _element = canvas.group();
     _element.use(this.sampleFaIcon(id)).width(33 * scale).height(50 * scale).move(offsetX, offsetY);
 
     return _element;
@@ -133,7 +133,7 @@ export class MarkerService {
   }
 
   // by default a round marker is 30 x 30px, and the border color is 10% darker than the fill color
-  public createSvgCircleMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.85) {
+  public createSvgCircleMarker (canvas: any, color: string, scale: number = 1, opacity: number = 0.85, stroke: boolean = true) {
 
     const _marker = canvas.group();
     _marker.attr('vOffset', -(16.5 * scale));
@@ -142,7 +142,11 @@ export class MarkerService {
     _marker.attr('type', 'pin');
     _marker.attr('type', 'circle');
     const _size = Math.round(33 * scale);
-    _marker.circle(_size, _size).fill(color).stroke({color: shadeColor(color, -15), width: 2 * scale}).move(-(16.5 * scale), -(16.5 * scale)).addClass('circle');
+    _marker.circle(_size, _size).fill(color).move(-(16.5 * scale), -(16.5 * scale)).addClass('circle');
+
+    if (stroke) {
+      _marker.stroke({color: shadeColor(color, -15), width: 2 * scale})
+    }
 
     return _marker;
   }
@@ -150,7 +154,7 @@ export class MarkerService {
   // font awesome webfont doesn't seem to render to svg elements
   // to fix this we're cloning svg data from generated (hidden) elements at start-up, see fa-sampler (component)
   // check if the svg data exists, and return the full id string to use
-  public sampleFaIcon(iconId:string) {
+  public sampleFaIcon(iconId: string) {
 
     // test if Font Awesome SVG data exists
     let svgIcon = document.getElementById('sample-' + iconId);

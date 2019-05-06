@@ -32,12 +32,12 @@
 <div id="right-panel" [ngStyle]="{'background-color': poiTypes[0].color} ">
   <div id="scroll-container">
     <div class="related-poi-list" *ngFor="let poiGroup of poiCollection">
-      <h3>Next {{relatedLabel(poiGroup.label)}}</h3>
+      <h3>Next {{relatedLabel(poiGroup['label'])}}</h3>
       <poi-list
         class="poi-list"
         [showUser]="false"
         [masterPoi]="data"
-        [poisData]="poiGroup.data">
+        [poisData]="poiGroup['data']">
       </poi-list>
     </div>
   </div>

@@ -15,6 +15,11 @@ export interface Mile {
   snowData?:          Array<Snowpoint>;   // snow data, can be empty
 
   pois?:              Array<number>;      // points of interest that belong to this mile (triangulation)
+  towns?:             Array<number>;      // towns that belongTo this mile
+
+  sideTrailsStarts?:  Array<number>;      // TODO: unused: side trails that start on this mile
+  sideTrailEnds?:     Array<number>;      // TODO: unused: side trails that end on this mile
+
   poiTypes?:          any;                // contains water: true, camp: true etc.
   hasMajorPoi?:       boolean;            // major are water/camp/road
   hasMinorPoi?:       boolean;            // minor is everything else
