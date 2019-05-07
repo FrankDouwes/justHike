@@ -1,5 +1,6 @@
 # JustHike
 
+RELEASES:
 BETA 1 released to first group of testers on: April 10th 2019.
 
 ----- ----- ----- ----- ----
@@ -11,9 +12,9 @@ TODO v1:
 - add: export personal notes (as csv?)
 - add: backup notes based on userID (firecloud)
 <br/><br/>
+- crucial bug: there's an issue sending/receiving ratings at startup, infinite loop...
 - fix: improve elevation profile scrollbar accuracy
 - fix: back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
-- fix: overlapping UTM lines (square miles)
 - fix: different contrast settings for online/offline maps.
 - fix: downloader state (has downloaded file, but there's an update available)
 - fix: optimising (virtual list rendering)
@@ -30,12 +31,9 @@ TODO v1:
 - Android: fullscreen settings
 - Android: keyboard issues
 <br/><br/>
-- iOS jumping in scroll list (either an event issue or a css issue)
 - iOS potential keyboard bug
 - iOS (sporadically): (possibly related to ionic webview) - [IPC] Connection::waitForSyncReply: Timed-out while waiting for reply
 - iOS (sporadically): (possibly related to ionic webview) - [LayoutConstraints] Unable to simultaneously satisfy constraints.
-<br/><br/>
-- NPM: node-pre-gyp WARN Using request for node-pre-gyp https download (not sure where that came from)
 <br/><br/><br/><br/>
 TODO v2:
 - add: side trails

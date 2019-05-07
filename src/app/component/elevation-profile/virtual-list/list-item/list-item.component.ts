@@ -18,6 +18,7 @@ import {Waypoint} from '../../../../type/waypoint';
 import {NoteService} from '../../../../service/note.service';
 import {OHLC} from '../../../../type/ohlc';
 import {normalizeElevation} from '../../../../_util/trail';
+import {Town} from '../../../../type/town';
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -255,7 +256,8 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
     // pois
     this._drawTrees();
-    this._drawPois();
+    this._drawPoisTowns(this.data.pois, this._trailGenerator.getPoiById.bind(this._trailGenerator), true);
+    this._drawPoisTowns(this.data.towns, this._trailGenerator.getTownById.bind(this._trailGenerator));
 
     if (this.user) {
       this._updateUserLocation();
@@ -415,13 +417,13 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
     }
   }
 
-  private _drawPois(): void {
+  private _drawPoisTowns(indexArray: Array<number>, getter: Function, filterRange: boolean = false): void {
 
     const min: number = this.visibleOHLC.low;   // high point
     const max: number = this.visibleOHLC.high;  // low point
     const range = (max - min);
 
-    const _poisArray = this.data.pois;
+    const _poisArray = indexArray;
 
     // draw markers
     if (_poisArray) {
@@ -432,10 +434,12 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
       const _totalPois: number = _poisArray.length;
       for (let i = 0; i < _totalPois; i++) {
 
-        const _poi: Poi = this._trailGenerator.getPoiById(_poisArray[i]);
+        const _poi: Poi | Town = getter(_poisArray[i]);
+
+        console.log(_poi);
 
         // filter out of range pois
-        if (_poi.waypoint.distance >= _maxPoiDistance) {
+        if (filterRange && _poi.waypoint.distance >= _maxPoiDistance) {
           return;
         }
 
@@ -453,7 +457,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
           const _type: string = _poiTypes[p];
 
-          // check if poi type is of visible type based on user settings (only camp/water/highway/end
+          // check if poi type is of visible type based on user settings (only camp/water/highway/end/resort/town
           const _setting: boolean = _self.settings[_self.createCamelCaseName(_type, 'show')];
 
           if (_setting === true) {
@@ -463,11 +467,13 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
         if (_visibleTypes.length > 0) {
 
-          const _markerElevation: number = normalizeElevation(this._svgHeight, _poi.waypoint.elevation, min, range, environment.LINEHEIGHT / 2);
+          const _pointElevation = (_poi.waypoint.elevation !== 0) ? _poi.waypoint.elevation : min;
+
+          const _markerElevation: number = normalizeElevation(this._svgHeight, _pointElevation, min, range, environment.LINEHEIGHT / 2);
 
           const _marker = this._markerFactory.setupMarker(this._markerSvgCanvas, _poi, _visibleTypes);
 
-          _marker.click(this._onMarkerClick.bind({data: _poi, self:this}));
+          _marker.click(this._onMarkerClick.bind({data: _poi, self: this}));
           _marker.move(this._svgWidth * (_poi.anchorPoint.distance / environment.MILE), _markerElevation);
         }
 

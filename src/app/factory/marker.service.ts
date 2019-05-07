@@ -6,6 +6,7 @@ import {getPoiTypeByType} from '../_util/poi';
 import {htmlIcon} from '../_util/leaflet/icon';
 import {LocalStorageService} from 'ngx-webstorage';
 import {shadeColor} from '../_util/color';
+import {Town} from '../type/town';
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +32,7 @@ export class MarkerService {
   - if a poi has 2 types, base them
   - if a poi has > 2 types, base 1+
   if a poi contains water always show that icon first */
-  public setupMarker(containerElement: any, poi: Poi, poiTypes?: Array<string>): any {
+  public setupMarker(containerElement: any, poi: Poi | Town, poiTypes?: Array<string>): any {
 
     // if there are no explicit poi types set, use all poi types
     if (!poiTypes) {

@@ -6,19 +6,19 @@
 	<dict>
 		<key>AppIcon60x60@2x.png</key>
 		<data>
-		Xa5xsxnOupuH0fxWaf1F18YrVLc=
+		sHk/zZGbPD1b644TgL7oIOioBsk=
 		</data>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<data>
-		3jNW/t+yX5Fo9HBU3oBTPm3pZo4=
+		brUAOESgZBHAmqTYFya9B7vBtrU=
 		</data>
 		<key>Assets.car</key>
 		<data>
-		gVhN4Ea6TaMalXmKgYridbfmJQM=
+		/K/zSPSIUYvki52JCG7mvm6W3sU=
 		</data>
 		<key>CDVLaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
 		<data>
-		YKJiqUUv6kb2VeNHCUmRoY1gMnc=
+		OnTH4Kad1LZAb95+VQ/V+waAP7E=
 		</data>
 		<key>CDVLaunchScreen.storyboardc/Info.plist</key>
 		<data>
@@ -26,7 +26,7 @@
 		</data>
 		<key>CDVLaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib</key>
 		<data>
-		4ZSYzIo1wA+tvikqCuzZ5rp4A6w=
+		bShZ6vJxVWReVJLSTyiOZW7sEWU=
 		</data>
 		<key>CDVNotification.bundle/beep.wav</key>
 		<data>
@@ -38,7 +38,7 @@
 		</data>
 		<key>MainViewController.nib</key>
 		<data>
-		KNA7WvkHT6OPMUHGFqmnQDZWt0A=
+		mYm17sH/vwl+WL6fL/GhU1ZOcV4=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -46,11 +46,15 @@
 		</data>
 		<key>config.xml</key>
 		<data>
-		gSiyVgO+N3rA+dZhbrAklGTbpwY=
+		B0KEtCwLq52GleAudiWLoFOBkGo=
 		</data>
 		<key>embedded.mobileprovision</key>
 		<data>
 		lBUIFUjkeKhGogpOjAv3XKbJ5Yc=
+		</data>
+		<key>www/3rdpartylicenses.txt</key>
+		<data>
+		ozL20u1FIERmCLSHS0/Xwe3cLi8=
 		</data>
 		<key>www/assets/css/highContrast.css</key>
 		<data>
@@ -236,25 +240,17 @@
 		<data>
 		aNOo/ylDI+TvsnHz0qaN9nD7rOQ=
 		</data>
-		<key>www/assets/files/DEMO/Xtrail-nobo.json</key>
-		<data>
-		N7aed4f7+L2a4J3rxCiL+pdGP3U=
-		</data>
-		<key>www/assets/files/DEMO/Xtrail-sobo.json</key>
-		<data>
-		vwH64/68yFA0ix48UtL2T5mKZsc=
-		</data>
 		<key>www/assets/files/DEMO/snow.json</key>
 		<data>
 		oZC2XJHVpVb/MIyTH8tyKkFE3SE=
 		</data>
 		<key>www/assets/files/DEMO/trail-nobo.json</key>
 		<data>
-		xxOI7lcAZKvBPejG8P/UtonMT/4=
+		wwKBR4mOxny8sKynoEwcMwWmzbc=
 		</data>
 		<key>www/assets/files/DEMO/trail-sobo.json</key>
 		<data>
-		gYPClrBwJCaUfKOguucsBZjY5BQ=
+		svzy9dswxjJfAQ2iuEz4pvtqanQ=
 		</data>
 		<key>www/assets/files/PCT/snow.json</key>
 		<data>
@@ -278,7 +274,7 @@
 		</data>
 		<key>www/assets/files/version.json</key>
 		<data>
-		2upXQ73dP5FgSIIIi7gBC/ao/uk=
+		gwND6r5IWQM9p9cKErvXzEjJbg8=
 		</data>
 		<key>www/assets/fonts/nationalpark-regular-webfont.eot</key>
 		<data>
@@ -376,7 +372,7 @@
 		<data>
 		ikNxoEeX5X7WueMSvasDZfvC9Uc=
 		</data>
-		<key>www/cdt.jpg</key>
+		<key>www/cdt.6ddc05428447b0011610.jpg</key>
 		<data>
 		QgsvkF4JqWgOAd8sOUYJc8jRSzE=
 		</data>
@@ -410,53 +406,49 @@
 		</data>
 		<key>www/index.html</key>
 		<data>
-		C6TmOfzSNivjZJEMiTpJugVQrVg=
+		aI2K30gs6/CDrBCgNhJt8RZSXGQ=
 		</data>
-		<key>www/layers-2x.png</key>
+		<key>www/layers-2x.4f0283c6ce28e888000e.png</key>
 		<data>
 		FSoWIzPkbST52J9WYxL8DGQBHe4=
 		</data>
-		<key>www/layers.png</key>
+		<key>www/layers.a6137456ed160d760698.png</key>
 		<data>
 		yedSjkkaOSMrokonBsbHOdb7DwY=
 		</data>
-		<key>www/main.js</key>
+		<key>www/main.8ac386422b0ab50e11b2.js</key>
 		<data>
-		aOGBsvDYhBkmYQnDNPzla4aTVkE=
-		</data>
-		<key>www/main.js.map</key>
-		<data>
-		UEYIaL9EOwXlqvR6jQ5Z4QxtRgM=
+		UG0gptE4gC0afDZKXJJtjDXI3lg=
 		</data>
 		<key>www/manifest.json</key>
 		<data>
 		FORtmrxkQBX+eDopFE7Blo8noiE=
 		</data>
-		<key>www/marker-icon.png</key>
+		<key>www/marker-icon.2273e3d8ad9264b7daa5.png</key>
 		<data>
 		YKkLy7K0K33bRVbblOt8EISw5do=
 		</data>
-		<key>www/nationalpark-regular-webfont.eot</key>
-		<data>
-		ELuWdFIIf0uIdBncGNUSnx13Pzc=
-		</data>
-		<key>www/nationalpark-regular-webfont.otf</key>
-		<data>
-		BNDa1EwvY9nNNkSlQInz9FHgYjs=
-		</data>
-		<key>www/nationalpark-regular-webfont.ttf</key>
-		<data>
-		2xZnitk/68iNRc8MdeoXpywmI7Q=
-		</data>
-		<key>www/nationalpark-regular-webfont.woff</key>
+		<key>www/nationalpark-regular-webfont.1084c62562a3435fdcc1.woff</key>
 		<data>
 		U8T4BAnfQgoHSD7d076tZ4mupfM=
 		</data>
-		<key>www/overlay.png</key>
+		<key>www/nationalpark-regular-webfont.c95cbce55ce295fd82b8.eot</key>
+		<data>
+		ELuWdFIIf0uIdBncGNUSnx13Pzc=
+		</data>
+		<key>www/nationalpark-regular-webfont.d31951ebe68018face15.ttf</key>
+		<data>
+		2xZnitk/68iNRc8MdeoXpywmI7Q=
+		</data>
+		<key>www/nationalpark-regular-webfont.fa7ca60ea93ed35bd876.otf</key>
+		<data>
+		BNDa1EwvY9nNNkSlQInz9FHgYjs=
+		</data>
+		<key>www/overlay.5d92a96daa32ae12328b.png</key>
 		<data>
 		saCcFNWXYiBl8Z1FBxqtbNTH8Oc=
 		</data>
-		<key>www/pct.jpg</key>
+		<key>www/pct.68fea8c0e46ddc942db4.jpg</key>
 		<data>
 		Be/59Dymk/HRMsk4n0ItidP2ERo=
 		</data>
@@ -620,57 +612,33 @@
 		<data>
 		SaYUot7eUOO74AAVeBga+HSnf/E=
 		</data>
-		<key>www/polyfills.js</key>
+		<key>www/polyfills.1f825ad3604e05b1e379.js</key>
 		<data>
-		tvA+q1TvO+zSLk96ERk2a6UNuq4=
+		n5HYpH40VoefI8nxDCdldy2Tad0=
 		</data>
-		<key>www/polyfills.js.map</key>
-		<data>
-		eqtsU1PgH4LguDex9tGEt9kkTmY=
-		</data>
-		<key>www/post-backgound.jpg</key>
+		<key>www/post-backgound.667c571aa4590bed96e9.jpg</key>
 		<data>
 		+NN9ZSTuXthlIt/4iezYJseYnUE=
 		</data>
-		<key>www/runtime.js</key>
+		<key>www/runtime.26209474bfa8dc87a77c.js</key>
 		<data>
-		sG3cdycy5m1DhWOGQVzU0biaULE=
+		tilWwhkr/lUW1jdOdTdzkB7VDsU=
 		</data>
-		<key>www/runtime.js.map</key>
+		<key>www/scripts.3c877bd1ad8c1ef7d67d.js</key>
 		<data>
-		MpOyIGTwYpd1pODkZdeGM0pt8Uk=
+		eVtLsqjoddWVafR4kadzQGNqhfk=
 		</data>
-		<key>www/scripts.js</key>
-		<data>
-		QweGma/VfAdYpDsPb7kOBmYYx+8=
-		</data>
-		<key>www/scripts.js.map</key>
-		<data>
-		r0xFofnhTXIDpwHvpT/Ka0+rw1A=
-		</data>
-		<key>www/shr.jpg</key>
+		<key>www/shr.509e8286dab829b15db3.jpg</key>
 		<data>
 		I9AoYhJAKCZeXn5N30Y2t39i0sg=
 		</data>
-		<key>www/sign-background.jpg</key>
+		<key>www/sign-background.fd6c27b8195ef1d3ce80.jpg</key>
 		<data>
 		8W+FhBroTL806zseRyRv51+nnBI=
 		</data>
-		<key>www/styles.js</key>
+		<key>www/styles.baa9f1e11f2a9e1db817.css</key>
 		<data>
-		ZmN8Q8ZgGxY5Mgb3fK4ovYnTbCw=
-		</data>
-		<key>www/styles.js.map</key>
-		<data>
-		TeOVXC7hC8FhDllbQ0cYK6p5asQ=
-		</data>
-		<key>www/vendor.js</key>
-		<data>
-		BvumQ3vG91HAYtST95fhuCumxpI=
-		</data>
-		<key>www/vendor.js.map</key>
-		<data>
-		/OhNiTtrz6irjsY7XbF6AuTaGes=
+		SH9P5IxmnOBGG29TnU8Xypj2Ekc=
 		</data>
 		<key>www/wk-plugin.js</key>
 		<data>
@@ -683,28 +651,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ZXZi5WzJCwUdMWLTwzBihZvfOXe0/8xsm2oD+SAWHqM=
+			23zti8kmx02hhS8hl9USgCFCc17VK4NKzpmirGRCDwk=
 			</data>
 		</dict>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			QC3xSRXv69YvUPcysBA5uMgSSQtJMBfmOMHEZexUQGo=
+			oP5ElSL12mC6WbEfGE7340fhsBvUZwkcaJjctS1EDQQ=
 			</data>
 		</dict>
 		<key>Assets.car</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			+tbnfHp57f3ni7VqLwudv7qBWNjOu7CYITQvlUx9n3w=
+			Se3vxYUY46kxUjnd1q9jIgQwgZyQw5ZjZvaeI2Ctf+Q=
 			</data>
 		</dict>
 		<key>CDVLaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			ZMxYul31SzxyyrVgQSXx6nPMJ6JiZTvzPa30bGfZ5y0=
+			1ynPHeeQhSG6nRRz4Ec55hUQrAf+nH2G9QIwoV1NWcA=
 			</data>
 		</dict>
 		<key>CDVLaunchScreen.storyboardc/Info.plist</key>
@@ -718,7 +686,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Z4QtHtiOUZWrSykKjLT0y+NNwSibfSwmzP5v4H96FDc=
+			1t7hS8EP5OTmZNrvT7M5L3TQRKOql5JCbPuZ9uU+Y7I=
 			</data>
 		</dict>
 		<key>CDVNotification.bundle/beep.wav</key>
@@ -732,14 +700,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			maIazBbg693kPN+B2DnjeveD1/tGIqeAjDxcnbrbjy0=
+			z4TGIjWHmCF12rD7eX7xL58H8eyATPS/1JHARBLK4+A=
 			</data>
 		</dict>
 		<key>config.xml</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			HNORzX6HuxafyDWMIvjUKWdMikrGiaIqmzh3bECF7nA=
+			QY0dVZ8jl0Tg9Rhfax95FhgVO9Bc9pIJbQ7x833fvg0=
 			</data>
 		</dict>
 		<key>embedded.mobileprovision</key>
@@ -747,6 +715,13 @@
 			<key>hash2</key>
 			<data>
 			BSRFSm62GZAOencGfUrP9k529Smwlkgsb/ORcYdHR6I=
+			</data>
+		</dict>
+		<key>www/3rdpartylicenses.txt</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			4u0+S3uBpP0BronbksgSjhjT1QEwHIq7UhNnEbQnrXU=
 			</data>
 		</dict>
 		<key>www/assets/css/highContrast.css</key>
@@ -1071,20 +1046,6 @@
 			yMb5EYWZaOvfU6fuB73YZJNertHp2VuQN88tzJh5ed0=
 			</data>
 		</dict>
-		<key>www/assets/files/DEMO/Xtrail-nobo.json</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			351KJRDNM7oXhHVL/o8ZmE0GtcOViWabhBOAIRSPIkg=
-			</data>
-		</dict>
-		<key>www/assets/files/DEMO/Xtrail-sobo.json</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			YL/Zfrlm9m32Qi/7D9SB9HJqx2jNOLiAEVpSuAYU9Fo=
-			</data>
-		</dict>
 		<key>www/assets/files/DEMO/snow.json</key>
 		<dict>
 			<key>hash2</key>
@@ -1096,14 +1057,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			JLBonu1jvROpGHMOYzmPCzxLKUg1MBP/HsGafMDwjA0=
+			iXSjLOxUTus+UhNVOb9Ft2Y4BKGr0sOO5KQqUgMBZgA=
 			</data>
 		</dict>
 		<key>www/assets/files/DEMO/trail-sobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			tcLts6gI0TdiJ/b/0AvK+3cnrn/RsPskrSMzhh7O2rI=
+			FdLN3YR/UMZTZixxppLEG+/W+JguHVGvxwuafEbz6m4=
 			</data>
 		</dict>
 		<key>www/assets/files/PCT/snow.json</key>
@@ -1145,7 +1106,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			3XvUgk/9DbdlwP14UA9kwlfK8Yjb9ua3zZKIz/lsoio=
+			y2pWmwFdczuq2+gIBYdqwwIokOlJIFgW4b/QioGYpP4=
 			</data>
 		</dict>
 		<key>www/assets/fonts/nationalpark-regular-webfont.eot</key>
@@ -1316,7 +1277,7 @@
 			FnJ/hBByanm6o4ZKJjiZQIG+n2xpYV35Sh8hVUY8Sig=
 			</data>
 		</dict>
-		<key>www/cdt.jpg</key>
+		<key>www/cdt.6ddc05428447b0011610.jpg</key>
 		<dict>
 			<key>hash2</key>
 			<data>
@@ -1376,35 +1337,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			xoaHQ+4c5MeqDIIw8FlCtx/RSPR1sT84HY7gbNfBTdc=
+			/JVI5aaxoQ9dQERBepiXcSjk+kYujLf5FYOAYAE2cyY=
 			</data>
 		</dict>
-		<key>www/layers-2x.png</key>
+		<key>www/layers-2x.4f0283c6ce28e888000e.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			Bm2sqFDY/77wB68AsG6sABVyje4nnFHzy2xxbffELt8=
 			</data>
 		</dict>
-		<key>www/layers.png</key>
+		<key>www/layers.a6137456ed160d760698.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			Hbvp0CjikvNvy6j4s6KNXokydU/CIVuaxp5M3s9RB8Y=
 			</data>
 		</dict>
-		<key>www/main.js</key>
+		<key>www/main.8ac386422b0ab50e11b2.js</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			sW18E/h7SogTIpU8LdPFSMAG+r2nNwZ+htSBOFoNaI4=
-			</data>
-		</dict>
-		<key>www/main.js.map</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			e1oBBcyCK9LrIM9QSM0RUoPTVbL3hZI3Ec+tybp98Po=
+			AagcvGtHBZUz+jpMUedK0WcS/+DD7HlDxsQlA4QTOG8=
 			</data>
 		</dict>
 		<key>www/manifest.json</key>
@@ -1414,49 +1368,49 @@
 			voNZQjd/EcyT+TqJHEJ5po6xFoO4Ci03MPPYf6E20AY=
 			</data>
 		</dict>
-		<key>www/marker-icon.png</key>
+		<key>www/marker-icon.2273e3d8ad9264b7daa5.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			V0w6XMqF9BFAhbaEFZbWLwDXyJLHsD8oy/owHesdxDc=
 			</data>
 		</dict>
-		<key>www/nationalpark-regular-webfont.eot</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			u0K5pAu5N17hRZpgYs5DQHERB6N6b97cZOlS0+7zxXg=
-			</data>
-		</dict>
-		<key>www/nationalpark-regular-webfont.otf</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			DvtaC8l51m8YOMMOtXOFip05dAbFj+afDblIQ6SmbJ0=
-			</data>
-		</dict>
-		<key>www/nationalpark-regular-webfont.ttf</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			A3UsE3gAe0gMg4kUPFpHnk2Wov6hZlHPVK6WjFAU1ZI=
-			</data>
-		</dict>
-		<key>www/nationalpark-regular-webfont.woff</key>
+		<key>www/nationalpark-regular-webfont.1084c62562a3435fdcc1.woff</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			NeNkNT0wCMYVRydvtd23OMvqL09JAHwYNyJ+uKI8TxU=
 			</data>
 		</dict>
-		<key>www/overlay.png</key>
+		<key>www/nationalpark-regular-webfont.c95cbce55ce295fd82b8.eot</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			u0K5pAu5N17hRZpgYs5DQHERB6N6b97cZOlS0+7zxXg=
+			</data>
+		</dict>
+		<key>www/nationalpark-regular-webfont.d31951ebe68018face15.ttf</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			A3UsE3gAe0gMg4kUPFpHnk2Wov6hZlHPVK6WjFAU1ZI=
+			</data>
+		</dict>
+		<key>www/nationalpark-regular-webfont.fa7ca60ea93ed35bd876.otf</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			DvtaC8l51m8YOMMOtXOFip05dAbFj+afDblIQ6SmbJ0=
+			</data>
+		</dict>
+		<key>www/overlay.5d92a96daa32ae12328b.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			zFxlwdVjwDlfcPVnP/BT4TSXCug7P9uG1Vqk4GigOpo=
 			</data>
 		</dict>
-		<key>www/pct.jpg</key>
+		<key>www/pct.68fea8c0e46ddc942db4.jpg</key>
 		<dict>
 			<key>hash2</key>
 			<data>
@@ -1743,95 +1697,53 @@
 			9CIW7f5Dk7yEK84D9evgQc6ryThptFDJtCnHYeOvWAo=
 			</data>
 		</dict>
-		<key>www/polyfills.js</key>
+		<key>www/polyfills.1f825ad3604e05b1e379.js</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			/H6RewoxTtmF+VatDK6E6TViBhPwBddfgZom8vszIYQ=
+			wEEiaFy/dYZVfy59xkcJ4pNjtVSEZ/aipIjxaQT1qsg=
 			</data>
 		</dict>
-		<key>www/polyfills.js.map</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			qtRYjY1JH+1+ykLLBB8XxurP81RYDkGv13PooDIkqfY=
-			</data>
-		</dict>
-		<key>www/post-backgound.jpg</key>
+		<key>www/post-backgound.667c571aa4590bed96e9.jpg</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			K1o2FMAZkcE6hV52hO06UuLpfnWHY42PHTS/3plauaQ=
 			</data>
 		</dict>
-		<key>www/runtime.js</key>
+		<key>www/runtime.26209474bfa8dc87a77c.js</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			XMgrbcZRzXE2H32g1syYxoXwk6651XrpkGmroVQJoCQ=
+			6z1fJgCRAXm++LBwkhS3xyHqZukuuzW8KCJkvrJjHq8=
 			</data>
 		</dict>
-		<key>www/runtime.js.map</key>
+		<key>www/scripts.3c877bd1ad8c1ef7d67d.js</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			LWfzVLHTmEYSQHpfbu+RDalr6E2nKFP/e/0Ivwd0zjk=
+			LfFeq8fKm32bHbuoA8VkrVRZ0IsepFuL/oKLTRLuH1E=
 			</data>
 		</dict>
-		<key>www/scripts.js</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			LxBQLDmvF3QjwbXY0evuLj34ScxTHeuqmRoe2S+wA/0=
-			</data>
-		</dict>
-		<key>www/scripts.js.map</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			Jy1KJUmq5vFCLURv36nZlylYv+j9KHYJOyKGqV/nd1c=
-			</data>
-		</dict>
-		<key>www/shr.jpg</key>
+		<key>www/shr.509e8286dab829b15db3.jpg</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			GbjI/Eq4r7BXuqZMp9g91DBx/HAkFsP8phLAOAdI9gs=
 			</data>
 		</dict>
-		<key>www/sign-background.jpg</key>
+		<key>www/sign-background.fd6c27b8195ef1d3ce80.jpg</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			vbFSekOk2QPAHZlQY+TLBYjxZ2vHEfoZnzQQ+Snieaw=
 			</data>
 		</dict>
-		<key>www/styles.js</key>
+		<key>www/styles.baa9f1e11f2a9e1db817.css</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			jf2iRiz90xsoX23tbHpNIlOBReupSC5MBPD7JfkMvvk=
-			</data>
-		</dict>
-		<key>www/styles.js.map</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			nP70k5cojRXj9jeuGD/kpJ50zdvBU4im6b3gL751Jfg=
-			</data>
-		</dict>
-		<key>www/vendor.js</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			jo+fjKeSWFjPsoHxkfTN30OOT8Zl3BhLa+xKo/8J2Vc=
-			</data>
-		</dict>
-		<key>www/vendor.js.map</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			sGe18vRcFLkmxZtaTDUKSbwN/XiaHnL2471CA2pBVdk=
+			jYK6XQCO+VXmmRmILDdrmJRtKqxDBaaqgIX6uO13P9A=
 			</data>
 		</dict>
 		<key>www/wk-plugin.js</key>

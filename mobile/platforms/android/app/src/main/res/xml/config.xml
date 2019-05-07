@@ -62,10 +62,11 @@
         <string>Requires geolocation.</string>
     </edit-config>
     <allow-intent href="market:*" />
-    <icon density="ldpi" src="res/icon/android/icon-36-ldpi.png" />
-    <icon density="mdpi" src="res/icon/android/icon-48-mdpi.png" />
-    <icon density="hdpi" src="res/icon/android/icon-72-hdpi.png" />
-    <icon density="xhdpi" src="res/icon/android/icon-96-xhdpi.png" />
+    <icon density="mdpi" src="res/icon/android/Icon-48.png" />
+    <icon density="hdpi" src="res/icon/android/Icon-72.png" />
+    <icon density="xhdpi" src="res/icon/android/Icon-96.png" />
+    <icon density="xxhdpi" src="res/icon/android/Icon-144.png" />
+    <icon density="xxxhdpi" src="res/icon/android/Icon-192.png" />
     <splash density="land-hdpi" src="res/screen/Default@2x~universal~anyany.png" />
     <splash density="land-ldpi" src="res/screen/Default@2x~universal~anyany.png" />
     <splash density="land-mdpi" src="res/screen/Default@2x~universal~anyany.png" />
