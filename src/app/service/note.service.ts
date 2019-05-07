@@ -14,23 +14,7 @@ import {Note} from '../type/note';
   providedIn: 'root'
 })
 
-/* there are 2 types of notes:
-- notes that belong to a mile (TODO: not implemented yet)
-- notes that belong to a poi
-
-structure of notes library object:
-
-notes.mile
-            1: [Poi, Poi]
-            13: [Poi, Poi, Poi]
-            87: [Poi]
-
-notes.poi
-            5: [Poi, Poi]
-            68: [Poi, Poi, Poi]
-            123: [Poi]
-*/
-
+/* notes are poi, that can be shared. */
 // keeps track of new notes that should be uploaded (shared with developer)
 export class NoteService implements OnDestroy {
 

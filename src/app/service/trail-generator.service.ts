@@ -20,7 +20,7 @@ import {calculateOHLC} from '../_util/trail';
   providedIn: 'root'
 })
 
-// TODO: generating multiple trails causes enourmous slowdown in poiToMiles, I'm assuming I'm not clearing something...
+// TODO: generating multiple trails causes enormous slowdown in poiToMiles, I'm assuming I'm not clearing something...
 export class TrailGeneratorService {
 
   public flatTrailData: Array<Waypoint>;              // the loaded raw waypoints
@@ -47,6 +47,10 @@ export class TrailGeneratorService {
 
   public getPoiById(id: number): Poi {
     return this._trailData.pois[id];
+  }
+
+  public getTownById(id: number): Town {
+    return this._trailData.towns[id];
   }
 
   public calcDistanceFlat(p1: any, p2: any): number {
@@ -84,12 +88,6 @@ export class TrailGeneratorService {
     delete this._trailData['waypointsPerMile'];
 
     this._trailData.direction = direction;
-
-    // // sobo reversal
-    // if (direction === 1) {
-    //   waypoints.reverse();
-    //   pois.reverse();
-    // }
 
     this._trailData.pois = pois;
 
@@ -258,7 +256,7 @@ export class TrailGeneratorService {
   }
 
   /* create data tree, a sorting mechanism to quickly figure out where the user is in relation to the trail,
-  and what the closest waypoint it. TODO: research optimal algo, someone smart probably made something for this. */
+  and what the closest waypoint is. */
   public createMileTree(waypoints: Array<Waypoint>): void {
     this._mileCenterpointTree = this._createWaypointTree(waypoints);
   }
@@ -404,14 +402,14 @@ export class TrailGeneratorService {
 
       const _anchorData = _self._anchorDistanceCalculation(_poi.waypoint, _nearestMile, _nearestMileWaypoints);
 
-      _poi.anchorPoint = _anchorData.anchorPoint;
+      _poi.anchorPoint = _anchorData['anchorPoint'];
       _poi.belongsTo = _nearestMile.id;
 
       // setup poi reference in waypoint
-      if (!_anchorData.nearestWaypoint.nearestToPois) {
-        _anchorData.nearestWaypoint.nearestToPois = [];
+      if (!_anchorData['nearestWaypoint'].nearestToPois) {
+        _anchorData['nearestWaypoint'].nearestToPois = [];
       }
-      _anchorData.nearestWaypoint.nearestToPois.push(_poi.id);
+      _anchorData['nearestWaypoint'].nearestToPois.push(_poi.id);
 
       // the distance of poi from trail
       _poi.waypoint.distance = _nearestMileWaypoints[0].distance;
@@ -461,6 +459,7 @@ export class TrailGeneratorService {
     }
   }
 
+  // TODO: needs a routine for multiple anchorpoints per town (as towns can be accessible from multiple locations)
   private _calculateTownsAnchorPoints(towns: Array<Town>): Array<Town> {
 
     if (!towns) {
@@ -468,34 +467,43 @@ export class TrailGeneratorService {
     }
 
     const _length = towns.length;
-    for (var t = 0; t < _length; t++) {
+
+    for (let t = 0; t < _length; t++) {
       const _town: Town = towns[t];
 
-      // only calculate the towns anchorpoint if it doesn't have any
-      if (!_town.anchorPoint) {
-
-        const _nearestMileWaypoints = this.findNearestPointInMileTree(_town.centerPoint, 2);
-
-        // link towns to nearest mile
-        const _nearestMile: Mile = this._trailData.miles[_nearestMileWaypoints[0].belongsTo];
-        if (!_nearestMile.towns) {
-          _nearestMile.towns = [];
-        }
-        _nearestMile.towns.push(_town.id);
-
-        // create anchor point
-        const _anchorData = this._anchorDistanceCalculation(_town.centerPoint, _nearestMile, _nearestMileWaypoints);
-        _town.anchorPoint = _anchorData.anchorPoint;
-
+      // fix elevation
+      if (!_town.waypoint.elevation) {
+        _town.waypoint.elevation = 0;
       }
-    }
 
+      let _nearestMileWaypoints;
+
+      if (!_town.anchorPoint) {
+        _nearestMileWaypoints = this.findNearestPointInMileTree(_town.waypoint, 2);
+      } else {
+        _nearestMileWaypoints = this.findNearestPointInMileTree(_town.anchorPoint as Waypoint, 2);
+      }
+
+      // link towns to nearest mile
+      const _nearestMile: Mile = this._trailData.miles[_nearestMileWaypoints[0].belongsTo];
+      if (!_nearestMile.towns) {
+        _nearestMile.towns = [];
+      }
+      _nearestMile.towns.push(_town.id);
+
+      // add/fix anchorpoint to be on trail
+      const _anchorData = this._anchorDistanceCalculation(_town.waypoint, _nearestMile, _nearestMileWaypoints);
+
+      _town.waypoint.distance = _anchorData['distance'];
+      _town.anchorPoint = _anchorData['anchorPoint'];
+      _town.belongsTo = _nearestMile.id;
+    }
 
     return towns;
   }
 
   // distance calculation
-  private _anchorDistanceCalculation(location: Waypoint, nearestMile: Mile, nearestWaypoints: object) {
+  private _anchorDistanceCalculation(location: Waypoint, nearestMile: Mile, nearestWaypoints: object): object {
 
     // console.log(location, nearestMile, nearestWaypoints);
 

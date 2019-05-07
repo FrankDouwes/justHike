@@ -1,9 +1,10 @@
 [
   {
     "id": 0,
-    "name": "Campo, CA",
+    "label": "Campo, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 32.607582,
       "longitude": -116.469732
     },
@@ -11,9 +12,10 @@
   },
   {
     "id": 1,
-    "name": "Morena Village",
+    "label": "Morena Village",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 32.679383,
       "longitude": -116.505438
     },
@@ -24,9 +26,10 @@
     }},
   {
     "id": 2,
-    "name": "Mt. Laguna",
+    "label": "Mt. Laguna",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 32.867469,
       "longitude": -116.418793
     },
@@ -38,9 +41,10 @@
   },
   {
     "id": 3,
-    "name": "Stagecoach Trails RV Resort",
+    "label": "Stagecoach Trails RV Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.060419,
       "longitude": -116.424933
     },
@@ -52,9 +56,10 @@
   },
   {
     "id": 4,
-    "name": "Julian",
+    "label": "Julian",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.078344,
       "longitude": -116.602072
     },
@@ -66,9 +71,10 @@
   },
   {
     "id": 5,
-    "name": "Warner Springs",
+    "label": "Warner Springs",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.283599,
       "longitude": -116.634486
     },
@@ -80,9 +86,10 @@
   },
   {
     "id": 6,
-    "name": "Lake Henshaw Resort",
+    "label": "Lake Henshaw Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.232029,
       "longitude": -116.760122
     },
@@ -94,9 +101,10 @@
   },
   {
     "id": 7,
-    "name": "Santa Ysabel, CA",
+    "label": "Santa Ysabel, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.109179,
       "longitude": -116.673795
     },

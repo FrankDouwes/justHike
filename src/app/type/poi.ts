@@ -7,7 +7,7 @@ export interface Poi extends LocationBase {
 
   // optional
   belongsTo?:         number;             // an id of a mile/poi this poi belongs to
-  belongsToType:      string;             // belongs to either a mile or another poi
+  belongsToType:      string;             // belongs to either a mile or another poi (town)
   description?:       string;             // optional description
   comment?:           string;             // optional comment
   distanceFromUser?:  number;             // distance from user in meters

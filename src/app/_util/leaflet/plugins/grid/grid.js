@@ -5,7 +5,7 @@
 
 L.Grids = L.LayerGroup.extend({
   options: {
-    redraw: 'move', // or moveend depending when the grids is refreshed
+    redraw: 'moveend', // or moveend depending when the grids is refreshed
     groups: [],
     lineStyle: {
       stroke: true,

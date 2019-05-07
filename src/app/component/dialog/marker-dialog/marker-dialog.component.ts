@@ -120,8 +120,8 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
     this.poiCollection.push({label: poiType, data: _poiIds});
   }
 
-
-
-
-  // EVENTS
+  // TODO: B3 add POI notes
+  public addNote(): void {
+    alert('POI notes will be implemented in B3. Use standalone notes for now (tap anywhere on the map > tap on the pen icon)');
+  }
 }

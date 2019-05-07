@@ -26,7 +26,6 @@ export class VersionResolverService implements Resolve<any> {
   public observables: any = {};       // object containing all observables
   private _subjects: any = {};        // object containing all behaviorSubjects
 
-  // TODO: incorporate town list (will be a seperate file)
   private _dataTypes: Array<string> = ['trail', 'snow', 'tiles'];
 
   constructor(

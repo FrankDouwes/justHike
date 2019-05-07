@@ -9,7 +9,7 @@ import {
   ComponentFactoryResolver,
   OnChanges,
   SimpleChanges,
-  HostBinding, ChangeDetectorRef
+  HostBinding, ChangeDetectorRef, Type
 } from '@angular/core';
 import { PoiListItemComponent } from '../poi-list-item/poi-list-item.component';
 import { PoiUserItemComponent } from '../poi-user-item/poi-user-item.component';
@@ -51,6 +51,8 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     if (changes.data) {
+
+      console.log(changes.data);
 
       if (changes.data.currentValue.type !== this._instance.data.type) {
 

@@ -28,7 +28,7 @@ import {Town} from '../type/town';
 /* trail generating, trail parsing, trail loading:
 trail:
 - consists of trail waypoints (can be multiple files)
-- contists poi data (points of interest), can be multiple files (TODO: multi poi files, when needed)
+- consists of poi data (points of interest), can be multiple files (TODO: multi poi files, when needed)
 - consists of snow data (single file)
  */
 export class TrailService {

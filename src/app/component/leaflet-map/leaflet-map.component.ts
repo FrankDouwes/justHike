@@ -37,7 +37,7 @@ import {calculateTrailAnchorPoint} from '../../_util/leaflet/calculate';
 import {latLngToWaypoint, waypointToLatLng} from '../../_util/leaflet/converter';
 import {distanceInMilesFeet} from '../../_util/math';
 import {NoteService} from '../../service/note.service';
-import {createGridLayer, createMapTileLayer} from '../../_util/leaflet/layer';
+import {createMapTileLayer} from '../../_util/leaflet/layer';
 import {clearTimeOut, TimerObj} from '../../_util/timer';
 import {Distance} from '../../_util/geolib/distance';
 import {DynamicComponentManager} from './elements/dynamic-component-manager';
@@ -149,6 +149,13 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         _self._removeMarkerByPoiId(_deletedNote.id);
       }
     }));
+
+    // const _appRoot = document.getElementsByTagName('app-root')[0];
+    // this.addEventListener(_appRoot, ['markerClick'] , function(event: Event) {
+    //   if (event['detail'] && event['detail'].waypoint) {
+    //     _self._centerOnPoint(event['detail'].waypoint, true);
+    //   }
+    // }, false);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -224,7 +231,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       zoomControl: false, attributionControl: false,
       layers: this._tileLayers,
       zoomSnap: 0,
-      // preferCanvas: true,
+      preferCanvas: true,
       closePopupOnClick: false,     // manual toggle
       maxBoundsViscosity: 0.95      // near solid
     });
@@ -235,81 +242,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // set an initial location
     this._map.setView([0, 0], 15);
-
-    // TODO: this needs to be moved, as towns need to be linked to miles (like pois)
-    if (this._trailGenerator.getTrailData().towns) {
-      this._trailGenerator.getTrailData().towns.forEach(function (town: Town) {
-        _self._drawTown(town);
-      });
-    }
   }
-
-
-
-
-
-  // draw pois
-  private _drawTown(town: Town): void {
-
-    const _towns: Array<any> = [];
-
-    _towns.push(this._assembleTownMarker(town));
-
-    const _markerGroup = L.featureGroup(_towns);
-    _markerGroup.addTo(this._map);
-
-    // draw line from anchor point in direction of town
-    if (town.anchorPoint) {
-
-      let _distance: number = geolib.getDistance(waypointToLatLng(town.centerPoint), waypointToLatLng(town.anchorPoint))
-
-      // only draw guide if trail is over a half mile away
-      // max guide length is 0.125mi
-      if (_distance < environment.MILE / 2) {
-        return;
-      } else {
-        _distance = ((_distance / 8) > environment.MILE / 2) ? environment.MILE : _distance / 8;
-      }
-
-      const _heading = Math.atan2(town.centerPoint.longitude - town.anchorPoint.longitude, town.centerPoint.latitude - town.anchorPoint.latitude) * 180 / Math.PI;
-
-      // const _point: Waypoint = this._createPoint(town.anchorPoint, _heading, _distance);
-
-      const _point = town.centerPoint;
-
-      const _guide = this._createGuide(waypointToLatLng(town.anchorPoint), waypointToLatLng(_point), false, true, 'rgba(155, 155, 155, 0.5)', 4, true);
-
-      _guide.forEach((guide) => {
-        guide.addTo(this._map);
-      });
-    }
-  }
-
-  private _assembleTownMarker(town: Town): void {
-
-    const _element = document.createElement('div');
-    const _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
-    this._markerFactory.createSvgCircleMarker(_svg, getPoiTypeByType('town').color, 1.47, 0.5, false);
-    _svg.use(this._markerFactory.sampleFaIcon('town')).width(24).height(24).move(-12, -12);
-
-    const _icon = htmlIcon({className: 'fa-marker marker town', html: _element});
-    const _options = {icon: _icon , town: town};
-    const _poiMarker = L.marker(waypointToLatLng(town.centerPoint), _options);
-    return _poiMarker;
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   private _setMapInteractionProperties(): void {
 
@@ -584,6 +517,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       _self._drawTrail(_mile, _mileId);
       _self._drawSnow(_mile, _mileId);
       _self._drawPois(_mile, _mileId);
+      _self._drawTowns(_mile, _mileId);
       _self._drawNotes(_mile, _mileId);
     }
   }
@@ -611,7 +545,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
         if (_self._renderedData[_mileId] && _self._map) {
 
-          // remove miles/markers/snow data/notes
+          // remove miles/markers/snow data/notes/towns
           for (const key in _self._renderedData[_mileId]) {
 
             // clear from trailLayers
@@ -621,7 +555,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
             _self._map.removeLayer(_self._renderedData[_mileId][key]);
 
-            if (key === 'markers' || key === 'notes') {
+            if (key === 'markers' || key === 'notes' || key === 'towns') {
               _self._renderedData[_mileId][key].clearLayers();
             }
 
@@ -789,6 +723,60 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     _markerGroup.addTo(this._map);
   }
 
+  // draw towns
+  private _drawTowns(mile: Mile, index: number): void {
+
+    let _towns: Array<any> = [];
+
+    if (mile.towns) {
+
+      const _length = mile.towns.length;
+      for (let i = 0; i < _length; i++) {
+
+        const _town: Town = this._trailGenerator.getTownById(mile.towns[i]);
+
+        // draw line from anchor point in direction of town
+        if (_town.anchorPoint) {
+
+          let _distance: number = geolib.getDistance(waypointToLatLng(_town.waypoint), waypointToLatLng(_town.anchorPoint as Waypoint))
+
+          // only draw guide if trail is over a half mile away
+          // max guide length is 0.125mi
+          if (_distance > environment.MILE / 2) {
+
+            _distance = ((_distance / 8) > environment.MILE / 2) ? environment.MILE : _distance / 8;
+
+            // const _heading = Math.atan2(_town.centerPoint.longitude - _town.anchorPoint.longitude, _town.centerPoint.latitude - _town.anchorPoint.latitude) * 180 / Math.PI;
+            // const _point: Waypoint = this._createPoint(town.anchorPoint, _heading, _distance);
+
+            const _point = _town.waypoint;
+
+            const _guide = this._createGuide(waypointToLatLng(_town.anchorPoint as Waypoint), waypointToLatLng(_point), false, true, 'rgba(155, 155, 155, 0.5)', 4, true);
+            _towns = _towns.concat(_guide);
+          }
+        }
+
+        _towns.push(this._assembleTownMarker(_town));
+      }
+    }
+
+    const _townsGroup = L.featureGroup(_towns);
+    this._renderedData[index].towns = _townsGroup;
+    _townsGroup.addTo(this._map);
+  }
+
+  private _assembleTownMarker(town: Town): any {
+
+    const _element = document.createElement('div');
+    const _svg = SVG(_element).size(36, 54).style('overflow', 'visible');
+    this._markerFactory.createSvgCircleMarker(_svg, getPoiTypeByType(town.type).color, 1.47, 0.5, false);
+    _svg.use(this._markerFactory.sampleFaIcon(town.type)).width(24).height(24).move(-12, -12);
+
+    const _icon = htmlIcon({className: 'fa-marker marker ' + town.type, html: _element});
+    const _options = {icon: _icon , town: town};
+    const _poiMarker = L.marker(waypointToLatLng(town.waypoint), _options);
+    return _poiMarker;
+  }
 
   // notes are pois, but they're excluded from the marker feature group, meaning they'll be ignored for map bounds
   private _drawNotes(mile: Mile, index: number): void {

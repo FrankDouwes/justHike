@@ -113,8 +113,8 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   private _onDialogEvent(event: Event): void {
 
     // destination reached
-    event.stopImmediatePropagation();
-    event.stopPropagation();
+    // event.stopImmediatePropagation();
+    // event.stopPropagation();
 
     this._forceHideNavigation();
 

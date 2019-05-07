@@ -29,7 +29,6 @@ declare const SVG: any;    // fixes SVGjs bug
 })
 
 // uses basic for loops for performance
-// TODO: iOS scroll performance issues (jumps backwards during scroll event)
 export class ListItemComponent extends BaseComponent implements OnInit, AfterViewInit, OnChanges {
 
   @ViewChild('map') map: ElementRef;

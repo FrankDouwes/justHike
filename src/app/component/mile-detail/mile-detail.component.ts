@@ -1,12 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Trail} from '../../type/trail';
 import {Waypoint} from '../../type/waypoint';
 import {LocalStorageService} from 'ngx-webstorage';
 import {LocationService} from '../../service/location.service';
 import {BaseComponent} from '../../base/base/base.component';
-import {ConnectionService} from '../../service/connection.service';
-import {RateService} from '../../service/rate.service';
 
 @Component({
   selector: 'app-mile-detail',
@@ -50,8 +48,6 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
 
   private _addSubscriptions(): void {
 
-    const _self = this;
-
     // get miles data based on route id
     this.routedMile = (this._route.snapshot) ? Number(this._route.snapshot.paramMap.get('id')) : 0;
 
@@ -61,9 +57,17 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
       }
     ));
 
-    this.addSubscription('location', this._locationService.locationStatus.subscribe(function(result) {
-      _self.isTracking = (result === 'tracking');
+    this.addSubscription('location', this._locationService.locationStatus.subscribe((result) => {
+      this.isTracking = (result === 'tracking');
     }));
+
+    const _appRoot = document.getElementsByTagName('app-root')[0];
+    this.addEventListener(_appRoot, ['markerClick'] , (event: Event) => {
+
+      if (event['detail'] && event['detail'].belongsTo) {
+        this.routedMile = event['detail'].belongsTo;
+      }
+    }, false);
   }
 
 
@@ -72,14 +76,14 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
 
   public onScrollTo(data: any): void {
 
-    console.log('on scroll to', data.mileId);
     this._setMapData(data.mileId, data.renderedPoiRange, data.renderedMileRange);
     this.routedMile = data.mileId;
 
     /* updating queryParamams (this._router.navigate) seems to cause bugs over time on iOS,
     so i'm setting a property that will be used for the back button navigate call */
+    // this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
+
     this._router['scrollToPosition'] = this.routedMile;
-    //this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
   }
 
   private _setMapData(mileId: number, poiRange?: any, mileRange?: any): void {

@@ -10,7 +10,6 @@ import {SequentialResolverService} from './service/sequential-resolver.service';
 import {AdminComponent} from './component/admin/admin.component';
 
 
-// // TODO: temp, iOS navigation error...
 // export function handleErrors(error: NavigationError):void {
 //   console.log('app routing error');
 // }

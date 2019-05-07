@@ -3,7 +3,6 @@ import {PoiType} from './type/poi';
 
 export class Settings {
 
-  // TODO: this should be moved somewhere else
   public static POITYPES: Array<PoiType> = [
     {
       type: 'user',

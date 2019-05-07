@@ -11,6 +11,7 @@ import {Poi} from '../../type/poi';
 import {User} from '../../type/user';
 import {LocalStorageService} from 'ngx-webstorage';
 import {NoteService} from '../../service/note.service';
+import {Town} from '../../type/town';
 
 @Component({
   selector: 'poi-list',
@@ -94,6 +95,11 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   ngOnChanges(changes: SimpleChanges) {
 
+    if (changes.activeMileId) {
+      console.log('active mile id changed', changes.activeMileId);
+      this._scrollToCenterMile();
+    }
+
     if (changes.milesData || changes.poisData) {
       this.setup();
       this._scrollToCenterMile();
@@ -115,11 +121,14 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
     this._staticPoisArray = [];
     let _poiIndexes = [];
+    let _townIndexes = [];
     const _maxPoiDistance = this._localStorage.retrieve('poiMaxDistance');
 
     const _self = this;
 
     // get all pois within miles
+    // TODO: this could be done faster, as all pois/towns could simply be provided as an array (without the need to loop miles)
+    // TODO: needs a routine to deal with towns that have multiple anchors/belongto, as they needs to be added multiple times
     if (this.milesData) {
 
       const _length = this.milesData.length;
@@ -128,24 +137,46 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
         if (_mile.pois && _mile.pois.length > 0) {
           _poiIndexes = _poiIndexes.concat(_mile.pois);
         }
+        if (_mile.towns && _mile.towns.length > 0) {
+          _townIndexes = _townIndexes.concat(_mile.towns);
+        }
       }
 
     } else if (this.poisData) {
       _poiIndexes = this.poisData;
     }
 
-    const _poiLength = _poiIndexes.length;
-    for (let p = 0; p < _poiLength; p++) {
-      const _poiId = _poiIndexes[p];
+    const _looper = function(input: Array<number>, getter: Function, filterDistance: boolean = false): void {
 
-      // filter out of range pois
-      const _poi = _self.trailGenerator.getPoiById(_poiId);
+      const _length = input.length;
 
-      if (_poi.waypoint.distance > _maxPoiDistance) {
-        _poi.type += ', offtrail';
+      for (let i = 0; i < _length; i++) {
+
+        const _id = input[i];
+
+        const _elements: Array<Poi> | Array<Town> = [getter(_id)];
+
+        // if this element belongs to multiple miles/locations (towns might have multiple entry points
+        if (Array.isArray(_elements[0].belongsTo) || Array.isArray(_elements[0].anchorPoint)) {
+          console.log('TODO: multiple anchors/belongto detected for', _elements[0]);
+          // create clone, create versions with singular belongsto/mile, push those in array...
+        }
+
+        const _eLength = _elements.length;
+        for (let e = 0; e < _eLength; e++) {
+
+          const _element = _elements[e];
+          // filter out of range
+          if (filterDistance && _element.waypoint.distance > _maxPoiDistance) {
+            _element.type += ', offtrail';
+          }
+          _self._staticPoisArray.push(_element);
+        }
       }
-      _self._staticPoisArray.push(_poi);
-    }
+    };
+
+    _looper(_poiIndexes, this.trailGenerator.getPoiById.bind(this.trailGenerator), true);
+    _looper(_townIndexes, this.trailGenerator.getTownById.bind(this.trailGenerator));
 
     if (this.showUser) {
       const _userRef: User = (this.user !== undefined) ? this.user : super.createBlankUser();
@@ -356,7 +387,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     // using 8 instead of 7 to compensate for the possibility that there is a user visible in list data
     for (let i = _firstIndex; i < _firstIndex + (this._visibleItemCount + 1); i++) {
 
-      const _poi: Poi | User = this.combinedData.getValue()[i];
+      const _poi: Poi | User | Town = this.combinedData.getValue()[i];
 
       // filter out the user
       if (_poi && _poi.type !== 'user') {

@@ -1,9 +1,13 @@
 \:host
 
+  #title-container
+    margin-top: 24px
+
   #type-container
     display: block
-    background-color: #F6F6F6
-    border-radius: 12px
+    //background-color: #F6F6F6
+    //border-radius: 12px
+    margin: 6px -6px -6px -6px
 
     .type, .select-form-field
       display: inline-block
@@ -15,7 +19,10 @@
     button
       background-color: white
       height: 48px
-      width: 33% !important
+      width: calc(33% - 6px) !important
+      vertical-align: top
+      margin: 6px 0 6px 6px
+      border-radius: 6px
 
 \:host ::ng-deep
 
@@ -58,6 +65,9 @@
 
       button
         margin: 0 6px
+
+      mat-checkbox
+        margin-left: 12px
 
     .mat-form-field-underline
       display: none

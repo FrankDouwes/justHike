@@ -24,34 +24,3 @@ export function createMapTileLayer(url: string, detectRetina: boolean): any {
 
   return _fallbackLayer;
 }
-
-
-
-/* grid (TODO: overlapping grid issues, investigate UTM grids)
-considering rewriting this: https://github.com/ggolikov/Leaflet.gmxIndexGrid for leafelt 1.x
-creates a square mile grid layer array (currently they're sliced into UTM zones, would prefer a single layer) */
-export function createGridLayer(trailAbbr: string): Array<any> {
-
-  const _gridLayers: Array<any> = [];
-
-  const _trailUtm: Array<number> = getTrailMetaDataByAbbr(trailAbbr).utm;
-
-  if (_trailUtm) {
-
-    _trailUtm.forEach(function (zone) {
-
-      const _utmGrid = L.utmGrid(zone, false, {
-        color: '#AAA',
-        showAxis100km: false,
-        weight: 1,
-        minInterval: environment.MILE,
-        maxInterval: environment.MILE,
-        opacity: 1,
-      });
-
-      _gridLayers.push(_utmGrid);
-    });
-  }
-
-  return _gridLayers;
-}

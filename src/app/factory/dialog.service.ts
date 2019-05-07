@@ -56,8 +56,8 @@ export class DialogService {
     if (type === 'note') {
       return this._dialog.open(NoteDialogComponent, {
         autoFocus: false,
-        width: '60%',
-        height: '75%',
+        width: '70%',
+        height: '85%',
         data: properties
       });
     } else {

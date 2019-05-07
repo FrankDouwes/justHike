@@ -15,7 +15,7 @@ export class PoiListItemComponent implements OnInit, OnChanges {
   };
 
   @Input() data: Poi;
-  @Input('status') status: string = 'idle';
+  @Input('status') status = 'idle';
   @Input() timeStamp: number;
 
   public poiTypes: Array<PoiType> = [];

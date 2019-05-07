@@ -1,16 +1,8 @@
 <mat-card-content>
 
-  <h2>Add location</h2>
+  <!--<h2>Add location</h2>-->
 
-  <form #noteForm="ngForm" class="example-form" (ngSubmit)="submitNote(noteForm.value)">
-
-    <mat-form-field class="example-full-width">
-      <input matInput placeholder="title" name="title" id="title" ngModel #titleField>
-    </mat-form-field>
-
-    <mat-form-field class="example-full-width">
-      <textarea matInput placeholder="note" name="note" id="note" rows="5" ngModel maxlength="140"></textarea>
-    </mat-form-field>
+  <form #noteForm="ngForm" class="note-form" (ngSubmit)="submitNote(noteForm.value)">
 
     <div id="type-container">
       <div class="type" *ngFor="let type of noteTypes; let i = index">
@@ -26,15 +18,21 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <button mat-stroked-button class="add-type-btn" *ngIf="noteTypes.length < 3" (click)="addType()" type="button">+</button>
+      <button mat-stroked-button class="add-type-btn" *ngIf="noteTypes.length < 3" (click)="addType()" type="button">+ Add Type</button>
     </div>
 
+    <mat-form-field id="title-container">
+      <input matInput placeholder="title" name="title" id="title" ngModel #titleField>
+    </mat-form-field>
 
-    <mat-checkbox name="share" [ngModel]="true">Share (with developer!)</mat-checkbox>
+    <mat-form-field id="note-container">
+      <textarea matInput placeholder="note" name="note" id="note" rows="4" ngModel maxlength="140"></textarea>
+    </mat-form-field>
 
     <div class="btn-group">
       <button mat-stroked-button (click)="onButtonClick('cancel')" type="button">Cancel</button>
       <button mat-stroked-button color="primary" type="submit">Save</button>
+      <mat-checkbox name="share" [ngModel]="true">Share with developer</mat-checkbox>
     </div>
   </form>
 
