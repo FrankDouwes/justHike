@@ -40,6 +40,7 @@
     <feature name="IonicWebView">
         <param name="android-package" value="com.ionicframework.cordova.webview.IonicWebView" />
     </feature>
+    <hook src="hooks/keyboard.js" type="before_build" />
     <name>Just Hike</name>
     <description>
       Long Distance Hiking Companion
@@ -55,9 +56,6 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
-    <edit-config file="AndroidManifest.xml" mode="merge" target="/manifest/application/activity[@android:name='MainActivity']">
-        <activity android:name="MainActivity" android:windowSoftInputMode="adjustPan" />
-    </edit-config>
     <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
         <string>Requires geolocation.</string>
     </edit-config>
@@ -80,12 +78,12 @@
     <preference name="Fullscreen" value="true" />
     <preference name="SplashMaintainAspectRatio" value="true" />
     <preference name="ShowSplashScreenSpinner" value="false" />
-    <preference name="SplashScreenDelay" value="2000" />
+    <preference name="SplashScreenDelay" value="1250" />
     <preference name="SplashScreen" value="screen" />
     <preference name="KeepRunning" value="false" />
-    <preference name="DisallowOverscroll" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
     <preference name="Orientation" value="landscape" />
-    <preference name="EnableViewportScale" value="true" />
+    <preference name="EnableViewportScale" value="false" />
     <preference name="Suppresses3DTouchGesture" value="true" />
     <preference name="SuppressesLongPressGesture" value="true" />
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />

@@ -7,23 +7,7 @@
     "files": {
       "AndroidManifest.xml": {
         "parents": {
-          "/manifest/application/activity[@android:name='MainActivity']": [
-            {
-              "xml": "<activity android:name=\"MainActivity\" android:windowSoftInputMode=\"adjustPan\" />",
-              "count": 1,
-              "mode": "merge",
-              "id": "config.xml",
-              "oldAttrib": {
-                "android:configChanges": "orientation|keyboardHidden|keyboard|screenSize|locale",
-                "android:label": "@string/activity_name",
-                "android:launchMode": "singleInstance",
-                "android:name": "MainActivity",
-                "android:screenOrientation": "landscape",
-                "android:theme": "@android:style/Theme.DeviceDefault.NoActionBar",
-                "android:windowSoftInputMode": "adjustPan"
-              }
-            }
-          ],
+          "/manifest/application/activity[@android:name='MainActivity']": [],
           "/*": [
             {
               "xml": "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />",

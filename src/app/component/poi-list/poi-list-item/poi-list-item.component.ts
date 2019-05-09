@@ -26,9 +26,7 @@ export class PoiListItemComponent implements OnInit, OnChanges {
     this.setupIcons();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
-  }
+  ngOnChanges(changes: SimpleChanges): void {}
 
   public setupIcons(): void {
 

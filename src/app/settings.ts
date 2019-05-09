@@ -188,9 +188,16 @@ export class Settings {
       color: '#9b9b9b',
       iconType: 'fa',
       icon: 'city'
+    }, {
+      type: 'directions',
+      label: 'directions',
+      isMajor: false,
+      color: '#b78e27',
+      iconType: 'fa',
+      icon: 'directions'
     },
 
-    // warning
+    // note
     {
       type: 'note',       // add
       label: 'note',

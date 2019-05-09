@@ -96,8 +96,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   ngOnChanges(changes: SimpleChanges) {
 
     if (changes.activeMileId) {
-      console.log('active mile id changed', changes.activeMileId);
-      this._scrollToCenterMile();
+      // console.log('active mile id changed', changes.activeMileId);
+      // this._scrollToCenterMile();
     }
 
     if (changes.milesData || changes.poisData) {

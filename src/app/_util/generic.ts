@@ -22,3 +22,12 @@ export function isObjectEmpty(obj:object): boolean {
   }
   return true;
 }
+
+
+export function createCamelCaseName(name: string, prepend?: string, append?: string): string {
+
+  prepend = (prepend) ? prepend : '';
+  append = (append) ? prepend : '';
+
+  return prepend + name.charAt(0).toUpperCase() + name.slice(1) + append;
+};

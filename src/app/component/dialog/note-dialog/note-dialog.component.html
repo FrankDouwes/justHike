@@ -1,4 +1,4 @@
-<mat-card-content>
+<mat-card-content #container>
 
   <!--<h2>Add location</h2>-->
 
@@ -10,7 +10,7 @@
           <mat-label>type</mat-label>
           <mat-select class="select-dropdown" placeholder="type" [(ngModel)]="type" [name]="'type_' + i" ngModel>
             <mat-option *ngFor="let poiType of getTypes()" [value]="poiType.type">
-              {{poiType.label}}
+              {{capName(poiType.label)}}
             </mat-option>
             <mat-option class="delete" *ngIf="noteTypes.length > 1" (click)="removeType(i)">
               delete
@@ -22,11 +22,11 @@
     </div>
 
     <mat-form-field id="title-container">
-      <input matInput placeholder="title" name="title" id="title" ngModel #titleField>
+      <input matInput placeholder="title" name="title" id="title" ngModel #titleField (focus)="onFocus($event)">
     </mat-form-field>
 
     <mat-form-field id="note-container">
-      <textarea matInput placeholder="note" name="note" id="note" rows="4" ngModel maxlength="140"></textarea>
+      <textarea matInput placeholder="note" name="note" id="note" rows="4" ngModel maxlength="140" (focus)="onFocus($event)"></textarea>
     </mat-form-field>
 
     <div class="btn-group">
@@ -35,5 +35,7 @@
       <mat-checkbox name="share" [ngModel]="true">Share with developer</mat-checkbox>
     </div>
   </form>
+
+  <br><br><br><br><br><br><br><br> <!-- fixes Android keyboard issues -->
 
 </mat-card-content>

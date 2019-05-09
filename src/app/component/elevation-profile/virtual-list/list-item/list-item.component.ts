@@ -19,6 +19,7 @@ import {NoteService} from '../../../../service/note.service';
 import {OHLC} from '../../../../type/ohlc';
 import {normalizeElevation} from '../../../../_util/trail';
 import {Town} from '../../../../type/town';
+import {createCamelCaseName} from '../../../../_util/generic';
 
 declare const SVG: any;    // fixes SVGjs bug
 
@@ -178,7 +179,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
   // add a poi type subscription to the subscriptionsObject
   private _addSubscription(name: string): void {
 
-    const _camelName =  this.createCamelCaseName(name, 'show');
+    const _camelName =  createCamelCaseName(name, 'show');
 
     this.addSubscription(_camelName, this._localStorage.observe(_camelName).subscribe(result => {
       this.settings[_camelName] = result;
@@ -192,7 +193,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
   // get initial poi type saved values, as subscriptions only listen to updates
   private _getSettingFromStorage(name: string): void {
 
-    const _camelName =  this.createCamelCaseName(name, 'show');
+    const _camelName =  createCamelCaseName(name, 'show');
     this.settings[_camelName] = this._localStorage.retrieve(_camelName);
   }
 
@@ -209,7 +210,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
       const _length = this._majorPoiTypes.length;
       for (let i = 0; i < _length; i++) {
         const _type = this._majorPoiTypes[i];
-        if (_self.data.poiTypes[_type] !== undefined && !_self.settings[_self.createCamelCaseName(_type, 'show')]) {
+        if (_self.data.poiTypes[_type] !== undefined && !_self.settings[createCamelCaseName(_type, 'show')]) {
           _newValue = true;
           break;
         }
@@ -436,8 +437,6 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
         const _poi: Poi | Town = getter(_poisArray[i]);
 
-        console.log(_poi);
-
         // filter out of range pois
         if (filterRange && _poi.waypoint.distance >= _maxPoiDistance) {
           return;
@@ -458,7 +457,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
           const _type: string = _poiTypes[p];
 
           // check if poi type is of visible type based on user settings (only camp/water/highway/end/resort/town
-          const _setting: boolean = _self.settings[_self.createCamelCaseName(_type, 'show')];
+          const _setting: boolean = _self.settings[createCamelCaseName(_type, 'show')];
 
           if (_setting === true) {
             _visibleTypes.push(_type);
@@ -474,7 +473,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
           const _marker = this._markerFactory.setupMarker(this._markerSvgCanvas, _poi, _visibleTypes);
 
           _marker.click(this._onMarkerClick.bind({data: _poi, self: this}));
-          _marker.move(this._svgWidth * (_poi.anchorPoint.distance / environment.MILE), _markerElevation);
+          _marker.move(this._svgWidth * ((_poi.anchorPoint as Waypoint).distance / environment.MILE), _markerElevation);
         }
 
       }
@@ -633,12 +632,4 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
       this._userMarker.attr('y', _userElevation);
     }
   }
-
-  public createCamelCaseName(name: string, prepend?: string, append?: string): string {
-
-    prepend = (prepend) ? prepend : '';
-    append = (append) ? prepend : '';
-
-    return prepend + name.charAt(0).toUpperCase() + name.slice(1) + append;
-  };
 }

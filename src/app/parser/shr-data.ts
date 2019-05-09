@@ -127,23 +127,29 @@ export class SHRData extends TrailParser {
 
       if (_identifier.includes('Begin') || _identifier.includes('Mono Village')) {
         poi['type'] = 'end';
-      } else if (_identifier.includes('Peak') || _identifier.includes('Mount') || _identifier.includes('Col')) {
+      } else if (_identifier.includes('Peak') || _identifier.includes('Mount') || _identifier.includes('Col') || _identifier.includes('Crest')) {
         poi['type'] = 'peak';
       } else if (_identifier.includes('Lake') || _identifier.includes('Outlet') || _identifier.includes('WA')
         || _identifier.includes('Stream') || _identifier.includes('Tarn') || _identifier.includes('Creek')) {
         poi['type'] = 'water';
       } else if (_identifier.includes('WACS')) {
         poi['type'] = 'water, camp';
-      } else if (_identifier.includes('Pass') || _identifier.includes('Saddle')) {
+      } else if (_identifier.includes('Pass') || _identifier.includes('Saddle') || _identifier.includes('Ridge')) {
         poi['type'] = 'view';
-      } else if (_identifier.includes('Memorial')) {
+      } else if (_identifier.includes('Memorial') || _identifier.includes('Meadow') || _identifier.includes('Descent')) {
         poi['type'] = 'sight';
-      } else if (_identifier.includes('OnionValley')) {
+      } else if (_identifier.includes('OnionValley') || poi['sym'] && poi['sym'].includes('Head')) {
         poi['type'] = 'trailhead';
       } else if (_identifier.includes('CS') || _identifier.includes('Campsite')) {
         poi['type'] = 'camp';
       } else if (_identifier.includes('Point')) {
         poi['type'] = 'view';
+      } else if (poi['label'] === 'unknown' || poi['label'].includes('Leave') || poi['label'].includes('Depart') || poi['label'].includes('Abort!')) {
+        poi['type'] = 'directions';
+      }
+
+      if(poi['type'] === 'unknown') {
+        console.log(poi);
       }
 
       // TODO: cleanup unused properties

@@ -29,7 +29,7 @@ export class OfftrailDialogComponent implements OnInit {
   public onOk(): void {
     // const _value: number = (Math.floor(Number(this.simulateInput.nativeElement.value)) > this.trailLength) ? this.trailLength : Math.floor(Number(this.simulateInput.nativeElement.value));
 
-    let _value: number = this.simulateInput.nativeElement.value.replace(',', '.');      // in case of comma
+    let _value: number = this.simulateInput.nativeElement.value.replace(',', '.') || this.simulatedMile;      // in case of comma
     _value = (Number(_value) < this.trailLength) ? Number(_value) : this.trailLength - 1;
 
     const _self = this;
@@ -48,5 +48,9 @@ export class OfftrailDialogComponent implements OnInit {
 
   public onCancel(): void {
     this._dialogRef.close();
+  }
+
+  public onFocus(event: Event): void {
+    event.target['value'] = '';
   }
 }

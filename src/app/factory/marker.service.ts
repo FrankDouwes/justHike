@@ -99,7 +99,7 @@ export class MarkerService {
     return _marker;
   }
 
-  private _createMarkerType(poi: Poi | User, containerElement: any, color: string): any {
+  private _createMarkerType(poi: Poi | User | Town, containerElement: any, color: string): any {
 
     let _marker;
 

@@ -91,6 +91,10 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
       }
 
       window.cancelAnimationFrame(_delay);       // probably not needed
+      setTimeout(function() {
+        _self.onResize(null, true);                 // fixes fullscreen at startup android
+        _self._changeDetector.detectChanges();
+      }, 3000);
     });
   }
 
@@ -196,17 +200,17 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   }
 
   // only executed once every 250ms as it's a redraw of all list items
-  public onResize(event): void {
+  public onResize(event?: Event, force: boolean = false): void {
 
     const self = this;
 
     clearTimeout(this._resizeTimer);
 
     this._resizeTimer = setTimeout(function() {
-      self.itemWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth || 0) / 4.5);
+      self.itemWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth, window.outerWidth || 0) / 4.5);
       self.resize = new Date().getTime();
       self.resizeEvent.emit({resize: new Date().getTime()});
-      self._redraw();
+      self._redraw(force);
     }, 250);
   }
 
@@ -277,19 +281,20 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
   }
 
   // redraw guides and trigger a scroll event (that redraws the list)
-  private _redraw(): void {
+  private _redraw(force: boolean = false): void {
 
     const _oldRange = this._visibleRange;
     this._visibleRange = this.scrollViewport.getRenderedRange();
 
     // only if really needed!
-    if (_oldRange !==  this._visibleRange) {
+    if (_oldRange !==  this._visibleRange || force) {
       this.scrollEvent.emit({visibleRange: this._visibleRange, scrollX: this.scrollViewport.getOffsetToRenderedContentStart()});
 
       // prevent redraw if not needed
       const _newOHLC = this._calculateVisOHLC(this._visibleRange);
-      if (!this.visibleOHLC || _newOHLC.high !== this.visibleOHLC.high || _newOHLC.low !== this.visibleOHLC.low) {
+      if (!this.visibleOHLC || _newOHLC.high !== this.visibleOHLC.high || _newOHLC.low !== this.visibleOHLC.low || force) {
         this.visibleOHLC = _newOHLC;
+        this.update = new Date().getTime();
         this._calculateGuides();
       }
     }

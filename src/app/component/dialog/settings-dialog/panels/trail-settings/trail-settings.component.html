@@ -7,7 +7,7 @@
       <mat-form-field class="select-form-field">
         <mat-select [value]="activeTrail.id" (selectionChange)="onTrailSelect($event)" #trailSelector>
           <mat-option *ngFor="let trail of purchasedTrailList" [value]="trail.id">
-            {{trail.name}}
+            {{trail.name}} ({{trail.abbr}})
           </mat-option>
         </mat-select>
       </mat-form-field>

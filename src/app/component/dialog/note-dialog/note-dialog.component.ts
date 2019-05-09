@@ -5,6 +5,7 @@ import {PoiType} from '../../../type/poi';
 import {NoteService} from '../../../service/note.service';
 import {Settings} from '../../../settings';
 import {Note} from '../../../type/note';
+import {createCamelCaseName} from '../../../_util/generic';
 
 export class NoteProperties {
   type: string;
@@ -23,6 +24,7 @@ export class NoteProperties {
 export class NoteDialogComponent implements OnInit {
 
   @ViewChild('titleField') titleField: ElementRef;
+  @ViewChild('container') container: ElementRef;
 
   public defaultType: string;
   public noteTypes: Array<string> = ['note'];
@@ -95,6 +97,23 @@ export class NoteDialogComponent implements OnInit {
 
   public removeType(index: number): void {
     this.noteTypes.splice(index, 1);
+  }
+
+  public capName(name: string): string {
+    return createCamelCaseName(name);
+  }
+
+  public onFocus(event: Event): void {
+
+    // const _pos = event.target['style'].position;
+    // const _top = event.target['style'].top;
+    // event.target['style'].position = 'relative';
+    // event.target['style'].top = '-24px';
+    event.target['scrollIntoView']({behavior: 'smooth', block: 'start'});
+    // event.target['style'].top = _top;
+    // event.target['style'].position = _pos;
+
+    // event.target['scrollIntoView']({block: 'start', inline: 'center', behavior: 'smooth'});
   }
 
 }

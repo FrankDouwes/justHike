@@ -26,7 +26,8 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private _offtrailDialog: MatDialogRef<any>;
   private _markerDialog: MatDialogRef<any>;
-  
+  private _previousDialogData: Array<any>;    // used for back navigation in marker dialog (related poi)
+
   constructor(
     private _route: ActivatedRoute,
     private _fileSystemService: FilesystemService,
@@ -80,7 +81,7 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
     }
 
     this._connectionService.startTracking();
-    this.addEventListener(this._element.nativeElement, ['markerClick', 'offtrail'] , this._onDialogEvent.bind(this), false);
+    this.addEventListener(this._element.nativeElement, ['markerClick', 'offtrail', 'markerBack'] , this._onDialogEvent.bind(this), false);
   }
 
   ngOnDestroy(): void {
@@ -120,6 +121,8 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
 
     if (event.type === 'offtrail') {
       this._openOfftrailDialog(event);
+    } else if (event.type === 'markerBack') {
+      this._openPreviousDialog(event);
     } else {
       this._openMarkerDialog(event);
     }
@@ -130,18 +133,43 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
   // DIALOGS
   
   // marker dialog
+  private _openPreviousDialog(event): void {
+    // inject old data into existing dialog
+    if (this._markerDialog && this._markerDialog.componentInstance) {
+      this._markerDialog.componentInstance.data = this._previousDialogData.pop();
+      if (this._previousDialogData.length < 1) {
+        this._markerDialog.componentInstance.showBackBtn = false;
+      }
+      this._markerDialog.componentInstance.ngOnInit();    // reload component
+    }
+  }
+
   private _openMarkerDialog(event): void {
 
-    // only show once
-    if (this._markerDialog) {
-      this._markerDialog.close();
+    // inject new data into existing dialog
+    if (this._markerDialog && this._markerDialog.componentInstance) {
+
+      if (!this._previousDialogData) {
+        this._previousDialogData = [];
+      }
+      this._previousDialogData.push(this._markerDialog.componentInstance.data);
+      this._markerDialog.componentInstance.data = event.detail;
+      this._markerDialog.componentInstance.showBackBtn = true;
+      this._markerDialog.componentInstance.ngOnInit();    // reload component
+      return;
     }
 
+    // create new dialog
     this._markerDialog = this._dialog.open(MarkerDialogComponent, {
       autoFocus: false, width: '85%', height: '75%', data: event.detail
     });
 
-    this._onDialogClose(this._markerDialog, 'markerClosed_' + event.detail.id);
+    this._onDialogClose(this._markerDialog, 'markerClosed_' + event.detail.id, (result) => {
+      if (this._previousDialogData) {
+        this._previousDialogData = null;
+      }
+    });
+
   }
 
   // settings dialog
@@ -153,7 +181,7 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
       autoFocus: false, width: '85%', height: '75%', data: {icon: 'cog'}
     });
 
-    this._onDialogClose(_settingsDialog, 'settingsClosed', result => {
+    this._onDialogClose(_settingsDialog, 'settingsClosed', (result) => {
       if (result) {
         this._loaderService.showOverlay();
         this._localStorage.store('timestamp', new Date().getTime());
@@ -172,7 +200,7 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
       panelClass: 'offtrail-dialog', autoFocus: false, width: '50%', height: 'auto', data: event.detail
     });
 
-    this._onDialogClose(this._offtrailDialog, 'offtrailClosed', result => {
+    this._onDialogClose(this._offtrailDialog, 'offtrailClosed', (result) => {
 
       this._offtrailDialog = null;
 
@@ -187,17 +215,17 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
 
   private _onDialogClose(dialog: any, name: string, callback?: Function): void {
 
-    this.addSubscription(name, dialog.afterClosed().subscribe(result => {
+    this.addSubscription(name, dialog.afterClosed().subscribe((result) => {
 
       this._toggleNavigationVisibility(true);
 
       this.removeSubscription(name);
-      dialog = null;
 
       if (callback) {
         callback(result);
       }
 
+      dialog = null;
 
     }));
   }

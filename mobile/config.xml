@@ -1,5 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="hike.frankdouwes.com" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <hook type="before_build" src="hooks/keyboard.js" />
     <name>Just Hike</name>
     <description>
       Long Distance Hiking Companion
@@ -18,28 +19,25 @@
     <preference name="Fullscreen" value="true" />
     <preference name="SplashMaintainAspectRatio" value="true" />
     <preference name="ShowSplashScreenSpinner" value="false" />
-    <preference name="SplashScreenDelay" value="2000" />
+    <preference name="SplashScreenDelay" value="1250" />
     <preference name="SplashScreen" value="screen" />
-    <edit-config file="AndroidManifest.xml" mode="merge" target="/manifest/application/activity[@android:name='MainActivity']">
-        <activity android:name="MainActivity" android:windowSoftInputMode="adjustPan" />
-    </edit-config>
     <platform name="android">
-        <allow-intent href="market:*" />
-        <preference name="AndroidLaunchMode" value="singleInstance" />
-        <icon src="res/icon/android/Icon-48.png" density="mdpi" />
-        <icon src="res/icon/android/Icon-72.png" density="hdpi" />
-        <icon src="res/icon/android/Icon-96.png" density="xhdpi" />
-        <icon src="res/icon/android/Icon-144.png" density="xxhdpi" />
-        <icon src="res/icon/android/Icon-192.png" density="xxxhdpi" />
+      <allow-intent href="market:*" />
+      <preference name="AndroidLaunchMode" value="singleInstance" />
+      <icon src="res/icon/android/Icon-48.png" density="mdpi" />
+      <icon src="res/icon/android/Icon-72.png" density="hdpi" />
+      <icon src="res/icon/android/Icon-96.png" density="xhdpi" />
+      <icon src="res/icon/android/Icon-144.png" density="xxhdpi" />
+      <icon src="res/icon/android/Icon-192.png" density="xxxhdpi" />
 
-        <splash density="land-hdpi" src="res/screen/Default@2x~universal~anyany.png" />
-        <splash density="land-ldpi" src="res/screen/Default@2x~universal~anyany.png" />
-        <splash density="land-mdpi" src="res/screen/Default@2x~universal~anyany.png" />
-        <splash density="land-xhdpi" src="res/screen/Default@2x~universal~anyany.png" />
-        <splash density="port-hdpi" src="res/screen/Default@2x~universal~anyany.png" />
-        <splash density="port-ldpi" src="res/screen/Default@2x~universal~anyany.png" />
-        <splash density="port-mdpi" src="res/screen/Default@2x~universal~anyany.png" />
-        <splash density="port-xhdpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="land-hdpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="land-ldpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="land-mdpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="land-xhdpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="port-hdpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="port-ldpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="port-mdpi" src="res/screen/Default@2x~universal~anyany.png" />
+      <splash density="port-xhdpi" src="res/screen/Default@2x~universal~anyany.png" />
     </platform>
     <platform name="ios">
         <!-- iOS 8.0+ -->
@@ -87,9 +85,9 @@
     <plugin name="cordova-plugin-screen-orientation" spec="~3.0.1" />
     <plugin name="cordova-plugin-downloader" spec="~0.0.4" />
     <preference name="KeepRunning" value="false" />
-    <preference name="DisallowOverscroll" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
     <preference name="Orientation" value="landscape" />
-    <preference name="EnableViewportScale" value="true" />
+    <preference name="EnableViewportScale" value="false" />
     <preference name="Suppresses3DTouchGesture" value="true" />
     <preference name="SuppressesLongPressGesture" value="true" />
     <plugin name="cordova-plugin-network-information" spec="^2.0.1" />

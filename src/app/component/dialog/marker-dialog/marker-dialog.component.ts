@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { Poi, PoiType } from '../../../type/poi';
 import { getPoiTypeByType } from '../../../_util/poi';
@@ -14,12 +14,15 @@ import {NoteService} from '../../../service/note.service';
 
 export class MarkerDialogComponent implements OnInit, OnDestroy {
 
-  public poiTypes:  Array<PoiType> = [];
-  public poiCollection: Array<object> = [];
+  public poiTypes:  Array<PoiType>;
+  public poiCollection: Array<object>;
   public showRelated: boolean;
   public rateable: boolean;
+  public showBackBtn: boolean;
+  public update: number;          // trigger an update of subcomponents
 
   constructor(
+    private _changeDetector: ChangeDetectorRef,
     private _trailGeneratorService: TrailGeneratorService,
     private _noteService: NoteService,
     public dialogRef: MatDialogRef<MarkerDialogComponent>,
@@ -28,6 +31,9 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+
+    this.poiTypes = [];
+    this.poiCollection = [];
 
     const _self = this;
 
@@ -72,12 +78,13 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
       this.showRelated = true;
       this._getRelatedPois('camp');
     }
+
+    this.update = new Date().getTime();
   }
 
   ngOnDestroy(): void {
 
   }
-
 
   public deletePoi(): void {
     this._noteService.deleteNote(this.data.id, this.data.belongsToType, this.data.belongsTo);
@@ -113,6 +120,8 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
   // get related pois (by type) to display
   private _getRelatedPois(poiType: string): void {
 
+    console.log('get related pois');
+
     const _relatedPois: Array<number> = this._trailGeneratorService.getTrailData().sortedPoiIds[poiType];
     const _poiIndex: number = _relatedPois.indexOf(this.data.id);
     const _poiIds: Array<number> = _relatedPois.slice(_poiIndex + 1, _poiIndex + 4);
@@ -123,5 +132,18 @@ export class MarkerDialogComponent implements OnInit, OnDestroy {
   // TODO: B3 add POI notes
   public addNote(): void {
     alert('POI notes will be implemented in B3. Use standalone notes for now (tap anywhere on the map > tap on the pen icon)');
+  }
+
+  public goBack(): void {
+    console.log('backkk!');
+
+    const _event = new CustomEvent(
+      'markerBack',
+      {
+        bubbles: true,
+        cancelable: true
+      });
+
+      document.getElementsByTagName('app-root')[0].dispatchEvent(_event);
   }
 }

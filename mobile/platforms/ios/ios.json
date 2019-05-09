@@ -79,14 +79,7 @@
       },
       "AndroidManifest.xml": {
         "parents": {
-          "/manifest/application/activity[@android:name='MainActivity']": [
-            {
-              "xml": "<activity android:name=\"MainActivity\" android:windowSoftInputMode=\"adjustPan\" />",
-              "count": 1,
-              "mode": "merge",
-              "id": "config.xml"
-            }
-          ]
+          "/manifest/application/activity[@android:name='MainActivity']": []
         }
       }
     }

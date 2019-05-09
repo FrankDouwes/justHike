@@ -1,4 +1,14 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit, SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import {PoiType} from '../../../../type/poi';
 import {RateService} from '../../../../service/rate.service';
 import {Waypoint} from '../../../../type/waypoint';
@@ -15,22 +25,24 @@ import {LocalStorageService} from 'ngx-webstorage';
   styleUrls: ['./rating.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RatingComponent extends LocationBasedComponent implements OnInit, OnDestroy {
+export class RatingComponent extends LocationBasedComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('ratingPanel') ratingPanel: ElementRef;
   @Input() poiTypes: Array<PoiType>;
   @Input() waypoint: Waypoint;
+  @Input() update: number;
 
   public totalRating = 0;
   public state: 'current' | 'add' = 'current';
   public timestamp: number;
-  public rateablePoiTypes: Array<PoiType> = [];
+  public rateablePoiTypes: Array<PoiType>;
 
-  private _ratings: object = {};
-  private _ratingSubscriptions: Array<Subscription> = [];
+  private _ratings: object;
+  private _ratingSubscriptions: Array<Subscription>;
   private _disableDistanceCheck: boolean;
 
   constructor(
+    private _changeDetector: ChangeDetectorRef,
     private _rateService: RateService,
     private _localStorage: LocalStorageService
   ) {
@@ -40,6 +52,15 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
   ngOnInit() {
 
     super.ngOnInit();
+
+    this._setup();
+  }
+
+  private _setup(): void {
+
+    this.rateablePoiTypes = [];
+    this._ratings = {};
+    this._ratingSubscriptions = [];
 
     const _self = this;
 
@@ -66,10 +87,21 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
     this.calculateTotalRating();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+
+    // reload component
+    if (changes.update && changes.update.previousValue) {
+      this._clear();
+      this._setup();
+    }
+  }
+
   ngOnDestroy(): void {
-
     super.ngOnDestroy();
+    this._clear();
+  }
 
+  private _clear(): void {
     this._saveRating();
 
     // clear subscriptions
@@ -134,6 +166,7 @@ export class RatingComponent extends LocationBasedComponent implements OnInit, O
   }
 
   public getAspect(type: string, aspect: string): TotalScore {
+    console.log('get aspect');
     return this.getRating(type).getAspect(aspect);
   }
 

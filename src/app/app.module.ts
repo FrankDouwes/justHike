@@ -9,7 +9,7 @@ import {AppComponent} from './app.component';
 import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {library} from '@fortawesome/fontawesome-svg-core';
 import {faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faStreetView, faPenAlt, faHouseDamage,
-  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock, faParking,
+  faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faExclamationTriangle, faMapMarkedAlt, faLock, faParking, faDirections,
   faHiking, faAngleRight, faPlus, faCar, faTrain, faDoorOpen, faTimes, faDownload, faMapPin, faHotel, faShoePrints,
   faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faFlag, faStar, faQuestionCircle, faGem, faCity,
   faSnowflake, faAtlas, faMountain, faSpinner, faTrash, faSkull, faCircle, faChevronDown, faChevronUp, faStarHalfAlt
@@ -187,7 +187,7 @@ export class AppModule {
     }
 
     // font awesome library
-    library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faHotel, faStreetView, faPenAlt,
+    library.add(faLongArrowAltUp, faLongArrowAltDown, faCampground, faCog, faLocationArrow, faHotel, faStreetView, faPenAlt, faDirections,
       faArrowLeft, faRoad, faMapMarkerAlt, faTint, faTree, faCompass, faCar, faTrain, faDoorOpen, faMapMarkedAlt, faHouseDamage,
       faBolt, faStore, faBoxOpen, faUtensils, faInfo, faMapSigns, faQuestionCircle, faFlag, faStar, faDownload, faCity, faStarHalfAlt,
       faDotCircle, faExclamationTriangle, faHiking, faArrowAltCircleDown, faAngleRight, faPlus, faSnowflake, faGem, faMapPin, fasStar,
