@@ -1,8 +1,8 @@
 import {Settings} from '../settings';
 import {PoiType} from '../type/poi';
 
-// since poiType is an array, we'll have to filter subobjects to select one by type
-export function getPoiTypeByType(type:string) {
+// since poiType is an array, we'll have to filter sub-objects to select one by type
+export function getPoiTypeByType(type: string) {
 
   const _pois = Settings.POITYPES;
 

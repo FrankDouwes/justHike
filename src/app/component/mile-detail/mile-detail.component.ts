@@ -88,6 +88,11 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
 
   private _setMapData(mileId: number, poiRange?: any, mileRange?: any): void {
 
+    if (mileId > this.trailData.miles.length) {
+      // this only happens when refreshing in browser (debug) after resetting trail...
+      mileId = this.trailData.miles.length;
+    }
+
     if (mileRange && mileRange.length > 0) {
 
       mileRange.sort((a, b) => a - b);

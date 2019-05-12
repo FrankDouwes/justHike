@@ -1,4 +1,4 @@
-// TODO: currently unused, would add another calculation
+// by: https://medium.com/@francoisromain/smooth-a-svg-path-with-cubic-bezier-curves-e37b49d46c74
 
 // The smoothing ratio
 const smoothing = 0.025;
@@ -49,10 +49,8 @@ const bezierCommand = (point, i, a) => {
 // Render the svg <path> element
 export function svgPath(points){
   // build the d attributes by looping over the points
-  const d = points.reduce((acc, point, i, a) => i === 0
+  return points.reduce((acc, point, i, a) => i === 0
     ? `M ${point[0]},${point[1]}`
     : `${acc} ${bezierCommand(point, i, a)}`
     , '');
-
-  return d;
 }

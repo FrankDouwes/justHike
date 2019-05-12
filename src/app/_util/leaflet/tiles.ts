@@ -7,6 +7,7 @@ import * as Browser from 'leaflet/src/core/Browser';
 // 2. internet tiles (fallbackTileUrl)
 // 3. assets missing tile image (errorTileUrl)
 // TODO: prevent 404 on image URL (stackoverflow.com/questions/9893886/prevent-image-load-errors-going-to-the-javascript-console)
+// TODO: this might cause a memory leak, investigate further, empty gifs arent drawn (they are for regular tile layer)
 const _fallbackTileLayer = L.TileLayer.extend({
 
   createTile: function (coords, done) {
@@ -35,6 +36,7 @@ const _fallbackTileLayer = L.TileLayer.extend({
 
     if (_tileState === 'default') {
       tile.setAttribute('state', 'fallback');
+      tile.src = '';
       tile.src = this.updateTileUrl(_tileCoords, this.options.fallbackTileUrl);
     } else if (_tileState === 'fallback') {
       tile.setAttribute('state', 'error');

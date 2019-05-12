@@ -2,39 +2,41 @@
 
 RELEASES:
 BETA 1 released to first group of testers on: April 10th 2019.
+BETA 2 ETA. May 15th?
 
 ----- ----- ----- ----- ----
 
+TODO: b2 (ASAP):
+- set up iOS testflight / certificates etc.
+- (sporadically) Get/set ratings sometimes turns into an infinite loop…? Old version data issue?
+- insta scroll to mile (on map) when tracking is active (now it always attempts to center user)
+- PCT towns, clickable on map
+- (wip) Android: keyboard issues (overlay form)
+<br/><br/>
 TODO v1:
-- (wip) add: towns (+info and link towns to nearest trail road/trail junction)
+- (wip) add: PCT towns (+info and link towns to nearest trail road/trail junction)
+- (wip) add points of interest (or notes) that belong to a town instead of the trail (when near town)
 - add: compass heading, all cordova plugins seem to have android issues, iOS only?
 - add: purchase routines (app store / google play)
 - add: export personal notes (as csv?)
 - add: backup notes based on userID (firecloud)
 <br/><br/>
-- crucial bug: there's an issue sending/receiving ratings at startup, infinite loop...
 - fix: improve elevation profile scrollbar accuracy
 - fix: back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
 - fix: different contrast settings for online/offline maps.
 - fix: downloader state (has downloaded file, but there's an update available)
-- fix: optimising (virtual list rendering)
-- fix: vertical red lines on startup (android)
+- fix: optimising (virtual list rendering), can/should be smoother
 - fix: end of trail scrolling (last 2 mile never visible on map)
-<br/><br/>
-- test: Check/Settings: When is a poi considered off trail
-- test: Check/Settings: When is a poi no longer rendered
 <br/><br/>
 - design: Make it look good / CSS
 - design: nightHike background image
 - design: instructions screen content
 <br/><br/>
-- Android: fullscreen settings
-- Android: keyboard issues
-<br/><br/>
-- iOS potential keyboard bug
+- iOS potential keyboard bug (latest iphones only? works on iPhone 8)
 - iOS (sporadically): (possibly related to ionic webview) - [IPC] Connection::waitForSyncReply: Timed-out while waiting for reply
 - iOS (sporadically): (possibly related to ionic webview) - [LayoutConstraints] Unable to simultaneously satisfy constraints.
 <br/><br/><br/><br/>
+
 TODO v2:
 - add: side trails
 - add: online backup of comments

@@ -28,8 +28,6 @@ export class PCTData extends TrailParser {
       {find: 'cmt', replace: 'comment'},
       {find: 'sym', replace: 'icon'}];
 
-
-
     // WAYPOINTS
 
     // convert the waypoints
@@ -49,6 +47,16 @@ export class PCTData extends TrailParser {
     poiData = this.convertToWaypointString(poiData);
     const poiAsJson: JSON = this.x2js.xml2js(poiData);
     const _pois: Array<Poi> = this.directionReverse(this.parsePois(poiAsJson['gpx']['wpt']));
+
+
+    // TOWNS
+    const _townLength = towns.length;
+    for (let t = 0; t < _townLength; t++) {
+      const _town: Town = towns[t];
+
+      // convert to feet
+      _town.waypoint.elevation = (_town.waypoint.elevation) ? _town.waypoint.elevation / environment.FOOT : 0;
+    }
 
     return [trail, _trailData, _pois, snow['datasets'][0], towns];
   }

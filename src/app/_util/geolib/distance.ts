@@ -1,10 +1,10 @@
-// Adjustments to geoLibs Distance class:
-// - key value for Distance is a string, converting that to a number
-// - added belongsTo, in case points belong to different sources
-import * as geolib from "geolib";
+import * as geolib from 'geolib';
 import {Waypoint} from '../../type/waypoint';
 import {environment} from '../../../environments/environment.prod';
 
+/* Adjustments to geoLibs Distance class:
+- key value for Distance is a string, converting that to a number
+- added belongsTo, in case points belong to different sources */
 export class Distance {
 
   public latitude: number;
@@ -58,7 +58,5 @@ export function calculateSectionScale(section: Array<Waypoint>, length: number, 
     _calcSectionLength = _calcSectionLength / environment.MILE;
   }
 
-  const _scale = length / _calcSectionLength;
-
-  return _scale;
+  return length / _calcSectionLength;
 }

@@ -133,7 +133,7 @@ export class NoteService implements OnDestroy {
   // get notes based on a given type and id (of that type)
   public getNotes(type: string, id: number): Array<Note> {
 
-    if (!this._notesLibrary) {
+    if (!this._notesLibrary || !this._notesLibrary[type]) {
       return;
     }
 
@@ -217,7 +217,29 @@ export class NoteService implements OnDestroy {
   }
 
   // easier to sort by distance (poi list)
-  public getFlatNotesArray(): Array<Note> {
+  public getFlatNotesArray(belongsToType?: string, id?:number): Array<Note> {
+
+    if (belongsToType) {
+
+      if (this._notes) {
+        let _typedNotes: Array<Note>;
+        const _notesLength = this._notes.length;
+        for (let n = 0; n < _notesLength; n++) {
+          if (this._notes[n].belongsToType === belongsToType) {
+            console.log(this._notes[n].belongsTo);
+            if (id && id === this._notes[n].belongsTo || !id) {
+              if (!_typedNotes) {
+                _typedNotes = [];
+              }
+              _typedNotes.push(this._notes[n]);
+            }
+          }
+        }
+
+        return _typedNotes;
+      }
+    }
+
     return this._notes;
   }
 

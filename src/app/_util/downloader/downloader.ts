@@ -17,17 +17,15 @@ class FileReference {
   }
 }
 
-
-/* file downloader
+/* sequential file downloader
 sets type using file extension, currently supports json & blob (zip)
 supports multiple files for a single downloader (zip parts, due to size limitations/freezing on mobile)
 has save / unzip / delete file (for zips)
-has resume download function (for multipart files)
-TODO: should probably be an uploader too... */
+has resume download function (for multipart files) */
 export class Downloader {
 
-  public meta:                        Observable<DownloaderStatus>;    // the downloader service observes this
-  public downloadedFile:              any;                   // only available if file is not being saved
+  public meta:                        Observable<DownloaderStatus>;     // the downloader service observes this
+  public downloadedFile:              any;                              // only available if file is not being saved
   public status:                      DownloaderStatusManager;
   private _parser:                    DownloadParser;
   private readonly _metaSubject:      BehaviorSubject<DownloaderStatus>;
@@ -35,7 +33,7 @@ export class Downloader {
   private _downloadRequest:           Subscription;
   private _fileType:                  string;
 
-  private _urls:                      Array<string>;     // allow sequential downloading
+  private _urls:                      Array<string>;                    // allow sequential downloading
   private _paths:                     Array<string>;
   private _cache:                     boolean;
   private _completedFiles             = 0;
@@ -123,7 +121,7 @@ export class Downloader {
 
     this._fileType = (_extension === 'json') ? _extension : 'blob';
 
-    // TODO: research on cloud storage caching/headers
+    // TODO: research on cloud storage caching/headers (I don't think its needed)
     // https://cloud.google.com/storage/docs/gsutil/addlhelp/WorkingWithObjectMetadata
 
     // let _headers = new HttpHeaders();

@@ -65,8 +65,7 @@ export class SequentialResolverService implements Resolve<any> {
     this._localStorage.store('simulatedMile', -1);
 
     const _firstRun = this._localStorage.retrieve('firstRun');
-
-    if (_firstRun !== false) {
+    if (_firstRun === null) {
 
       this._localStorage.store('firstRun', true);
 

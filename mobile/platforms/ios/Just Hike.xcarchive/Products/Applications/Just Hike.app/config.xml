@@ -52,6 +52,7 @@
     <feature name="Zip">
         <param name="ios-package" value="ZipPlugin" />
     </feature>
+    <hook src="hooks/keyboard.js" type="before_build" />
     <name>Just Hike</name>
     <description>
       Long Distance Hiking Companion
@@ -67,9 +68,6 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
-    <edit-config file="AndroidManifest.xml" mode="merge" target="/manifest/application/activity[@android:name='MainActivity']">
-        <activity android:name="MainActivity" android:windowSoftInputMode="adjustPan" />
-    </edit-config>
     <edit-config file="*-Info.plist" mode="merge" target="NSLocationWhenInUseUsageDescription">
         <string>Requires geolocation.</string>
     </edit-config>
@@ -95,7 +93,7 @@
     <splash src="res/screen/Default@2x~universal~anyany.png" />
     <preference name="AllowInlineMediaPlayback" value="false" />
     <preference name="BackupWebStorage" value="none" />
-    <preference name="EnableViewportScale" value="true" />
+    <preference name="DisallowOverscroll" value="true" />
     <preference name="KeyboardDisplayRequiresUserAction" value="true" />
     <preference name="MediaPlaybackRequiresUserAction" value="false" />
     <preference name="SuppressesIncrementalRendering" value="false" />
@@ -109,10 +107,10 @@
     <preference name="Fullscreen" value="true" />
     <preference name="SplashMaintainAspectRatio" value="true" />
     <preference name="ShowSplashScreenSpinner" value="false" />
-    <preference name="SplashScreenDelay" value="2000" />
+    <preference name="SplashScreenDelay" value="1250" />
     <preference name="SplashScreen" value="screen" />
     <preference name="KeepRunning" value="false" />
-    <preference name="DisallowOverscroll" value="false" />
     <preference name="Orientation" value="landscape" />
+    <preference name="EnableViewportScale" value="false" />
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
 </widget>

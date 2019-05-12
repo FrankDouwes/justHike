@@ -1,7 +1,7 @@
 import {Waypoint} from '../../type/waypoint';
 import * as L from 'leaflet';
 
-// define the seperate converter functions for easier referencing
+// define the separate converter functions for easier referencing
 const _converters = {
   flat_waypoint: flatToWaypoint,
   latlng_waypoint: latLngToWaypoint,
@@ -30,12 +30,20 @@ export function pointArrayTypeConversion(waypoints: Array<any>, from: 'waypoint'
 }
 
 // convert a single Waypoint to a Latlng (that leaflet uses), optional elevation
-export function waypointToLatLng(waypoint: Waypoint): L.latlng {
-  return L.latLng(waypoint.latitude, waypoint.longitude, waypoint.elevation);
+export function waypointToLatLng(waypoint: Waypoint, noElevation: boolean = false): L.latlng {
+
+  const _latLng:L.latlng = L.latLng(waypoint.latitude, waypoint.longitude, waypoint.elevation);
+
+  if (noElevation) {
+    _latLng['alt'] = null;
+    delete _latLng['alt'];
+  }
+
+  return _latLng;
 }
 
 
-// convert a latlng to a waypoint, optional elevation
+// convert a latlng to a Waypoint, optional elevation
 export function latLngToWaypoint(latlng: L.latLng): Waypoint {
 
   const _waypoint: Waypoint = {
@@ -50,7 +58,7 @@ export function latLngToWaypoint(latlng: L.latLng): Waypoint {
   return _waypoint;
 }
 
-// convert flat data to waypoint (assuming an array with structure [latitude:number, longitude: number, elevation?:number]
+// convert flat data to Waypoint (assuming an array with structure [latitude:number, longitude: number, elevation?:number]
 export function flatToWaypoint(flat: Array<number>): Waypoint {
 
   const _waypoint: Waypoint = {
@@ -66,7 +74,7 @@ export function flatToWaypoint(flat: Array<number>): Waypoint {
 }
 
 
-// convert flat data to waypoint (assuming an array with structure [latitude:number, longitude: number, elevation?:number]
+// convert flat data to Waypoint (assuming an array with structure [latitude:number, longitude: number, elevation?:number]
 export function waypointToFlat(waypoint: Waypoint): Array<number> {
 
   const _flat: Array<number> = [waypoint.latitude, waypoint.longitude];
@@ -79,7 +87,7 @@ export function waypointToFlat(waypoint: Waypoint): Array<number> {
 }
 
 
-// convert waypoint to waypoint, turns string to numbers
+// convert Waypoint to Waypoint, turns string to numbers
 export function waypointToWaypoint(waypoint: Waypoint): Waypoint {
 
   const _waypoint: any = {};

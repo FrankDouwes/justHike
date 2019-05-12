@@ -13,6 +13,7 @@ import { Snow } from '../type/snow';
 import { reverseSnow } from '../_util/snow';
 import { DownloadService } from './download.service';
 import {RateService} from './rate.service';
+import {environment} from '../../environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
@@ -90,7 +91,13 @@ export class TrailResolverService implements Resolve<any> {
               this._rateService.setup();
               this._loaderService.showMessage('initialized rating system');
 
-              this._loaderService.hideOverlay();
+              // TODO: BETA FLAG, remove for release
+              if (new Date().getTime() < environment.betaEndTime) {
+                this._loaderService.hideOverlay();
+              } else {
+                alert('Beta version expired! contact developer.')
+                this._loaderService.showMessage('Beta version expired! contact developer.');
+              }
 
               return of({trail: this._cachedTrail, snow: this._cachedSnow});
 

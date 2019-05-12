@@ -187,17 +187,4 @@ export class MarkerService {
 
     return htmlIcon({className: 'user', html: _element});
   }
-
-  // public createLeafletIndicatorMarker(): any {
-  //
-  //   // create root + svg element
-  //   const _element = document.createElement('div');
-  //   _element.classList.add('indicator-marker');
-  //
-  //   // create circle + icon
-  //   const _draw = SVG(_element).size(8, 8).style('overflow', 'visible');
-  //   this.createSvgCircleMarker(_draw, '#FF0000', 0.25);
-  //
-  //   return htmlIcon({className: 'indicator', html: _element});
-  // }
 }

@@ -14,11 +14,11 @@
 		</data>
 		<key>Assets.car</key>
 		<data>
-		/K/zSPSIUYvki52JCG7mvm6W3sU=
+		ZlmXzFsMoYsm8c2N4H4Itg+YDm8=
 		</data>
 		<key>CDVLaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
 		<data>
-		OnTH4Kad1LZAb95+VQ/V+waAP7E=
+		o6YBb+EdOS2Bs2aZYfJc+05dEvE=
 		</data>
 		<key>CDVLaunchScreen.storyboardc/Info.plist</key>
 		<data>
@@ -26,7 +26,7 @@
 		</data>
 		<key>CDVLaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib</key>
 		<data>
-		bShZ6vJxVWReVJLSTyiOZW7sEWU=
+		8Dg26Fs9SHbmfPVmC6Z2e8LFICo=
 		</data>
 		<key>CDVNotification.bundle/beep.wav</key>
 		<data>
@@ -38,7 +38,7 @@
 		</data>
 		<key>MainViewController.nib</key>
 		<data>
-		mYm17sH/vwl+WL6fL/GhU1ZOcV4=
+		JgBE+E4zRPbc/3aMLQdd7Xg6zno=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -46,7 +46,7 @@
 		</data>
 		<key>config.xml</key>
 		<data>
-		B0KEtCwLq52GleAudiWLoFOBkGo=
+		EOw5KfkuZqgniGaIDjN5OrLUMAk=
 		</data>
 		<key>embedded.mobileprovision</key>
 		<data>
@@ -98,7 +98,7 @@
 		</data>
 		<key>www/assets/data/DEMO/towns.json</key>
 		<data>
-		OiQFLgXHRiMEsCG/ouxVhEuu05E=
+		nIcEUyKOIFnj31fc1kHkqZGumEM=
 		</data>
 		<key>www/assets/data/DEMO/trail.dat</key>
 		<data>
@@ -114,7 +114,7 @@
 		</data>
 		<key>www/assets/data/PCT/towns.json</key>
 		<data>
-		4FrYXO81bu48bMuRmNn+uUlSCo0=
+		1/i7XaidoqC6DU6v+qrqrdaBA/U=
 		</data>
 		<key>www/assets/data/PCT/trail_0.dat</key>
 		<data>
@@ -246,11 +246,11 @@
 		</data>
 		<key>www/assets/files/DEMO/trail-nobo.json</key>
 		<data>
-		wwKBR4mOxny8sKynoEwcMwWmzbc=
+		+eQkAr17OZ8z+ZD8TaDZPrrkZMo=
 		</data>
 		<key>www/assets/files/DEMO/trail-sobo.json</key>
 		<data>
-		svzy9dswxjJfAQ2iuEz4pvtqanQ=
+		HnMR0kMMokGwRVeLzYcjcttonxw=
 		</data>
 		<key>www/assets/files/PCT/snow.json</key>
 		<data>
@@ -258,23 +258,23 @@
 		</data>
 		<key>www/assets/files/PCT/trail-nobo.json</key>
 		<data>
-		zJ0so7Zd6K7Cyjo0ikmnbID0aoY=
+		tfu32xbYt1JprHB6l41tNx6gtm0=
 		</data>
 		<key>www/assets/files/PCT/trail-sobo.json</key>
 		<data>
-		6QAtxDHFOz12Kh4lf5siVdrTpVk=
+		oaprFp/XEpf6aaEjvXGCxn0PVXA=
 		</data>
 		<key>www/assets/files/SHR/trail-nobo.json</key>
 		<data>
-		3/zlfKB70N1WrzC1euAeXRyH0Ic=
+		jwe8bPP2sCRIRpnP3F536fLu8Lo=
 		</data>
 		<key>www/assets/files/SHR/trail-sobo.json</key>
 		<data>
-		oATEkyYDv8zGt5/AJ1ZcCKCELDY=
+		BAmwAPA81w1eRlVaGIyZ3tfMamE=
 		</data>
 		<key>www/assets/files/version.json</key>
 		<data>
-		gwND6r5IWQM9p9cKErvXzEjJbg8=
+		lD7ZbyNR5/+cADPZnnbppwYp/pU=
 		</data>
 		<key>www/assets/fonts/nationalpark-regular-webfont.eot</key>
 		<data>
@@ -291,6 +291,10 @@
 		<key>www/assets/fonts/nationalpark-regular-webfont.woff</key>
 		<data>
 		U8T4BAnfQgoHSD7d076tZ4mupfM=
+		</data>
+		<key>www/assets/fonts/roboto-regular.ttf</key>
+		<data>
+		zKBvneSET0Wi4K8VAbZPMXB4s7A=
 		</data>
 		<key>www/assets/icons/marker-shadow.png</key>
 		<data>
@@ -362,7 +366,7 @@
 		</data>
 		<key>www/assets/images/slides/instructions-1.jpg</key>
 		<data>
-		iYdF3ITf26CUtTQUYXEBCON+C1E=
+		MzlT0gTRMjZbDSNZXW/csLqqxPQ=
 		</data>
 		<key>www/assets/images/slides/instructions-2.jpg</key>
 		<data>
@@ -406,7 +410,7 @@
 		</data>
 		<key>www/index.html</key>
 		<data>
-		aI2K30gs6/CDrBCgNhJt8RZSXGQ=
+		J703Z6ABXNrJLOXAmqZoJAgO8d8=
 		</data>
 		<key>www/layers-2x.4f0283c6ce28e888000e.png</key>
 		<data>
@@ -416,9 +420,9 @@
 		<data>
 		yedSjkkaOSMrokonBsbHOdb7DwY=
 		</data>
-		<key>www/main.8ac386422b0ab50e11b2.js</key>
+		<key>www/main.bbbf7d35ac7b8146ee14.js</key>
 		<data>
-		UG0gptE4gC0afDZKXJJtjDXI3lg=
+		6G7aRzWIqzAgNT78bCc5tHT+Q5o=
 		</data>
 		<key>www/manifest.json</key>
 		<data>
@@ -620,6 +624,10 @@
 		<data>
 		+NN9ZSTuXthlIt/4iezYJseYnUE=
 		</data>
+		<key>www/roboto-regular.18d44f79b3979ec16886.ttf</key>
+		<data>
+		zKBvneSET0Wi4K8VAbZPMXB4s7A=
+		</data>
 		<key>www/runtime.26209474bfa8dc87a77c.js</key>
 		<data>
 		tilWwhkr/lUW1jdOdTdzkB7VDsU=
@@ -636,9 +644,9 @@
 		<data>
 		8W+FhBroTL806zseRyRv51+nnBI=
 		</data>
-		<key>www/styles.baa9f1e11f2a9e1db817.css</key>
+		<key>www/styles.1e128f31b4c8f8f9342e.css</key>
 		<data>
-		SH9P5IxmnOBGG29TnU8Xypj2Ekc=
+		IkAfs8XBSvNcuqWFYtuvuRvWPBc=
 		</data>
 		<key>www/wk-plugin.js</key>
 		<data>
@@ -665,14 +673,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			Se3vxYUY46kxUjnd1q9jIgQwgZyQw5ZjZvaeI2Ctf+Q=
+			+5RboUVB8G6K75hPUct84Tz6XnUxOY/Paaedv9Ks5n0=
 			</data>
 		</dict>
 		<key>CDVLaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			1ynPHeeQhSG6nRRz4Ec55hUQrAf+nH2G9QIwoV1NWcA=
+			ti+RFCD4GmT7nfg0ZATanuak+yHwDOomJAYfQZFCOJI=
 			</data>
 		</dict>
 		<key>CDVLaunchScreen.storyboardc/Info.plist</key>
@@ -686,7 +694,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			1t7hS8EP5OTmZNrvT7M5L3TQRKOql5JCbPuZ9uU+Y7I=
+			noR0FE3MnKPyd92hr57hyI1NfKXb9oTYwh7O55b8gsw=
 			</data>
 		</dict>
 		<key>CDVNotification.bundle/beep.wav</key>
@@ -700,14 +708,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			z4TGIjWHmCF12rD7eX7xL58H8eyATPS/1JHARBLK4+A=
+			MuXaZXTdq3+EoKX5VgpgP1z8q2vynnKVCZWb5Sx1KlY=
 			</data>
 		</dict>
 		<key>config.xml</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			QY0dVZ8jl0Tg9Rhfax95FhgVO9Bc9pIJbQ7x833fvg0=
+			fHC1Jxhbmy/w26WqrZU11X2971k8xIj3Ex975dlNHTU=
 			</data>
 		</dict>
 		<key>embedded.mobileprovision</key>
@@ -798,7 +806,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			h5ikQxeTm5OEx7ozNYNX94EB5mmAxCpfR1KGhXr3Z2s=
+			6MQvWG/pQIg8E3gqQY3dpIRqAneaPsyUnEU7FKRqhG0=
 			</data>
 		</dict>
 		<key>www/assets/data/DEMO/trail.dat</key>
@@ -826,7 +834,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ph2vDIYhfb5VYjc4l+raS+Su9DjpBMjZvxjUkvav43o=
+			2D4KNVWSq9ArfX/4jUViUuZWif3zjVv7kSFECqMFXqs=
 			</data>
 		</dict>
 		<key>www/assets/data/PCT/trail_0.dat</key>
@@ -1057,14 +1065,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			iXSjLOxUTus+UhNVOb9Ft2Y4BKGr0sOO5KQqUgMBZgA=
+			Nkg2Uu8ZDAF5d3mF02qv06PfHHqAHZ6EOEprJ/cT6io=
 			</data>
 		</dict>
 		<key>www/assets/files/DEMO/trail-sobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			FdLN3YR/UMZTZixxppLEG+/W+JguHVGvxwuafEbz6m4=
+			/b0VN9u7Y57ukuAx5T47cF2POObcc1RmIy+E1/PptRw=
 			</data>
 		</dict>
 		<key>www/assets/files/PCT/snow.json</key>
@@ -1078,35 +1086,35 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			8Smur8qVK15zidrlXsa62jpqMqbwxVXhEITHYyR4Iu0=
+			BgJ/tdtpDCXIVcjL1Yx60q9M1nMuvvpkgMeabr8Z2b0=
 			</data>
 		</dict>
 		<key>www/assets/files/PCT/trail-sobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			0kcPoTLtlSGs8Std77XajVid4/XaDp6kHL6JfDJYb6o=
+			HfUHnMxZNcRlNu/ctQbfHrY8MLF9wZDSV8NBqH7XDh4=
 			</data>
 		</dict>
 		<key>www/assets/files/SHR/trail-nobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Lnrwxc25vyo5SZkbymKs/M7CRV/C+HdkkgrU7JKbJlA=
+			T7fWsUndyz5AsHyztSFqIn2Or2uouI3irJBNVt9lKMM=
 			</data>
 		</dict>
 		<key>www/assets/files/SHR/trail-sobo.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			WKL0XsWWA5reRSqWzPRBCmB2n+D7531RJ0XFWGBUMVI=
+			gJCGiWgIpczKQuzLfEnBmUaeit3wa9a9YExlTSXateg=
 			</data>
 		</dict>
 		<key>www/assets/files/version.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			y2pWmwFdczuq2+gIBYdqwwIokOlJIFgW4b/QioGYpP4=
+			gHjZOlTBNooID6Avjj8CUVQ066BOF1//19e51EDEofs=
 			</data>
 		</dict>
 		<key>www/assets/fonts/nationalpark-regular-webfont.eot</key>
@@ -1135,6 +1143,13 @@
 			<key>hash2</key>
 			<data>
 			NeNkNT0wCMYVRydvtd23OMvqL09JAHwYNyJ+uKI8TxU=
+			</data>
+		</dict>
+		<key>www/assets/fonts/roboto-regular.ttf</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nnnq6+/pyxGI3vupQTrW04PP8fC0M08Lh4Y0ZI+3AyI=
 			</data>
 		</dict>
 		<key>www/assets/icons/marker-shadow.png</key>
@@ -1260,7 +1275,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			dAgn6XGEwqqwEQM7e6VxH9lAk4WLgDlPv+zeSZ4L910=
+			Otw3OX9g0y7WBAOCpIscCPKiEewsi125o0Ijm9966w4=
 			</data>
 		</dict>
 		<key>www/assets/images/slides/instructions-2.jpg</key>
@@ -1337,7 +1352,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			/JVI5aaxoQ9dQERBepiXcSjk+kYujLf5FYOAYAE2cyY=
+			/q1xXA4SifUUifXUrufmnyMidT0LHUCBpQ3T3SFW+XE=
 			</data>
 		</dict>
 		<key>www/layers-2x.4f0283c6ce28e888000e.png</key>
@@ -1354,11 +1369,11 @@
 			Hbvp0CjikvNvy6j4s6KNXokydU/CIVuaxp5M3s9RB8Y=
 			</data>
 		</dict>
-		<key>www/main.8ac386422b0ab50e11b2.js</key>
+		<key>www/main.bbbf7d35ac7b8146ee14.js</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			AagcvGtHBZUz+jpMUedK0WcS/+DD7HlDxsQlA4QTOG8=
+			BzDLSV0mfw/csP4pXjyLxvHa82pm3npJiOPah4lqfzc=
 			</data>
 		</dict>
 		<key>www/manifest.json</key>
@@ -1711,6 +1726,13 @@
 			K1o2FMAZkcE6hV52hO06UuLpfnWHY42PHTS/3plauaQ=
 			</data>
 		</dict>
+		<key>www/roboto-regular.18d44f79b3979ec16886.ttf</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nnnq6+/pyxGI3vupQTrW04PP8fC0M08Lh4Y0ZI+3AyI=
+			</data>
+		</dict>
 		<key>www/runtime.26209474bfa8dc87a77c.js</key>
 		<dict>
 			<key>hash2</key>
@@ -1739,11 +1761,11 @@
 			vbFSekOk2QPAHZlQY+TLBYjxZ2vHEfoZnzQQ+Snieaw=
 			</data>
 		</dict>
-		<key>www/styles.baa9f1e11f2a9e1db817.css</key>
+		<key>www/styles.1e128f31b4c8f8f9342e.css</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			jYK6XQCO+VXmmRmILDdrmJRtKqxDBaaqgIX6uO13P9A=
+			XhFcVYfKWnIXRg2yEPzv8vBfcmeJ/5U6L6RciS2mOMM=
 			</data>
 		</dict>
 		<key>www/wk-plugin.js</key>

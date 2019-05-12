@@ -2,7 +2,7 @@ import * as L from 'leaflet';
 import {toPoint as point} from 'node_modules/leaflet/src/geometry/Point';
 
 /* creates a leaflet icon out of an html element
-the default divIcon class (that's being extended) uses innerHTML() which breaks svg href links in iOS/Safari*/
+the default divIcon class (that's being extended) uses innerHTML() which breaks svg href links in iOS/Safari */
 const _htmlIcon = L.DivIcon.extend({
 
   createIcon: function (oldIcon) {

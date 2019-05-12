@@ -6,6 +6,7 @@ import {NoteService} from '../../../service/note.service';
 import {Settings} from '../../../settings';
 import {Note} from '../../../type/note';
 import {createCamelCaseName} from '../../../_util/generic';
+import {BaseComponent} from '../../../base/base/base.component';
 
 export class NoteProperties {
   type: string;
@@ -21,7 +22,7 @@ export class NoteProperties {
   templateUrl: './note-dialog.component.html',
   styleUrls: ['./note-dialog.component.sass']
 })
-export class NoteDialogComponent implements OnInit {
+export class NoteDialogComponent extends BaseComponent implements OnInit {
 
   @ViewChild('titleField') titleField: ElementRef;
   @ViewChild('container') container: ElementRef;
@@ -35,12 +36,24 @@ export class NoteDialogComponent implements OnInit {
     private _noteService: NoteService,
     @Inject(MAT_DIALOG_DATA)
     public data: NoteProperties
-  ) {}
+  ) {
+    super();
+  }
 
   ngOnInit() {
-
     this.defaultType = this.data.type;
     this.titleField.nativeElement.focus();
+
+    // fix for android, soft-keyboard hides dialog, this will make the dialog larger / scroll / based on keyboard size
+    if (navigator.userAgent.match(/(Android)/)) {
+      this.addEventListener(window, 'native.keyboardshow', (e) => {
+        this.container.nativeElement.style.paddingBottom = e['keyboardHeight'] + 'px';
+      });
+
+      this.addEventListener(window, 'native.keyboardhide', (e) => {
+        this.container.nativeElement.style.paddingBottom = null;
+      });
+    }
   }
 
   public submitNote(formData: object): void {
@@ -62,8 +75,6 @@ export class NoteDialogComponent implements OnInit {
     this.data['label'] = formData['title'];
     this.data['description'] = formData['note'];
     this.data['share'] = formData['share'];
-
-    console.log(this.data);
 
     const _noteObj: Note = this.data as Note;
 
@@ -103,17 +114,10 @@ export class NoteDialogComponent implements OnInit {
     return createCamelCaseName(name);
   }
 
+  // fixes android soft-keyboard overlap issue
   public onFocus(event: Event): void {
-
-    // const _pos = event.target['style'].position;
-    // const _top = event.target['style'].top;
-    // event.target['style'].position = 'relative';
-    // event.target['style'].top = '-24px';
-    event.target['scrollIntoView']({behavior: 'smooth', block: 'start'});
-    // event.target['style'].top = _top;
-    // event.target['style'].position = _pos;
-
-    // event.target['scrollIntoView']({block: 'start', inline: 'center', behavior: 'smooth'});
+    if (navigator.userAgent.match(/(Android)/)) {
+      event.target['scrollIntoView']({behavior: 'smooth', block: 'start'});
+    }
   }
-
 }

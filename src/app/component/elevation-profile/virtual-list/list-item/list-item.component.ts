@@ -144,8 +144,6 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
     }
 
     if (changes.update) {
-
-      console.log('changes, set screenmode, redraw');
       this._screenMode = this._localStorage.retrieve('screenMode');
       this._drawMap();
     }
@@ -230,7 +228,7 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
   private _hasNotes(): void {
 
-    const _mileNotes = this._noteService.getNotes('mile', this.data.id);
+    const _mileNotes = this._noteService.getNotes('trail', this.data.id);
     let _newValue: boolean;
 
     if (_mileNotes) {
@@ -424,26 +422,25 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
     const max: number = this.visibleOHLC.high;  // low point
     const range = (max - min);
 
-    const _poisArray = indexArray;
-
     // draw markers
-    if (_poisArray) {
+    if (indexArray) {
 
       const _self = this;
-      const _maxPoiDistance = this._localStorage.retrieve('poiMaxDistance');
+      const _maxDistance = this._localStorage.retrieve('poiMaxDistance');
 
-      const _totalPois: number = _poisArray.length;
+      const _totalPois: number = indexArray.length;
       for (let i = 0; i < _totalPois; i++) {
 
-        const _poi: Poi | Town = getter(_poisArray[i]);
-
-        // filter out of range pois
-        if (filterRange && _poi.waypoint.distance >= _maxPoiDistance) {
-          return;
-        }
+        const _poi: Poi | Town = getter(indexArray[i]);
 
         if (!_poi) {
           console.log('bug at poi with id: ' + _poi.id);
+          return;
+        }
+
+        // filter out of range pois
+        if (filterRange && _poi.waypoint.distance >= _maxDistance) {
+          return;
         }
 
         const _poiTypes = _poi['type'].split(', ');
@@ -468,12 +465,32 @@ export class ListItemComponent extends BaseComponent implements OnInit, AfterVie
 
           const _pointElevation = (_poi.waypoint.elevation !== 0) ? _poi.waypoint.elevation : min;
 
-          const _markerElevation: number = normalizeElevation(this._svgHeight, _pointElevation, min, range, environment.LINEHEIGHT / 2);
+          let _markerElevation: number = normalizeElevation(this._svgHeight, _pointElevation, min, range, environment.LINEHEIGHT / 2);
 
+          if (!filterRange) {
+            if (_markerElevation > this._svgHeight) {
+              _markerElevation = this._svgHeight;
+            } else if (_markerElevation < 0) {
+              _markerElevation = 0;
+            }
+          }
+
+          const _xPos: number  = this._svgWidth * ((_poi.anchorPoint as Waypoint).distance / environment.MILE);
           const _marker = this._markerFactory.setupMarker(this._markerSvgCanvas, _poi, _visibleTypes);
 
           _marker.click(this._onMarkerClick.bind({data: _poi, self: this}));
-          _marker.move(this._svgWidth * ((_poi.anchorPoint as Waypoint).distance / environment.MILE), _markerElevation);
+          _marker.move(_xPos, _markerElevation);
+
+          // draw line segment (if town)
+          if (!filterRange) {
+            const _anchorElevation = ((_poi.anchorPoint as Waypoint).elevation !== 0) ? (_poi.anchorPoint as Waypoint).elevation : min;
+            const _anchorMarkerElevation = normalizeElevation(this._svgHeight, _anchorElevation, min, range, environment.LINEHEIGHT / 2);
+
+            const _polyline = this._lineCanvas.path(svgPath([
+              [_xPos, _anchorMarkerElevation],
+              [_xPos, _markerElevation]
+            ])).stroke({ color: 'rgba(119, 119, 119, 0.5)', width: environment.LINEHEIGHT, dasharray: [14,14], linecap:"round"});
+          }
         }
 
       }

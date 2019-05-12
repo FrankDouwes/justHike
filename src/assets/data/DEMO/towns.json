@@ -1,14 +1,17 @@
 [
-  {
+   {
     "id": 0,
     "label": "Campo, CA",
     "type": "town",
     "radius": 1,
     "waypoint": {
       "latitude": 32.607582,
-      "longitude": -116.469732
+      "longitude": -116.469732,
+      "elevation": 792
     },
-    "pois": []
+    "pois": [],
+    "amenities": "",
+    "description": ""
   },
   {
     "id": 1,
@@ -17,9 +20,12 @@
     "radius": 1,
     "waypoint": {
       "latitude": 32.679383,
-      "longitude": -116.505438
+      "longitude": -116.505438,
+      "elevation": 968
     },
     "pois": [],
+    "amenities": "",
+    "description": "",
     "anchorPoint": {
       "latitude": 32.682597,
       "longitude": -116.516642
@@ -31,9 +37,12 @@
     "radius": 1,
     "waypoint": {
       "latitude": 32.867469,
-      "longitude": -116.418793
+      "longitude": -116.418793,
+      "elevation": 1801
     },
     "pois": [],
+    "amenities": "",
+    "description": "",
     "anchorPoint": {
       "latitude": 32.871248,
       "longitude": -116.415299
@@ -46,9 +55,12 @@
     "radius": 1,
     "waypoint": {
       "latitude": 33.060419,
-      "longitude": -116.424933
+      "longitude": -116.424933,
+      "elevation": 718
     },
     "pois": [],
+    "amenities": "",
+    "description": "",
     "anchorPoint": {
       "latitude": 33.093543,
       "longitude": -116.462592
@@ -61,9 +73,12 @@
     "radius": 1,
     "waypoint": {
       "latitude": 33.078344,
-      "longitude": -116.602072
+      "longitude": -116.602072,
+      "elevation": 1289
     },
     "pois": [],
+    "amenities": "",
+    "description": "",
     "anchorPoint": {
       "latitude": 33.097703,
       "longitude": -116.472981
@@ -76,9 +91,12 @@
     "radius": 1,
     "waypoint": {
       "latitude": 33.283599,
-      "longitude": -116.634486
+      "longitude": -116.634486,
+      "elevation": 954
     },
     "pois": [],
+    "amenities": "",
+    "description": "",
     "anchorPoint": {
       "latitude": 33.273140,
       "longitude": -116.645365
@@ -91,9 +109,12 @@
     "radius": 1,
     "waypoint": {
       "latitude": 33.232029,
-      "longitude": -116.760122
+      "longitude": -116.760122,
+      "elevation": 844
     },
     "pois": [],
+    "amenities": "",
+    "description": "",
     "anchorPoint": {
       "latitude": 33.273140,
       "longitude": -116.645365
@@ -106,9 +127,12 @@
     "radius": 1,
     "waypoint": {
       "latitude": 33.109179,
-      "longitude": -116.673795
+      "longitude": -116.673795,
+      "elevation": 908
     },
     "pois": [],
+    "amenities": "",
+    "description": "",
     "anchorPoint": {
       "latitude": 33.273140,
       "longitude": -116.645365

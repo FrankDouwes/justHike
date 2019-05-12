@@ -7,7 +7,7 @@ export interface Poi extends LocationBase {
 
   // optional
   belongsTo?:         number;             // an id of a mile/poi this poi belongs to
-  belongsToType:      string;             // belongs to either a mile or another poi (town)
+  belongsToType:      'trail' | 'poi' | 'town'; // support for nested poi, only poi beloning to trail are rendered on map/elevation prof.
   description?:       string;             // optional description
   comment?:           string;             // optional comment
   distanceFromUser?:  number;             // distance from user in meters

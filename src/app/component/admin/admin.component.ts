@@ -46,7 +46,7 @@ export class AdminComponent extends BaseComponent implements OnInit, OnDestroy {
     private _localStorageService: LocalStorageService,
     private _loaderService: LoaderService,
     // private _orientationService: OrientationService,
-    private _sequentialResolver: SequentialResolverService
+    private _sequentialResolver: SequentialResolverService,
   ) {
     super();
   }

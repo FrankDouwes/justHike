@@ -13,7 +13,7 @@ export class DynamicComponentManager {
     this._map = map;
   }
 
-  // load an angular component into a leaflet component map, _popupTimer
+  // load an angular component into a leaflet component map
   public createPopupComponent(location: L.LatLng, properties?: object, onTimeOut?: Function): TimerObj {
 
     const _self = this;

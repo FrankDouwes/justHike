@@ -2,14 +2,14 @@ import {FilesystemService} from '../../service/filesystem.service';
 import {DownloaderStatus, DownloaderStatusManager} from './status-manager';
 import {getExtensionFromString} from '../file';
 
+// parse downloaded files
 export class DownloadParser {
 
   private _onComplete: Function;
 
   constructor(
     private _filesystemService: FilesystemService,
-    private _status: DownloaderStatusManager)
-  {}
+    private _status: DownloaderStatusManager) {}
 
 
   // FILE SAVING

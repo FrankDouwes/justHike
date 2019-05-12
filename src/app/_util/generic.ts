@@ -1,5 +1,3 @@
-import * as L from 'leaflet';
-
 // sort an array of objects by a key (in each object)
 export function sortByKey(array, key) {
   return array.sort(function(a, b) {
@@ -14,8 +12,8 @@ export function cloneData(input: object): object{
   return JSON.parse(JSON.stringify(input));
 }
 
-export function isObjectEmpty(obj:object): boolean {
-  for(const key in obj) {
+export function isObjectEmpty(obj: object): boolean {
+  for (const key in obj) {
     if (obj.hasOwnProperty(key)) {
       return false;
     }

@@ -1,7 +1,7 @@
 /*
- *
- * Inspired by Leaflet.Grid: https://github.com/jieter/Leaflet.Grid
- */
+Leaflet.grids https://github.com/trailbehind/leaflet-grids
+missing package.json...
+*/
 
 L.Grids = L.LayerGroup.extend({
   options: {
@@ -50,10 +50,10 @@ L.Grids = L.LayerGroup.extend({
   },
 
   redraw: function () {
-    this._lngCoords = [],
-      this._latCoords = [],
-      this._gridLabels =  [],
-      this._mapZoom = this._map.getZoom();
+    this._lngCoords = [];
+    this._latCoords = [];
+    this._gridLabels =  [];
+    this._mapZoom = this._map.getZoom();
     this._bounds =  this._map.getBounds(); //.pad(0.5);
     this._gridSize = this._gridSpacing();
 

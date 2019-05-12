@@ -10,11 +10,13 @@ import {LoaderService} from './loader.service';
 import {getPoiTypeByType} from '../_util/poi';
 import {cloneData, sortByKey} from '../_util/generic';
 import {calculateDistance, Distance} from '../_util/geolib/distance';
-import {pointArrayTypeConversion, waypointToWaypoint} from '../_util/leaflet/converter';
+import {pointArrayTypeConversion, waypointToLatLng, waypointToWaypoint} from '../_util/leaflet/converter';
 import {getClosestPointOnLine} from '../_util/math';
 import PositionAsDecimal = geolib.PositionAsDecimal;
 import {Town} from '../type/town';
 import {calculateOHLC} from '../_util/trail';
+import latitude = geolib.latitude;
+import longitude = geolib.longitude;
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +41,31 @@ export class TrailGeneratorService {
 
   public getTrailData(): Trail {
     return this._trailData;
+  }
+
+  public findNearestTown(waypoint: Waypoint, returnTown: boolean = false): Town | Distance {
+
+    if (this._trailData.towns) {
+
+      const _length = this._trailData.towns.length;
+      const _townWaypoints: Array<any> = [];
+
+      for (let t = 0; t < _length; t++) {
+        const _town: Town = this._trailData.towns[t];
+        _townWaypoints.push(_town.waypoint);
+      }
+
+      const _nearest: Array<any> = geolib.orderByDistance(waypoint, _townWaypoints)
+
+      if (returnTown) {
+        return this._trailData.towns[_nearest[0].key];
+      } else {
+        return _nearest[0];
+      }
+    } else {
+      console.log('no towns for this trail');
+      return;
+    }
   }
 
   public getTrailVersion(): string {
@@ -139,6 +166,7 @@ export class TrailGeneratorService {
 
     // 5. Towns
     this._trailData.towns = this._calculateTownsAnchorPoints(towns);
+    // todo: add pois to towns
 
     return this._trailData;
   }
@@ -404,6 +432,7 @@ export class TrailGeneratorService {
 
       _poi.anchorPoint = _anchorData['anchorPoint'];
       _poi.belongsTo = _nearestMile.id;
+      _poi.belongsToType = 'trail';
 
       // setup poi reference in waypoint
       if (!_anchorData['nearestWaypoint'].nearestToPois) {

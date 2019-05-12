@@ -72,13 +72,18 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
     }));
 
     // show settings on first load
-    const _firstRun = this._localStorage.retrieve('firstRun');
-    if (_firstRun) {
-      this._localStorage.store('firstRun', false);
-      const timeOut = setTimeout(() => {
-        _self._openSettingsDialog();
-      }, 250);
-    }
+    let _firstRun = this._localStorage.observe('firstRun').subscribe((result) => {
+
+      _firstRun.unsubscribe();
+      _firstRun = null;
+
+      if (result === true) {
+        setTimeout(() => {
+          _self._openSettingsDialog();
+          this._localStorage.store('firstRun', false);
+        }, 250);
+      }
+    });
 
     this._connectionService.startTracking();
     this.addEventListener(this._element.nativeElement, ['markerClick', 'offtrail', 'markerBack'] , this._onDialogEvent.bind(this), false);
@@ -174,6 +179,8 @@ export class AppComponent extends BaseComponent implements OnInit, OnDestroy {
 
   // settings dialog
   private _openSettingsDialog(): void {
+
+    console.log('open settings on first run');
 
     this._forceHideNavigation();
 

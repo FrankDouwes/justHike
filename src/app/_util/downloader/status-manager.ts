@@ -12,6 +12,7 @@ export class DownloaderStatus {
   }
 }
 
+// allows for listening to the status (http (the actual downloading), file (file parsing) and downloader (global))
 export class DownloaderStatusManager {
 
   public isActiveSubject: BehaviorSubject<boolean>;

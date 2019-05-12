@@ -1,6 +1,6 @@
 // UTILS for colors
 
-// get X (steps) colors inbetween 2 colors
+// get X (steps) colors between 2 colors
 export function interpolateColors(color1, color2, steps) {
 
   const stepFactor = 1 / (steps - 1),
@@ -36,26 +36,15 @@ export function shadeColor(color: string, percent: number): string {
     color = '#F00';
   }
 
-  // hex values
-  let R: number = parseInt(color.substring(1, 3), 16);
-  let G: number = parseInt(color.substring(3, 5), 16);
-  let B: number = parseInt(color.substring(5, 7), 16);
+  let rgbString = '';
 
-  // decimal values
-  R = parseInt(String(R * (100 + percent) / 100), 10);
-  G = parseInt(String(G * (100 + percent) / 100), 10);
-  B = parseInt(String(B * (100 + percent) / 100), 10);
+  // decimal to hex values
+  for (let i = 0; i < 3; i++) {
+    let _val: number = parseInt(color.substring(1 + (i * 2), 3 + (i * 2)), 16);
+    _val = parseInt(String(_val * (100 + percent) / 100), 10);
+    _val = (_val < 255) ? _val : 255;
+    rgbString += ((_val.toString(16).length === 1) ? '0' + _val.toString(16) : _val.toString(16));
+  }
 
-  // take care of max values
-  R = (R < 255) ? R : 255;
-  G = (G < 255) ? G : 255;
-  B = (B < 255) ? B : 255;
-
-  // create a hex value, both values of the different channels are always the same value 77 CC FF etc,
-  // as the shade does not affect the color
-  const RR = ((R.toString(16).length === 1) ? '0' + R.toString(16) : R.toString(16));
-  const GG = ((G.toString(16).length === 1) ? '0' + G.toString(16) : G.toString(16));
-  const BB = ((B.toString(16).length === 1) ? '0' + B.toString(16) : B.toString(16));
-
-  return '#' + RR + GG + BB;
+  return '#' + rgbString;
 }

@@ -22,6 +22,7 @@ export class PopupComponent implements OnInit {
   @Input() description:     string;
 
   @Input() belongsTo:       number;     // always belong to a mile.
+  @Input() belongsToType:   'trail' | 'poi' | 'town' = 'trail';
 
   @Input() showCoords:      boolean;
   @Input() timer:           TimerObj;   // popups have a timer that hides/destroys them
@@ -77,7 +78,7 @@ export class PopupComponent implements OnInit {
       waypoint:         _waypoint,
       anchorPoint:      _anchorPoint,
       belongsTo:        this.belongsTo,
-      belongsToType:    'mile'
+      belongsToType:    this.belongsToType
     };
 
     this._dialogFactory.openDialog('note', _dialogProperties, _callback);

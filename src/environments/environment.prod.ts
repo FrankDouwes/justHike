@@ -3,7 +3,8 @@ export const environment = {
   production: true,
   simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
-  version: '1.0',     // current application version that settings belong to (in case of update to settings structure)
+  version: '1.0',                 // current application version that settings belong to (in case of update to settings structure)
+  betaEndTime: 1577750400000,        // the end date of the beta 31/12 TODO: BETA FLAG, remove for release
 
   // FILES
   // PRODUCTION SERVER:

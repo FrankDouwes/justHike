@@ -78,7 +78,7 @@ export class FilesystemService  {
           });
         } else {
           resolve(false);
-          alert('No filesystem available, use chrome or do a cordova build (iOS/Android)');
+          console.warn('No filesystem available, use chrome or do a cordova build (iOS/Android)');
         }
       }
     });

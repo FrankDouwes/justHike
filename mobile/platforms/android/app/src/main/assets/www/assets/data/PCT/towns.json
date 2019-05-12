@@ -1,554 +1,581 @@
 [
   {
     "id": 0,
-    "name": "Campo, CA",
+    "label": "Campo, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 32.607582,
       "longitude": -116.469732
     },
-    "pois": [],
-    "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
-    }
+    "pois": []
   },
   {
     "id": 1,
-    "name": "Morena Village",
+    "label": "Morena Village",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 32.679383,
       "longitude": -116.505438
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 32.682597,
+      "longitude": -116.516642
     }},
   {
     "id": 2,
-    "name": "Mt. Laguna",
+    "label": "Mt. Laguna",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 32.867469,
       "longitude": -116.418793
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 32.871248,
+      "longitude": -116.415299
     }
   },
   {
     "id": 3,
-    "name": "Stagecoach Trails RV Resort",
+    "label": "Stagecoach Trails RV Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.060419,
       "longitude": -116.424933
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.093543,
+      "longitude": -116.462592
     }
   },
   {
     "id": 4,
-    "name": "Julian",
+    "label": "Julian",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.078344,
       "longitude": -116.602072
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.097703,
+      "longitude": -116.472981
     }
   },
   {
     "id": 5,
-    "name": "Warner Springs",
+    "label": "Warner Springs",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.283599,
       "longitude": -116.634486
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.273140,
+      "longitude": -116.645365
     }
   },
   {
     "id": 6,
-    "name": "Lake Henshaw Resort",
+    "label": "Lake Henshaw Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.232029,
       "longitude": -116.760122
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.273140,
+      "longitude": -116.645365
     }
   },
   {
     "id": 7,
-    "name": "Santa Ysabel, CA",
+    "label": "Santa Ysabel, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.109179,
       "longitude": -116.673795
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.273140,
+      "longitude": -116.645365
     }
   },
   {
     "id": 8,
-    "name": "Paradise Valley Café",
+    "label": "Paradise Valley Café",
+    "type": "food",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.569027,
       "longitude": -116.591365
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.563105,
+      "longitude": -116.576928
     }
   },
   {
     "id": 9,
-    "name": "Idyllwild, CA",
+    "label": "Idyllwild, CA (TODO: multiple entries)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.745268,
       "longitude": -116.713677
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.774279, 
+      "longitude": -116.673063
     }
   },
   {
     "id": 10,
-    "name": "Cabazon, CA",
+    "label": "Cabazon, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 33.921772,
       "longitude": -116.805486
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 33.924498,
+      "longitude": -116.694657
     }
   },
   {
     "id": 11,
-    "name": "Big Bear City, CA (TODO: double access)",
+    "label": "Big Bear City, CA (TODO: double access)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.264414,
+      "longitude": -116.846140
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.290557, 
+      "longitude": -116.802824
     }
   },
   {
     "id": 12,
-    "name": "Cajon Pass / Interstate (fast food)",
+    "label": "Cajon Pass / Interstate (fast food)",
+    "type": "food",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 334.309423, 
+      "longitude": -117.470401
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.306070, 
+      "longitude": -117.466133
     }
   },
   {
     "id": 13,
-    "name": "Wrightwood, CA (TODO: double access)",
+    "label": "Wrightwood, CA (TODO: double access)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.361267,
+      "longitude": -117.633641
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.372330,
+      "longitude": -117.710076
     }
   },
   {
     "id": 14,
-    "name": "Acton CA",
+    "label": "Acton CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.468119,
+      "longitude": -118.197201
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.437553,
+      "longitude": -118.272847
     }
   },
   {
     "id": 15,
-    "name": "Agua Dulce, CA",
+    "label": "Agua Dulce, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.496353,
+      "longitude": -118.326223
     },
-    "pois": [],
-    "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
-    }
-  },
-  {
+    "pois": []
+  },{
     "id": 16,
-    "name": "Andersons (trail angels)",
+    "label": "Hiker Heaven (the Saufley's)",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.496661,
+      "longitude": -118.343155
     },
-    "pois": [],
-    "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
-    }
+    "pois": []
   },
   {
     "id": 17,
-    "name": "Lake Hughes",
+    "label": "Casa De Luna (the Anderson's)",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.619214, 
+      "longitude": -118.410036
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.634476,
+      "longitude":  -118.390036
     }
   },
   {
     "id": 18,
-    "name": "Hikertown",
+    "label": "Lake Hughes",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.675157,
+      "longitude": -118.440754
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.659680,
+      "longitude":  -118.460444
     }
   },
   {
     "id": 19,
-    "name": "Iberdrola Wind Farm",
+    "label": "Hikertown",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.776446, 
+      "longitude": -118.605942
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.775842,
+      "longitude": -118.607018
     }
   },
   {
     "id": 20,
-    "name": "Mojave, CA (TODO: dual access)",
+    "label": "Iberdrola Renewables, Manzana Wind Project office",
+    "type": "postoffice",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 34.919449,
+      "longitude": -118.446964
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 34.916999,
+      "longitude": -118.467267
     }
   },
   {
     "id": 21,
-    "name": "Tehachapi, CA (TODO: dual access)",
+    "label": "Mojave, CA (TODO: dual access)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 35.049790,
+      "longitude": -118.172790
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 35.099368,
+      "longitude":  -118.292967
     }
   },
   {
     "id": 22,
-    "name": "Onyx, CA",
+    "label": "Tehachapi, CA (TODO: dual access)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 35.131725,
+      "longitude": -118.444708
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 35.099368,
+      "longitude":  -118.292967
     }
   },
   {
     "id": 23,
-    "name": "Weldon, CA",
+    "label": "Onyx, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 35.693209,
+      "longitude":  -118.223448
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 35.662835,
+      "longitude": -118.026733
     }
   },
   {
     "id": 24,
-    "name": "Lake Isabella",
+    "label": "Weldon, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 35.648574,
+      "longitude": -118.359576
     },
     "pois": [],
-    "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+     "anchorPoint": {
+      "latitude": 35.662835,
+      "longitude": -118.026733
     }
   },
   {
     "id": 25,
-    "name": "Kennedy Meadows, CA",
+    "label": "Lake Isabella",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 35.618396,
+      "longitude": -118.477349
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 35.662835,
+      "longitude": -118.026733
     }
   },
   {
     "id": 26,
-    "name": "Lone Pine, CA (TODO: dual access)",
+    "label": "Kennedy Meadows, CA",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 36.018057, 
+      "longitude": -118.122433
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 36.023616,
+      "longitude": -118.134200
     }
   },
   {
     "id": 27,
-    "name": "Independence, CA",
+    "label": "Lone Pine, CA (TODO: dual access)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 36.604321,
+      "longitude": -118.062738
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 36.427114, 
+      "longitude": -118.176361
     }
   },
   {
     "id": 28,
-    "name": "Bishop, CA",
+    "label": "Independence, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 36.801574,
+      "longitude": -118.199092
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 36.769422, 
+      "longitude": -118.411540
     }
   },
   {
     "id": 29,
-    "name": "Muir Trail Ranch",
+    "label": "Bishop, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.363371, 
+      "longitude": -118.395263
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 36.769422, 
+      "longitude": -118.411540
     }
   },
   {
     "id": 30,
-    "name": "Vermilion Valley Resort",
+    "label": "Muir Trail Ranch",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.238078,
+      "longitude": -118.883187
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 37.225875,
+      "longitude": -118.861300
     }
   },
   {
     "id": 31,
-    "name": "Mono Hot Springs",
+    "label": "Vermilion Valley Resort (TODO: multiple ways to get here)",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.376221,
+      "longitude": -119.011934
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 37.382532,
+      "longitude": -118.910404
     }
   },
   {
     "id": 32,
-    "name": "Reds Meadows, CA",
+    "label": "Mono Hot Springs",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.327035,
+      "longitude": -119.017599
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 37.382532, 
+      "longitude": -118.910404
     }
   },
   {
     "id": 33,
-    "name": "Mammoth Lakes, CA",
+    "label": "Reds Meadows, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.614807, 
+      "longitude": -119.075088
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 37.611984, 
+      "longitude": -119.076920
     }
   },
   {
     "id": 34,
-    "name": "Tuolumne Meadows, CA",
+    "label": "Mammoth Lakes, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.647553, 
+      "longitude": -118.969309
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 37.611984, 
+      "longitude": -119.076920
     }
   },
   {
     "id": 35,
-    "name": "Lee Vining, CA",
+    "label": "Tuolumne Meadows, CA",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.874485, 
+      "longitude": -119.357106
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 37.872034, 
+      "longitude": -119.370489
     }
   },
   {
     "id": 36,
-    "name": "Kennedy Meadows Resort (north)",
+    "label": "Lee Vining, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 37.957624,
+      "longitude": -119.119943
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 37.872034, 
+      "longitude": -119.370489
     }
   },
   {
     "id": 37,
-    "name": "Bridgeport, CA",
+    "label": "Kennedy Meadows Resort (north)",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 38.311407,
+      "longitude": -119.745951
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 38.328167,
+      "longitude": -119.637288
     }
   },
   {
     "id": 38,
-    "name": "Walker, CA",
+    "label": "Bridgeport, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
-      "latitude": 1,
-      "longitude": 1
+    "waypoint": {
+      "latitude": 38.255935, 
+      "longitude": -119.227586
     },
     "pois": [],
     "anchorPoint": {
-      "latitude": 1,
-      "longitude": 1
+      "latitude": 38.327988,
+      "longitude": -119.637278
     }
   },
   {
     "id": 39,
-    "name": "Markleeville, CA",
+    "label": "Walker, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -560,9 +587,10 @@
   },
   {
     "id": 40,
-    "name": "Echo Lake, CA",
+    "label": "Markleeville, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -574,9 +602,10 @@
   },
   {
     "id": 41,
-    "name": "South Lake Tahoe",
+    "label": "Echo Lake, CA",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -588,9 +617,10 @@
   },
   {
     "id": 42,
-    "name": "Tahoe City, CA",
+    "label": "South Lake Tahoe",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -602,9 +632,10 @@
   },
   {
     "id": 43,
-    "name": "TODO: DUAL - Truckee, CA (interstate 80, Exit 158 & Old Towne)",
+    "label": "Tahoe City, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -616,9 +647,10 @@
   },
   {
     "id": 44,
-    "name": "Soda Springs, CA",
+    "label": "Truckee, CA (TODO: DUAL interstate 80, Exit 158 & Old Towne)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -630,9 +662,10 @@
   },
   {
     "id": 45,
-    "name": "Sierra City, CA",
+    "label": "Soda Springs, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -644,9 +677,10 @@
   },
   {
     "id": 46,
-    "name": "Bucks Lake (on alternate)",
+    "label": "Sierra City, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -658,9 +692,10 @@
   },
   {
     "id": 47,
-    "name": "Braatens (trail angels) (Belden, CA)",
+    "label": "Bucks Lake (on alternate)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -672,9 +707,10 @@
   },
   {
     "id": 48,
-    "name": "Caribou Crossroads (Belden, CA)",
+    "label": "Braatens (trail angels) (Belden, CA)",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -686,9 +722,10 @@
   },
   {
     "id": 49,
-    "name": "Belden Town Resort",
+    "label": "Caribou Crossroads (Belden, CA)",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -700,9 +737,10 @@
   },
   {
     "id": 50,
-    "name": "Quincy, CA",
+    "label": "Belden Town Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -714,9 +752,10 @@
   },
   {
     "id": 51,
-    "name": "Chester, CA",
+    "label": "Quincy, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -728,9 +767,10 @@
   },
   {
     "id": 52,
-    "name": "Drakesbad Guest Ranch",
+    "label": "Chester, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -742,9 +782,10 @@
   },
   {
     "id": 53,
-    "name": "Old Station PO and Hat Creek Store",
+    "label": "Drakesbad Guest Ranch",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -756,9 +797,10 @@
   },
   {
     "id": 54,
-    "name": "Old Station Fill-Up / Rim Rock Ranch",
+    "label": "Old Station PO and Hat Creek Store",
+    "type": "postoffice",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -770,9 +812,10 @@
   },
   {
     "id": 55,
-    "name": "Burney Mountain Guest Ranch",
+    "label": "Old Station Fill-Up / Rim Rock Ranch",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -784,9 +827,10 @@
   },
   {
     "id": 56,
-    "name": "Burney, CA",
+    "label": "Burney Mountain Guest Ranch",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -798,9 +842,10 @@
   },
   {
     "id": 57,
-    "name": "Burney Falls State Park",
+    "label": "Burney, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -812,9 +857,10 @@
   },
   {
     "id": 58,
-    "name": "Castella, CA",
+    "label": "Burney Falls State Park",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -826,9 +872,10 @@
   },
   {
     "id": 59,
-    "name": "Dunsmuir, CA",
+    "label": "Castella, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -840,9 +887,10 @@
   },
   {
     "id": 60,
-    "name": "Mt. Shasta, CA",
+    "label": "Dunsmuir, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -854,9 +902,10 @@
   },
   {
     "id": 61,
-    "name": "Callahan, CA",
+    "label": "Mt. Shasta, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -868,9 +917,10 @@
   },
   {
     "id": 62,
-    "name": "Etna, CA",
+    "label": "Callahan, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -882,9 +932,10 @@
   },
   {
     "id": 63,
-    "name": "Seiad Valley, CA",
+    "label": "Etna, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -896,9 +947,10 @@
   },
   {
     "id": 64,
-    "name": "Callahan's Lodge",
+    "label": "Seiad Valley, CA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -910,9 +962,10 @@
   },
   {
     "id": 65,
-    "name": "Ashland, OR",
+    "label": "Callahan's Lodge",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -924,9 +977,10 @@
   },
   {
     "id": 66,
-    "name": "Green Springs Inn",
+    "label": "Ashland, OR",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -938,9 +992,10 @@
   },
   {
     "id": 67,
-    "name": "Hyatt Lake Resort",
+    "label": "Green Springs Inn",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -952,9 +1007,10 @@
   },
   {
     "id": 68,
-    "name": "Fish Lake Resort",
+    "label": "Hyatt Lake Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -966,9 +1022,10 @@
   },
   {
     "id": 69,
-    "name": "Lake in the Woods Resort",
+    "label": "Fish Lake Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -980,9 +1037,10 @@
   },
   {
     "id": 70,
-    "name": "Crater Lake Mazama Village",
+    "label": "Lake in the Woods Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -994,9 +1052,10 @@
   },
   {
     "id": 71,
-    "name": "Crater Lake Rim Village (TODO: PO?)",
+    "label": "Crater Lake Mazama Village",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1008,9 +1067,10 @@
   },
   {
     "id": 72,
-    "name": "Diamond Lake Resort",
+    "label": "Crater Lake Rim Village (TODO: PO?)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1022,9 +1082,10 @@
   },
   {
     "id": 73,
-    "name": "Sherter Cove Resort",
+    "label": "Diamond Lake Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1036,9 +1097,10 @@
   },
   {
     "id": 74,
-    "name": "Crescent Lake, OR",
+    "label": "Sherter Cove Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1050,9 +1112,10 @@
   },
   {
     "id": 75,
-    "name": "Elk Lake Resort",
+    "label": "Crescent Lake, OR",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1064,9 +1127,10 @@
   },
   {
     "id": 76,
-    "name": "Bend, OR (TODO: dual access)",
+    "label": "Elk Lake Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1078,9 +1142,10 @@
   },
   {
     "id": 77,
-    "name": "Sisters, OR (TODO: dual access)",
+    "label": "Bend, OR (TODO: dual access)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1092,9 +1157,10 @@
   },
   {
     "id": 78,
-    "name": "Big Lake Youth Camp",
+    "label": "Sisters, OR (TODO: dual access)",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1106,9 +1172,10 @@
   },
   {
     "id": 79,
-    "name": "Olallie Lake Resort",
+    "label": "Big Lake Youth Camp",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1120,9 +1187,10 @@
   },
   {
     "id": 80,
-    "name": "Government Camp, OR",
+    "label": "Olallie Lake Resort",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1134,9 +1202,10 @@
   },
   {
     "id": 81,
-    "name": "Sandy, OR",
+    "label": "Government Camp, OR",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1148,9 +1217,10 @@
   },
   {
     "id": 82,
-    "name": "Timberline Lodge",
+    "label": "Sandy, OR",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1162,9 +1232,10 @@
   },
   {
     "id": 83,
-    "name": "Cascade Locks, OR",
+    "label": "Timberline Lodge",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1176,9 +1247,10 @@
   },
   {
     "id": 84,
-    "name": "Stevenson, WA",
+    "label": "Cascade Locks, OR",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1190,9 +1262,10 @@
   },
   {
     "id": 85,
-    "name": "Hood River, OR",
+    "label": "Stevenson, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1204,9 +1277,10 @@
   },
   {
     "id": 86,
-    "name": "Trout Lake, WA",
+    "label": "Hood River, OR",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1218,9 +1292,10 @@
   },
   {
     "id": 87,
-    "name": "White Pass, WA",
+    "label": "Trout Lake, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1232,9 +1307,10 @@
   },
   {
     "id": 88,
-    "name": "Packwood, WA",
+    "label": "White Pass, WA",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1246,9 +1322,10 @@
   },
   {
     "id": 89,
-    "name": "Snoqualmie Pass, WA",
+    "label": "Packwood, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1260,9 +1337,10 @@
   },
   {
     "id": 90,
-    "name": "Stevens Pass Ski Area",
+    "label": "Snoqualmie Pass, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1274,9 +1352,10 @@
   },
   {
     "id": 91,
-    "name": "Skykomish, WA",
+    "label": "Stevens Pass Ski Area",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1288,9 +1367,10 @@
   },
   {
     "id": 92,
-    "name": "Dinsmores (trail angels)",
+    "label": "Skykomish, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1302,9 +1382,10 @@
   },
   {
     "id": 93,
-    "name": "Leavenworth, WA",
+    "label": "Dinsmores (trail angels)",
+    "type": "resort",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1316,9 +1397,10 @@
   },
   {
     "id": 94,
-    "name": "Stehekin, WA",
+    "label": "Leavenworth, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1330,9 +1412,10 @@
   },
   {
     "id": 95,
-    "name": "Chelan, WA",
+    "label": "Stehekin, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1344,9 +1427,10 @@
   },
   {
     "id": 96,
-    "name": "Winthrop, WA",
+    "label": "Chelan, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1358,9 +1442,10 @@
   },
   {
     "id": 97,
-    "name": "Mazama, WA",
+    "label": "Winthrop, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },
@@ -1372,9 +1457,25 @@
   },
   {
     "id": 98,
-    "name": "Manning Park",
+    "label": "Mazama, WA",
+    "type": "town",
     "radius": 1,
-    "centerPoint": {
+    "waypoint": {
+      "latitude": 1,
+      "longitude": 1
+    },
+    "pois": [],
+    "anchorPoint": {
+      "latitude": 1,
+      "longitude": 1
+    }
+  },
+  {
+    "id": 99,
+    "label": "Manning Park",
+    "type": "resort",
+    "radius": 1,
+    "waypoint": {
       "latitude": 1,
       "longitude": 1
     },

@@ -12,6 +12,7 @@ import {User} from '../../type/user';
 import {LocalStorageService} from 'ngx-webstorage';
 import {NoteService} from '../../service/note.service';
 import {Town} from '../../type/town';
+import {Note} from '../../type/note';
 
 @Component({
   selector: 'poi-list',
@@ -69,24 +70,29 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       }));
 
     this.addSubscription('note', this._noteService.noteUpdateObserver.subscribe(function(update) {
-      if (update === 'added') {
 
-        const _lastAddedNote: Poi = _self._noteService.getLastNote();
-        const _newCombinedData: Array<any> = _self.combinedData.getValue();
-        _newCombinedData.push(_lastAddedNote);
-        _self._sortListData(_newCombinedData);
+      const _lastNote: Poi = _self._noteService.getLastNote();
 
-      } else if (update === 'removed') {
+      if (_lastNote.belongsToType === 'trail') {
 
-        const _deletedNote: Poi = _self._noteService.getLastNote();
-        const _data: Array<any> = _self.combinedData.getValue();
+        if (update === 'added') {
 
-        const _length = _data.length;
-        for(let i = 0; i < _length; i++) {
-          if (_data[i].id === _deletedNote.id) {
-            _data.splice(i, 1);
-            _self._sortListData(_data);
-            break;
+          const _newCombinedData: Array<any> = _self.combinedData.getValue();
+          _newCombinedData.push(_lastNote);
+          _self._sortListData(_newCombinedData);
+
+        } else if (update === 'removed') {
+
+          const _deletedNote: Poi = _self._noteService.getLastNote();
+          const _data: Array<any> = _self.combinedData.getValue();
+
+          const _length = _data.length;
+          for (let i = 0; i < _length; i++) {
+            if (_data[i].id === _deletedNote.id) {
+              _data.splice(i, 1);
+              _self._sortListData(_data);
+              break;
+            }
           }
         }
       }
@@ -183,7 +189,8 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       let _array = this._staticPoisArray.concat(_userRef);
 
-      const _notes = this._noteService.getFlatNotesArray();
+      const _notes: Array<Note> = this._noteService.getFlatNotesArray('trail');
+
       if (_notes) {
         _array = _array.concat(_notes);
       }
@@ -214,7 +221,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
   public onUserLocationChange(user: User): void {
 
-    const _notes = this._noteService.getFlatNotesArray();
+    const _notes = this._noteService.getFlatNotesArray('trail');
     let _poisArray: Array<Poi>;
 
     // // if tracking
