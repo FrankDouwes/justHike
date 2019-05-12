@@ -1,7 +1,7 @@
 # JustHike
 
 RELEASES:
-BETA 1 released to first group of testers on: April 10th 2019.
+BETA 1 released to first group of testers on: April 10th 2019.<br/>
 BETA 2 ETA. May 15th?
 
 ----- ----- ----- ----- ----
