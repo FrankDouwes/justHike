@@ -73,7 +73,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       const _lastNote: Poi = _self._noteService.getLastNote();
 
-      if (_lastNote.belongsToType === 'trail') {
+      if (_lastNote && _lastNote.belongsToType === 'trail') {
 
         if (update === 'added') {
 
@@ -212,7 +212,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
   public onStatusChange(status: string): void {
 
     // if we're switching to tracking
-    if (this._userStatus && this._userStatus !== 'tracking' && status === 'tracking') {
+    if (this._userStatus !== undefined && this._userStatus !== 'tracking' && status === 'tracking') {
       this.centerOnUser();
     }
     this._userStatus = this.status;
@@ -309,7 +309,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       const _delay = window.requestAnimationFrame(function() {
 
-        const _padding = _self.itemSize * 2;    // this makes sure the user list item is fully on screen, therefor the poi/mile index is correct
+        const _padding = _self.itemSize * 1.5;    // this makes sure the user list item is fully on screen, therefor the poi/mile index is correct
         let _verticalOffset = _padding;
 
         if (_self.directionReversal) {
@@ -332,7 +332,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     let _activeMile: Mile;
 
     // find the first mile containing a poi
-    for (let i = this.activeMileId - 1; i < trailLength; i++) {
+    for (let i = this.activeMileId; i < trailLength; i++) {
 
       if (i > -1) {
 
@@ -347,7 +347,7 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       return;
     }
 
-    let _middlePoi: number = _activeMile.pois[Math.floor(_activeMile.pois.length - 1)];
+    let _middlePoi: number = _activeMile.pois[Math.floor(_activeMile.pois.length - 1)] + 4;
 
     const _delay = window.requestAnimationFrame(function () {
 
@@ -366,15 +366,13 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
       const _total = (_middlePoi === 0) ? 1 : _middlePoi * _self.itemSize;
 
       _self.container.scrollToIndex(_middlePoi, 'auto');
-      _self.container.scrollToOffset(_total, 'auto');
+      //_self.container.scrollToOffset(_total, 'auto');
 
       window.cancelAnimationFrame(_delay);       // probably not needed
     });
   }
 
   public onScroll(event): void {
-
-    console.log('poi list scrolled');
 
     if (this.combinedData.getValue().length < 1) {
       return; // no data
@@ -387,8 +385,9 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     const _renderedMiles: Array<number> = [];
 
     // get the offset
-    const _renderedOffset = this.container.measureScrollOffset('top');
+    const _direction = this.trailGenerator.getTrailData().direction;
 
+    const _renderedOffset = this.container.measureScrollOffset('top');
     const _firstIndex = Math.floor(_renderedOffset / this.itemSize);
 
     // using 8 instead of 7 to compensate for the possibility that there is a user visible in list data
@@ -409,13 +408,24 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
     }
 
     // const _firstPoiId: number = (this.directionReversal) ? _renderedIndexes[_renderedIndexes.length - 1] : _renderedIndexes[0];
-    const _firstPoi = this.combinedData.getValue()[_renderedIndexes[0]];
 
-    if (!_firstPoi) {
+    // decide mileId based on range
+    const _firstPoi: Poi = this.combinedData.getValue()[_renderedIndexes[0]];
+    const _lastPoi: Poi = this.combinedData.getValue()[_renderedIndexes[_renderedIndexes.length -1]];
+
+    if (!_firstPoi || !_lastPoi) {
       return;
     }
 
-    const _mile = this.trailGenerator.getTrailData().miles[_firstPoi['belongsTo'] - 1];
+    let position = 0;
+    const _difference = (_direction === 0) ? _firstPoi.belongsTo - _lastPoi.belongsTo : _lastPoi.belongsTo - _firstPoi.belongsTo;
+    if (_direction === 0) {
+      position = _lastPoi.belongsTo + Math.floor(_difference / 2);
+    } else {
+      position = _firstPoi.belongsTo + Math.floor(_difference / 2);
+    }
+
+    const _mile = this.trailGenerator.getTrailData().miles[position - 1];
     this.scrollToEvent.emit({mileId: _mile.id, renderedPoiRange: _renderedPois, renderedMileRange: _renderedMiles});
   }
 

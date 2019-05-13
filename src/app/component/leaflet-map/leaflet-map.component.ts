@@ -143,12 +143,12 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
 
     // TODO: needs a if rendered mile check
-    // const _appRoot = document.getElementsByTagName('app-root')[0];
-    // this.addEventListener(_appRoot, ['markerClick'] , function(event: Event) {
-    //   if (event['detail'] && event['detail'].waypoint) {
-    //     _self._centerOnPoint(event['detail'].waypoint, true);
-    //   }
-    // }, false);
+    const _appRoot = document.getElementsByTagName('app-root')[0];
+    this.addEventListener(_appRoot, ['markerClick'] , function(event: Event) {
+      if (event['detail'] && event['detail'].waypoint) {
+        _self._centerOnPoint(event['detail'].waypoint, true);
+      }
+    }, false);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -202,15 +202,24 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       return;
     }
 
+    const _showRetinaTiles: boolean = this._localStorageService.retrieve('detectRetina');
+
     // create the tile layer (deals with online / offline / missing tiles)
     if (this.showMapTiles) {
       const _url = this._generateTileUrl();
-      this._tileLayers.push(createMapTileLayer(_url, this._localStorageService.retrieve('detectRetina')));
+      const _1stLayer = createMapTileLayer(_url, 15, _showRetinaTiles);
+      this._tileLayers.push(_1stLayer);
     }
 
-    // grid layer is only shown on the full map, not the mini map
-    if (this.allowZooming && this._showMileGrid) {
-      this._tileLayers = this._tileLayers.concat(createGridLayer());
+    if (this.allowZooming) {
+      // add 2nd zoomed out layer
+      const _2ndTileLayer = createMapTileLayer('', 12, _showRetinaTiles);
+      this._tileLayers.push(_2ndTileLayer);
+
+      // grid layer is only shown on the full map, not the mini map
+      if (this._showMileGrid) {
+        this._tileLayers = this._tileLayers.concat(createGridLayer());
+      }
     }
 
     // setup the leaflet map
@@ -290,21 +299,31 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       }
     });
 
-    // TODO: incorporate zoomlevel 12 layer/tiles (to prevent loading lots of tiles)
+    /* when a user zooms out, render zoom layer 12, this is to prevent drawing a lot of images
+    which would be bad for performance/battery */
     this._map.on('zoom', function(){
 
       const _zoomLevel = _self._map.getZoom();
 
       if (_zoomLevel < 14 && _self._tileLayersVisible) {
         _self._tileLayers.forEach((layer) => {
-          layer.removeFrom(_self._map);
+
+          if (layer.options.name === 'layer_15') {
+            layer.removeFrom(_self._map);
+          } else if (layer.options.name === 'layer_12') {
+            layer.addTo(_self._map);
+          }
         });
 
         _self._tileLayersVisible = false;
 
       } else if (_zoomLevel >= 14 && !_self._tileLayersVisible) {
         _self._tileLayers.forEach((layer) => {
-          layer.addTo(_self._map);
+          if (layer.options.name === 'layer_15') {
+            layer.addTo(_self._map);
+          } else if (layer.options.name === 'layer_12') {
+            layer.removeFrom(_self._map);
+          }
         });
 
         _self._tileLayersVisible = true;
@@ -923,12 +942,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
           if (_marker.options.poi && this.poiRange.indexOf(_marker.options.poi.id) !== -1
             || _marker.options.mileNumber && this.mileRange.indexOf(Number(_marker.options.mileNumber)) !== -1) {
-
-            // console.log(_marker.options.mileNumber);
-            // if (_visibleMileCount < 7) {
-            //   _visibleMileCount++;
-              _bounds.push(_marker);
-            // }
+            _bounds.push(_marker);
           }
         }
       }
@@ -936,7 +950,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (_bounds.length > 0) {
 
-      console.log('set bounds');
       const _group = new L.featureGroup(_bounds, this.centerPoint);
 
       this._map.stop();
@@ -949,7 +962,6 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
   private _centerOnPoint(point: Waypoint, forceAnimate?: boolean): void {
 
-    console.log('center on point');
     if (!point) {
       return;
     }
@@ -967,6 +979,8 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
   }
 
   public centerOnUser(): void {
+
+    console.log('centerOnUser');
     if (this.user) {
       this._centerOnPoint(this.user.waypoint);
     }

@@ -15,19 +15,23 @@ export function createGPX(trailMeta: TrailMeta, flatTrailData: any): any {
     delete waypoint.distanceTotal;
     delete waypoint.nearestToPois;
     delete waypoint.distance;
-    waypoint['time'] = null;
+    waypoint['time'] = '';      // value gpx requires a time
   });
 
-  // split in 3 (Atlas generator cant handle lots of waypoints)
-  const _fileLength = Math.ceil(flatTrailData.length / 3);
-  const _arrays = _splitArray(flatTrailData, _fileLength);
   const _files: Array<any> = [];
 
-  _arrays.forEach(function(fileData) {
-    _files.push(createGpx(fileData, _gpxOptions));
-  });
+  // split in 3 (Atlas generator cant handle lots of waypoints)
+  if (trailMeta.abbr !== 'DEMO') {
 
-  _files.push(createGpx(flatTrailData, _gpxOptions));
+    const _fileLength = Math.ceil(flatTrailData.length / 3);
+    const _arrays = _splitArray(flatTrailData, _fileLength);
+
+    _arrays.forEach(function (fileData) {
+      _files.push(createGpx(fileData, _gpxOptions));
+    });
+  } else {
+    _files.push(createGpx(flatTrailData, _gpxOptions));
+  }
 
   return _files;
 }

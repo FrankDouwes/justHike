@@ -61,13 +61,13 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
       this.isTracking = (result === 'tracking');
     }));
 
-    const _appRoot = document.getElementsByTagName('app-root')[0];
-    this.addEventListener(_appRoot, ['markerClick'] , (event: Event) => {
-
-      if (event['detail'] && event['detail'].belongsTo) {
-        this.routedMile = event['detail'].belongsTo;
-      }
-    }, false);
+    // const _appRoot = document.getElementsByTagName('app-root')[0];
+    // this.addEventListener(_appRoot, ['markerClick'] , (event: Event) => {
+    //
+    //   if (event['detail'] && event['detail'].belongsTo) {
+    //     this.routedMile = event['detail'].belongsTo;
+    //   }
+    // }, false);
   }
 
 
@@ -82,7 +82,6 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
     /* updating queryParamams (this._router.navigate) seems to cause bugs over time on iOS,
     so i'm setting a property that will be used for the back button navigate call */
     // this._router.navigate(['.'], {relativeTo: this._route, queryParams: {back: this.routedMile}});
-
     this._router['scrollToPosition'] = this.routedMile;
   }
 
@@ -109,7 +108,7 @@ export class MileDetailComponent extends BaseComponent implements OnInit {
       this.visiblePoiRange = poiRange;
     }
 
-    mileId = (mileId === 0) ? 0 : mileId - 1;
+    mileId = (mileId === 0) ? 0 : mileId;
 
     this.centerPoint = this.trailData.miles[mileId].centerpoint as Waypoint;
   }
