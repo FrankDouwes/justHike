@@ -817,7 +817,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
           }
         }
 
-        _towns.push(this._assembleTownMarker(_town));
+        const _townMarker = this._assembleTownMarker(_town);
+        _townMarker.on('click', this._onMarkerClick.bind({data: _town, self: this}));
+        _towns.push(_townMarker);
       }
     }
 
