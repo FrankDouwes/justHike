@@ -226,7 +226,6 @@ export class NoteService implements OnDestroy {
         const _notesLength = this._notes.length;
         for (let n = 0; n < _notesLength; n++) {
           if (this._notes[n].belongsToType === belongsToType) {
-            console.log(this._notes[n].belongsTo);
             if (id && id === this._notes[n].belongsTo || !id) {
               if (!_typedNotes) {
                 _typedNotes = [];

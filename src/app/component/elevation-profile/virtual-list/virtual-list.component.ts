@@ -210,14 +210,12 @@ export class VirtualListComponent extends LocationBasedComponent implements OnIn
       self.itemWidth = Math.floor(Math.max(document.documentElement.clientWidth, window.innerWidth, window.outerWidth || 0) / 4.5);
       self.resize = new Date().getTime();
       self.resizeEvent.emit({resize: new Date().getTime()});
-      console.log('thorugh timer');
       self._redraw(force);
     }, 250);
   }
 
   public onScroll(viewport: CdkVirtualScrollViewport, index: number): void {
     this._currentIndex = index;
-    console.log('thorugh scroll');
     this._redraw();
   }
 

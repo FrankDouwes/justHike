@@ -396,11 +396,15 @@ export class PoiListComponent extends LocationBasedComponent implements OnInit, 
 
       const _poi: Poi | User | Town = this.combinedData.getValue()[i];
 
-      // filter out the user
-      if (_poi && _poi.type !== 'user') {
+      // filter out the user and towns
+      if (_poi && _poi.type !== 'user' && !_poi['radius']) {
         _renderedIndexes.push(i);
-        _renderedPois.push(_poi.id);
-        _renderedMiles.push(_poi['belongsTo']);
+        if (_renderedPois.indexOf(_poi.id) === -1) {
+          _renderedPois.push(_poi.id);
+        }
+        if (_renderedMiles.indexOf(_poi['belongsTo']) === -1) {
+          _renderedMiles.push(_poi['belongsTo']);
+        }
       }
     }
 

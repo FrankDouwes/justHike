@@ -217,7 +217,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 13.5,
+      minZoom: 13,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: this._tileLayers,
@@ -290,26 +290,26 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       }
     });
 
-    // TODO: incorporate zoomlevel 12 layer/tiles
-    // this._map.on('zoom', function(){
-    //
-    //   const _zoomLevel = _self._map.getZoom();
-    //
-    //   if (_zoomLevel < 13.5 && _self._tileLayersVisible) {
-    //     _self._tileLayers.forEach((layer) => {
-    //       layer.removeFrom(_self._map);
-    //     });
-    //
-    //     _self._tileLayersVisible = false;
-    //
-    //   } else if (_zoomLevel > 13.5 && !_self._tileLayersVisible) {
-    //     _self._tileLayers.forEach((layer) => {
-    //       layer.addTo(_self._map);
-    //     });
-    //
-    //     _self._tileLayersVisible = true;
-    //   }
-    // });
+    // TODO: incorporate zoomlevel 12 layer/tiles (to prevent loading lots of tiles)
+    this._map.on('zoom', function(){
+
+      const _zoomLevel = _self._map.getZoom();
+
+      if (_zoomLevel < 14 && _self._tileLayersVisible) {
+        _self._tileLayers.forEach((layer) => {
+          layer.removeFrom(_self._map);
+        });
+
+        _self._tileLayersVisible = false;
+
+      } else if (_zoomLevel >= 14 && !_self._tileLayersVisible) {
+        _self._tileLayers.forEach((layer) => {
+          layer.addTo(_self._map);
+        });
+
+        _self._tileLayersVisible = true;
+      }
+    });
   }
 
 
@@ -368,7 +368,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     let _nearestTown: Town;
     _closerToTown = false;
 
-    // check for towns TODO: B3
+    // check for towns TODO: enable for B3
     // if (this._trailGenerator.getTrailData().towns && this._trailGenerator.getTrailData().towns.length > 0) {
     //   const _nearestTownRef: Distance = this._trailGenerator.findNearestTown(_eLatLngAsWaypoint) as Distance;
     //   if (_nearestTownRef.distance < _nearestPoint.distance) {
@@ -454,10 +454,13 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       return;
     }
 
+    const _trailLength = this._trailGenerator.getTrailData().miles.length;
+
     // get visible miles
     const _relativeRange = {start: this.activeMileId - this.range['behind'], end: this.activeMileId + this.range['ahead']};
+
     const _oldmMilesToDelete: Array<number> = [];
-    const _newVisibleMiles: Array<number> = [];
+    let _newVisibleMiles: Array<number> = [];
 
     if (_relativeRange.start < _relativeRange.end - 9) {
       this._renderedCenterMileId = _relativeRange.start + Math.floor((_relativeRange.end - _relativeRange.start) / 2);
@@ -467,8 +470,34 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     // create range array (check for trail ends)
     for (let i = _relativeRange.start; i <= _relativeRange.end; i++) {
-      if (i >= 0 && i < this._trailGenerator.getTrailData().miles.length) {
+      if (i >= 0 && i < _trailLength) {
         _newVisibleMiles.push(i);
+      }
+    }
+
+    // always render at least 7 miles (if trail is shorter, show all)
+    if (_newVisibleMiles.length < 7) {
+      if (_trailLength < 7) {
+
+        // short trail
+        _newVisibleMiles = [];
+        for (let i = 0; i < _trailLength; i++) {
+          _newVisibleMiles.push(i);
+        }
+      } else {
+        // trail over 7 miles, check for start/end
+        if (_newVisibleMiles.indexOf(0) !== -1) {
+
+          // start of trail
+          _newVisibleMiles = [0, 1, 2, 3, 4, 5, 6]; // just force it
+
+        } else if (_newVisibleMiles.indexOf(_trailLength - 1) !== -1) {
+          // end of trail
+          _newVisibleMiles = [];
+          for (let i = _trailLength - 1; i > _trailLength - 1 - 6; i--) {
+            _newVisibleMiles.push(i);
+          }
+        }
       }
     }
 
@@ -486,10 +515,10 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
 
     this._drawMiles(_newVisibleMiles);
-    this._setBounds();
     this._removeMiles(_oldmMilesToDelete);
 
     this._visibleMiles = this._visibleMiles.concat(_newVisibleMiles);
+    this._setBounds();
   }
 
   // draw all mile data
@@ -895,10 +924,11 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
           if (_marker.options.poi && this.poiRange.indexOf(_marker.options.poi.id) !== -1
             || _marker.options.mileNumber && this.mileRange.indexOf(Number(_marker.options.mileNumber)) !== -1) {
 
-            if (_visibleMileCount < 7) {
-              _visibleMileCount++;
+            // console.log(_marker.options.mileNumber);
+            // if (_visibleMileCount < 7) {
+            //   _visibleMileCount++;
               _bounds.push(_marker);
-            }
+            // }
           }
         }
       }
@@ -906,23 +936,20 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (_bounds.length > 0) {
 
+      console.log('set bounds');
       const _group = new L.featureGroup(_bounds, this.centerPoint);
 
       this._map.stop();
 
-      // else center on the center mile of the rendered range.
-      // if (this._renderedCenterMileId === -1) {
-        this._map.fitBounds(_group.getBounds(), {animate: this._animateMap, duration: 0.5, maxZoom: 14.5, minZoom: 13.75});
-      // } else {
-      //   const _centerPoint = this._trailGenerator.getTrailData().miles[this._renderedCenterMileId].centerpoint;
-      //   this._map.panTo([_centerPoint.latitude, _centerPoint.longitude], {animate: this._animateMap, duration: 0.5, maxZoom: 16, minZoom: 13});
-      //   // this._map.setView([_centerPoint['latitude'], _centerPoint['longitude']], 13.75, {animate: this._animateMap, duration: 0.5, maxZoom: 16, minZoom: 13});
-      // }
+      // show bounds (based on pois in poi list), add padding if end of trail
+      let padding = (this._visibleMiles.indexOf(0) === -1 && this._visibleMiles.indexOf(this._trailGenerator.getTrailData().miles.length - 1) === -1) ? 0 : 0.25;
+      this._map.fitBounds(_group.getBounds().pad(padding), {animate: this._animateMap, duration: 0.5, maxZoom: 16, minZoom: 13.25});
     }
   }
 
   private _centerOnPoint(point: Waypoint, forceAnimate?: boolean): void {
 
+    console.log('center on point');
     if (!point) {
       return;
     }
@@ -935,7 +962,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
         _animate = forceAnimate;
       }
 
-      this._map.panTo([point.latitude, point.longitude], {animate: _animate, duration: 0.5, maxZoom: 14.5, minZoom: 13.75});
+      this._map.panTo([point.latitude, point.longitude], {animate: _animate, duration: 0.5, maxZoom: 16, minZoom: 13.25});
     }
   }
 

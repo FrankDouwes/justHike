@@ -52,8 +52,6 @@ export class DynamicItemComponent implements OnInit, OnDestroy, OnChanges {
 
     if (changes.data) {
 
-      console.log(changes.data);
-
       if (changes.data.currentValue.type !== this._instance.data.type) {
 
         this.isHidden = (this.data['type'].includes('offtrail'));

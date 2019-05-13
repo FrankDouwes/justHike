@@ -2,7 +2,6 @@ import {Waypoint} from './waypoint';
 import {Poi} from './poi';
 
 export interface Town {
-
   trail:              string;             // abbr. of trail mile belongs to
   id:                 number;             // id (mile number, starts at 1 not 0)
   label:              string;             // town name
