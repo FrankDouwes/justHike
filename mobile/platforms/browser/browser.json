@@ -20,14 +20,7 @@
       "AndroidManifest.xml": {
         "parents": {
           "/manifest/application/activity": [],
-          "/manifest/application/activity[@android:name='MainActivity']": [
-            {
-              "xml": "<activity android:name=\"MainActivity\" android:windowSoftInputMode=\"adjustPan\" />",
-              "count": 1,
-              "mode": "merge",
-              "id": "config.xml"
-            }
-          ]
+          "/manifest/application/activity[@android:name='MainActivity']": []
         }
       },
       "config.xml": {
@@ -80,6 +73,9 @@
       "PACKAGE_NAME": "hike.frankdouwes.com"
     },
     "cordova-plugin-ionic-webview": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-ionic-keyboard": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
     }
   },
@@ -413,6 +409,7 @@
     "cordova-plugin-splashscreen": "5.0.3-dev",
     "cordova-plugin-dialogs": "2.0.1",
     "cordova-plugin-device": "2.0.2",
-    "cordova-plugin-ionic-webview": "4.0.1"
+    "cordova-plugin-ionic-webview": "4.0.1",
+    "cordova-plugin-ionic-keyboard": "2.1.3"
   }
 }

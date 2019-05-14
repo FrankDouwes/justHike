@@ -113,6 +113,8 @@ export class TrailGeneratorService {
     delete this._trailData['dataPath'];
     delete this._trailData['dataPath'];
     delete this._trailData['waypointsPerMile'];
+    delete this._trailData['parts'];
+    delete this._trailData['multipart'];
 
     this._trailData.direction = direction;
 
@@ -166,7 +168,7 @@ export class TrailGeneratorService {
 
     // 5. Towns
     this._trailData.towns = this._calculateTownsAnchorPoints(towns);
-    // todo: add pois to towns
+    // TODO: add pois to towns
 
     return this._trailData;
   }

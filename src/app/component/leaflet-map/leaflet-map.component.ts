@@ -203,17 +203,17 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     }
 
     const _showRetinaTiles: boolean = this._localStorageService.retrieve('detectRetina');
+    const _url = this._generateTileUrl();
 
     // create the tile layer (deals with online / offline / missing tiles)
     if (this.showMapTiles) {
-      const _url = this._generateTileUrl();
       const _1stLayer = createMapTileLayer(_url, 15, _showRetinaTiles);
       this._tileLayers.push(_1stLayer);
     }
 
     if (this.allowZooming) {
       // add 2nd zoomed out layer
-      const _2ndTileLayer = createMapTileLayer('', 12, _showRetinaTiles);
+      const _2ndTileLayer = createMapTileLayer(_url, 12, _showRetinaTiles);
       this._tileLayers.push(_2ndTileLayer);
 
       // grid layer is only shown on the full map, not the mini map
@@ -226,7 +226,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     this._map = new L.map('leaflet_' + this.name, {
       minNativeZoom: 15,
       maxNativeZoom: 15,
-      minZoom: 13,
+      minZoom: 12.5,
       maxZoom: 16,
       zoomControl: false, attributionControl: false,
       layers: this._tileLayers,
@@ -301,34 +301,37 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     /* when a user zooms out, render zoom layer 12, this is to prevent drawing a lot of images
     which would be bad for performance/battery */
-    this._map.on('zoom', function(){
-
-      const _zoomLevel = _self._map.getZoom();
-
-      if (_zoomLevel < 14 && _self._tileLayersVisible) {
-        _self._tileLayers.forEach((layer) => {
-
-          if (layer.options.name === 'layer_15') {
-            layer.removeFrom(_self._map);
-          } else if (layer.options.name === 'layer_12') {
-            layer.addTo(_self._map);
-          }
-        });
-
-        _self._tileLayersVisible = false;
-
-      } else if (_zoomLevel >= 14 && !_self._tileLayersVisible) {
-        _self._tileLayers.forEach((layer) => {
-          if (layer.options.name === 'layer_15') {
-            layer.addTo(_self._map);
-          } else if (layer.options.name === 'layer_12') {
-            layer.removeFrom(_self._map);
-          }
-        });
-
-        _self._tileLayersVisible = true;
-      }
+    this._map.on('zoom', function() {
+      _self._onMapZoom();
     });
+  }
+
+  private _onMapZoom(): void {
+    const _zoomLevel = this._map.getZoom();
+
+    if (_zoomLevel < 13.25 && this._tileLayersVisible) {
+      this._tileLayers.forEach((layer) => {
+
+        if (layer.options.name === 'layer_15') {
+          layer.removeFrom(this._map);
+        } else if (layer.options.name === 'layer_12') {
+          layer.addTo(this._map);
+        }
+      });
+
+      this._tileLayersVisible = false;
+
+    } else if (_zoomLevel >= 13.25 && !this._tileLayersVisible) {
+      this._tileLayers.forEach((layer) => {
+        if (layer.options.name === 'layer_15') {
+          layer.addTo(this._map);
+        } else if (layer.options.name === 'layer_12') {
+          layer.removeFrom(this._map);
+        }
+      });
+
+      this._tileLayersVisible = true;
+    }
   }
 
 
@@ -356,7 +359,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
 
     if (_version) {
       // appends the ionic webview compatible root directory URL
-      return this.fileSystem.rootPath + this.trailGenerator.getTrailData().abbr + '/' + _version + '/tiles/{x}/{y}.png';
+      return this.fileSystem.rootPath + this.trailGenerator.getTrailData().abbr + '/' + _version + '/tiles/{z}/{x}/{y}.png';
     } else {
       return environment.onlineTileUrl;
     }
@@ -957,8 +960,9 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       this._map.stop();
 
       // show bounds (based on pois in poi list), add padding if end of trail
-      let padding = (this._visibleMiles.indexOf(0) === -1 && this._visibleMiles.indexOf(this._trailGenerator.getTrailData().miles.length - 1) === -1) ? 0 : 0.25;
+      const padding = (this._visibleMiles.indexOf(0) === -1 && this._visibleMiles.indexOf(this._trailGenerator.getTrailData().miles.length - 1) === -1) ? 0 : 0.25;
       this._map.fitBounds(_group.getBounds().pad(padding), {animate: this._animateMap, duration: 0.5, maxZoom: 16, minZoom: 13.25});
+      this._onMapZoom();
     }
   }
 
@@ -977,6 +981,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
       }
 
       this._map.panTo([point.latitude, point.longitude], {animate: _animate, duration: 0.5, maxZoom: 16, minZoom: 13.25});
+      this._onMapZoom();
     }
   }
 

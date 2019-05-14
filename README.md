@@ -6,14 +6,12 @@ BETA 2 ETA. May 15th?
 
 ----- ----- ----- ----- ----
 
-TODO: b2 (ASAP):
-- set up iOS testflight / certificates etc.
-- (sporadically) Get/set ratings sometimes turns into an infinite loop…? Old version data issue?
-- insta scroll to mile (on map) when tracking is active (now it always attempts to center user)
-- PCT towns, clickable on map
-- (wip) Android: keyboard issues (overlay form)
+TODO: b3 (ASAP):
+- (sporadically? still?) Get/set ratings sometimes turns into an infinite loop…? Old version data issue?
+- B2 bug: you need to be online when switching trails, something with loading ratings(scores) initially (set empty array?)
+- B2 bug: dialog scaling iOS, needs to have a fixed height (only on iOS)
 <br/><br/>
-TODO v1:
+TODO v1: 
 - (wip) add: PCT towns (+info and link towns to nearest trail road/trail junction)
 - (wip) add points of interest (or notes) that belong to a town instead of the trail (when near town)
 - add: compass heading, all cordova plugins seem to have android issues, iOS only?
@@ -22,13 +20,12 @@ TODO v1:
 - add: backup notes based on userID (firecloud)
 <br/><br/>
 - fix: improve elevation profile scrollbar accuracy
-- fix: back and forth between elevation profile and mile detail page results in change of current mile (scroll issue)
 - fix: different contrast settings for online/offline maps.
 - fix: downloader state (has downloaded file, but there's an update available)
 - fix: optimising (virtual list rendering), can/should be smoother
-- fix: end of trail scrolling (last 2 mile never visible on map)
 <br/><br/>
 - design: Make it look good / CSS
+- add some minor transitions (investigate most optimal, battery saving)
 - design: nightHike background image
 - design: instructions screen content
 <br/><br/>

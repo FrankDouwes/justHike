@@ -36,6 +36,9 @@
     },
     "cordova-plugin-ionic-webview": {
       "PACKAGE_NAME": "hike.frankdouwes.com"
+    },
+    "cordova-plugin-ionic-keyboard": {
+      "PACKAGE_NAME": "hike.frankdouwes.com"
     }
   },
   "dependent_plugins": {

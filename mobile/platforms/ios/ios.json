@@ -55,6 +55,10 @@
             {
               "xml": "<preference name=\"CordovaWebViewEngine\" value=\"CDVWKWebViewEngine\" />",
               "count": 1
+            },
+            {
+              "xml": "<feature name=\"Keyboard\"><param name=\"ios-package\" onload=\"true\" value=\"CDVIonicKeyboard\" /></feature>",
+              "count": 1
             }
           ],
           "/widget": [
@@ -69,7 +73,15 @@
         "parents": {
           "NSLocationWhenInUseUsageDescription": [
             {
-              "xml": "<string>Requires geolocation.</string>",
+              "xml": "<string>Used to show your location and to calculate your relative distance to points of interest.</string>",
+              "count": 1,
+              "mode": "merge",
+              "id": "config.xml"
+            }
+          ],
+          "NSLocationAlwaysUsageDescription": [
+            {
+              "xml": "<string>Used to show your location and to calculate your relative distance to points of interest.</string>",
               "count": 1,
               "mode": "merge",
               "id": "config.xml"
@@ -122,6 +134,9 @@
       "PACKAGE_NAME": "$(PRODUCT_BUNDLE_IDENTIFIER)"
     },
     "cordova-plugin-ionic-webview": {
+      "PACKAGE_NAME": "$(PRODUCT_BUNDLE_IDENTIFIER)"
+    },
+    "cordova-plugin-ionic-keyboard": {
       "PACKAGE_NAME": "$(PRODUCT_BUNDLE_IDENTIFIER)"
     }
   },
@@ -442,6 +457,14 @@
       "clobbers": [
         "cordova.exec"
       ]
+    },
+    {
+      "id": "cordova-plugin-ionic-keyboard.keyboard",
+      "file": "plugins/cordova-plugin-ionic-keyboard/www/ios/keyboard.js",
+      "pluginId": "cordova-plugin-ionic-keyboard",
+      "clobbers": [
+        "window.Keyboard"
+      ]
     }
   ],
   "plugin_metadata": {
@@ -457,6 +480,7 @@
     "cordova-plugin-zip": "3.1.0",
     "es6-promise-plugin": "4.2.2",
     "cordova-plugin-device": "2.0.2",
-    "cordova-plugin-ionic-webview": "4.0.1"
+    "cordova-plugin-ionic-webview": "4.0.1",
+    "cordova-plugin-ionic-keyboard": "2.1.3"
   }
 }

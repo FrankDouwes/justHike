@@ -46,8 +46,8 @@ export class LocationService {
     this._updateStatusLabel('idle');
 
     if (cordovaEnabled()) {
-      document.addEventListener("pause", this._onPause, false);
-      document.addEventListener("resume", this._onResume, false);
+      document.addEventListener('pause', this._onPause, false);
+      document.addEventListener('resume', this._onResume, false);
     }
   }
 

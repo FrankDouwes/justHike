@@ -21,7 +21,7 @@ export function createGPX(trailMeta: TrailMeta, flatTrailData: any): any {
   const _files: Array<any> = [];
 
   // split in 3 (Atlas generator cant handle lots of waypoints)
-  if (trailMeta.abbr !== 'DEMO') {
+  if (trailMeta.abbr !== 'DEMO' && trailMeta.abbr !== 'SHR') {
 
     const _fileLength = Math.ceil(flatTrailData.length / 3);
     const _arrays = _splitArray(flatTrailData, _fileLength);

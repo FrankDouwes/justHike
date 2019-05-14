@@ -3,17 +3,17 @@ export const environment = {
   production: true,
   simulateTouch: false,           //  simulate touch with hammerjs, production must be set to false
 
-  version: '1.0',                 // current application version that settings belong to (in case of update to settings structure)
+  version: '0.2',                 // current application version that settings belong to (in case of update to settings structure)
   betaEndTime: 1577750400000,        // the end date of the beta 31/12 TODO: BETA FLAG, remove for release
 
   // FILES
   // PRODUCTION SERVER:
-  // appDomain: 'https://storage.googleapis.com/',
-  // fileBaseUrl: 'just-hike/',
+  appDomain: 'https://storage.googleapis.com/',
+  fileBaseUrl: 'just-hike/',
 
   // TEST SERVER:
-  appDomain: 'https://hike.frankdouwes.com/',
-  fileBaseUrl: 'files/',
+  // appDomain: 'https://hike.frankdouwes.com/',
+  // fileBaseUrl: 'files/',
 
   mailto: 'https://hike.frankdouwes.com/scripts/mailto.php',       // TODO: BETA only
 
@@ -64,9 +64,9 @@ export const environment = {
     {
       abbr: 'DEMO',
       id: 0,
-      trailVersion: '1.1',
-      tilesVersion: '1.0',
-      snowVersion: '1.0',
+      trailVersion: '0.2',
+      tilesVersion: '0.2',
+      snowVersion: '0.2',
       hasTowns: true,                   // has a seperate file for towns
       length: 109.5,                    // estimated length (first section is 109.5)
       dataPath: 'DEMO/',
@@ -75,9 +75,9 @@ export const environment = {
     }, {
       abbr: 'PCT',
       id: 1,
-      trailVersion: '1.1',
-      tilesVersion: '1.0',
-      snowVersion: '1.0',
+      trailVersion: '0.2',
+      tilesVersion: '0.2',
+      snowVersion: '0.2',
       hasTowns: true,                   // has a seperate file for towns
       length: [109.5, 100, 132.5, 112.5, 111.9, 85.6, 115, 175.5, 74.4, 75.4,
         64.8, 38.3, 91.4, 132.2, 82.2, 98.5, 56.2, 63, 54.5, 74.4, 60.1, 75.9,
@@ -89,9 +89,9 @@ export const environment = {
     }, {
       abbr: 'CDT',
       id: 2,
-      trailVersion: '1.0',
-      tilesVersion: '1.0',
-      snowVersion: '1.0',
+      trailVersion: '0.2',
+      tilesVersion: '0.2',
+      snowVersion: '0.2',
       length: 3011,                    // estimated length
       dataPath: 'CDT/',
       scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
@@ -100,9 +100,9 @@ export const environment = {
     }, {
       abbr: 'AT',
       id: 3,
-      trailVersion: '1.0',
-      tilesVersion: '1.0',
-      snowVersion: '1.0',
+      trailVersion: '0.2',
+      tilesVersion: '0.2',
+      snowVersion: '0.2',
       length: 2199,                    // estimated length
       dataPath: 'AT/',
       scrollbarSegmentSize: 200,       // one scrollbar segment for every X miles
@@ -110,8 +110,8 @@ export const environment = {
     }, {
       abbr: 'SHR',
       id: 4,
-      trailVersion: '1.0',
-      tilesVersion: '1.0',
+      trailVersion: '0.2',
+      tilesVersion: '0.2',
       length: 215,                      // estimated length
       dataPath: 'SHR/',
       scrollbarSegmentSize: 100,        // one scrollbar segment for every X miles

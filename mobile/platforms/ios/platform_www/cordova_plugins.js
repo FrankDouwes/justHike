@@ -315,6 +315,14 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "clobbers": [
         "cordova.exec"
       ]
+    },
+    {
+      "id": "cordova-plugin-ionic-keyboard.keyboard",
+      "file": "plugins/cordova-plugin-ionic-keyboard/www/ios/keyboard.js",
+      "pluginId": "cordova-plugin-ionic-keyboard",
+      "clobbers": [
+        "window.Keyboard"
+      ]
     }
   ];
   module.exports.metadata = {
@@ -330,6 +338,7 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-zip": "3.1.0",
     "es6-promise-plugin": "4.2.2",
     "cordova-plugin-device": "2.0.2",
-    "cordova-plugin-ionic-webview": "4.0.1"
+    "cordova-plugin-ionic-webview": "4.0.1",
+    "cordova-plugin-ionic-keyboard": "2.1.3"
   };
 });

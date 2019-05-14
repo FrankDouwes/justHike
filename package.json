@@ -1,6 +1,6 @@
 {
   "name": "just-hike",
-  "version": "0.0.0",
+  "version": "0.2.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
