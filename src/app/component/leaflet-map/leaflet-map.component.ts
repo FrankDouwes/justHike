@@ -1057,7 +1057,7 @@ export class LeafletMapComponent extends LocationBasedComponent implements OnIni
     const _labelIcon = L.divIcon({className: 'mile-marker', html: '<div class="label">' + (mile.id - 1) + '</div>'});
     _labelElements.push(L.marker([_endPoint.latitude, _endPoint.longitude], {icon: _labelIcon, mileNumber: mile.id - 1}));
 
-    if (_markerLocation._distance > 0) {
+    if (_markerLocation.distance > 0) {
       _labelElements = _labelElements.concat(createGuide(_markerLocation.latlng, waypointToLatLng(_endPoint), true));
     }
 

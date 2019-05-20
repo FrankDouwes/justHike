@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="hike.frankdouwes.com" version="0.2.2" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="hike.frankdouwes.com" version="0.2.3" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <feature name="LocalStorage">
         <param name="ios-package" value="CDVLocalStorage" />
     </feature>
@@ -94,6 +94,13 @@
     <icon height="50" src="res/icon/ios/Icon-50.png" width="50" />
     <icon height="100" src="res/icon/ios/Icon-100.png" width="100" />
     <icon height="167" src="res/icon/ios/Icon-167.png" width="167" />
+    <icon height="1024" src="res/icon/ios/Icon-1024.png" width="1024" />
+    <icon height="196" src="res/icon/ios/Icon-196.png" width="196" />
+    <icon height="172" src="res/icon/ios/Icon-172.png" width="172" />
+    <icon height="88" src="res/icon/ios/Icon-88.png" width="88" />
+    <icon height="55" src="res/icon/ios/Icon-55.png" width="55" />
+    <icon height="48" src="res/icon/ios/Icon-48.png" width="48" />
+    <icon height="20" src="res/icon/ios/Icon-20.png" width="20" />
     <allow-intent href="itms:*" />
     <allow-intent href="itms-apps:*" />
     <splash src="res/screen/Default@2x~universal~anyany.png" />

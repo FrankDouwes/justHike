@@ -1,7 +1,7 @@
 {
     "name": "just-hike",
     "displayName": "Just Hike",
-    "version": "0.2",
+    "version": "0.2.3",
     "description": "lon distance hiking companion",
     "main": "index.js",
     "scripts": {

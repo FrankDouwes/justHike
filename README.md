@@ -2,16 +2,14 @@
 
 RELEASES:
 BETA 1 released to first group of testers on: April 10th 2019.<br/>
-BETA 2 ETA. May 15th?
+BETA 2 released on April 15th.
 
 ----- ----- ----- ----- ----
 
 TODO: b3 (ASAP):
-- (sporadically? still?) Get/set ratings sometimes turns into an infinite loop…? Old version data issue?
-- B2 bug: you need to be online when switching trails, something with loading ratings(scores) initially (set empty array?)
-- B2 bug: dialog scaling iOS, needs to have a fixed height (only on iOS)
-<br/><br/>
+<br/>
 TODO v1: 
+- iOS better dialog scaling, needs to have a fixed height (only on iOS)
 - (wip) add: PCT towns (+info and link towns to nearest trail road/trail junction)
 - (wip) add points of interest (or notes) that belong to a town instead of the trail (when near town)
 - add: compass heading, all cordova plugins seem to have android issues, iOS only?
@@ -29,7 +27,8 @@ TODO v1:
 - design: nightHike background image
 - design: instructions screen content
 <br/><br/>
-- iOS potential keyboard bug (latest iphones only? works on iPhone 8)
+- both: (sporadically? still?) Get/set ratings sometimes turns into an infinite loop…? Old version data issue?
+- iOS potential keyboard bug (latest iphones only? works on iPhone 8), is this still an issue?!
 - iOS (sporadically): (possibly related to ionic webview) - [IPC] Connection::waitForSyncReply: Timed-out while waiting for reply
 - iOS (sporadically): (possibly related to ionic webview) - [LayoutConstraints] Unable to simultaneously satisfy constraints.
 <br/><br/><br/><br/>
